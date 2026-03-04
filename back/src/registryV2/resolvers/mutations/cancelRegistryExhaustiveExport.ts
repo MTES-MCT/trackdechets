@@ -15,19 +15,26 @@ export async function cancelRegistryExhaustiveExport(
     const registryExport = await prisma.registryExhaustiveExport.findUnique({
       where: {
         id: exportId,
-        createdById: user.id,
-      },
+        createdById: user.id
+      }
     });
     if (!registryExport) {
-      throw new UserInputError(`Export de registre exhaustif "${exportId}" non trouvé`);
+      throw new UserInputError(
+        `Export de registre exhaustif "${exportId}" non trouvé`
+      );
     }
-    if (registryExport.status !== RegistryExportStatus.PENDING && registryExport.status !== RegistryExportStatus.STARTED) {
-      throw new UserInputError(`L'export de registre exhaustif "${exportId}" ne peut être annulé car il est déjà terminé`);
+    if (
+      registryExport.status !== RegistryExportStatus.PENDING &&
+      registryExport.status !== RegistryExportStatus.STARTED
+    ) {
+      throw new UserInputError(
+        `L'export de registre exhaustif "${exportId}" ne peut être annulé car il est déjà terminé`
+      );
     }
     const updatedRegistryExport = await prisma.registryExhaustiveExport.update({
       where: {
         id: exportId,
-        createdById: user.id,
+        createdById: user.id
       },
       data: {
         status: RegistryExportStatus.CANCELED
@@ -38,7 +45,9 @@ export async function cancelRegistryExhaustiveExport(
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2025") {
-        throw new UserInputError(`Export de registre exhaustif "${exportId}" non trouvé`);
+        throw new UserInputError(
+          `Export de registre exhaustif "${exportId}" non trouvé`
+        );
       }
     }
     throw new Error("Une erreur inattendue est survenue");

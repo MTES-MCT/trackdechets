@@ -573,9 +573,9 @@ export function getStatusFromStats({
 }): RegistryImportStatus {
   if (
     numberOfCancellations +
-    numberOfEdits +
-    numberOfInsertions +
-    numberOfSkipped ===
+      numberOfEdits +
+      numberOfInsertions +
+      numberOfSkipped ===
     0
   ) {
     // No data was processed. Mark the import as failed

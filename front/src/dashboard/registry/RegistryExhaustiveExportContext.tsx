@@ -74,7 +74,9 @@ export const RegistryExhaustiveExportProvider: React.FC<{
     Partial<MutationCancelRegistryExhaustiveExportArgs>
   >(CANCEL_REGISTRY_EXHAUSTIVE_EXPORT, {
     refetchQueries: [
-      asAdmin ? GET_REGISTRY_EXHAUSTIVE_EXPORTS_AS_ADMIN : GET_REGISTRY_EXHAUSTIVE_EXPORTS
+      asAdmin
+        ? GET_REGISTRY_EXHAUSTIVE_EXPORTS_AS_ADMIN
+        : GET_REGISTRY_EXHAUSTIVE_EXPORTS
     ],
     onError: () => {
       refetch();

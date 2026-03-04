@@ -16,13 +16,18 @@ export async function cancelRegistryV2Export(
       where: {
         id: exportId,
         createdById: user.id
-      },
+      }
     });
     if (!registryExport) {
       throw new UserInputError(`Export de registre "${exportId}" non trouvé`);
     }
-    if (registryExport.status !== RegistryExportStatus.PENDING && registryExport.status !== RegistryExportStatus.STARTED) {
-      throw new UserInputError(`L'export de registre "${exportId}" ne peut être annulé car il est déjà terminé`);
+    if (
+      registryExport.status !== RegistryExportStatus.PENDING &&
+      registryExport.status !== RegistryExportStatus.STARTED
+    ) {
+      throw new UserInputError(
+        `L'export de registre "${exportId}" ne peut être annulé car il est déjà terminé`
+      );
     }
     const updatedRegistryExport = await prisma.registryExport.update({
       where: {

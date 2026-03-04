@@ -47,15 +47,15 @@ type BaseRegistryExportContext = {
 
 export type RegistryExportContextType =
   | (BaseRegistryExportContext & {
-    type: "registryV2";
-    registryExports: RegistryV2Export[] | undefined;
-    cancelRegistryExport: (exportId: string) => Promise<void>;
-  })
+      type: "registryV2";
+      registryExports: RegistryV2Export[] | undefined;
+      cancelRegistryExport: (exportId: string) => Promise<void>;
+    })
   | (BaseRegistryExportContext & {
-    type: "registryExhaustive";
-    registryExports: RegistryExhaustiveExport[] | undefined;
-    cancelRegistryExport: (exportId: string) => Promise<void>;
-  });
+      type: "registryExhaustive";
+      registryExports: RegistryExhaustiveExport[] | undefined;
+      cancelRegistryExport: (exportId: string) => Promise<void>;
+    });
 
 export const RegistryV2ExportContext =
   createContext<RegistryExportContextType | null>(null);
