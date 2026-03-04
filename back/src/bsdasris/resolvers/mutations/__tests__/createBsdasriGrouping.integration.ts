@@ -238,7 +238,7 @@ describe("Mutation.createDasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée",
+          "Cette opération d'élimination / valorisation n'existe pas ou n'est pas appropriée",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

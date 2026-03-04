@@ -1422,7 +1422,7 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
       // When
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "La valeur « D9 » n'existe pas dans les options : 'D9F' | 'D10' | 'R1'"
+        "Cette opération d'élimination / valorisation n'existe pas ou n'est pas appropriée"
       );
     });
 
