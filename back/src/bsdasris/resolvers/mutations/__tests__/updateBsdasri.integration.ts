@@ -1376,7 +1376,7 @@ describe("Mutation.updateBsdasri", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
+        "Cette opération d'élimination / valorisation n'existe pas ou n'est pas appropriée"
       );
     });
 

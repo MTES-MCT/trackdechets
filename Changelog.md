@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Par défaut, afficher le composant du transporteur ouvert sur les formulaires de déclarations au registre national [PR 4677](https://github.com/MTES-MCT/trackdechets/pull/4677)
+- Ajout des codes groupement (D13 et R12) à la révision BSDASRI [PR 4688](https://github.com/MTES-MCT/trackdechets/pull/4688)
 
 #### :bug: Corrections de bugs
 
