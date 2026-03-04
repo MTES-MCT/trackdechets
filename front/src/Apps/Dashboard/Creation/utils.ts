@@ -26,6 +26,7 @@ export enum TabId {
   worker = "worker",
   transporter = "transporter",
   destination = "destination",
+  detenteur = "detenteur",
   none = "none",
   other = "other"
 }
@@ -101,6 +102,10 @@ export const getTabs = (
   if (bsdType === BsdType.Bsda) {
     return getBsdaTabs(commonsTabs, errorTabIds);
   }
+
+  if (bsdType === BsdType.Bsff) {
+    return getBsffTabs(commonsTabs, errorTabIds);
+  }
   return commonsTabs;
 };
 
@@ -142,6 +147,31 @@ const getBsdaTabs = (commonTabs, errorTabIds) => {
     }
   ];
   return bsdaTabs;
+};
+
+const getBsffTabs = (commonTabs, errorTabIds) => {
+  const bsffTabs = [
+    {
+      ...commonTabs[0] //waste
+    },
+    {
+      tabId: TabId.emitter,
+      label: "Opérateur",
+      iconId: getTabClassName(errorTabIds, "emitter")
+    },
+    {
+      tabId: TabId.detenteur,
+      label: "Détenteur",
+      iconId: getTabClassName(errorTabIds, "detenteur")
+    },
+    {
+      ...commonTabs[2] // transpoteur
+    },
+    {
+      ...commonTabs[3] // destination
+    }
+  ];
+  return bsffTabs;
 };
 
 const pathPrefixToTab = {

@@ -1,7 +1,7 @@
 import React from "react";
 
 const EmitterBsff = () => {
-  return <div>Emitter</div>;
+  return <div>Operateur</div>;
 };
 
 export default EmitterBsff;
