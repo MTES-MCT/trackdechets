@@ -541,12 +541,12 @@ function DashboardRoutes() {
             />
 
             <Route
-              path={routes.dashboard.bsffs.create}
+              path={toRelative(routes.dashboard.bsffs.create)}
               element={<FormContainer bsdTypeName={BsdTypename.Bsff} />}
             />
 
             <Route
-              path={routes.dashboard.bsffs.edit}
+              path={toRelative(routes.dashboard.bsffs.edit)}
               element={<FormContainer bsdTypeName={BsdTypename.Bsff} />}
             />
           </Routes>
