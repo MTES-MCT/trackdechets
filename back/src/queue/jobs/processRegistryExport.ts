@@ -14,7 +14,7 @@ import { format as csvFormat } from "@fast-csv/format";
 import type { DateFilter, RegistryV2ExportType } from "@td/codegen-back";
 import { Upload } from "@aws-sdk/lib-storage";
 import { UserInputError } from "../../common/errors";
-import { pipeline, Readable } from "stream";
+import { addAbortSignal, pipeline, Readable } from "stream";
 import {
   Prisma,
   RegistryExport,
@@ -148,6 +148,14 @@ async function failExport(exportId: string) {
   });
 }
 
+async function isExportCanceled(exportId: string) {
+  const registryExport = await prisma.registryExport.findUnique({
+    where: { id: exportId },
+    select: { status: true }
+  });
+  return registryExport?.status === RegistryExportStatus.CANCELED;
+}
+
 async function endExport(
   exportId: string,
   siretsEncountered: string[],
@@ -171,10 +179,17 @@ export async function processRegistryExportJob(
 ) {
   const { exportId, dateRange } = job.data;
   let upload: Upload | null = null;
+  let cancelledByUser = false;
+  let clearCancelCheck: () => void = () => {
+    /* assigned before use */
+  };
 
   try {
     const registryExport = await startExport(exportId);
     if (!registryExport) {
+      if (await isExportCanceled(exportId)) {
+        return;
+      }
       throw new UserInputError(`L'export ${exportId} est introuvable`);
     }
     const exportType = registryExport.registryType;
@@ -399,6 +414,37 @@ export async function processRegistryExportJob(
       addEncounteredSiret
     );
 
+    const abortController = new AbortController();
+    let cancelCheckIntervalId: ReturnType<typeof setInterval> | null = null;
+    const CANCEL_CHECK_INTERVAL_MS = 10000;
+
+    clearCancelCheck = () => {
+      if (cancelCheckIntervalId != null) {
+        clearInterval(cancelCheckIntervalId);
+        cancelCheckIntervalId = null;
+      }
+    };
+
+    cancelCheckIntervalId = setInterval(async () => {
+      try {
+        const row = await prisma.registryExport.findUnique({
+          where: { id: exportId },
+          select: { status: true }
+        });
+        if (row?.status === RegistryExportStatus.CANCELED) {
+          clearCancelCheck();
+          abortController.abort();
+        }
+      } catch (err) {
+        logger.warn(`Cancel check failed for export ${exportId}`, err);
+      }
+    }, CANCEL_CHECK_INTERVAL_MS);
+
+    const inputStreamWithAbort = addAbortSignal(
+      abortController.signal,
+      inputStream
+    );
+
     // handle CSV exports
     if (registryExport.format === RegistryExportFormat.CSV) {
       const csvStream = csvFormat({
@@ -411,13 +457,17 @@ export async function processRegistryExportJob(
         useLabelAsKey: true
       });
       pipeline(
-        inputStream,
+        inputStreamWithAbort,
         transformer,
         csvStream,
         outputStream,
         async error => {
+          clearCancelCheck();
           if (error) {
-            logger.info(`Error on stream for export ${exportId}`, error);
+            cancelledByUser = error?.name === "AbortError";
+            if (!cancelledByUser) {
+              logger.info(`Error on stream for export ${exportId}`, error);
+            }
             await upload?.abort();
             return;
           }
@@ -468,12 +518,17 @@ export async function processRegistryExportJob(
         logger.info(`Finished processing export ${exportId}`, { exportId });
       });
       outputStream.on("error", async error => {
+        clearCancelCheck();
         logger.info(`Error on output stream for export ${exportId}`, error);
         await upload?.abort();
       });
-      pipeline(inputStream, transformer, async error => {
+      pipeline(inputStreamWithAbort, transformer, async error => {
+        clearCancelCheck();
         if (error) {
-          logger.info(`Error on stream for export ${exportId}`, error);
+          cancelledByUser = error?.name === "AbortError";
+          if (!cancelledByUser) {
+            logger.info(`Error on stream for export ${exportId}`, error);
+          }
           await upload?.abort();
           return;
         }
@@ -484,18 +539,22 @@ export async function processRegistryExportJob(
     // we call upload.done before it's actually "done", because this call
     // actually triggers the flow (in @aws-sdk/lib-storage)
     const result = await upload.done();
+    clearCancelCheck();
     await endExport(
       exportId,
       registryExport.sirets.filter(siret => !unusedSirets.has(siret)),
       result.Key
     );
   } catch (error) {
+    clearCancelCheck();
     logger.error(`Error processing export ${exportId}`, error);
     if (upload) {
       await upload
         .abort()
-        .catch(error => logger.error("Upload cannot be aborted", error));
+        .catch(err => logger.error("Upload cannot be aborted", err));
     }
-    await failExport(exportId);
+    if (!cancelledByUser) {
+      await failExport(exportId);
+    }
   }
 }
