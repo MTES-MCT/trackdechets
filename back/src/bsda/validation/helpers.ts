@@ -146,6 +146,7 @@ export function prismaToZodBsda(bsda: PrismaBsdaForParsing): ZodBsda {
 
   return {
     ...data,
+    status: data.status,
     weightValue: data.weightValue?.toNumber(),
     destinationReceptionWeight: data.destinationReceptionWeight?.toNumber(),
     destinationReceptionRefusedWeight:

@@ -310,7 +310,7 @@ async function checkEmitterIsNotEcoOrganisme(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["emitter", "company", "siret"] as EditionRulePath,
-      message: `"L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...). Un autre champ dédié existe et doit être utilisé pour viser l'éco-organisme concerné : https://faq.trackdechets.fr/dechets-dangereux-classiques/les-eco-organismes-sur-trackdechets#ou-etre-vise-en-tant-queco-organisme",`
+      message: `L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...).`
     });
   }
 }
@@ -770,11 +770,26 @@ export const checkBsdaDestinationReceptionRefusedWeight = (
   const {
     destinationReceptionWeight,
     destinationReceptionRefusedWeight,
-    destinationReceptionAcceptationStatus
+    destinationReceptionAcceptationStatus,
+    status
   } = bsd;
 
+  // If the BSDA has already been received, don't block it
+  const postReceptionStatuses = [
+    BsdaStatus.RECEIVED,
+    BsdaStatus.PROCESSED,
+    BsdaStatus.REFUSED,
+    BsdaStatus.AWAITING_CHILD
+  ];
+  if (
+    !isDefined(destinationReceptionRefusedWeight) &&
+    postReceptionStatuses.includes(status as BsdaStatus)
+  ) {
+    return;
+  }
+
   if (!isDefined(destinationReceptionRefusedWeight)) {
-    // If status is defined, it means that the reception happened. Refused weight is required
+    // If waste acceptation status is defined, it means that the reception happened. Refused weight is required
     if (isDefined(destinationReceptionAcceptationStatus)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

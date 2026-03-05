@@ -5,19 +5,45 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2026.03.1] 10/03/2026
+
+#### :nail_care: Améliorations
+
+- Par défaut, afficher le composant du transporteur ouvert sur les formulaires de déclarations au registre national [PR 4677](https://github.com/MTES-MCT/trackdechets/pull/4677)
+- Ajout des codes groupement (D13 et R12) à la révision BSDASRI [PR 4688](https://github.com/MTES-MCT/trackdechets/pull/4688)
+
+#### :bug: Corrections de bugs
+
+- Résolution de conflits sur readableId de BSD suite [PR 4674](https://github.com/MTES-MCT/trackdechets/pull/4674)
+- Conversion des poids sur export registre BSFF en tonnes [PR 4675](https://github.com/MTES-MCT/trackdechets/pull/4675)
+- Afficher le BSPAOH dans l'onglet Pour action lorsqu'il est au statut PARTIALLY_REFUSED [PR 4676](https://github.com/MTES-MCT/trackdechets/pull/4676)
+- Remontée du message d'erreur "L'émetteur visé sur le bordereau ne peut pas être un éco-organisme." sous le company selector à la sélection d'un EO sur l'onglet Émetteur BSDA [PR 4687](https://github.com/MTES-MCT/trackdechets/pull/4687)
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de la possibilité d'annuler un export de registre en cours [PR 4696](https://github.com/MTES-MCT/trackdechets/pull/4696)
+
 # [2026.02.1] 10/02/2026
 
 ### :boom: Breaking changes
 
 - Suppression du champ `consistence` sur WasteDetails et WasteDetailsInput (BSDD). L'utilisation du champ `consistences` est maintenant obligatoire [PR 4634](https://github.com/MTES-MCT/trackdechets/pull/4634)
+- Le champ `destinationReceptionRefusedWeight` est désormais obligatoire sur le BSDA [PR 4638](https://github.com/MTES-MCT/trackdechets/pull/4638)
 
 #### :nail_care: Améliorations
 
 - Changement des règles de traçabilité DND/TEXS selon les types d'établissements [PR 4643](https://github.com/MTES-MCT/trackdechets/pull/4643)
+- Ajout du mode de traitement sur le PDF d'un BSFF [PR 4624](https://github.com/MTES-MCT/trackdechets/pull/4624)
+- Affichage des bons lots entrants dans le cadre 10 des PDFs des BSVHUs [PR 4625](https://github.com/MTES-MCT/trackdechets/pull/4625)
+- Ajout des intermédiaires au PDF du BSVHU [PR 4661](https://github.com/MTES-MCT/trackdechets/pull/4661)
+- Retrait de l'affichage du code de signature aux chauffeurs [PR 4664](https://github.com/MTES-MCT/trackdechets/pull/4664)
 
 #### :bug: Corrections de bugs
 
 - Ne pas vérifier que l'établissement Producteur est ouvert ou fermé à la création d'un BSVHU lorsque la case "Situation irrégulière" est cochée [PR 4635](https://github.com/MTES-MCT/trackdechets/pull/4635)
+- Rendre la colonne RegistryTexsAnalysisFile.s3FileKey unique pour éviter des accès non-autorisés [PR 4659](https://github.com/MTES-MCT/trackdechets/pull/4659)
+- Ajout d'un rate limiting à l'export de registre ne prenant pas en compte les paramètres [PR 4658](https://github.com/MTES-MCT/trackdechets/pull/4658)
+- Appliquer règles d'affichage de nom aux exports MyCompaniesCsv/MyCompaniesXls [PR 4657](https://github.com/MTES-MCT/trackdechets/pull/4657)
 
 #### :rocket: Nouvelles fonctionnalités
 

@@ -320,7 +320,11 @@ const WasteBsda = () => {
               fieldName="packagings"
               packagingTypes={bsdaPackagingTypes}
             />
-
+            {formState?.errors?.packagings && (
+              <p className="fr-text--sm fr-error-text fr-mb-4v">
+                {formState?.errors?.packagings?.message as string}
+              </p>
+            )}
             <h4 className="fr-h4 fr-mt-4w">Consistance</h4>
 
             <RadioButtons

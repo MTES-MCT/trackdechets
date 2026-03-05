@@ -187,6 +187,10 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
                     2720-2, 2760-2-a, 2760-2-b)
                   </li>
                   <li>
+                    Installation dans laquelle les déchets perdent leur statut
+                    de déchet
+                  </li>
+                  <li>
                     Sinon, à défaut, ils ne remontent pas dans les registres
                     réglementaires.
                   </li>

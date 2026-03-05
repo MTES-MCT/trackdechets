@@ -50,7 +50,7 @@ export const ZodOperationEnum = z
       if (issue.code === z.ZodIssueCode.invalid_enum_value) {
         return {
           message:
-            "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
+            "Cette opération d'élimination / valorisation n'existe pas ou n'est pas appropriée"
         };
       }
       return { message: ctx.defaultError };

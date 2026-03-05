@@ -1,5 +1,6 @@
 import {
   BsdaConsistence,
+  BsdaStatus,
   BsdaType,
   OperationMode,
   WasteAcceptationStatus
@@ -102,6 +103,11 @@ const rawBsdaTransporterSchema = z
   })
   .merge(rawTransporterSchema);
 
+const nullifyIfNotGathering = (val, ctx) => {
+  const type = ctx.parent?.type;
+  return type !== "GATHERING" ? null : val;
+};
+
 /**
  * Schéma de validation Zod de base permettant pour chaque champ de :
  * - définir le typage attendu
@@ -115,6 +121,7 @@ export const rawBsdaSchema = z.object({
     .string()
     .max(50)
     .default(() => getReadableId(ReadableIdPrefix.BSDA)),
+  status: z.nativeEnum(BsdaStatus).nullish(),
   // on ajoute `createdAt` au schéma de validation pour appliquer certaines
   // règles de façon contextuelles en fonction de la date de création du BSDA.
   // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
@@ -137,11 +144,31 @@ export const rawBsdaSchema = z.object({
   emitterCompanyPhone: z.string().max(250).nullish(),
   emitterCompanyMail: z.string().max(250).nullish(),
   emitterCustomInfo: z.string().max(250).nullish(),
-  emitterPickupSiteName: z.string().max(250).nullish(),
-  emitterPickupSiteAddress: z.string().max(250).nullish(),
-  emitterPickupSiteCity: z.string().max(250).nullish(),
-  emitterPickupSitePostalCode: z.string().max(250).nullish(),
-  emitterPickupSiteInfos: z.string().max(250).nullish(),
+  emitterPickupSiteName: z
+    .string()
+    .max(250)
+    .nullish()
+    .transform(nullifyIfNotGathering),
+  emitterPickupSiteAddress: z
+    .string()
+    .max(250)
+    .nullish()
+    .transform(nullifyIfNotGathering),
+  emitterPickupSiteCity: z
+    .string()
+    .max(250)
+    .nullish()
+    .transform(nullifyIfNotGathering),
+  emitterPickupSitePostalCode: z
+    .string()
+    .max(250)
+    .nullish()
+    .transform(nullifyIfNotGathering),
+  emitterPickupSiteInfos: z
+    .string()
+    .max(250)
+    .nullish()
+    .transform(nullifyIfNotGathering),
   emitterEmissionSignatureAuthor: z.string().max(250).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
   ecoOrganismeName: z.string().max(250).nullish(),

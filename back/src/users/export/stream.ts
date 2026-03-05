@@ -4,6 +4,7 @@ import { getConnection } from "../../common/pagination";
 import { prisma } from "@td/prisma";
 import { Prisma } from "@td/prisma";
 import { UserInCompany } from "./types";
+import { userNameDisplay } from "../../companies/database";
 
 export interface MyCompaniesReadersOptions extends ReadableOptions {
   read?(this: MyCompaniesReader, size: number): void;
@@ -18,6 +19,8 @@ export class MyCompaniesReader extends Readable {
 export interface MyCompaniesReaderArgs {
   companyIds: string[];
   chunk?: number;
+  requestingUserId?: string;
+  isTDAdmin?: boolean;
 }
 
 export const CompanyWithUsersInclude = {
@@ -36,7 +39,9 @@ export type CompanyWithUsers = Prisma.CompanyGetPayload<{
  */
 export function myCompaniesReader({
   companyIds,
-  chunk = 100
+  chunk = 100,
+  requestingUserId,
+  isTDAdmin
 }: MyCompaniesReaderArgs): Readable {
   const stream = new MyCompaniesReader({
     objectMode: true,
@@ -81,13 +86,21 @@ export function myCompaniesReader({
           );
           // Pousse autant d'élements dans le stream que d'utilisateurs
           // qui appartiennent à cet établissement
-          sortedAssociations.forEach(({ user, createdAt, role }) => {
+          sortedAssociations.forEach(association => {
+            const userName = userNameDisplay(
+              association,
+              requestingUserId,
+              isTDAdmin
+            );
+            const userEmail = association.user.email;
+            const userJoinedAt = association.createdAt;
+            const userRole = association.role;
             const userInCompany: UserInCompany = {
               ...company,
-              userEmail: user.email,
-              userName: user.name,
-              userJoinedAt: createdAt,
-              userRole: role
+              userEmail,
+              userName,
+              userJoinedAt,
+              userRole
             };
             this.push(userInCompany);
           });

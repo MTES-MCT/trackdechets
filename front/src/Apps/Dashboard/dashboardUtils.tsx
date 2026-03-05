@@ -48,7 +48,11 @@ import {
   bsd_sub_type_option_tournee,
   filter_bsd_status,
   filter_contact,
-  filter_contact_placeholder
+  filter_contact_placeholder,
+  filter_emitter_company_siret,
+  filter_worker_company_siret,
+  filter_transporter_company_siret,
+  filter_destination_company_siret
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
 import {
@@ -260,7 +264,11 @@ enum FilterName {
   ficheInterventionNumbers = "ficheInterventionNumbers",
   status = "status",
   cap = "cap",
-  contact = "contact"
+  contact = "contact",
+  emitterCompanySiret = "emitterCompanySiret",
+  workerCompanySiret = "workerCompanySiret",
+  transporterCompanySiret = "transporterCompanySiret",
+  destinationCompanySiret = "destinationCompanySiret"
 }
 
 export const quickFilterList: Filter[] = [
@@ -416,6 +424,30 @@ export const advancedFilterList: Filter[][] = [
       label: filter_contact,
       type: FilterType.input,
       placeholder: filter_contact_placeholder,
+      isActive: true
+    },
+    {
+      name: FilterName.emitterCompanySiret,
+      label: filter_emitter_company_siret,
+      type: FilterType.input,
+      isActive: true
+    },
+    {
+      name: FilterName.workerCompanySiret,
+      label: filter_worker_company_siret,
+      type: FilterType.input,
+      isActive: true
+    },
+    {
+      name: FilterName.transporterCompanySiret,
+      label: filter_transporter_company_siret,
+      type: FilterType.input,
+      isActive: true
+    },
+    {
+      name: FilterName.destinationCompanySiret,
+      label: filter_destination_company_siret,
+      type: FilterType.input,
       isActive: true
     }
   ]
@@ -704,6 +736,30 @@ export const filterPredicates: {
           }
         }
       ]
+    })
+  },
+  {
+    filterName: FilterName.emitterCompanySiret,
+    where: value => ({
+      emitter: { company: { siret: { _contains: value } } }
+    })
+  },
+  {
+    filterName: FilterName.workerCompanySiret,
+    where: value => ({
+      worker: { company: { siret: { _contains: value } } }
+    })
+  },
+  {
+    filterName: FilterName.transporterCompanySiret,
+    where: value => ({
+      transporter: { company: { siret: { _contains: value } } }
+    })
+  },
+  {
+    filterName: FilterName.destinationCompanySiret,
+    where: value => ({
+      destination: { company: { siret: { _contains: value } } }
     })
   }
 ];

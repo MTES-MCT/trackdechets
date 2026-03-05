@@ -4,7 +4,6 @@ import {
   TransportedWasteV2,
   AllWasteV2
 } from "@td/codegen-back";
-import Decimal from "decimal.js";
 import {
   BsffPackaging,
   BsffType,
@@ -27,6 +26,7 @@ import {
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { splitAddress } from "../common/addresses";
 import { getBsffSubType } from "../common/subTypes";
+import { kgToTonRegistryV2 } from "../common/converter";
 import {
   deleteRegistryLookup,
   generateDateInfos,
@@ -202,9 +202,7 @@ const getFinalOperationsData = (bsff: RegistryV2Bsff) => {
         destinationFinalOperationCodes.push(ope.operationCode);
 
         // conversion en tonnes
-        destinationFinalOperationWeights.push(
-          ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
-        );
+        destinationFinalOperationWeights.push(kgToTonRegistryV2(ope.quantity));
         if (ope.finalBsffPackaging.bsff.destinationCompanySiret) {
           // cela devrait tout le temps être le cas
           destinationFinalOperationCompanySirets.push(
@@ -335,9 +333,7 @@ export const toIncomingWasteV2 = (
     wasteIsDangerous: true,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsff.weightValue),
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
     initialEmitterCompanyAddress,
@@ -380,14 +376,13 @@ export const toIncomingWasteV2 = (
     destinationCompanyCity,
     destinationCompanyMail: bsff.destinationCompanyMail,
     destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: destinationReceptionWeight
-      ? new Decimal(destinationReceptionWeight)
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : destinationReceptionWeight,
-    destinationReceptionRefusedWeight,
-    destinationReceptionAcceptedWeight,
+    destinationReceptionWeight: kgToTonRegistryV2(destinationReceptionWeight),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      destinationReceptionRefusedWeight
+    ),
+    destinationReceptionAcceptedWeight: kgToTonRegistryV2(
+      destinationReceptionAcceptedWeight
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
@@ -570,9 +565,7 @@ export const toOutgoingWasteV2 = (
     wasteIsDangerous: true,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsff.weightValue),
     volume: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
@@ -707,15 +700,14 @@ export const toOutgoingWasteV2 = (
     postTempStorageDestinationCity: null,
     postTempStorageDestinationCountry: null,
     destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: destinationReceptionWeight
-      ? new Decimal(destinationReceptionWeight)
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : destinationReceptionWeight,
+    destinationReceptionWeight: kgToTonRegistryV2(destinationReceptionWeight),
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionAcceptedWeight,
-    destinationReceptionRefusedWeight,
+    destinationReceptionAcceptedWeight: kgToTonRegistryV2(
+      destinationReceptionAcceptedWeight
+    ),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      destinationReceptionRefusedWeight
+    ),
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes,
@@ -849,9 +841,7 @@ export const toTransportedWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsff.weightValue),
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: false,
@@ -982,15 +972,14 @@ export const toTransportedWasteV2 = (
     destinationDropSiteCountryCode: null,
 
     destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: destinationReceptionWeight
-      ? new Decimal(destinationReceptionWeight)
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : destinationReceptionWeight,
+    destinationReceptionWeight: kgToTonRegistryV2(destinationReceptionWeight),
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionAcceptedWeight,
-    destinationReceptionRefusedWeight,
+    destinationReceptionAcceptedWeight: kgToTonRegistryV2(
+      destinationReceptionAcceptedWeight
+    ),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      destinationReceptionRefusedWeight
+    ),
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
@@ -1112,9 +1101,7 @@ export const toAllWasteV2 = (
     wasteIsDangerous: true,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsff.weightValue),
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
     initialEmitterCompanyAddress,
@@ -1253,15 +1240,14 @@ export const toAllWasteV2 = (
     postTempStorageDestinationCity: null,
     postTempStorageDestinationCountry: null,
     destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: destinationReceptionWeight
-      ? new Decimal(destinationReceptionWeight)
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : destinationReceptionWeight,
+    destinationReceptionWeight: kgToTonRegistryV2(destinationReceptionWeight),
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionAcceptedWeight,
-    destinationReceptionRefusedWeight,
+    destinationReceptionAcceptedWeight: kgToTonRegistryV2(
+      destinationReceptionAcceptedWeight
+    ),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      destinationReceptionRefusedWeight
+    ),
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes,

@@ -144,9 +144,14 @@ const Worker = () => {
               onChange: e => {
                 setValue("worker.isDisabled", e.currentTarget.checked);
                 setValue("worker.company", null);
+                setValue("worker.company.siret", null);
+                setValue("worker.company.orgId", null);
+                setValue("worker.company.vatNumber", null);
+                setValue("worker.company.name", null);
                 setValue("worker.company.contact", null);
                 setValue("worker.company.phone", null);
                 setValue("worker.company.mail", null);
+                setValue("worker.company.address", null);
                 setValue("worker.certification", null);
               }
             }

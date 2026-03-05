@@ -1,7 +1,7 @@
 import React from "react";
 import { TransporterAccordion } from "../../../../Apps/Forms/Components/TransporterAccordion/TransporterAccordion";
 import { TransporterForm } from "./TransporterForm";
-import { TransportMode } from "@td/codegen-ui";
+import { RegistryCompanyType, TransportMode } from "@td/codegen-ui";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { formatError } from "../../builder/error";
@@ -15,7 +15,7 @@ type TransporterSelectorProps = {
 
 export const INITIAL_TRANSPORTER = {
   TransportMode: TransportMode.Road,
-  CompanyType: "ETABLISSEMENT_FR",
+  CompanyType: RegistryCompanyType.EtablissementFr,
   CompanyOrgId: "",
   RecepisseIsExempted: false,
   RecepisseNumber: "",
@@ -25,6 +25,20 @@ export const INITIAL_TRANSPORTER = {
   CompanyCity: "",
   CompanyCountryCode: ""
 };
+
+/**
+ * Returns only transporters that have at least one identifying field filled.
+ * Use this before submit so the placeholder empty slot is not sent.
+ */
+export function filterFilledTransporters<
+  T extends { CompanyOrgId?: string; CompanyName?: string }
+>(transporters: T[]): T[] {
+  return transporters.filter(
+    t =>
+      (t.CompanyOrgId?.trim()?.length ?? 0) > 0 ||
+      (t.CompanyName?.trim()?.length ?? 0) > 0
+  );
+}
 
 /**
  * Ce composant reçoit les évenements au clic sur les boutons de l'accordéon et gère :
