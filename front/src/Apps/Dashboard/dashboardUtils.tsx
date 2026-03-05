@@ -47,6 +47,8 @@ import {
   bsd_sub_type_option_temp_stored,
   bsd_sub_type_option_tournee,
   filter_bsd_status,
+  filter_contact,
+  filter_contact_placeholder,
   filter_emitter_company_siret,
   filter_worker_company_siret,
   filter_transporter_company_siret,
@@ -262,6 +264,7 @@ enum FilterName {
   ficheInterventionNumbers = "ficheInterventionNumbers",
   status = "status",
   cap = "cap",
+  contact = "contact",
   emitterCompanySiret = "emitterCompanySiret",
   workerCompanySiret = "workerCompanySiret",
   transporterCompanySiret = "transporterCompanySiret",
@@ -414,6 +417,13 @@ export const advancedFilterList: Filter[][] = [
       name: FilterName.nextDestinationSiret,
       label: filter_next_destination_siret,
       type: FilterType.input,
+      isActive: true
+    },
+    {
+      name: FilterName.contact,
+      label: filter_contact,
+      type: FilterType.input,
+      placeholder: filter_contact_placeholder,
       isActive: true
     },
     {
@@ -687,6 +697,46 @@ export const filterPredicates: {
   {
     filterName: FilterName.cap,
     where: value => ({ destination: { cap: { _match: value } } })
+  },
+  {
+    filterName: FilterName.contact,
+    where: value => ({
+      _or: [
+        { emitter: { company: { contact: { _contains: value } } } },
+        { emitter: { company: { phone: { _contains: value } } } },
+        { emitter: { company: { mail: { _contains: value } } } },
+        { worker: { company: { contact: { _contains: value } } } },
+        { worker: { company: { phone: { _contains: value } } } },
+        { worker: { company: { mail: { _contains: value } } } },
+        { transporter: { company: { contact: { _contains: value } } } },
+        { transporter: { company: { phone: { _contains: value } } } },
+        { transporter: { company: { mail: { _contains: value } } } },
+        { destination: { company: { contact: { _contains: value } } } },
+        { destination: { company: { phone: { _contains: value } } } },
+        { destination: { company: { mail: { _contains: value } } } },
+        {
+          destination: {
+            operation: {
+              nextDestination: { company: { contact: { _contains: value } } }
+            }
+          }
+        },
+        {
+          destination: {
+            operation: {
+              nextDestination: { company: { phone: { _contains: value } } }
+            }
+          }
+        },
+        {
+          destination: {
+            operation: {
+              nextDestination: { company: { mail: { _contains: value } } }
+            }
+          }
+        }
+      ]
+    })
   },
   {
     filterName: FilterName.emitterCompanySiret,

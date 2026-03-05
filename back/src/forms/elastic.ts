@@ -231,7 +231,23 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
         transporter.transporterCompanySiret,
         transporter.transporterCompanyVatNumber
       ])
-    ].filter(Boolean)
+    ].filter(Boolean),
+    // Contacts
+    destinationCompanyContact: form.recipientCompanyContact ?? "",
+    destinationCompanyPhone: form.recipientCompanyPhone ?? "",
+    destinationCompanyMail: form.recipientCompanyMail ?? "",
+    emitterCompanyContact: form.emitterCompanyContact ?? "",
+    emitterCompanyPhone: form.emitterCompanyPhone ?? "",
+    emitterCompanyMail: form.emitterCompanyMail ?? "",
+    transporterCompanyContact: transporter1?.transporterCompanyContact ?? "",
+    transporterCompanyPhone: transporter1?.transporterCompanyPhone ?? "",
+    transporterCompanyMail: transporter1?.transporterCompanyMail ?? "",
+    workerCompanyContact: "",
+    workerCompanyPhone: "",
+    workerCompanyMail: "",
+    nextDestinationCompanyContact: form.nextDestinationCompanyContact ?? "",
+    nextDestinationCompanyPhone: form.nextDestinationCompanyPhone ?? "",
+    nextDestinationCompanyMail: form.nextDestinationCompanyMail ?? ""
   };
 }
 
