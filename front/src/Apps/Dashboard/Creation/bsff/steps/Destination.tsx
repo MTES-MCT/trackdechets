@@ -118,9 +118,6 @@ const DestinationBsff = () => {
           nativeInputProps={{
             ...register("destination.cap")
           }}
-          disabled={sealedFields.includes(
-            `destination.operation.nextDestination.cap`
-          )}
           state={formState.errors.destination?.["cap"] ? "error" : "default"}
           stateRelatedMessage={formState.errors.destination?.["cap"]?.message}
         />
@@ -141,9 +138,6 @@ const DestinationBsff = () => {
           nativeSelectProps={{
             ...register("destination.plannedOperationCode")
           }}
-          disabled={sealedFields.includes(
-            "destination.operation.nextDestination.plannedOperationCode"
-          )}
         >
           <option value="">Sélectionnez une valeur</option>
 
