@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, gql } from "@apollo/client";
-import { Query, UserRole } from "@td/codegen-ui";
+import { CompanyPrivate, Query, UserRole } from "@td/codegen-ui";
 import { CompanySwitcherProps } from "./companySwitcherTypes";
 import { debounce } from "../../../../common/helper";
 import {
@@ -123,8 +123,12 @@ const CompanySwitcher = ({
     debouncedSearch({ search: "" });
   };
 
-  const displayedItem = (company, onClick?, current?) => {
-    const onKeyDown = e => {
+  const displayedItem = (
+    company: CompanyPrivate,
+    onClick?: () => void,
+    current?: boolean
+  ) => {
+    const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.keyCode === 13 && onClick) {
         onClick();
       }
@@ -214,13 +218,14 @@ const CompanySwitcher = ({
       }`}
       ref={targetRef as React.RefObject<HTMLDivElement>}
     >
-      {displayedItem(
-        defaultCompany,
-        () => {
-          if (nbOfCompanies > 1) setOpen(open => !open);
-        },
-        true
-      )}
+      {defaultCompany &&
+        displayedItem(
+          defaultCompany,
+          () => {
+            if (nbOfCompanies > 1) setOpen(open => !open);
+          },
+          true
+        )}
       <div className="company-switcher-list">
         {nbOfCompanies > 10 && (
           <div className="company-switcher-search">
