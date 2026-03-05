@@ -43,7 +43,7 @@ const EmitterBsff = () => {
   const selectedCompanyError = (company?: CompanySearchResult) => {
     if (company) {
       if (!company.isRegistered) {
-        return "Cet établissement n'est pas inscrit sur Trackdéchets. Il ne peut être visé comme émetteur sur ce bordereau.";
+        return "Cet établissement n'est pas inscrit sur Trackdéchets. Il ne peut être visé comme opérateur sur ce bordereau.";
       } else if (formState.errors?.emitter?.["company"]?.siret?.message) {
         return formState.errors?.emitter?.["company"]?.siret?.message;
       }
