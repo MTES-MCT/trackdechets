@@ -230,15 +230,19 @@ export const rebuildRegistryLookupGeneric =
     findMany
   }: {
     name: string;
-    getTotalCount: () => Promise<number>;
-    findMany: (pageSize: number, cursorId: string | null) => Promise<T[]>;
+    getTotalCount: (id?: string) => Promise<number>;
+    findMany: (
+      pageSize: number,
+      cursorId: string | null,
+      id?: string
+    ) => Promise<T[]>;
     toLookupData: (items: T[]) => Prisma.RegistryLookupUncheckedCreateInput[];
   }) =>
-  async (pageSize = 100, threads = 4) => {
+  async (pageSize = 100, threads = 4, readableOrPublicId?: string) => {
     const logger = createRegistryLogger(name);
 
     // First, get total count for progress calculation
-    const total = await getTotalCount();
+    const total = await getTotalCount(readableOrPublicId);
 
     let done = false;
     let cursorId: string | null = null;
@@ -277,7 +281,7 @@ export const rebuildRegistryLookupGeneric =
 
     while (!done) {
       // Sequential read
-      const items = await findMany(pageSize, cursorId);
+      const items = await findMany(pageSize, cursorId, readableOrPublicId);
 
       // Start the write operation
       const currentOperationId = operationId++;

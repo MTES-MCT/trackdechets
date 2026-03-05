@@ -1769,21 +1769,26 @@ export const updateRegistryLookup = async (
   });
 };
 
+const bsdaBaseWhere = {
+  isDeleted: false,
+  isDraft: false
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalBsdaForLookup>({
     name: "BSDA",
-    getTotalCount: () =>
+    getTotalCount: (id?: string) =>
       prisma.bsda.count({
         where: {
-          isDeleted: false,
-          isDraft: false
+          ...bsdaBaseWhere,
+          ...(id && { id })
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, id?: string) =>
       prisma.bsda.findMany({
         where: {
-          isDeleted: false,
-          isDraft: false
+          ...bsdaBaseWhere,
+          ...(id && { id })
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,

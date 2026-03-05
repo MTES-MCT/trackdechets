@@ -1719,25 +1719,28 @@ export const updateRegistryLookup = async (
   });
 };
 
+const bsddBaseWhere = {
+  isDeleted: false,
+  NOT: {
+    status: Status.DRAFT
+  }
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalBsddForLookup>({
     name: "BSDD",
-    getTotalCount: () =>
+    getTotalCount: (readableId?: string) =>
       prisma.form.count({
         where: {
-          isDeleted: false,
-          NOT: {
-            status: "DRAFT"
-          }
+          ...bsddBaseWhere,
+          ...(readableId && { readableId })
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, readableId?: string) =>
       prisma.form.findMany({
         where: {
-          isDeleted: false,
-          NOT: {
-            status: "DRAFT"
-          }
+          ...bsddBaseWhere,
+          ...(readableId && { readableId })
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,

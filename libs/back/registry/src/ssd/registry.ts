@@ -129,21 +129,26 @@ export const updateRegistryLookup = async (
   }
 };
 
+const ssdBaseWhere = {
+  isCancelled: false,
+  isLatest: true
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalRegistryForLookup>({
     name: "SSD",
-    getTotalCount: () =>
+    getTotalCount: (publicId?: string) =>
       prisma.registrySsd.count({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...ssdBaseWhere,
+          ...(publicId && { publicId })
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, publicId?: string) =>
       prisma.registrySsd.findMany({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...ssdBaseWhere,
+          ...(publicId && { publicId })
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,

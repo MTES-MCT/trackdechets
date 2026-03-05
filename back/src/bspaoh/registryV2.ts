@@ -800,25 +800,28 @@ export const updateRegistryLookup = async (
   });
 };
 
+const bspaohBaseWhere = {
+  isDeleted: false,
+  NOT: {
+    status: BspaohStatus.DRAFT
+  }
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalBspaohForLookup>({
     name: "BSPAOH",
-    getTotalCount: () =>
+    getTotalCount: (id?: string) =>
       prisma.bspaoh.count({
         where: {
-          isDeleted: false,
-          NOT: {
-            status: "DRAFT"
-          }
+          ...bspaohBaseWhere,
+          ...(id && { id })
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, id?: string) =>
       prisma.bspaoh.findMany({
         where: {
-          isDeleted: false,
-          NOT: {
-            status: "DRAFT"
-          }
+          ...bspaohBaseWhere,
+          ...(id && { id })
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,

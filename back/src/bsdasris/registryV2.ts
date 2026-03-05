@@ -1050,21 +1050,26 @@ export const updateRegistryLookup = async (
   });
 };
 
+const bsdasriBaseWhere = {
+  isDeleted: false,
+  isDraft: false
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalBsdasriForLookup>({
     name: "BSDASRI",
-    getTotalCount: () =>
+    getTotalCount: (id?: string) =>
       prisma.bsdasri.count({
         where: {
-          isDeleted: false,
-          isDraft: false
+          ...bsdasriBaseWhere,
+          ...(id && { id })
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, id?: string) =>
       prisma.bsdasri.findMany({
         where: {
-          isDeleted: false,
-          isDraft: false
+          ...bsdasriBaseWhere,
+          ...(id && { id })
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,

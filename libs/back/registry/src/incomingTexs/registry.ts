@@ -275,21 +275,26 @@ export const updateRegistryLookup = async (
   }
 };
 
+const incomingTexsBaseWhere = {
+  isCancelled: false,
+  isLatest: true
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalRegistryForLookup>({
     name: "INCOMING_TEXS",
-    getTotalCount: () =>
+    getTotalCount: (publicId?: string) =>
       prisma.registryIncomingTexs.count({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...incomingTexsBaseWhere,
+          ...(publicId && { publicId })
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, publicId?: string) =>
       prisma.registryIncomingTexs.findMany({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...incomingTexsBaseWhere,
+          ...(publicId && { publicId })
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,

@@ -324,21 +324,26 @@ export const updateRegistryLookup = async (
   }
 };
 
+const managedBaseWhere = {
+  isCancelled: false,
+  isLatest: true
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalRegistryForLookup>({
     name: "MANAGED",
-    getTotalCount: () =>
+    getTotalCount: (publicId?: string) =>
       prisma.registryManaged.count({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...managedBaseWhere,
+          ...(publicId && { publicId })
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, publicId?: string) =>
       prisma.registryManaged.findMany({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...managedBaseWhere,
+          ...(publicId && { publicId })
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,

@@ -315,21 +315,26 @@ export const updateRegistryLookup = async (
   }
 };
 
+const outgoingWasteBaseWhere = {
+  isCancelled: false,
+  isLatest: true
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalRegistryForLookup>({
     name: "OUTGOING_WASTE",
-    getTotalCount: () =>
+    getTotalCount: (publicId?: string) =>
       prisma.registryOutgoingWaste.count({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...outgoingWasteBaseWhere,
+          ...(publicId && { publicId })
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, publicId?: string) =>
       prisma.registryOutgoingWaste.findMany({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...outgoingWasteBaseWhere,
+          ...(publicId && { publicId })
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,
