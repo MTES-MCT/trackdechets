@@ -1,7 +1,7 @@
 import React from "react";
 
 const DetenteurBsff = () => {
-  return <div>Detenteur</div>;
+  return <div>Détenteur</div>;
 };
 
 export default DetenteurBsff;
