@@ -56,10 +56,6 @@ export default function WasteInfo({ disabled }) {
     }
   }, [values.wasteDetails?.code, setFieldValue]);
 
-  useEffect(() => {
-    setFieldValue("wasteDetails.code", "17 05 03*");
-  }, [setFieldValue]);
-
   const showDuplicateWarning = !!values.isDuplicateOf && !disabled;
 
   return (
