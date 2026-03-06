@@ -997,7 +997,7 @@ model UserAccountHash {
   createdAt    DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
   acceptedAt   DateTime? @db.Timestamptz(6)
-  expiresAt    DateTime? @db.Timestamptz(6)
+  expiresAt    DateTime  @default(dbgenerated("(now() + '7 days'::interval)")) @db.Timestamptz(6)
 
   @@index([email], map: "_UserAccountHashEmailIdx")
   @@index([companySiret], map: "_UserAccountHashCompanySiretIdx")
