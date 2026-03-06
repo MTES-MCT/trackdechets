@@ -26,8 +26,10 @@ import {
   emptyAllWasteV2
 } from "../registryV2/types";
 import {
+  checkRegistryLookupExistsForDiscovery,
   deleteRegistryLookup,
   generateDateInfos,
+  type MissingLookupEntry,
   rebuildRegistryLookupGeneric
 } from "@td/registry";
 import { logger } from "@td/logger";
@@ -807,21 +809,46 @@ const bspaohBaseWhere = {
   }
 };
 
+export const discoverMissingLookups = async (
+  items: MinimalBspaohForLookup[]
+): Promise<MissingLookupEntry[]> => {
+  const missing: MissingLookupEntry[] = [];
+  for (const bspaoh of items) {
+    const expectedLookups = bspaohToLookupCreateInputs(bspaoh);
+    for (const lookup of expectedLookups) {
+      const exists = await checkRegistryLookupExistsForDiscovery({
+        id: lookup.id,
+        exportRegistryType: lookup.exportRegistryType,
+        siret: lookup.siret
+      });
+      if (!exists) {
+        missing.push({
+          id: bspaoh.id,
+          exportRegistryType: lookup.exportRegistryType,
+          siret: lookup.siret,
+          createdAt: bspaoh.createdAt.toISOString()
+        });
+      }
+    }
+  }
+  return missing;
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalBspaohForLookup>({
     name: "BSPAOH",
-    getTotalCount: (id?: string) =>
+    getTotalCount: (ids?: string[]) =>
       prisma.bspaoh.count({
         where: {
           ...bspaohBaseWhere,
-          ...(id && { id })
+          ...(ids?.length ? { id: { in: ids } } : {})
         }
       }),
-    findMany: (pageSize, cursorId, id?: string) =>
+    findMany: (pageSize, cursorId, ids?: string[]) =>
       prisma.bspaoh.findMany({
         where: {
           ...bspaohBaseWhere,
-          ...(id && { id })
+          ...(ids?.length ? { id: { in: ids } } : {})
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,
@@ -838,7 +865,8 @@ export const rebuildRegistryLookup =
         createArray = createArray.concat(createInputs);
       }
       return createArray;
-    }
+    },
+    discoverMissingLookups
   });
 
 export const lookupUtils = {

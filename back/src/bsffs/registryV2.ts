@@ -28,8 +28,10 @@ import { splitAddress } from "../common/addresses";
 import { getBsffSubType } from "../common/subTypes";
 import { kgToTonRegistryV2 } from "../common/converter";
 import {
+  checkRegistryLookupExistsForDiscovery,
   deleteRegistryLookup,
   generateDateInfos,
+  type MissingLookupEntry,
   rebuildRegistryLookupGeneric
 } from "@td/registry";
 import { Nullable } from "../types";
@@ -1422,21 +1424,46 @@ const bsffBaseWhere = {
   isDraft: false
 };
 
+export const discoverMissingLookups = async (
+  items: MinimalBsffForLookup[]
+): Promise<MissingLookupEntry[]> => {
+  const missing: MissingLookupEntry[] = [];
+  for (const bsff of items) {
+    const expectedLookups = bsffToLookupCreateInputs(bsff);
+    for (const lookup of expectedLookups) {
+      const exists = await checkRegistryLookupExistsForDiscovery({
+        id: lookup.id,
+        exportRegistryType: lookup.exportRegistryType,
+        siret: lookup.siret
+      });
+      if (!exists) {
+        missing.push({
+          id: bsff.id,
+          exportRegistryType: lookup.exportRegistryType,
+          siret: lookup.siret,
+          createdAt: bsff.createdAt.toISOString()
+        });
+      }
+    }
+  }
+  return missing;
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalBsffForLookup>({
     name: "BSFF",
-    getTotalCount: (id?: string) =>
+    getTotalCount: (ids?: string[]) =>
       prisma.bsff.count({
         where: {
           ...bsffBaseWhere,
-          ...(id && { id })
+          ...(ids?.length ? { id: { in: ids } } : {})
         }
       }),
-    findMany: (pageSize, cursorId, id?: string) =>
+    findMany: (pageSize, cursorId, ids?: string[]) =>
       prisma.bsff.findMany({
         where: {
           ...bsffBaseWhere,
-          ...(id && { id })
+          ...(ids?.length ? { id: { in: ids } } : {})
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,
@@ -1453,7 +1480,8 @@ export const rebuildRegistryLookup =
         createArray = createArray.concat(createInputs);
       }
       return createArray;
-    }
+    },
+    discoverMissingLookups
   });
 
 export const lookupUtils = {

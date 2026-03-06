@@ -25,8 +25,10 @@ import { formToBsddV2, BsddV2 } from "./compat";
 import { getBsddSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import {
+  checkRegistryLookupExistsForDiscovery,
   deleteRegistryLookup,
   generateDateInfos,
+  type MissingLookupEntry,
   rebuildRegistryLookupGeneric
 } from "@td/registry";
 import { prisma } from "@td/prisma";
@@ -1696,6 +1698,32 @@ const bsddToLookupCreateInputs = (
   return res;
 };
 
+export const discoverMissingLookups = async (
+  items: MinimalBsddForLookup[]
+): Promise<MissingLookupEntry[]> => {
+  const missing: MissingLookupEntry[] = [];
+  for (const form of items) {
+    const expectedLookups = bsddToLookupCreateInputs(form);
+    for (const lookup of expectedLookups) {
+      const exists = await checkRegistryLookupExistsForDiscovery({
+        id: lookup.id,
+        exportRegistryType: lookup.exportRegistryType,
+        siret: lookup.siret
+      });
+      if (!exists) {
+        missing.push({
+          id: form.id,
+          readableId: form.readableId,
+          exportRegistryType: lookup.exportRegistryType,
+          siret: lookup.siret,
+          createdAt: form.createdAt.toISOString()
+        });
+      }
+    }
+  }
+  return missing;
+};
+
 export const updateRegistryLookup = async (
   form: MinimalBsddForLookup
 ): Promise<void> => {
@@ -1729,18 +1757,18 @@ const bsddBaseWhere = {
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalBsddForLookup>({
     name: "BSDD",
-    getTotalCount: (readableId?: string) =>
+    getTotalCount: (ids?: string[]) =>
       prisma.form.count({
         where: {
           ...bsddBaseWhere,
-          ...(readableId && { readableId })
+          ...(ids?.length ? { readableId: { in: ids } } : {})
         }
       }),
-    findMany: (pageSize, cursorId, readableId?: string) =>
+    findMany: (pageSize, cursorId, ids?: string[]) =>
       prisma.form.findMany({
         where: {
           ...bsddBaseWhere,
-          ...(readableId && { readableId })
+          ...(ids?.length ? { readableId: { in: ids } } : {})
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,
@@ -1757,7 +1785,8 @@ export const rebuildRegistryLookup =
         createArray = createArray.concat(createInputs);
       }
       return createArray;
-    }
+    },
+    discoverMissingLookups
   });
 
 export const lookupUtils = {

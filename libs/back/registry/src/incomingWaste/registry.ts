@@ -8,8 +8,10 @@ import {
 } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
+  checkRegistryLookupExistsForDiscovery,
   deleteRegistryLookup,
   generateDateInfos,
+  type MissingLookupEntry,
   rebuildRegistryLookupGeneric
 } from "../lookup/utils";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
@@ -290,21 +292,43 @@ const incomingWasteBaseWhere = {
   isLatest: true
 };
 
+export const discoverMissingLookups = async (
+  items: MinimalRegistryForLookup[]
+): Promise<MissingLookupEntry[]> => {
+  const missing: MissingLookupEntry[] = [];
+  for (const item of items) {
+    const exists = await checkRegistryLookupExistsForDiscovery({
+      id: item.id,
+      exportRegistryType: RegistryExportType.INCOMING,
+      siret: item.reportForCompanySiret
+    });
+    if (!exists) {
+      missing.push({
+        id: item.id,
+        publicId: item.publicId,
+        siret: item.reportForCompanySiret,
+        createdAt: item.createdAt.toISOString()
+      });
+    }
+  }
+  return missing;
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalRegistryForLookup>({
     name: "INCOMING_WASTE",
-    getTotalCount: (publicId?: string) =>
+    getTotalCount: (ids?: string[]) =>
       prisma.registryIncomingWaste.count({
         where: {
           ...incomingWasteBaseWhere,
-          ...(publicId && { publicId })
+          ...(ids?.length ? { id: { in: ids } } : {})
         }
       }),
-    findMany: (pageSize, cursorId, publicId?: string) =>
+    findMany: (pageSize, cursorId, ids?: string[]) =>
       prisma.registryIncomingWaste.findMany({
         where: {
           ...incomingWasteBaseWhere,
-          ...(publicId && { publicId })
+          ...(ids?.length ? { id: { in: ids } } : {})
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,
@@ -317,7 +341,8 @@ export const rebuildRegistryLookup =
     toLookupData: items =>
       items.map((registryIncomingWaste: MinimalRegistryForLookup) =>
         registryToLookupCreateInput(registryIncomingWaste)
-      )
+      ),
+    discoverMissingLookups
   });
 
 export const lookupUtils = {

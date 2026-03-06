@@ -8,8 +8,10 @@ import {
 } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
+  checkRegistryLookupExistsForDiscovery,
   deleteRegistryLookup,
   generateDateInfos,
+  type MissingLookupEntry,
   rebuildRegistryLookupGeneric
 } from "../lookup/utils";
 import type { ManagedWasteV2 } from "@td/codegen-back";
@@ -329,21 +331,43 @@ const managedBaseWhere = {
   isLatest: true
 };
 
+export const discoverMissingLookups = async (
+  items: MinimalRegistryForLookup[]
+): Promise<MissingLookupEntry[]> => {
+  const missing: MissingLookupEntry[] = [];
+  for (const item of items) {
+    const exists = await checkRegistryLookupExistsForDiscovery({
+      id: item.id,
+      exportRegistryType: RegistryExportType.MANAGED,
+      siret: item.reportForCompanySiret
+    });
+    if (!exists) {
+      missing.push({
+        id: item.id,
+        publicId: item.publicId,
+        siret: item.reportForCompanySiret,
+        createdAt: item.createdAt.toISOString()
+      });
+    }
+  }
+  return missing;
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalRegistryForLookup>({
     name: "MANAGED",
-    getTotalCount: (publicId?: string) =>
+    getTotalCount: (ids?: string[]) =>
       prisma.registryManaged.count({
         where: {
           ...managedBaseWhere,
-          ...(publicId && { publicId })
+          ...(ids?.length ? { id: { in: ids } } : {})
         }
       }),
-    findMany: (pageSize, cursorId, publicId?: string) =>
+    findMany: (pageSize, cursorId, ids?: string[]) =>
       prisma.registryManaged.findMany({
         where: {
           ...managedBaseWhere,
-          ...(publicId && { publicId })
+          ...(ids?.length ? { id: { in: ids } } : {})
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,
@@ -356,7 +380,8 @@ export const rebuildRegistryLookup =
     toLookupData: items =>
       items.map((registryManaged: MinimalRegistryForLookup) =>
         registryToLookupCreateInput(registryManaged)
-      )
+      ),
+    discoverMissingLookups
   });
 
 export const lookupUtils = {
