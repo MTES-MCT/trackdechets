@@ -2457,4 +2457,99 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       );
     });
   });
+
+  it("[Legacy BSDAs] should be possible to review an already received BSDA with quantityRefused = null", async () => {
+    // Given
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        status: BsdaStatus.RECEIVED,
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionRefusedWeight: null,
+        destinationReceptionWeight: 10,
+        destinationReceptionDate: new Date(),
+        destinationReceptionSignatureAuthor: "Fred"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            destination: {
+              reception: {
+                weight: 5
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+  });
+
+  it("[Legacy BSDAs] should be possible to review an already processed BSDA with quantityRefused = null", async () => {
+    // Given
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        status: BsdaStatus.PROCESSED,
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionRefusedWeight: null,
+        destinationReceptionWeight: 10,
+        destinationReceptionDate: new Date(),
+        destinationReceptionSignatureAuthor: "Fred",
+        destinationOperationCode: "R5",
+        destinationOperationMode: "RECYCLAGE",
+        destinationOperationDate: new Date(),
+        destinationOperationSignatureAuthor: "Fred",
+        destinationOperationSignatureDate: new Date()
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            destination: {
+              reception: {
+                weight: 5
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+  });
 });

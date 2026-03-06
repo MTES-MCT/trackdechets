@@ -187,7 +187,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             </div>
             <p className="mb-3">
               Nom de la personne à contacter :{" "}
-              {bsvhu?.emitter?.company?.contact}
+              {bsvhu?.destination?.company?.contact}
             </p>
           </div>
           {/* EndRecipient */}

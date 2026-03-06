@@ -41,7 +41,11 @@ async function getUsersCompanies(userIds: string[]) {
 
 async function genActiveUserAccountHashesBySiret(companySirets: string[]) {
   const userAccountHashes = await prisma.userAccountHash.findMany({
-    where: { companySiret: { in: companySirets }, acceptedAt: null }
+    where: {
+      companySiret: { in: companySirets },
+      acceptedAt: null,
+      expiresAt: { gte: new Date() }
+    }
   });
 
   return companySirets.map(siret =>

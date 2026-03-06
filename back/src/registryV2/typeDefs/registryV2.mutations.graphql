@@ -86,6 +86,11 @@ type Mutation {
     where: RegistryV2ExportWhere
   ): RegistryV2Export!
 
+  "Annule un export de registre"
+  cancelRegistryV2Export(
+    "Identifiant de l'export"
+    exportId: String!
+  ): RegistryV2Export!
   """
   Annule des déclarations au registre
   """
@@ -110,6 +115,12 @@ type Mutation {
     siret: String
     "plage de dates à exporter, une date de début est obligatoire"
     dateRange: DateFilter!
+  ): RegistryExhaustiveExport!
+
+  "Annule un export de registre exhaustif"
+  cancelRegistryExhaustiveExport(
+    "Identifiant de l'export"
+    exportId: String!
   ): RegistryExhaustiveExport!
 
   createTexsAnalysisFile(

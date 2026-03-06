@@ -1,14 +1,18 @@
 import { z } from "zod";
-import { OperationMode, BsdasriStatus, BsdasriType, Bsdasri } from "@td/prisma";
+import {
+  OperationMode,
+  BsdasriStatus,
+  BsdasriType,
+  Bsdasri,
+  prisma
+} from "@td/prisma";
 
 import { capitalize } from "../../common/strings";
 import { getOperationModes } from "@td/constants";
-
+import { ZodOperationEnum } from "./schema";
+import { isCollector, isWasteCenter } from "../../companies/validation";
 // Dasri still uses yup for main validation but migration to zod is on its way
 const ZodWasteCodeEnum = z.enum(["18 01 03*", "18 02 02*"]).nullish();
-
-const ZodOperationCodes = ["D9F", "D10", "R1"] as const;
-const ZodOperationEnum = z.enum(ZodOperationCodes).nullish();
 
 const ZodBsdasriPackagingEnum = z.enum([
   "BOITE_CARTON",
@@ -249,7 +253,7 @@ const revisionRules: RevisionRules = {
   }
 };
 
-export const checkRevisionRules = (flatContent, bsdasri: Bsdasri) => {
+export const checkRevisionRules = async (flatContent, bsdasri: Bsdasri) => {
   const { status, type } = bsdasri;
   // check if fields are editable
   const errors: string[] = [];
@@ -263,5 +267,27 @@ export const checkRevisionRules = (flatContent, bsdasri: Bsdasri) => {
     throw new Error(
       `Les champs suivants ne sont pas révisables : ${errors.join(",")}`
     );
+  }
+
+  // additional refinements depending on the BSDASRI data
+  const { destinationCompanySiret } = bsdasri;
+  if (destinationCompanySiret) {
+    const destinationCompany = await prisma.company.findUnique({
+      where: {
+        siret: destinationCompanySiret
+      }
+    });
+    if (destinationCompany) {
+      if (
+        (flatContent.destinationOperationCode === "D13" ||
+          flatContent.destinationOperationCode === "R12") &&
+        !isCollector(destinationCompany) &&
+        !isWasteCenter(destinationCompany)
+      ) {
+        throw new Error(
+          "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement ou installations de collecte (Rubrique 2710)"
+        );
+      }
+    }
   }
 };

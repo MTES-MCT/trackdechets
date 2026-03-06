@@ -27,6 +27,7 @@ import {
 import { splitAddress } from "../common/addresses";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { getBsdaSubType } from "../common/subTypes";
+import { kgToTonRegistryV2 } from "../common/converter";
 import { BsdaForElastic } from "./elastic";
 import {
   deleteRegistryLookup,
@@ -125,7 +126,7 @@ const getFinalOperationsData = (bsda: RegistryV2Bsda) => {
       destinationFinalOperationCodes.push(ope.operationCode);
       destinationFinalOperationWeights.push(
         // conversion en tonnes
-        ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
+        kgToTonRegistryV2(ope.quantity)
       );
       if (ope.finalBsda.destinationCompanySiret) {
         // cela devrait tout le temps être le cas
@@ -253,9 +254,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsda.wastePop,
     wasteIsDangerous: true,
-    weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsda.weightValue),
     quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     initialEmitterCompanyName,
@@ -331,18 +330,11 @@ export const toIncomingWasteV2 = (
     destinationCompanyMail: bsda.destinationCompanyMail,
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
-    destinationReceptionRefusedWeight: quantityRefused
-      ? quantityRefused.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
-    destinationReceptionAcceptedWeight: quantityAccepted
-      ? quantityAccepted.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(quantityRefused),
+    destinationReceptionAcceptedWeight: kgToTonRegistryV2(quantityAccepted),
     destinationReceptionWeightIsEstimate:
       bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionVolume: null,
@@ -535,9 +527,7 @@ export const toOutgoingWasteV2 = (
     wasteIsDangerous: true,
     quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsda.weightValue),
     weightIsEstimate: bsda.weightIsEstimate,
     volume: null,
     initialEmitterCompanyName,
@@ -673,21 +663,15 @@ export const toOutgoingWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate:
       bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
-      ? bsda.destinationReceptionRefusedWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionRefusedWeight
+    ),
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsda.destinationOperationCode
@@ -826,9 +810,7 @@ export const toTransportedWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsda.wastePop,
     wasteIsDangerous: true,
-    weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsda.weightValue),
     quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsda.weightIsEstimate,
@@ -960,21 +942,15 @@ export const toTransportedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate:
       bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
-      ? bsda.destinationReceptionRefusedWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionRefusedWeight
+    ),
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
@@ -1097,9 +1073,7 @@ export const toManagedWasteV2 = (
     wasteIsDangerous: true,
     quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsda.weightValue),
     weightIsEstimate: bsda.weightIsEstimate,
     volume: null,
     managingStartDate: null,
@@ -1237,21 +1211,15 @@ export const toManagedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate:
       bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
-      ? bsda.destinationReceptionRefusedWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionRefusedWeight
+    ),
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsda.destinationOperationCode
@@ -1398,9 +1366,7 @@ export const toAllWasteV2 = (
     wasteIsDangerous: true,
     quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsda.weightValue),
     weightIsEstimate: bsda.weightIsEstimate,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
@@ -1545,21 +1511,15 @@ export const toAllWasteV2 = (
     postTempStorageDestinationCountry,
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate:
       bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
-      ? bsda.destinationReceptionRefusedWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionRefusedWeight
+    ),
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsda.destinationOperationCode

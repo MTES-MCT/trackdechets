@@ -51,15 +51,17 @@ export function getGenerateRegistryV2Export({ asAdmin }: { asAdmin: boolean }) {
       );
     }
 
-    const recentExportsByUserCount = await prisma.registryExport.count({
+    const runningExportsByUserCount = await prisma.registryExport.count({
       where: {
         createdById: user.id,
-        createdAt: { gte: subMinutes(new Date(), 5) }
+        status: {
+          in: [RegistryExportStatus.PENDING, RegistryExportStatus.STARTED]
+        }
       }
     });
-    if (recentExportsByUserCount >= 10 && !(user.isAdmin && asAdmin)) {
+    if (runningExportsByUserCount >= 10 && !(user.isAdmin && asAdmin)) {
       throw new TooManyRequestsError(
-        "Vous avez déjà réalisé 10 exports dans les 5 dernières minutes. Veuillez réessayer plus tard."
+        "Vous avez déjà 10 exports en cours ou en attente de traitement. Veuillez réessayer plus tard."
       );
     }
 
