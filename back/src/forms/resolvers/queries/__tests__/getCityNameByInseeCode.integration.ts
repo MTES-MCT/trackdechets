@@ -10,7 +10,7 @@ jest.mock("axios");
 const GET_CITY_NAME_BY_INSEE_CODE = `
   query GetCityNameByInseeCode($inseeCode: String!) {
     getCityNameByInseeCode(inseeCode: $inseeCode)
-  }
+  } 
 `;
 
 describe("getCityNameByInseeCode", () => {
@@ -106,7 +106,9 @@ describe("getCityNameByInseeCode", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: expect.stringContaining("Le code INSEE doit contenir exactement 5 caractères")
+        message: expect.stringContaining(
+          "Le code INSEE doit contenir exactement 5 caractères"
+        )
       })
     ]);
   });
@@ -124,7 +126,9 @@ describe("getCityNameByInseeCode", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: expect.stringContaining("Le code INSEE doit être composé de 5 chiffres ou commencer par 2A/2B pour la Corse")
+        message: expect.stringContaining(
+          "Le code INSEE doit être composé de 5 chiffres ou commencer par 2A/2B pour la Corse"
+        )
       })
     ]);
   });

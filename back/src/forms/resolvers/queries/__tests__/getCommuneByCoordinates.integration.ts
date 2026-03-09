@@ -131,7 +131,9 @@ describe("Query.getCommuneByCoordinates", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: expect.stringContaining("La latitude doit être comprise entre -90 et 90")
+        message: expect.stringContaining(
+          "La latitude doit être comprise entre -90 et 90"
+        )
       })
     ]);
   });
@@ -149,7 +151,9 @@ describe("Query.getCommuneByCoordinates", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: expect.stringContaining("La longitude doit être comprise entre -180 et 180")
+        message: expect.stringContaining(
+          "La longitude doit être comprise entre -180 et 180"
+        )
       })
     ]);
   });
