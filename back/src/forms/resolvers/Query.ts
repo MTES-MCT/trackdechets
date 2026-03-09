@@ -5,6 +5,8 @@ import formPdf from "./queries/formPdf";
 import appendixForms from "./queries/appendixForms";
 import formsLifeCycle from "./queries/formsLifeCycle";
 import formRevisionRequests from "./queries/formRevisionRequests";
+import getCityNameByInseeCode from "./queries/getCityNameByInseeCode";
+import getCommuneByCoordinates from "./queries/getCommuneByCoordinates";
 
 export type FormQueryResolvers = Pick<
   QueryResolvers,
@@ -14,6 +16,8 @@ export type FormQueryResolvers = Pick<
   | "appendixForms"
   | "formsLifeCycle"
   | "formRevisionRequests"
+  | "getCityNameByInseeCode"
+  | "getCommuneByCoordinates"
 >;
 
 const Query: FormQueryResolvers = {
@@ -22,7 +26,9 @@ const Query: FormQueryResolvers = {
   formPdf,
   appendixForms,
   formsLifeCycle,
-  formRevisionRequests: formRevisionRequests as any
+  formRevisionRequests: formRevisionRequests as any,
+  getCityNameByInseeCode,
+  getCommuneByCoordinates
 };
 
 export default Query;
