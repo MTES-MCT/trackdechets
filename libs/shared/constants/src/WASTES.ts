@@ -5653,6 +5653,31 @@ export const INCOMING_WASTE_WASTE_CODES = BSDD_WASTE_CODES_ENUM.filter(
   code => !INCOMING_TEXS_WASTE_CODES.includes(code)
 ) as unknown as WasteCodeEnum;
 
+export const WASTE_FAMILY_CODES = [
+  { value: "1", label: "1 - amiante pur utilisé en bourrage ou en sac" },
+  {
+    value: "2",
+    label:
+      "2 - amiante mélangé dans des poudres ou des produits minéraux sans liaison forte"
+  },
+  {
+    value: "3",
+    label: "3 - amiante intégré dans des liquides ou des solutions visqueuses"
+  },
+  { value: "4", label: "4 - amiante tissé ou tressé" },
+  { value: "5", label: "5 - amiante en feuilles ou en plaques" },
+  { value: "6", label: "6 - amiante lié à des matériaux inertes" },
+  {
+    value: "7",
+    label: "7 - amiante noyé dans une résine ou une matière plastique"
+  },
+  { value: "8", label: "8 - amiante dans des matériels et équipements" },
+  {
+    value: "9",
+    label: "9 - tous les matériaux contaminés susceptibles d'émettre des fibres"
+  }
+];
+
 function flatten(wastes: readonly WasteNode[]): WasteNode[] {
   return wastes
     .reduce(

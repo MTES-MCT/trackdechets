@@ -178,6 +178,7 @@ async function getUpdateFromRevisionRequest(
 
   const result = removeEmpty({
     wasteCode: revisionRequest.wasteCode,
+    wasteFamilyCode: revisionRequest.wasteFamilyCode,
     wastePop: revisionRequest.wastePop,
     packagings: revisionRequest.packagings,
     wasteSealNumbers: revisionRequest.wasteSealNumbers,

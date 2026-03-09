@@ -36,6 +36,7 @@ const reviewFragment = gql`
       }
       waste {
         code
+        familyCode
         materialName
         pop
         sealNumbers
@@ -106,6 +107,7 @@ const reviewFragment = gql`
       }
       waste {
         code
+        familyCode
         materialName
         pop
         sealNumbers

@@ -22,6 +22,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de la possibilité d'annuler un export de registre en cours [PR 4696](https://github.com/MTES-MCT/trackdechets/pull/4696)
+- Ajouter le champs `code famille` à la révision bordereau BSDA sur la modale de révision. [PR 4634] (https://github.com/MTES-MCT/trackdechets/pull/4692)
 
 # [2026.02.1] 10/02/2026
 
