@@ -1,18 +1,25 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { FieldProps, useFormikContext } from "formik";
-import { Form, ParcelNumber } from "@td/codegen-ui";
+import { useLazyQuery } from "@apollo/client";
+import {
+  Form,
+  ParcelNumber,
+  Query,
+  QueryGetCityNameByInseeCodeArgs,
+  QueryGetCommuneByCoordinatesArgs
+} from "@td/codegen-ui";
 
 import TdSwitch from "../../../../common/components/Switch";
 import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import TagsInput from "../../../../common/components/tags-input/TagsInput";
 import {
-  fetchCityNameByInseeCode,
-  fetchCommuneByCoords
-} from "../../../../common/api/geoApi";
-import {
   FormikParcelsVisualizer,
   type ParcelFromMap
 } from "../../../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
+import {
+  GET_CITY_NAME_BY_INSEE_CODE,
+  GET_COMMUNE_BY_COORDINATES
+} from "./queries";
 
 /**
  * Split a parcel number string "prefix-section-number" (e.g. "000-AB-25")
@@ -88,6 +95,16 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
     () => Array.isArray(field.value) && field.value.length > 0
   );
 
+  const [getCityNameByInseeCode] = useLazyQuery<
+    Pick<Query, "getCityNameByInseeCode">,
+    QueryGetCityNameByInseeCodeArgs
+  >(GET_CITY_NAME_BY_INSEE_CODE);
+
+  const [getCommuneByCoordinates] = useLazyQuery<
+    Pick<Query, "getCommuneByCoordinates">,
+    QueryGetCommuneByCoordinatesArgs
+  >(GET_COMMUNE_BY_COORDINATES);
+
   function handleParcelNumberToggle() {
     if (isEnabled) {
       setFieldValue(field.name, null, false);
@@ -104,7 +121,10 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
 
       // GPS coordinate mode (non-cadastered land)
       if (parcel.x != null && parcel.y != null) {
-        const commune = await fetchCommuneByCoords(parcel.x, parcel.y);
+        const { data } = await getCommuneByCoordinates({
+          variables: { lat: parcel.x, lng: parcel.y }
+        });
+        const commune = data?.getCommuneByCoordinates;
         const newParcelNumber: ParcelNumber = {
           city: commune?.city ?? "",
           inseeCode: commune?.inseeCode,
@@ -122,7 +142,10 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
         parcel.parcelNumber
       );
 
-      const city = await fetchCityNameByInseeCode(parcel.inseeCode);
+      const { data } = await getCityNameByInseeCode({
+        variables: { inseeCode: parcel.inseeCode }
+      });
+      const city = data?.getCityNameByInseeCode ?? "";
 
       const newParcelNumber: ParcelNumber = {
         city,
@@ -134,7 +157,13 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
 
       setFieldValue(field.name, [...values, newParcelNumber], false);
     },
-    [values, field.name, setFieldValue]
+    [
+      values,
+      field.name,
+      setFieldValue,
+      getCityNameByInseeCode,
+      getCommuneByCoordinates
+    ]
   );
 
   const handleRemoveParcel = useCallback(

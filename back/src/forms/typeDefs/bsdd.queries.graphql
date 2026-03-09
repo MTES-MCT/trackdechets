@@ -227,4 +227,27 @@ type Query {
     """
     first: Int
   ): FormRevisionRequestConnection!
+
+  """
+  Récupère le nom de la ville à partir d'un code INSEE de commune.
+  Cette requête fait appel à l'API geo.api.gouv.fr en backend pour éviter
+  les problèmes de CORS.
+  """
+  getCityNameByInseeCode(
+    "Code INSEE de la commune (ex: 75056 pour Paris)"
+    inseeCode: String!
+  ): String!
+
+  """
+  Récupère les informations d'une commune à partir de ses coordonnées GPS (WGS 84).
+  Effectue un géocodage inverse via l'API geo.api.gouv.fr.
+  Retourne null si les coordonnées ne correspondent à aucune commune
+  (ex: coordonnées en dehors de la France métropolitaine/DOM-TOM).
+  """
+  getCommuneByCoordinates(
+    "Latitude (ex: 48.8566)"
+    lat: Float!
+    "Longitude (ex: 2.3522)"
+    lng: Float!
+  ): Commune
 }
