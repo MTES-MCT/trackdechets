@@ -31,7 +31,7 @@ export const getVerboseConsistence = (
   if (!consistence) {
     return "";
   }
-  return consistence === "SOLIDE" ? "Solide" : "Siquide";
+  return consistence === "SOLIDE" ? "Solide" : "Liquide";
 };
 
 export const getVerbosePaohPackagingsAcceptationStatus = (
