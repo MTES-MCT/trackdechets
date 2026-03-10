@@ -1,4 +1,9 @@
-import { CollectorType, WasteProcessorType, Company } from "@td/prisma";
+import {
+  CollectorType,
+  WasteProcessorType,
+  Company,
+  CompanyType
+} from "@td/prisma";
 
 const hasAuthorization = (requiredAuthorizations, companySubTypes): boolean => {
   const matching = requiredAuthorizations.filter(i =>
@@ -38,6 +43,10 @@ export const canProcessDangerousWaste = (company: Company): boolean => {
   return hasAuthorization(requiredAuthorizations, companySubTypes);
 };
 export const canProcessNonDangerousWaste = (company: Company): boolean => {
+  if (company.companyTypes.includes(CompanyType.DISPOSAL_FACILITY)) {
+    return true;
+  }
+
   const collectorAuthorizations = [
     CollectorType.NON_DANGEROUS_WASTES,
     CollectorType.DEEE_WASTES,
