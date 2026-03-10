@@ -565,7 +565,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             <div className="BoxCol">
               <strong>12. Installation de broyage prévisionnelle </strong>
               <p>
-                SIRET:{" "}
+                Numéro d'identification:{" "}
                 {bsvhu?.destination?.operation?.nextDestination?.company?.siret}
               </p>
               <p>
@@ -577,6 +577,18 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
                 Adresse:{" "}
                 {bsvhu?.destination?.operation?.nextDestination?.company
                   ?.address ?? ""}
+                {bsvhu?.destination?.operation?.nextDestination?.company
+                  ?.country
+                  ? `${
+                      bsvhu?.destination?.operation?.nextDestination?.company
+                        ?.address
+                        ? " ,"
+                        : ""
+                    }${
+                      bsvhu?.destination?.operation?.nextDestination?.company
+                        ?.country
+                    }`
+                  : ""}
               </p>
               <p>
                 Tel:{" "}
