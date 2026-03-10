@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Par défaut, afficher le composant du transporteur ouvert sur les formulaires de déclarations au registre national [PR 4677](https://github.com/MTES-MCT/trackdechets/pull/4677)
 - Ajout des codes groupement (D13 et R12) à la révision BSDASRI [PR 4688](https://github.com/MTES-MCT/trackdechets/pull/4688)
+- Ajout du siret de la destination ultérieure BSVHU aux exports registre et pays sur PDF [PR 4706](https://github.com/MTES-MCT/trackdechets/pull/4706)
 
 #### :bug: Corrections de bugs
 
