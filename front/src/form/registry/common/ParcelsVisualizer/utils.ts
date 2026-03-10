@@ -17,7 +17,9 @@ export const getView = (lonLat: number[], zoom: number) => {
   });
 };
 
-export const createMap = (): {
+export const createMap = (
+  target: HTMLElement | string = "parcels-map"
+): {
   map: Map;
   markerLayerId: string;
   parcelLayerId: string;
@@ -49,7 +51,7 @@ export const createMap = (): {
   const parcelLayerId = getUid(parcelLayer);
 
   const map = new Map({
-    target: "parcels-map",
+    target,
     maxTilesLoading: 5,
     layers: [
       new LayerWMS({
@@ -267,6 +269,8 @@ export const addParcelToMap = async (
         VectorSource<Geometry>
       >;
       if (parcelLayer) {
+        // Always clear previous features before adding a new one
+        parcelLayer.getSource().clear();
         const feature = new Feature(res.geometry);
         const featureId = getUid(feature);
         parcelLayer.getSource().addFeature(feature);

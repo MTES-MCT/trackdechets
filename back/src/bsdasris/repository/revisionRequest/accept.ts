@@ -19,6 +19,7 @@ import { operationHook } from "../../operationHook";
 import { isFinalOperationCode } from "../../../common/operationCodes";
 import type { BsdasriPackaging } from "@td/codegen-back";
 import { computeTotalVolume } from "../../converter";
+import { DASRI_GROUPING_OPERATIONS_CODES } from "@td/constants";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -162,7 +163,11 @@ async function getUpdateFromRevisionRequest(
     where: { id: revisionRequest.bsdasriId },
     select: { status: true }
   });
-  const newStatus = getNewStatus(currentStatus, revisionRequest.isCanceled);
+  const newStatus = getNewStatus(
+    currentStatus,
+    revisionRequest.destinationOperationCode,
+    revisionRequest.isCanceled
+  );
 
   const result = removeEmpty({
     wasteCode: revisionRequest.wasteCode,
@@ -198,7 +203,7 @@ async function getUpdateFromRevisionRequest(
 
 function getNewStatus(
   status: BsdasriStatus,
-  // newOperationCode: string | null,
+  newOperationCode: string | null,
   isCanceled = false
 ): BsdasriStatus {
   if (isCanceled) {
@@ -209,6 +214,22 @@ function getNewStatus(
     }
 
     return BsdasriStatus.CANCELED;
+  }
+
+  if (
+    status === BsdasriStatus.PROCESSED &&
+    newOperationCode &&
+    DASRI_GROUPING_OPERATIONS_CODES.includes(newOperationCode)
+  ) {
+    return BsdasriStatus.AWAITING_GROUP;
+  }
+
+  if (
+    status === BsdasriStatus.AWAITING_GROUP &&
+    newOperationCode &&
+    !DASRI_GROUPING_OPERATIONS_CODES.includes(newOperationCode)
+  ) {
+    return BsdasriStatus.PROCESSED;
   }
 
   return status;

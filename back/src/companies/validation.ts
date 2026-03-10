@@ -39,6 +39,10 @@ export function isWasteCenter(company: Company) {
   return company.companyTypes.includes(CompanyType.WASTE_CENTER);
 }
 
+export function isDisposalFacility(company: Company) {
+  return company.companyTypes.includes(CompanyType.DISPOSAL_FACILITY);
+}
+
 export function isWasteVehicles(company: Company) {
   return company.companyTypes.includes(CompanyType.WASTE_VEHICLES);
 }

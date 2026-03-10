@@ -98,7 +98,7 @@ const CompanySelectorItem = ({
               rel="noopener noreferrer"
               className="fr-link force-external-link-content force-underline-link"
             >
-              Lien vers la page entreprise
+              Lien vers la page établissement
             </a>
           </div>
         </div>

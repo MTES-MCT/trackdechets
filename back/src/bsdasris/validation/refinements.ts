@@ -42,7 +42,7 @@ export const validateDestinationOperationCode: (
           fatal: true,
           path: ["destination", "operation", "code"],
           message:
-            "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
+            "Cette opération d'élimination / valorisation n'existe pas ou n'est pas appropriée"
         });
       }
     }

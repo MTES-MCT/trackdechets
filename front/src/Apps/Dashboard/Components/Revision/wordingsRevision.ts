@@ -31,6 +31,8 @@ export const TITLE_REQUEST_LIST = "Demander une révision du ";
 export const DENOMINATION_USUELLE = "Dénomination usuelle du déchet";
 export const NOUVELLE_DENOMINATION_USUELLE =
   "Nouvelle dénomination usuelle du déchet";
+export const CODE_FAMILLE = "Code famille";
+export const NOUVEAU_CODE_FAMILLE = "Nouvelle valeur du code famille";
 export const NOUVEAU_POIDS_EN_TONNES = "Nouveau poids en tonnes";
 export const CODE_TRAITEMENT = "Code de traitement D/R";
 export const NOUVEAU_CODE_TRAITEMENT = "Nouvelle valeur du code de traitement";

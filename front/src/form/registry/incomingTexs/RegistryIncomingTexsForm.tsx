@@ -16,6 +16,10 @@ import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
 import { FormTransporter } from "../builder/types";
 import {
+  filterFilledTransporters,
+  INITIAL_TRANSPORTER
+} from "../common/TransporterSelector/TransporterSelector";
+import {
   handleServerError,
   isoDateToHtmlDate,
   schemaFromShape,
@@ -61,7 +65,11 @@ const DEFAULT_VALUES: Partial<FormValues> = {
   destinationParcelNumbers: [],
   destinationParcelCoordinates: [],
   initialEmitterMunicipalitiesInseeCodes: [],
-  transporter: []
+  transporter: [
+    {
+      ...INITIAL_TRANSPORTER
+    }
+  ]
 };
 
 const getInitialDisabledFields = (values: {
@@ -234,6 +242,11 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
       setDisabledFieldNames(prev =>
         prev.filter(field => field !== "transporter")
       );
+      methods.setValue("transporter", [
+        {
+          ...INITIAL_TRANSPORTER
+        }
+      ]);
     }
   }, [isDirectSupply, methods]);
 
@@ -267,10 +280,11 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
 
   async function onSubmit(data: FormValues) {
     const { transporter, ...rest } = data;
+    const transportersToSubmit = filterFilledTransporters(transporter);
     // Flatten transporter array back into individual fields
     const flattenedData = {
       ...rest,
-      ...transporter.reduce(
+      ...transportersToSubmit.reduce(
         (acc, t, index) => ({
           ...acc,
           [`transporter${index + 1}TransportMode`]: t.TransportMode,

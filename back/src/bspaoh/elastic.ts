@@ -106,7 +106,8 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
       break;
     }
 
-    case BspaohStatus.RECEIVED: {
+    case BspaohStatus.RECEIVED:
+    case BspaohStatus.PARTIALLY_REFUSED: {
       setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
       break;
     }
@@ -252,7 +253,23 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
         transporter?.transporterCompanyVatNumber,
         bspaoh.destinationCompanySiret
       ].filter(Boolean)
-    )
+    ),
+    // Contacts
+    destinationCompanyContact: bspaoh.destinationCompanyContact ?? "",
+    destinationCompanyPhone: bspaoh.destinationCompanyPhone ?? "",
+    destinationCompanyMail: bspaoh.destinationCompanyMail ?? "",
+    emitterCompanyContact: bspaoh.emitterCompanyContact ?? "",
+    emitterCompanyPhone: bspaoh.emitterCompanyPhone ?? "",
+    emitterCompanyMail: bspaoh.emitterCompanyMail ?? "",
+    transporterCompanyContact: transporter?.transporterCompanyContact ?? "",
+    transporterCompanyPhone: transporter?.transporterCompanyPhone ?? "",
+    transporterCompanyMail: transporter?.transporterCompanyMail ?? "",
+    workerCompanyContact: "",
+    workerCompanyPhone: "",
+    workerCompanyMail: "",
+    nextDestinationCompanyContact: "",
+    nextDestinationCompanyPhone: "",
+    nextDestinationCompanyMail: ""
   };
 }
 

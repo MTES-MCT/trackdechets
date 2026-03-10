@@ -2498,6 +2498,78 @@ describe("Mutation.updateForm", () => {
     expect(bsdSuite?.isDeleted).toBe(true);
   });
 
+  it("should re-create BSD suite when re-adding temp storage after removal (unique readableId conflict)", async () => {
+    // Given: form with temp storage, then temp storage is removed (suite is soft-deleted but row still exists with readableId "X-suite")
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const form = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
+      }
+    });
+
+    const suiteReadableId = `${form.readableId}-suite`;
+    const existingSuite = await prisma.form.findUnique({
+      where: { readableId: suiteReadableId }
+    });
+    expect(existingSuite).not.toBeNull();
+
+    // Remove temp storage (disconnect + soft-delete suite)
+    await makeClient(user).mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: { id: form.id, temporaryStorageDetail: null }
+      }
+    });
+
+    const bsdAfterRemoval = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(bsdAfterRemoval.forwardedInId).toBe(null);
+
+    const softDeletedSuite = await prisma.form.findFirst({
+      where: { readableId: suiteReadableId }
+    });
+    expect(softDeletedSuite?.isDeleted).toBe(true);
+
+    // When: re-add temp storage (creates new forwardedIn with same readableId "X-suite" -> triggers unique retry: rename old row then retry)
+    const { data } = await makeClient(user).mutate<
+      Pick<Mutation, "updateForm">
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          recipient: { isTempStorage: true }
+        }
+      }
+    });
+
+    // Then: update succeeds, new BSD suite has readableId "X-suite"
+    expect(data.updateForm).toBeDefined();
+
+    const formWithNewSuite = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+    expect(formWithNewSuite.recipientIsTempStorage).toBe(true);
+    expect(formWithNewSuite.forwardedIn).not.toBeNull();
+    expect(formWithNewSuite.forwardedIn!.readableId).toBe(suiteReadableId);
+
+    // Old suite row was renamed (readableId now ends with a suffix)
+    const renamedOldSuite = await prisma.form.findFirst({
+      where: {
+        readableId: { startsWith: `${suiteReadableId}-` },
+        isDeleted: true
+      }
+    });
+    expect(renamedOldSuite).not.toBeNull();
+  });
+
   it("should remove a temporary storage, even if BSD was created by transporter", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");

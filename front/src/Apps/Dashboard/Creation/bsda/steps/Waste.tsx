@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
-import { BSDA_WASTE_CODES, pluralize } from "@td/constants";
+import { BSDA_WASTE_CODES, pluralize, WASTE_FAMILY_CODES } from "@td/constants";
 import {
   BsdaConsistence,
   BsdaType,
@@ -209,30 +209,11 @@ const WasteBsda = () => {
               disabled={sealedFields.includes(`waste.familyCode`)}
             >
               <option value="">Sélectionnez une valeur</option>
-              <option value="1">
-                1 - amiante pur utilisé en bourrage ou en sac
-              </option>
-              <option value="2">
-                2 - amiante mélangé dans des poudres ou des produits minéraux
-                sans liaison forte
-              </option>
-              <option value="3">
-                3 - amiante intégré dans des liquides ou des solutions
-                visqueuses
-              </option>
-              <option value="4">4 - amiante tissé ou tressé</option>
-              <option value="5">5 - amiante en feuilles ou en plaques</option>
-              <option value="6">6 - amiante lié à des matériaux inertes</option>
-              <option value="7">
-                7 - amiante noyé dans une résine ou une matière plastique
-              </option>
-              <option value="8">
-                8 - amiante dans des matériels et équipements
-              </option>
-              <option value="9">
-                9 - tous les matériaux contaminés susceptibles d'émettre des
-                fibres
-              </option>
+              {WASTE_FAMILY_CODES.map(item => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
             </Select>
 
             <Input
