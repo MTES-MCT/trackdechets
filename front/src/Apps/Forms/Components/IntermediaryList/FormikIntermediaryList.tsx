@@ -1,6 +1,6 @@
 import React from "react";
 import { FieldArray, useFormikContext } from "formik";
-import { CompanyInput } from "@td/codegen-ui";
+import { BsdType, CompanyInput } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../common/data/initialState";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import CompanySelectorWrapper, {
@@ -10,11 +10,13 @@ import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 
 type FormikIntermediaryListProps = {
   // SIRET de l'établissement courant
+  bsdType:BsdType
   siret?: string;
   disabled: boolean;
 };
 
 function FormikIntermediaryList({
+  bsdType = BsdType.Bsdd,
   siret,
   disabled
 }: FormikIntermediaryListProps) {
@@ -92,7 +94,7 @@ function FormikIntermediaryList({
                   <hr />
                 </div>
               ))}
-              {values.intermediaries.length < 5 && (
+              {(bsdType === BsdType.Bsdd ? values.intermediaries.length < 5 : values.intermediaries.length < 3) && (
                 // Pas plus de cinq intermédiaires
                 <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
                   <button

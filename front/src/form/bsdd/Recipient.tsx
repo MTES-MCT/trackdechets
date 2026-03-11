@@ -143,7 +143,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           siret={siret}
           disabled={disabled}
         />
-        <FormikIntermediaryList siret={siret} disabled={disabled} />
+        <FormikIntermediaryList siret={siret} disabled={disabled} bsdType={BsdType.Bsdd} />
       </div>
     </>
   );

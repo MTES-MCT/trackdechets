@@ -89,7 +89,7 @@ export default function Destination({ status, stepName, disabled = false }) {
               siret={siret}
               disabled={disabled}
             />
-            <FormikIntermediaryList siret={siret} disabled={disabled} />
+            <FormikIntermediaryList siret={siret} disabled={disabled} bsdType={BsdType.Bsdasri} />
           </div>
         </>
       )}
