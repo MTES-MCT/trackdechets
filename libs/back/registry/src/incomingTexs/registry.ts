@@ -7,8 +7,10 @@ import {
 } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
+  checkRegistryLookupExistsForDiscovery,
   deleteRegistryLookup,
   generateDateInfos,
+  type MissingLookupEntry,
   rebuildRegistryLookupGeneric
 } from "../lookup/utils";
 import type { IncomingWasteV2 } from "@td/codegen-back";
@@ -275,21 +277,48 @@ export const updateRegistryLookup = async (
   }
 };
 
+const incomingTexsBaseWhere = {
+  isCancelled: false,
+  isLatest: true
+};
+
+export const discoverMissingLookups = async (
+  items: MinimalRegistryForLookup[]
+): Promise<MissingLookupEntry[]> => {
+  const missing: MissingLookupEntry[] = [];
+  for (const item of items) {
+    const exists = await checkRegistryLookupExistsForDiscovery({
+      id: item.id,
+      exportRegistryType: RegistryExportType.INCOMING,
+      siret: item.reportForCompanySiret
+    });
+    if (!exists) {
+      missing.push({
+        id: item.id,
+        publicId: item.publicId,
+        siret: item.reportForCompanySiret,
+        createdAt: item.createdAt.toISOString()
+      });
+    }
+  }
+  return missing;
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalRegistryForLookup>({
     name: "INCOMING_TEXS",
-    getTotalCount: () =>
+    getTotalCount: (ids?: string[]) =>
       prisma.registryIncomingTexs.count({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...incomingTexsBaseWhere,
+          ...(ids?.length ? { id: { in: ids } } : {})
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, ids?: string[]) =>
       prisma.registryIncomingTexs.findMany({
         where: {
-          isCancelled: false,
-          isLatest: true
+          ...incomingTexsBaseWhere,
+          ...(ids?.length ? { id: { in: ids } } : {})
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,
@@ -302,7 +331,8 @@ export const rebuildRegistryLookup =
     toLookupData: items =>
       items.map((registryIncomingTexs: MinimalRegistryForLookup) =>
         registryToLookupCreateInput(registryIncomingTexs)
-      )
+      ),
+    discoverMissingLookups
   });
 
 export const lookupUtils = {
