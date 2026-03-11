@@ -34,6 +34,7 @@ import {
   validateReceptionOperationCode
 } from "./refinements";
 import {
+  emptyPickupSiteDependingOnType,
   fillIntermediariesOrgIds,
   fillWasteConsistenceWhenForwarding,
   emptyWorkerCertificationWhenWorkerIsDisabled,
@@ -103,11 +104,6 @@ const rawBsdaTransporterSchema = z
   })
   .merge(rawTransporterSchema);
 
-const nullifyIfNotGathering = (val, ctx) => {
-  const type = ctx.parent?.type;
-  return type !== "GATHERING" ? null : val;
-};
-
 /**
  * Schéma de validation Zod de base permettant pour chaque champ de :
  * - définir le typage attendu
@@ -144,31 +140,11 @@ export const rawBsdaSchema = z.object({
   emitterCompanyPhone: z.string().max(250).nullish(),
   emitterCompanyMail: z.string().max(250).nullish(),
   emitterCustomInfo: z.string().max(250).nullish(),
-  emitterPickupSiteName: z
-    .string()
-    .max(250)
-    .nullish()
-    .transform(nullifyIfNotGathering),
-  emitterPickupSiteAddress: z
-    .string()
-    .max(250)
-    .nullish()
-    .transform(nullifyIfNotGathering),
-  emitterPickupSiteCity: z
-    .string()
-    .max(250)
-    .nullish()
-    .transform(nullifyIfNotGathering),
-  emitterPickupSitePostalCode: z
-    .string()
-    .max(250)
-    .nullish()
-    .transform(nullifyIfNotGathering),
-  emitterPickupSiteInfos: z
-    .string()
-    .max(250)
-    .nullish()
-    .transform(nullifyIfNotGathering),
+  emitterPickupSiteName: z.string().max(250).nullish(),
+  emitterPickupSiteAddress: z.string().max(250).nullish(),
+  emitterPickupSiteCity: z.string().max(250).nullish(),
+  emitterPickupSitePostalCode: z.string().max(250).nullish(),
+  emitterPickupSiteInfos: z.string().max(250).nullish(),
   emitterEmissionSignatureAuthor: z.string().max(250).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
   ecoOrganismeName: z.string().max(250).nullish(),
@@ -353,6 +329,7 @@ export const refinedSchema = rawBsdaSchema
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
 const transformedSyncSchema = refinedSchema
+  .transform(emptyPickupSiteDependingOnType)
   // FIXME le calcul du champ dénormalisé `intermediariesOrgIds`
   // devrait se faire dans le repository pour s'assurer que les données restent synchro
   .transform(fillIntermediariesOrgIds)
