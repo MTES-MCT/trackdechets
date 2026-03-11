@@ -24,7 +24,8 @@ export default function FormContainer() {
             // emitter can still update any field after his own signature
             const disabledAfterEmission =
               (emitterSigned && !isEmitter) || transporterSigned;
-
+            const operationSigned =
+              bsff?.destination?.reception?.signature?.author != null;
             return (
               <>
                 <StepContainer
@@ -49,7 +50,7 @@ export default function FormContainer() {
                 <StepContainer
                   component={Recipient}
                   title="Destination du déchet"
-                  disabled={disabledAfterEmission}
+                  disabled={operationSigned}
                 />
               </>
             );

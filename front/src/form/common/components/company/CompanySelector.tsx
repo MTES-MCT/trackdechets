@@ -63,6 +63,7 @@ interface CompanySelectorProps {
   registeredOnlyCompanies?: boolean;
   heading?: string;
   disabled?: boolean;
+  contactFieldsDisabled?: boolean;
   optionalMail?: boolean;
   skipFavorite?: boolean;
   isBsdaTransporter?: boolean;
@@ -79,6 +80,7 @@ export default function CompanySelector({
   registeredOnlyCompanies = false,
   heading,
   disabled,
+  contactFieldsDisabled,
   optionalMail = false,
   skipFavorite = false,
   isBsdaTransporter = false,
@@ -585,7 +587,7 @@ export default function CompanySelector({
               name={`${field.name}.contact`}
               placeholder="NOM Prénom"
               className="td-input"
-              disabled={disabled}
+              disabled={contactFieldsDisabled}
             />
           </label>
           <RedErrorMessage name={`${field.name}.contact`} />
@@ -598,7 +600,7 @@ export default function CompanySelector({
               name={`${field.name}.phone`}
               placeholder="Numéro"
               className={`td-input ${styles.companySelectorSearchPhone}`}
-              disabled={disabled}
+              disabled={contactFieldsDisabled}
             />
           </label>
 
@@ -611,7 +613,7 @@ export default function CompanySelector({
               type="email"
               name={`${field.name}.mail`}
               className={`td-input ${styles.companySelectorSearchEmail}`}
-              disabled={disabled}
+              disabled={contactFieldsDisabled}
             />
           </label>
 

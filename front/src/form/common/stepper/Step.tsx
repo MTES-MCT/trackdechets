@@ -7,6 +7,7 @@ export interface IStepContainerProps {
   children?: JSX.Element;
   title: string;
   disabled?: boolean;
+  contactFieldsDisabled?: boolean;
   status?: string;
   stepName?: string;
   form?: Form | undefined;
@@ -15,6 +16,7 @@ export function StepContainer(props: IStepContainerProps) {
   return props.component
     ? createElement(props.component, {
         disabled: props.disabled,
+        contactFieldsDisabled: props.contactFieldsDisabled,
         status: props.status,
         stepName: props.stepName,
         form: props.form
