@@ -2694,9 +2694,9 @@ export async function validateIntermediaries(
     );
   }
 
-  if (intermediaries.length > 3) {
+  if (intermediaries.length > 5) {
     throw new UserInputError(
-      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires"
+      "Intermédiaires: impossible d'ajouter plus de 5 intermédiaires"
     );
   }
 
