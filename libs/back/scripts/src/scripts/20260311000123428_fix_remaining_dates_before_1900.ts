@@ -202,7 +202,9 @@ export async function run(tx: Prisma.TransactionClient) {
     }
 
     cleanup();
-    logger.info(`✅ Completed: Fixed ${totalUpdated} remaining problematic dates`);
+    logger.info(
+      `✅ Completed: Fixed ${totalUpdated} remaining problematic dates`
+    );
     logger.info(`📄 Traceability CSV file saved to: ${CSV_FILE_PATH}`);
   } catch (error) {
     cleanup();
