@@ -54,10 +54,10 @@ describe("BSDA parsing", () => {
       expect(parsed).toBeDefined();
     });
 
-    test("when type is not GATHERING, pickup site fields are nullified globally", () => {
+    test("when type is GATHERING, pickup site fields are nullified", () => {
       const data: ZodBsda = {
         ...bsda,
-        type: BsdaType.OTHER_COLLECTIONS,
+        type: BsdaType.GATHERING,
         emitterPickupSiteName: "Pickup site",
         emitterPickupSiteAddress: "Pickup site address",
         emitterPickupSiteCity: "Pickup site city",
