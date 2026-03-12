@@ -16,7 +16,7 @@ import FormikBroker from "../../Apps/Forms/Components/Broker/FormikBroker";
 import FormikTrader from "../../Apps/Forms/Components/Trader/FormikTrader";
 import FormikIntermediaryList from "../../Apps/Forms/Components/IntermediaryList/FormikIntermediaryList";
 
-export default function Recipient({ disabled }) {
+export default function Recipient({ disabled, intermediariesDisabled }) {
   const { siret } = useParams<{ siret: string }>();
 
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -143,7 +143,10 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           siret={siret}
           disabled={disabled}
         />
-        <FormikIntermediaryList siret={siret} disabled={disabled} />
+        <FormikIntermediaryList
+          siret={siret}
+          disabled={intermediariesDisabled}
+        />
       </div>
     </>
   );

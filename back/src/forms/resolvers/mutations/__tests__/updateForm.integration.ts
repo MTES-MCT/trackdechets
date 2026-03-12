@@ -293,7 +293,7 @@ describe("Mutation.updateForm", () => {
     expect(errors).toBeUndefined();
   });
 
-  it("should not be possible to update intermediaries when emitter has signed", async () => {
+  it("should not be possible to update intermediaries when form is RECEIVED", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const destination = await userWithCompanyFactory("ADMIN", {
       companyTypes: [CompanyType.WASTEPROCESSOR],
@@ -304,10 +304,11 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
-        status: "SIGNED_BY_PRODUCER",
+        status: "RECEIVED",
         emitterCompanySiret: emitter.company.siret,
         recipientCompanySiret: destination.company.siret,
         emittedAt: new Date(),
+        receivedAt: new Date(),
         intermediaries: { create: toIntermediaryCompany(intermediary1) }
       }
     });
