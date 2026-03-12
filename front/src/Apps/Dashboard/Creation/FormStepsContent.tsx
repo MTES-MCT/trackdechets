@@ -24,10 +24,10 @@ interface FormStepsContentProps {
   draftCtaLabel: string;
   mainCtaLabel: string;
   tabsContent: {
-    waste: React.JSX.Element;
-    emitter: React.JSX.Element;
-    transporter: React.JSX.Element;
-    destination: React.JSX.Element;
+    waste?: React.JSX.Element;
+    emitter?: React.JSX.Element;
+    transporter?: React.JSX.Element;
+    destination?: React.JSX.Element;
   };
   setPublishErrors: (normalizedErrors: NormalizedError[]) => void;
   errorTabIds?: TabId[];

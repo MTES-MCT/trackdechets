@@ -17,7 +17,6 @@ import CompaniesRoutes from "../../../Companies/CompaniesRoutes";
 import RegistryRoutes from "../../../../dashboard/registry/RegistryRoutes";
 import Account from "../../../Account/Account";
 import FormContainer from "../../../../form/bsdd/FormContainer";
-import BsffFormContainer from "../../../../form/bsff/FormContainer";
 import BsdasriFormContainer from "../../../../form/bsdasri/FormContainer";
 import WasteSelector from "../../../../login/WasteSelector";
 import Invite from "../../../../login/Invite";
@@ -154,24 +153,6 @@ export default function LayoutContainer() {
             element={
               <RequireAuth>
                 <FormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboard.bsffs.create}
-            element={
-              <RequireAuth>
-                <BsffFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboard.bsffs.edit}
-            element={
-              <RequireAuth>
-                <BsffFormContainer />
               </RequireAuth>
             }
           />
