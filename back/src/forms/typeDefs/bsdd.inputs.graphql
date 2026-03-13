@@ -64,6 +64,11 @@ input SignTransportFormInput {
 
   "Le mode de transport utilisé par le transporteur"
   transporterTransportMode: TransportMode
+
+  "Coordonnées de l'entreprise de transport (contact, mail, téléphone)"
+  transporterCompanyContact: String
+  transporterCompanyMail: String
+  transporterCompanyPhone: String
 }
 
 "Payload de signature d'un BSD par un transporteur"

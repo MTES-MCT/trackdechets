@@ -156,6 +156,21 @@ const signTransportFn = async (
           transporterTransportMode: args.input.transporterTransportMode
         }
       : {}),
+    ...(args.input.transporterCompanyContact
+      ? {
+          transporterCompanyContact: args.input.transporterCompanyContact
+        }
+      : {}),
+    ...(args.input.transporterCompanyMail
+      ? {
+          transporterCompanyMail: args.input.transporterCompanyMail
+        }
+      : {}),
+    ...(args.input.transporterCompanyPhone
+      ? {
+          transporterCompanyPhone: args.input.transporterCompanyPhone
+        }
+      : {}),
     ...receiptFields
   };
 
