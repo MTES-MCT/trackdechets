@@ -266,7 +266,8 @@ function getSchema(packaging: BsffPackaging) {
 function getSignatureType(packaging: BsffPackaging): BsffSignatureType | null {
   if (
     packaging?.operation?.signature?.date ||
-    packaging?.acceptation?.status === WasteAcceptationStatus.Refused
+    (!!packaging.acceptation?.signature?.date &&
+      packaging?.acceptation?.status === WasteAcceptationStatus.Refused)
   ) {
     return null;
   }
