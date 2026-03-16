@@ -17,6 +17,7 @@ import type {
 import { prisma } from "@td/prisma";
 import {
   UserWithCompany,
+  companyFactory,
   transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -39,6 +40,18 @@ import {
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { getTransportersSync } from "../../../database";
 import { UPDATE_BSFF } from "./updateBsff.integration";
+
+// Mock searchCompany for dormant/closed company tests.
+// The mock defaults to jest.fn() (returns undefined), which makes
+// searchCompanyFailFast return null, effectively skipping sirenify.
+jest.mock("../../../../companies/search", () => ({
+  ...jest.requireActual("../../../../companies/search"),
+  searchCompany: jest.fn()
+}));
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { searchCompany: mockSearchCompany } = require(
+  "../../../../companies/search"
+) as { searchCompany: jest.Mock };
 
 const SIGN = gql`
   mutation Sign($id: ID!, $input: BsffSignatureInput!) {
@@ -1531,5 +1544,224 @@ describe("Mutation.signBsff", () => {
         expect(newBsff2.status).toEqual(BsffStatus.PROCESSED);
       }
     );
+  });
+
+  describe("dormant sirets", () => {
+    afterEach(() => {
+      mockSearchCompany.mockReset();
+    });
+
+    const createUserAndBsff = async (
+      input: Partial<{
+        status: BsffStatus;
+        emitterEmissionSignatureDate: Date;
+        emitterEmissionSignatureAuthor: string;
+      }> = {}
+    ) => {
+      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
+        name: "Emitter"
+      });
+      const transporterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
+        name: "Transporter"
+      });
+      await transporterReceiptFactory({
+        company: transporterCompanyAndUser.company
+      });
+      const destination = await companyFactory({ name: "Destination" });
+
+      const bsff = await createBsffBeforeEmission(
+        {
+          emitter: emitterCompanyAndUser,
+          destination: {
+            company: destination,
+            user: emitterCompanyAndUser.user
+          },
+          transporter: transporterCompanyAndUser
+        },
+        {
+          data: {
+            ...input
+          },
+          transporterData: {
+            transporterTransportMode: TransportMode.ROAD,
+            transporterTransportPlates: ["AA-123-BB"]
+          }
+        }
+      );
+
+      return {
+        user: emitterCompanyAndUser.user,
+        transporterUser: transporterCompanyAndUser.user,
+        bsff
+      };
+    };
+
+    it("should not be able to sign if a siret is closed", async () => {
+      // In this example the emitter is closed, so he shouldn't
+      // be able to sign the EMISSION step
+
+      // Given
+      const { user, bsff } = await createUserAndBsff();
+
+      mockSearchCompany.mockImplementation((siret: string) =>
+        Promise.resolve({
+          siret,
+          etatAdministratif:
+            siret === bsff.emitterCompanySiret ? "F" : "O",
+          address: "Company address",
+          name: "Company name"
+        })
+      );
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            author: user.name,
+            type: "EMISSION"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'établissement ${bsff.emitterCompanySiret} est fermé selon le répertoire SIRENE`
+      );
+    });
+
+    it("should be able to sign if a siret is closed but field is sealed", async () => {
+      // In this example the emitter has closed but it's ok because
+      // EMISSION has already been signed. The transporter can go on with
+      // the workflow
+
+      // Given
+      const { transporterUser, bsff } = await createUserAndBsff({
+        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureAuthor: "Emitter",
+        status: BsffStatus.SIGNED_BY_EMITTER
+      });
+
+      mockSearchCompany.mockImplementation((siret: string) =>
+        Promise.resolve({
+          siret,
+          etatAdministratif:
+            siret === bsff.emitterCompanySiret ? "F" : "O",
+          address: "Company address",
+          name: "Company name"
+        })
+      );
+
+      // When
+      const { mutate } = makeClient(transporterUser);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            author: transporterUser.name,
+            type: "TRANSPORT"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+    });
+
+    it("should not be able to sign if a siret is dormant", async () => {
+      // In this example the emitter is dormant, so he shouldn't
+      // be able to sign the EMISSION step
+
+      // Given
+      const { user, bsff } = await createUserAndBsff();
+
+      mockSearchCompany.mockImplementation((siret: string) =>
+        Promise.resolve({
+          siret,
+          etatAdministratif: "O",
+          address: "Company address",
+          name: "Company name"
+        })
+      );
+
+      await prisma.company.update({
+        where: { siret: bsff.emitterCompanySiret! },
+        data: { isDormantSince: new Date() }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            author: user.name,
+            type: "EMISSION"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'établissement avec le SIRET ${bsff.emitterCompanySiret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+      );
+    });
+
+    it("should be able to sign if a siret is dormant but field is sealed", async () => {
+      // In this example the emitter has gone dormant but it's ok because
+      // EMISSION has already been signed. The transporter can go on with
+      // the workflow
+
+      // Given
+      const { transporterUser, bsff } = await createUserAndBsff({
+        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureAuthor: "Emitter",
+        status: BsffStatus.SIGNED_BY_EMITTER
+      });
+
+      mockSearchCompany.mockImplementation((siret: string) =>
+        Promise.resolve({
+          siret,
+          etatAdministratif: "O",
+          address: "Company address",
+          name: "Company name"
+        })
+      );
+
+      await prisma.company.update({
+        where: { siret: bsff.emitterCompanySiret! },
+        data: { isDormantSince: new Date() }
+      });
+
+      // When
+      const { mutate } = makeClient(transporterUser);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            author: transporterUser.name,
+            type: "TRANSPORT"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+    });
   });
 });
