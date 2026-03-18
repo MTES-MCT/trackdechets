@@ -10,7 +10,7 @@ import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 
 type FormikIntermediaryListProps = {
   // SIRET de l'établissement courant
-  bsdType:BsdType
+  bsdType: BsdType
   siret?: string;
   disabled: boolean;
 };
