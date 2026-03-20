@@ -10,7 +10,7 @@ import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 
 type FormikIntermediaryListProps = {
   // SIRET de l'établissement courant
-  bsdType: BsdType
+  bsdType: BsdType;
   siret?: string;
   disabled: boolean;
 };
@@ -94,7 +94,9 @@ function FormikIntermediaryList({
                   <hr />
                 </div>
               ))}
-              {(bsdType === BsdType.Bsdd ? values.intermediaries.length < 5 : values.intermediaries.length < 3) && (
+              {(bsdType === BsdType.Bsdd
+                ? values.intermediaries.length < 5
+                : values.intermediaries.length < 3) && (
                 // Pas plus de cinq intermédiaires
                 <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
                   <button
