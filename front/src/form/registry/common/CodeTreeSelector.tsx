@@ -10,7 +10,7 @@ import { MEDIA_QUERIES } from "../../../common/config";
 import { capitalize } from "../../../common/helper";
 import { useMedia } from "../../../common/use-media";
 import { formatError } from "../builder/error";
-import "./WasteCodeSelector.scss";
+import "./CodeTreeSelector.scss";
 
 export type TreeSelectorNode = Readonly<{
   code: string;
@@ -209,7 +209,7 @@ export function CodeTreeSelector({
       {!multiple && (
         <div
           className={`fr-col-md-2 ${label ? "search-btn-lbl" : "search-btn"} ${
-            infoLabel ? "tw-mb-12" : ""
+            infoLabel ? "search-btn-info-label " : ""
           }`}
           style={
             isMobile
