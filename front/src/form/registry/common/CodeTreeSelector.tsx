@@ -91,7 +91,7 @@ export function CodeTreeSelector({
       methods.setValue(name, newValues);
     } else {
       methods.setValue(name, code);
-      setShowSearch(false);
+      setComboboxOpen(false);
     }
   }
 
@@ -195,7 +195,7 @@ export function CodeTreeSelector({
               : undefined
           }
           nativeInputProps={{
-            onClick: () => multiple && setShowSearch(!showSearch),
+            onClick: () => multiple && setComboboxOpen(!showSearch),
             type: "text",
             ...(!multiple && { ...methods.register(name) }),
             value: multiple ? currentValues.join(", ") : currentValue || "",
@@ -228,7 +228,7 @@ export function CodeTreeSelector({
             })}
           >
             <Button
-              onClick={() => setShowSearch(!showSearch)}
+              onClick={() => setComboboxOpen(!showSearch)}
               priority="secondary"
               type="button"
               ref={triggerRef}
