@@ -181,6 +181,8 @@ type BsffPackaging {
   volume: Float
   "Poids en kilogrammes."
   weight: Float!
+  "Nombre de colis associés à ce conditionnement."
+  quantity: Int!
   "Informations sur l'acceptation ou le refus du contenant"
   acceptation: BsffPackagingAcceptation
   "Informations sur le traitement effectué par contenant"

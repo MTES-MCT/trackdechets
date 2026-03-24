@@ -239,17 +239,21 @@ input BsffPackagingInput {
   """
   volume: Float
   """
-  Numéro du contenant.
+  Numéros des contenants.
 
-  Min: 1 caractère, Max: 250 caractères
+  Max: 250 caractères par élément
   """
-  numero: String!
+  identificationNumbers: [String!]
   """
   Poids en kilogrammes
 
   Min: 0kg
   """
   weight: Float!
+  """
+  Nombre de colis associés à ce conditionnement
+  """
+  quantity: Int!
 }
 
 input UpdateBsffPackagingInput {

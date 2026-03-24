@@ -1,6 +1,8 @@
 import {
   BsdaPackagingInput,
+  BsffPackagingInput,
   BsdaPackagingType,
+  BsffPackagingType,
   PackagingInfoInput,
   Packagings
 } from "@td/codegen-ui";
@@ -19,6 +21,15 @@ export const emptyBsddPackaging: PackagingInfoInput = {
 export const emptyBsdaPackaging: BsdaPackagingInput = {
   type: "" as BsdaPackagingType,
   quantity: null as any as number
+};
+
+export const emptyBsffPackaging: BsffPackagingInput = {
+  type: "" as BsffPackagingType, // valeur par défaut safe
+  identificationNumbers: [],
+  quantity: "" as any as number,
+  other: "",
+  weight: "" as any as number,
+  volume: "" as any as number
 };
 
 /**
@@ -41,7 +52,7 @@ export const emptyBsdaPackaging: BsdaPackagingInput = {
  * Il est donc nécessaire de nettoyer les données avant de les envoyer au serveur
  */
 export function cleanPackagings<
-  P extends PackagingInfoInput | BsdaPackagingInput
+  P extends PackagingInfoInput | BsdaPackagingInput | BsffPackagingInput
 >(packagings: P[]) {
   return packagings
     .filter(
@@ -49,14 +60,23 @@ export function cleanPackagings<
       // si celui-ci n'a pas été complété.
       p => !!p.type
     )
-    .map(p => ({
-      ...p,
+    .map(p => {
+      const cleaned = { ...p } as any;
+
       // Convertit "" vers 0 dans le cas où l'input est laissé vide
       // car le champ `quantity` est requis sur PackagingInfoInput
-      quantity: Number(p.quantity),
+      // Si le champ quantity existe
+      if ("quantity" in cleaned) {
+        cleaned.quantity = Number(cleaned.quantity);
+      }
+
       // Convertit "" vers null dans le cas où l'input est laissé vide
-      volume: (p.volume as any) === "" ? null : p.volume
-    }));
+      // Si le champ volume existe
+      if ("volume" in cleaned) {
+        cleaned.volume = cleaned.volume === "" ? null : cleaned.volume;
+      }
+      return cleaned;
+    });
 }
 
 export const bsddPackagingTypes = [
@@ -76,8 +96,15 @@ export const bsdaPackagingTypes = [
   BsdaPackagingType.Other
 ];
 
+export const bsffPackagingTypes = [
+  BsffPackagingType.Bouteille,
+  BsffPackagingType.Citerne,
+  BsffPackagingType.Conteneur,
+  BsffPackagingType.Autre
+];
+
 export const packagingTypeLabels: Record<
-  Packagings | BsdaPackagingType,
+  Packagings | BsdaPackagingType | BsffPackagingType,
   string
 > = {
   [Packagings.Benne]: "Benne",
@@ -91,5 +118,7 @@ export const packagingTypeLabels: Record<
   [BsdaPackagingType.DepotBag]: "Dépôt-bag",
   [BsdaPackagingType.PaletteFilme]: "Palette filmée",
   [BsdaPackagingType.SacRenforce]: "Sac renforcé",
-  [BsdaPackagingType.Other]: "Autre"
+  [BsdaPackagingType.Other]: "Autre",
+  [BsffPackagingType.Bouteille]: "Bouteille",
+  [BsffPackagingType.Conteneur]: "Conteneur"
 };
