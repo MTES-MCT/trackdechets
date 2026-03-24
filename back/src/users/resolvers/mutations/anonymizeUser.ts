@@ -20,10 +20,7 @@ const idOrEmailSchema = z
   .string()
   .transform(v => v.trim())
   .pipe(
-    z.union([
-      z.string().email(),
-      z.string().cuid()
-    ], {
+    z.union([z.string().email(), z.string().cuid()], {
       errorMap: () => ({
         message:
           "Le format de l'identifiant est invalide. Veuillez fournir un identifiant (cuid) ou une adresse email valide."
