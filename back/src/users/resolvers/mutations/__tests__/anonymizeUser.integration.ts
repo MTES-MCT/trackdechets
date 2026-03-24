@@ -31,8 +31,8 @@ jest.mock("../../../../utils", () => {
 });
 
 const ANONYMIZE_MUTATION = gql`
-  mutation AnonymizeUser($id: ID!) {
-    anonymizeUser(id: $id)
+  mutation AnonymizeUser($idOrEmail: String!) {
+    anonymizeUser(idOrEmail: $idOrEmail)
   }
 `;
 
@@ -46,7 +46,7 @@ describe("disconnectDeletedUser Middleware", () => {
     const user2 = await userFactory();
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { errors } = await mutate(ANONYMIZE_MUTATION, {
-      variables: { id: user2.id }
+      variables: { idOrEmail: user2.id }
     });
 
     expect(errors.length).toBe(1);
@@ -78,7 +78,7 @@ describe("disconnectDeletedUser Middleware", () => {
     });
 
     const { data } = await mutate(ANONYMIZE_MUTATION, {
-      variables: { id: user.id }
+      variables: { idOrEmail: user.id }
     });
 
     expect(data.anonymizeUser).toContain("-anonymous@trackdechets.fr");
@@ -113,7 +113,7 @@ describe("disconnectDeletedUser Middleware", () => {
     });
 
     const { errors } = await mutate(ANONYMIZE_MUTATION, {
-      variables: { id: user.id }
+      variables: { idOrEmail: user.id }
     });
 
     expect(errors.length).toBe(1);
@@ -139,7 +139,7 @@ describe("disconnectDeletedUser Middleware", () => {
 
     expect(res.body.data.me.email).toEqual(user.email);
     const { data } = await mutate(ANONYMIZE_MUTATION, {
-      variables: { id: user.id }
+      variables: { idOrEmail: user.id }
     });
 
     expect(data.anonymizeUser).toContain("-anonymous@trackdechets.fr");
@@ -152,5 +152,94 @@ describe("disconnectDeletedUser Middleware", () => {
     expect(rejected.body.errors[0]).toMatchObject({
       message: "Vous n'êtes pas connecté."
     });
+  });
+
+  it("should anonymize a user when providing an email and disconnect the session", async () => {
+    const user = await userFactory();
+    const admin = await adminFactory();
+
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+
+    const { sessionCookie } = await logIn(app, user.email, "pass");
+    const cookieValue = sessionCookie.match(cookieRegExp)![1];
+
+    // should be logged-in
+    const res = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual({
+      me: { email: user.email }
+    });
+
+    const { data } = await mutate(ANONYMIZE_MUTATION, {
+      variables: { idOrEmail: user.email }
+    });
+
+    expect(data.anonymizeUser).toContain("-anonymous@trackdechets.fr");
+
+    // should be logged-out
+    const rejected = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    expect(rejected.status).toBe(302);
+    expect(rejected.headers["location"]).toBe(`${getUIBaseURL()}/login`);
+  });
+
+  it("should return an error for an unknown email", async () => {
+    const admin = await adminFactory();
+
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+
+    const { errors } = await mutate(ANONYMIZE_MUTATION, {
+      variables: { idOrEmail: "unknown@example.com" }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0]).toMatchObject({
+      extensions: {
+        code: "BAD_USER_INPUT"
+      }
+    });
+    expect(errors[0].message).toMatch("introuvable");
+  });
+
+  it("should return an error for an empty input", async () => {
+    const admin = await adminFactory();
+
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+
+    const { errors } = await mutate(ANONYMIZE_MUTATION, {
+      variables: { idOrEmail: "   " }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0]).toMatchObject({
+      extensions: {
+        code: "BAD_USER_INPUT"
+      }
+    });
+  });
+
+  it("should return an error for an input that is neither an ID nor an email", async () => {
+    const admin = await adminFactory();
+
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+
+    const { errors } = await mutate(ANONYMIZE_MUTATION, {
+      variables: { idOrEmail: "not-a-valid-id-or-email" }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0]).toMatchObject({
+      extensions: {
+        code: "BAD_USER_INPUT"
+      }
+    });
+    expect(errors[0].message).toMatch("e-mail non valide");
   });
 });
