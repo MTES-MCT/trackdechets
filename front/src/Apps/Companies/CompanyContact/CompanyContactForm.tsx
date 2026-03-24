@@ -10,6 +10,7 @@ import { NotificationError } from "../../common/Components/Error/Error";
 import { validatePhoneNumber } from "../../../common/helper";
 import CompanyFormWrapper from "../common/Components/CompanyFormWrapper";
 import { Loader } from "../../common/Components";
+import { ContactNotice } from "../common/Components/GivenNameNotice/GivenNameNotice";
 
 interface ContactFormProps {
   company: CompanyPrivate;
@@ -74,52 +75,58 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
     >
       {(formRef, isEditing, onClose) =>
         isEditing ? (
-          <form
-            ref={formRef}
-            onSubmit={handleSubmit(
-              async data => await updateCompanyContact(data, onClose)
-            )}
-          >
-            <Input
-              label="Prénom et nom"
-              state={formState.errors.contact ? "error" : "default"}
-              nativeInputProps={{
-                ...register("contact", { required: true }),
-                placeholder: "Prénom et nom"
-              }}
-              stateRelatedMessage="Ce champ est obligatoire"
-            />
-            <Input
-              label="Courriel"
-              nativeInputProps={{
-                type: "email",
-                ...register("contactEmail", { required: true }),
-                ...{ "data-testid": "company-contact-email" }
-              }}
-              state={formState.errors.contactEmail ? "error" : "default"}
-              stateRelatedMessage="Courriel invalide"
-            />
-            <Input
-              label="Téléphone"
-              nativeInputProps={{
-                ...register("contactPhone", { required: true }),
-                placeholder: "Téléphone"
-              }}
-              state={formState.errors.contactPhone ? "error" : "default"}
-              stateRelatedMessage="Merci de renseigner un numéro de téléphone valide"
-            />
-            <Input
-              label="Site web (optionnel)"
-              nativeInputProps={{
-                ...register("website"),
-                placeholder: "Site web"
-              }}
-              state={formState.errors.website ? "error" : "default"}
-              stateRelatedMessage="URL invalide"
-            />
-            {loading && <Loader />}
-            {error && <NotificationError apolloError={error} />}
-          </form>
+          <>
+            <form
+              ref={formRef}
+              onSubmit={handleSubmit(
+                async data => await updateCompanyContact(data, onClose)
+              )}
+            >
+              <Input
+                label="Prénom et nom"
+                state={formState.errors.contact ? "error" : "default"}
+                nativeInputProps={{
+                  ...register("contact", { required: true }),
+                  placeholder: "Prénom et nom"
+                }}
+                stateRelatedMessage="Ce champ est obligatoire"
+              />
+              <Input
+                label="Courriel"
+                nativeInputProps={{
+                  type: "email",
+                  ...register("contactEmail", { required: true }),
+                  ...{ "data-testid": "company-contact-email" }
+                }}
+                state={formState.errors.contactEmail ? "error" : "default"}
+                stateRelatedMessage="Courriel invalide"
+              />
+              <Input
+                label="Téléphone"
+                nativeInputProps={{
+                  ...register("contactPhone", { required: true }),
+                  placeholder: "Téléphone"
+                }}
+                state={formState.errors.contactPhone ? "error" : "default"}
+                stateRelatedMessage="Merci de renseigner un numéro de téléphone valide"
+              />
+              <Input
+                label="Site web (optionnel)"
+                nativeInputProps={{
+                  ...register("website"),
+                  placeholder: "Site web"
+                }}
+                state={formState.errors.website ? "error" : "default"}
+                stateRelatedMessage="URL invalide"
+              />
+              {loading && <Loader />}
+              {error && <NotificationError apolloError={error} />}
+            </form>
+
+            <div className="fr-mt-2w">
+              <ContactNotice />
+            </div>
+          </>
         ) : (
           <>
             <p className="companyFormWrapper__title-field">Prénom et nom</p>
