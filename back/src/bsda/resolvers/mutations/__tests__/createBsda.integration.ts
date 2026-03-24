@@ -1566,7 +1566,7 @@ describe("Mutation.Bsda.create", () => {
     );
   });
 
-  it("should create a RESHIPMENT bsda and copy consistence from forwarded bsda if field is not provided", async () => {
+  it("should create a RESHIPMENT bsda and copy consistence & consistence description from forwarded bsda if field is not provided", async () => {
     const { company: emitter } = await userWithCompanyFactory("MEMBER");
     const { company: transporter } = await userWithCompanyFactory("MEMBER");
     const { user, company: destination } = await userWithCompanyFactory(
@@ -1581,7 +1581,8 @@ describe("Mutation.Bsda.create", () => {
         destinationCompanySiret: ttr.siret,
         status: BsdaStatus.AWAITING_CHILD,
         destinationOperationCode: "D 15",
-        wasteConsistence: "PULVERULENT"
+        wasteConsistence: "PULVERULENT",
+        wasteConsistenceDescription: "Pulverulent"
       },
       transporterOpt: {
         transporterCompanySiret: transporter.siret
@@ -1655,9 +1656,10 @@ describe("Mutation.Bsda.create", () => {
     expect(reshipped?.type).toEqual("RESHIPMENT");
     expect(reshipped?.forwardingId).toEqual(bsda.id);
     expect(reshipped?.wasteConsistence).toEqual("PULVERULENT"); // consistence matches forwarde bsda consistence
+    expect(reshipped?.wasteConsistenceDescription).toEqual("Pulverulent"); // consistence description matches forwarded bsda consistence description
   });
 
-  it("should create a RESHIPMENT bsda and use provided cosnsitence field ", async () => {
+  it("should create a RESHIPMENT bsda and use provided consistence & consistence description fields ", async () => {
     const worker = await companyFactory();
     const { company: emitter } = await userWithCompanyFactory("MEMBER");
     const { company: transporter } = await userWithCompanyFactory("MEMBER");
@@ -1672,7 +1674,8 @@ describe("Mutation.Bsda.create", () => {
         destinationCompanySiret: ttr.siret,
         status: BsdaStatus.AWAITING_CHILD,
         destinationOperationCode: "D 15",
-        wasteConsistence: "SOLIDE"
+        wasteConsistence: "SOLIDE",
+        wasteConsistenceDescription: "Solide"
       },
       transporterOpt: {
         transporterCompanySiret: transporter.siret
@@ -1707,6 +1710,7 @@ describe("Mutation.Bsda.create", () => {
         adr: "ADR",
         pop: true,
         consistence: "PULVERULENT",
+        consistenceDescription: "Pulverulent",
         familyCode: "Code famille",
         materialName: "A material",
         sealNumbers: ["1", "2"]
@@ -1746,6 +1750,7 @@ describe("Mutation.Bsda.create", () => {
     expect(reshipped?.type).toEqual("RESHIPMENT");
     expect(reshipped?.forwardingId).toEqual(bsda.id);
     expect(reshipped?.wasteConsistence).toEqual("PULVERULENT"); // consistence matches input
+    expect(reshipped?.wasteConsistenceDescription).toEqual("Pulverulent"); // consistence description matches input
   });
 
   it("should create a bsda if destination is NOT verified, provided it's a WASTE_CENTER and bsda is COLLECTION_2710", async () => {

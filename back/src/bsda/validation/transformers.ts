@@ -48,14 +48,25 @@ export const fillWasteConsistenceWhenForwarding: ZodBsdaTransformer =
   async bsda => {
     if (
       bsda.type === "RESHIPMENT" &&
-      !bsda?.wasteConsistence &&
+      (!bsda?.wasteConsistence || !bsda?.wasteConsistenceDescription) &&
       !!bsda?.forwarding
     ) {
       const forwarding = await prisma.bsda.findUnique({
         where: { id: bsda.forwarding }
       });
       if (!!forwarding) {
-        bsda = { ...bsda, wasteConsistence: forwarding.wasteConsistence };
+        if (!bsda?.wasteConsistence) {
+          bsda = {
+            ...bsda,
+            wasteConsistence: forwarding.wasteConsistence
+          };
+        }
+        if (!bsda?.wasteConsistenceDescription) {
+          bsda = {
+            ...bsda,
+            wasteConsistenceDescription: forwarding.wasteConsistenceDescription
+          };
+        }
       }
     }
     return bsda;
