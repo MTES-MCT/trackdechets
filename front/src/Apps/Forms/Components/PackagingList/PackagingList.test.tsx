@@ -49,6 +49,7 @@ describe("<PackagingList />", () => {
             <RhfPackagingList
               fieldName="packagings"
               packagingTypes={[...bsddPackagingTypes, ...bsdaPackagingTypes]}
+              type="BSDA"
             />
           </form>
         </FormProvider>

@@ -2,6 +2,8 @@ import Select, { SelectProps } from "@codegouvfr/react-dsfr/Select";
 import {
   BsdaPackagingInput,
   BsdaPackagingType,
+  BsffPackagingInput,
+  BsffPackagingType,
   PackagingInfoInput,
   Packagings
 } from "@td/codegen-ui";
@@ -12,16 +14,17 @@ import { numberToString } from "../../../Dashboard/Creation/bspaoh/utils/numbers
 import TagsInput from "../TagsInput/TagsInput";
 import { pluralize } from "@td/constants";
 import { packagingTypeLabels } from "./helpers";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 export type PackagingFormProps = {
   // Valeur de `packaging` provenant du store Formik ou RHF
-  packaging: PackagingInfoInput | BsdaPackagingInput;
+  packaging: PackagingInfoInput | BsdaPackagingInput | BsffPackagingInput;
   // Nombre total de conditionnement qui permet de contrôler
   // l'affichage des types de conditionnements que l'on peut ajouter.
   packagingsLength: number;
   // Liste des types de conditionnement possible
   // À ajuster en fonction du type de bordereau
-  packagingTypes: (Packagings | BsdaPackagingType)[];
+  packagingTypes: (Packagings | BsdaPackagingType | BsffPackagingType)[];
   // Props que l'on passe aux différents champs du formulaire
   // pour qu'ils soient contrôlés via Formik (`getFieldProps(fieldName)`)
   // ou RHF (`register(fieldName)`)
@@ -34,16 +37,25 @@ export type PackagingFormProps = {
       push: (v: string) => void;
       remove: (index: number) => void;
     };
+    weight: InputProps["nativeInputProps"];
   };
   // Permet de griser les champs pour les rendre non éditable
   disabled?: boolean;
   // Erreurs sur chacun des champs
   errors?: Partial<
-    Record<keyof (PackagingInfoInput | BsdaPackagingInput), string>
+    Record<
+      | keyof (PackagingInfoInput | BsdaPackagingInput | BsffPackagingInput)
+      | "weight",
+      string
+    >
   >;
   // Permet de savoir si les différents champs ont été visité
   touched?: Partial<
-    Record<keyof (PackagingInfoInput | BsdaPackagingInput), boolean>
+    Record<
+      | keyof (PackagingInfoInput | BsdaPackagingInput | BsffPackagingInput)
+      | "weight",
+      boolean
+    >
   >;
 };
 
@@ -101,7 +113,7 @@ function PackagingForm({
   return (
     <>
       <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-md-6 fr-col-12">
+        <div className="fr-col-md-5 fr-col-12">
           <Select
             label="Type"
             disabled={disabled}
@@ -125,7 +137,7 @@ function PackagingForm({
             </p>
           )}
         </div>
-        <div className="fr-col-md-4 fr-col-12">
+        <div className="fr-col-md-3 fr-col-12">
           <NonScrollableInput
             label={`Volume en ${volumeUnit} (optionnel)`}
             className="fr-mb-2w"
@@ -162,38 +174,79 @@ function PackagingForm({
             }}
           />
         </div>
-      </div>
-      {(packaging.type === Packagings.Autre ||
-        packaging.type === BsdaPackagingType.Other) && (
-        <div className="fr-grid-row fr-grid-row--gutters">
-          <div className="fr-col-12">
-            <Input
-              label="Nom du type de conditionnement"
+
+        {inputProps.weight && (
+          <div className="fr-col-md-2 fr-col-12">
+            <NonScrollableInput
+              label="Poids en kg (optionnel)"
+              className="fr-mb-2w"
               disabled={disabled}
-              state={errors?.other && touched?.other ? "error" : "default"}
-              stateRelatedMessage={errors?.other}
-              nativeInputProps={inputProps.other}
+              state={errors?.weight && touched?.weight ? "error" : "default"}
+              stateRelatedMessage={errors?.weight}
+              nativeInputProps={{
+                type: "number",
+                inputMode: "decimal",
+                step: "0.001",
+                ...inputProps.weight
+              }}
             />
           </div>
-        </div>
-      )}
-      <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-md-12 fr-col-12">
-          <TagsInput
-            label="N° de contenant (optionnel)"
-            tags={packaging.identificationNumbers ?? []}
-            disabled={disabled}
-            onAddTag={tag => inputProps.identificationNumbers.push(tag)}
-            onDeleteTag={idx => inputProps.identificationNumbers.remove(idx)}
-          />
+        )}
 
-          <p className="fr-info-text">
-            Vous avez saisi {identificationNumbersLength}{" "}
-            {pluralize("numéro", identificationNumbersLength)} pour{" "}
-            {Number(packaging.quantity)}{" "}
-            {pluralize("contenant", packaging.quantity)}
-          </p>
+        {(packaging.type === Packagings.Autre ||
+          packaging.type === BsdaPackagingType.Other ||
+          packaging.type === BsffPackagingType.Autre) && (
+          <div className="fr-col-12">
+            <div className="fr-grid-row fr-grid-row--gutters">
+              <div className="fr-col-md-6 fr-col-12">
+                <Input
+                  label="Nom du type de conditionnement"
+                  disabled={disabled}
+                  state={errors?.other && touched?.other ? "error" : "default"}
+                  stateRelatedMessage={errors?.other}
+                  nativeInputProps={inputProps.other}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+        <div className="fr-col-12">
+          <div className="fr-grid-row fr-grid-row--gutters">
+            <div className="fr-col-md-6 fr-col-12">
+              <TagsInput
+                label="N° de contenant (optionnel)"
+                tags={packaging.identificationNumbers ?? []}
+                disabled={disabled}
+                onAddTag={tag => inputProps.identificationNumbers.push(tag)}
+                onDeleteTag={idx =>
+                  inputProps.identificationNumbers.remove(idx)
+                }
+              />
+
+              <p className="fr-info-text">
+                Vous avez saisi {identificationNumbersLength}{" "}
+                {pluralize("numéro", identificationNumbersLength)} pour{" "}
+                {Number(packaging.quantity)}{" "}
+                {pluralize("contenant", packaging.quantity)}
+              </p>
+            </div>
+          </div>
         </div>
+
+        {/* ALERT METIER */}
+        {"weight" in packaging &&
+          packaging.weight &&
+          packaging.volume &&
+          inputProps.weight &&
+          packaging.weight > packaging.volume * 1.5 && (
+            <div className="fr-col-12">
+              <Alert
+                severity="warning"
+                description="Poids trop élevé par rapport au volume"
+                small
+              />
+            </div>
+          )}
       </div>
     </>
   );

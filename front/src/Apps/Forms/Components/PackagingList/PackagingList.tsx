@@ -1,11 +1,14 @@
 import {
   BsdaPackagingType,
+  BsffPackagingType,
+  BsffType,
   PackagingInfoInput,
   Packagings
 } from "@td/codegen-ui";
 import React from "react";
 import { emptyBsddPackaging } from "./helpers";
 import { PackagingFormProps } from "./PackagingForm";
+import { useFormContext, useWatch } from "react-hook-form";
 
 // Props passé à l'implémentation concrète (Formik ou RHF)
 // de PackagingForm dans le composant fonction enfant.
@@ -24,7 +27,7 @@ export type PackagingListProps = {
   fieldName: string;
   // Liste des types de conditionnement possible
   // À ajuster en fonction du type de bordereau
-  packagingTypes: (Packagings | BsdaPackagingType)[];
+  packagingTypes: (Packagings | BsdaPackagingType | BsffPackagingType)[];
   // Valeur de `packagingInfos` provenant du store Formik ou RHF
   packagingInfos: PackagingInfoInput[];
   // Permet de griser les champs
@@ -35,6 +38,8 @@ export type PackagingListProps = {
   remove: (idx: number) => void;
   // Implémentation concrète de <PackagingForm />
   children: React.FC<RenderPackagingFormProps>;
+  // type du bordereau
+  type: "BSDA" | "BSFF" |  "BSDD";
 };
 
 function PackagingList({
@@ -44,14 +49,25 @@ function PackagingList({
   push,
   remove,
   disabled = false,
-  children
+  children,
+  type
 }: PackagingListProps) {
-  const showAddButton = packagingInfos.every(
-    p =>
-      p.type !== Packagings.Citerne &&
-      p.type !== Packagings.Benne &&
-      p.type !== Packagings.Pipeline
-  );
+  const { control } = useFormContext();
+  let canAdd = true;
+  if (type === "BSFF") {
+    const bsffType = useWatch({ control, name: "type" });
+    const maxPackagings =
+      bsffType === BsffType.Reconditionnement ? 1 : Infinity;
+    canAdd = packagingInfos.length < maxPackagings;
+  } else {
+    // RG BSDA : ne pas permettre plus de 1 citerne, benne, pipeline
+    canAdd = packagingInfos.every(
+      p =>
+        p.type !== Packagings.Citerne &&
+        p.type !== Packagings.Benne &&
+        p.type !== Packagings.Pipeline
+    );
+  }
 
   return (
     <>
@@ -84,7 +100,7 @@ function PackagingList({
             )}
           </div>
         ))}
-      {showAddButton && (
+      {!disabled && canAdd && (
         <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
           <button
             type="button"
@@ -96,6 +112,11 @@ function PackagingList({
           >
             Ajouter un conditionnement
           </button>
+        </div>
+      )}
+      {type === "BSFF" && packagingInfos.length >= 1 && (
+        <div className="fr-alert fr-alert--info fr-mb-4w">
+          {`Un seul contenant est autorisé dans le cadre d'un reconditionnement.`}
         </div>
       )}
     </>

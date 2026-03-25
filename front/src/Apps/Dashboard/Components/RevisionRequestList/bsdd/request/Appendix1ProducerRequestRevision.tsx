@@ -38,6 +38,7 @@ const Appendix1ProducerRequestRevision = ({
         <RhfPackagingList
           fieldName="wasteDetails.packagingInfos"
           packagingTypes={bsddPackagingTypes}
+          type="BSDD"
         />
       </RhfReviewableField>
 

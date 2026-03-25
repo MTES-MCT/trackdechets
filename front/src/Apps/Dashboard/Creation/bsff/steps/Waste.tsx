@@ -19,6 +19,7 @@ import MyCompanySelector from "../../../../common/Components/CompanySelector/MyC
 import RhfBsffPackagingList from "../../../../Forms/Components/PackagingList/bsff/RhfBsffPackagingList";
 import SelectableWasteTableWrapper from "../../bsda/components/SelectableWasteTableWrapper";
 import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
+import RhfPackagingList from "../../../../Forms/Components/PackagingList/RhfPackagingList";
 
 const WasteBsff = () => {
   const methods = useFormContext();
@@ -256,10 +257,11 @@ const WasteBsff = () => {
 
         {!fieldIsDisabled && (
           <>
-            <RhfBsffPackagingList
+            <RhfPackagingList
               disabled={sealedFields.includes("packagings")}
               fieldName="packagings"
               packagingTypes={bsffPackagingTypes}
+              type="BSFF"
             />
 
             {formState?.errors?.packagings && (

@@ -254,6 +254,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   <RhfPackagingList
                     fieldName="wasteDetails.packagingInfos"
                     packagingTypes={bsddPackagingTypes}
+                    type="BSDD"
                   />
                 </RhfReviewableField>
 

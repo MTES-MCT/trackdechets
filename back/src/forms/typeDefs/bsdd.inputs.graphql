@@ -795,7 +795,6 @@ input PackagingInfoInput {
 
   """
   Description du conditionnement dans le cas où le type de conditionnement est `OTHER`.
-
   Max: 250 caractères
   """
   other: String
@@ -808,13 +807,17 @@ input PackagingInfoInput {
 
   """
   Volume du conditionnement en litre(s).
-
   Min: 0L
   """
   volume: Float
 
   "Numéros des contenants"
   identificationNumbers: [String!]
+
+  """
+  Poids en kilogrammes
+  """
+  weight: Float
 }
 
 "Payload lié au détails du déchet (case 3 à 6)"

@@ -286,6 +286,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 <RhfPackagingList
                   fieldName="packagings"
                   packagingTypes={bsdaPackagingTypes}
+                  type="BSDA"
                 />
               </RhfReviewableField>
 

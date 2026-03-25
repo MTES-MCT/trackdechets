@@ -339,6 +339,7 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
             <RhfPackagingList
               fieldName="packagings"
               packagingTypes={bsdaPackagingTypes}
+              type="BSDA"
             />
 
             <h4 className="fr-h4">Consistance</h4>

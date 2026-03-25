@@ -97,11 +97,11 @@ function BsffPackagingList({
 
       {/* MESSAGE INFO */}
       {packagingInfos.length >= maxPackagings && (
-          <div className="fr-alert fr-alert--info fr-mb-4w">
-            Un seul contenant est autorisé dans le cadre d'un reconditionnement.
-            Ex. : 1 citerne
-          </div>
-        )}
+        <div className="fr-alert fr-alert--info fr-mb-4w">
+          Un seul contenant est autorisé dans le cadre d'un reconditionnement.
+          Ex. : 1 citerne
+        </div>
+      )}
     </>
   );
 }

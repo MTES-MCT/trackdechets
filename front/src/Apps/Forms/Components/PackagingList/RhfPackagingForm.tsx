@@ -2,7 +2,11 @@ import React from "react";
 import { RenderPackagingFormProps } from "./PackagingList";
 import { useFormContext, useFieldArray, useController } from "react-hook-form";
 import PackagingForm from "./PackagingForm";
-import { BsdaPackagingType, Packagings } from "@td/codegen-ui";
+import {
+  BsdaPackagingType,
+  BsffPackagingType,
+  Packagings
+} from "@td/codegen-ui";
 import Decimal from "decimal.js";
 
 /**
@@ -37,6 +41,10 @@ function RhfPackagingForm({
     control
   });
 
+  const { error: errorWeight, isTouched: isTouchedWeight } = getFieldState(
+    fieldPath("weight")
+  );
+
   const { error: errorType, isTouched: isTouchedType } = getFieldState(
     fieldPath("type")
   );
@@ -52,6 +60,7 @@ function RhfPackagingForm({
     type: errorType?.message,
     volume: errorVolume?.message,
     quantity: errorQuantity?.message,
+    weight: errorWeight?.message,
     other: errorOther?.message
   };
 
@@ -63,6 +72,7 @@ function RhfPackagingForm({
     type: isTouchedType && hasBeenSubmitted,
     volume: isTouchedVolume && hasBeenSubmitted,
     quantity: isTouchedQuantity && hasBeenSubmitted,
+    weight: isTouchedWeight && hasBeenSubmitted,
     other: isTouchedOther && hasBeenSubmitted
   };
 
@@ -113,7 +123,8 @@ function RhfPackagingForm({
             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
               if (
                 event.target.value === Packagings.Autre ||
-                event.target.value === BsdaPackagingType.Other
+                event.target.value === BsdaPackagingType.Other ||
+                event.target.value === BsffPackagingType.Autre
               ) {
                 setValue(fieldPath("other"), "", {
                   shouldTouch: true,
@@ -138,7 +149,14 @@ function RhfPackagingForm({
         identificationNumbers: {
           push: append,
           remove
-        }
+        },
+        weight:
+          "weight" in packaging
+            ? {
+                value: packaging.weight ?? "",
+                ...register(fieldPath("weight"))
+              }
+            : undefined
       }}
     />
   );

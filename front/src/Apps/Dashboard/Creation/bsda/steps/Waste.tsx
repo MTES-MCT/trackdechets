@@ -319,6 +319,7 @@ const WasteBsda = () => {
               disabled={sealedFields.includes(`packagings`)}
               fieldName="packagings"
               packagingTypes={bsdaPackagingTypes}
+              type="BSDA"
             />
             {formState?.errors?.packagings && (
               <p className="fr-text--sm fr-error-text fr-mb-4v">
