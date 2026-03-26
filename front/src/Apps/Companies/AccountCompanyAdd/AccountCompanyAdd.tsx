@@ -38,7 +38,9 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import SingleCheckbox from "../../common/Components/SingleCheckbox/SingleCheckbox";
-import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotice";
+import GivenNameNotice, {
+  ContactNotice
+} from "../common/Components/GivenNameNotice/GivenNameNotice";
 import FormikCompanyTypeForm, {
   FormikCompanyTypeValues
 } from "../common/Components/CompanyTypeForm/FormikCompanyTypeForm";
@@ -705,6 +707,7 @@ export default function AccountCompanyAdd() {
                         </div>
                       </div>
                     </div>
+                    <ContactNotice />
 
                     <div className={styles.separator} />
 
