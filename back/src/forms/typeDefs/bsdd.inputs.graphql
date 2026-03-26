@@ -809,7 +809,7 @@ input PackagingInfoInput {
   Nombre de colis associés à ce conditionnement. Dans le cas d'un conditionnemt BENNE ou CITERNE,
   le nombre de colis ne peut être supérieur à 2.
   """
-  quantity: Int!
+  quantity: Int
 
   """
   Volume du conditionnement en litre(s).
@@ -820,6 +820,16 @@ input PackagingInfoInput {
 
   "Numéros des contenants"
   identificationNumbers: [String!]
+
+  "Numéro du conditionnement / contenant"
+  numero: String
+
+  """
+  Poids du conditionnement en kilogrammes.
+
+  Min: 0
+  """
+  weight: Float
 }
 
 "Payload lié au détails du déchet (case 3 à 6)"
