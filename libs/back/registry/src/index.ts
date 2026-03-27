@@ -17,8 +17,10 @@ export { SSD_HEADERS } from "./ssd/constants";
 export {
   generateDateInfos,
   deleteRegistryLookup,
+  checkRegistryLookupExistsForDiscovery,
   createRegistryLogger,
-  rebuildRegistryLookupGeneric
+  rebuildRegistryLookupGeneric,
+  type MissingLookupEntry
 } from "./lookup/utils";
 
 export { lookupUtils as ssdLookupUtils } from "./ssd/registry";

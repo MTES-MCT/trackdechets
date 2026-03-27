@@ -26,8 +26,10 @@ import { getWasteDescription } from "./utils";
 import { splitAddress } from "../common/addresses";
 import { kgToTonRegistryV2 } from "../common/converter";
 import {
+  checkRegistryLookupExistsForDiscovery,
   deleteRegistryLookup,
   generateDateInfos,
+  type MissingLookupEntry,
   rebuildRegistryLookupGeneric
 } from "@td/registry";
 import { prisma } from "@td/prisma";
@@ -1050,21 +1052,51 @@ export const updateRegistryLookup = async (
   });
 };
 
+const bsdasriBaseWhere = {
+  isDeleted: false,
+  isDraft: false
+};
+
+export const discoverMissingLookups = async (
+  items: MinimalBsdasriForLookup[]
+): Promise<MissingLookupEntry[]> => {
+  const missing: MissingLookupEntry[] = [];
+  for (const bsdasri of items) {
+    const expectedLookups = bsdasriToLookupCreateInputs(bsdasri);
+    for (const lookup of expectedLookups) {
+      const exists = await checkRegistryLookupExistsForDiscovery({
+        id: lookup.id,
+        exportRegistryType: lookup.exportRegistryType,
+        siret: lookup.siret
+      });
+      if (!exists) {
+        missing.push({
+          id: bsdasri.id,
+          exportRegistryType: lookup.exportRegistryType,
+          siret: lookup.siret,
+          createdAt: bsdasri.createdAt.toISOString()
+        });
+      }
+    }
+  }
+  return missing;
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalBsdasriForLookup>({
     name: "BSDASRI",
-    getTotalCount: () =>
+    getTotalCount: (ids?: string[]) =>
       prisma.bsdasri.count({
         where: {
-          isDeleted: false,
-          isDraft: false
+          ...bsdasriBaseWhere,
+          ...(ids?.length ? { id: { in: ids } } : {})
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, ids?: string[]) =>
       prisma.bsdasri.findMany({
         where: {
-          isDeleted: false,
-          isDraft: false
+          ...bsdasriBaseWhere,
+          ...(ids?.length ? { id: { in: ids } } : {})
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,
@@ -1081,7 +1113,8 @@ export const rebuildRegistryLookup =
         createArray = createArray.concat(createInputs);
       }
       return createArray;
-    }
+    },
+    discoverMissingLookups
   });
 
 export const lookupUtils = {
