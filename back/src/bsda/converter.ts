@@ -674,6 +674,11 @@ export function flattenBsdaRevisionRequestInput(
       chain(c.emitter, e => chain(e.pickupSite, w => w.infos))
     ),
     wasteCode: chain(reviewContent, r => chain(r.waste, w => w.code)),
+
+    wasteFamilyCode: chain(reviewContent, r =>
+      chain(r.waste, w => w.familyCode)
+    ),
+
     wasteMaterialName: chain(reviewContent, r =>
       chain(r.waste, w => w.materialName)
     ),
@@ -741,6 +746,7 @@ export function expandBsdaRevisionRequestContent(
     ),
     waste: nullIfNoValues<BsdaRevisionRequestWaste>({
       code: bsdaRevisionRequest.wasteCode,
+      familyCode: bsdaRevisionRequest.wasteFamilyCode,
       materialName: bsdaRevisionRequest.wasteMaterialName,
       pop: bsdaRevisionRequest.wastePop,
       sealNumbers: bsdaRevisionRequest.wasteSealNumbers

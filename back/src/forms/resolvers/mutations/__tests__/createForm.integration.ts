@@ -3481,4 +3481,114 @@ describe("Mutation.createForm", () => {
       expect(updatedAppendix2_3.quantityGrouped).toEqual(10);
     });
   });
+
+  it("should allow disposal facilities to create a non-dangerous BSDD", async () => {
+    // Given
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: [CompanyType.DISPOSAL_FACILITY]
+      }
+    );
+
+    // When
+    const { mutate } = makeClient(emitter);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitterCompany.siret }
+          },
+          recipient: {
+            company: { siret: destinationCompany.siret }
+          },
+          wasteDetails: {
+            code: "20 01 99",
+            isDangerous: false
+          }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+  });
+
+  it("should NOT allow disposal facilities to create a dangerous BSDD", async () => {
+    // Given
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: [CompanyType.DISPOSAL_FACILITY]
+      }
+    );
+
+    // When
+    const { mutate } = makeClient(emitter);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitterCompany.siret }
+          },
+          recipient: {
+            company: { siret: destinationCompany.siret }
+          },
+          wasteDetails: {
+            code: "20 01 35*" // Dangerous!
+          }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+  });
+
+  it("should NOT allow disposal facilities to create a dangerous BSDD", async () => {
+    // Given
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: [CompanyType.DISPOSAL_FACILITY]
+      }
+    );
+
+    // When
+    const { mutate } = makeClient(emitter);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitterCompany.siret }
+          },
+          recipient: {
+            company: { siret: destinationCompany.siret }
+          },
+          wasteDetails: {
+            code: "20 01 99",
+            isDangerous: true // Dangerous!
+          }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+  });
 });

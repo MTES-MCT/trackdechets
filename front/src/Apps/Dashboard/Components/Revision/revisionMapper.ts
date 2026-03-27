@@ -30,6 +30,7 @@ import {
 export enum DataNameEnum {
   ADRESS_COLLECT = "Adresse de collecte",
   WASTE_CODE = "Code déchet",
+  FAMILY_CODE = "Code famille",
   NAME_COLLECT = "Nom de chantier",
   POP = "Pop",
   WASTE_DESC = "Description déchet",
@@ -168,6 +169,11 @@ export const mapRevision = (
         dataNewValue: review?.content?.waste?.code
       },
 
+      {
+        dataName: DataNameEnum.FAMILY_CODE,
+        dataOldValue: review?.[bsdName]?.waste?.familyCode,
+        dataNewValue: review?.content?.waste?.familyCode
+      },
       {
         dataName: DataNameEnum.POP,
         dataOldValue: review?.bsda?.waste?.pop

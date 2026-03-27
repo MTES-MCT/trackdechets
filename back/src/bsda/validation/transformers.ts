@@ -32,6 +32,18 @@ export const fillIntermediariesOrgIds: ZodBsdaTransformer = bsda => {
   return bsda;
 };
 
+export const emptyPickupSiteDependingOnType: ZodBsdaTransformer = bsda => {
+  if (bsda.type === "GATHERING" || bsda.type === "RESHIPMENT") {
+    bsda.emitterPickupSiteName = null;
+    bsda.emitterPickupSiteAddress = null;
+    bsda.emitterPickupSiteCity = null;
+    bsda.emitterPickupSitePostalCode = null;
+    bsda.emitterPickupSiteInfos = null;
+  }
+
+  return bsda;
+};
+
 export const fillWasteConsistenceWhenForwarding: ZodBsdaTransformer =
   async bsda => {
     if (

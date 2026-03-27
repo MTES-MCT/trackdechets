@@ -46,6 +46,7 @@ const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
       ...actualBsda,
       wasteCode: parent.initialWasteCode,
       wastePop: parent.initialWastePop,
+      wasteFamilyCode: parent.initialWasteFamilyCode,
       packagings: parent.initialPackagings,
       wasteSealNumbers: parent.initialWasteSealNumbers,
       wasteMaterialName: parent.initialWasteMaterialName,

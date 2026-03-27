@@ -1,99 +1,200 @@
+import React, { useCallback, useMemo, useState } from "react";
+import { FieldProps, useFormikContext } from "formik";
+import { useLazyQuery } from "@apollo/client";
 import {
-  Field,
-  FieldArray,
-  FieldArrayRenderProps,
-  FieldProps,
-  useFormikContext
-} from "formik";
-import React, { useMemo } from "react";
-import TdSwitch from "../../../../common/components/Switch";
-import { Form, ParcelNumber } from "@td/codegen-ui";
-import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
-import { IconDelete1 } from "../../../../Apps/common/Components/Icons/Icons";
-import TagsInput from "../../../../common/components/tags-input/TagsInput";
+  Form,
+  ParcelNumber,
+  Query,
+  QueryGetCityNameByInseeCodeArgs,
+  QueryGetCommuneByCoordinatesArgs
+} from "@td/codegen-ui";
 
-const newParcelNumber = {
-  city: "",
-  inseeCode: "",
-  prefix: "",
-  number: "",
-  section: ""
-};
+import TdSwitch from "../../../../common/components/Switch";
+import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
+import TagsInput from "../../../../common/components/tags-input/TagsInput";
+import {
+  FormikParcelsVisualizer,
+  type ParcelFromMap
+} from "../../../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
+import {
+  GET_CITY_NAME_BY_INSEE_CODE,
+  GET_COMMUNE_BY_COORDINATES
+} from "./queries";
+
+/**
+ * Split a parcel number string "prefix-section-number" (e.g. "000-AB-25")
+ * into its constituent parts.
+ */
+function splitParcelNumber(parcelNumber: string): {
+  prefix: string;
+  section: string;
+  number: string;
+} {
+  const parts = parcelNumber.split("-");
+  return {
+    prefix: parts[0] ?? "",
+    section: parts[1] ?? "",
+    number: parts[2] ?? ""
+  };
+}
+
+/**
+ * Format a ParcelNumber as a display label.
+ * Cadastre: "75056 | 000-AB-25 | Paris"
+ * GPS:      "GPS : 48.852197, 2.310674"
+ */
+function formatParcelLabel(parcel: ParcelNumber): string {
+  // GPS-based parcel (non-cadastered land)
+  if (parcel.x != null && parcel.y != null && !parcel.prefix) {
+    const label = `GPS : ${parcel.x}, ${parcel.y}`;
+    return parcel.city ? `${label} | ${parcel.city}` : label;
+  }
+
+  // Cadastre-based parcel
+  const parts: string[] = [];
+  if (parcel.inseeCode) parts.push(parcel.inseeCode);
+  if (parcel.prefix && parcel.section && parcel.number) {
+    parts.push(`${parcel.prefix}-${parcel.section}-${parcel.number}`);
+  }
+  if (parcel.city) parts.push(parcel.city);
+
+  return parts.join(" | ") || "Parcelle incomplète";
+}
+
+/**
+ * Check whether a parcel already exists in the list.
+ */
+function isDuplicateParcel(
+  existing: ParcelNumber[],
+  newParcel: ParcelFromMap
+): boolean {
+  // GPS mode
+  if (newParcel.x != null && newParcel.y != null) {
+    return existing.some(p => p.x === newParcel.x && p.y === newParcel.y);
+  }
+
+  // Cadastre mode
+  const { prefix, section, number } = splitParcelNumber(newParcel.parcelNumber);
+
+  return existing.some(
+    p =>
+      p.inseeCode === newParcel.inseeCode &&
+      p.prefix === prefix &&
+      p.section === section &&
+      p.number === number
+  );
+}
+
 export function ParcelNumbersSelector({ field }: FieldProps) {
   const { setFieldValue } = useFormikContext<Form>();
-  const values: ParcelNumber[] = field.value ?? [];
-  const showParcelNumberSelector = values.length > 0;
+  const values: ParcelNumber[] = useMemo(
+    () => field.value ?? [],
+    [field.value]
+  );
+  const [isEnabled, setIsEnabled] = useState<boolean>(
+    () => Array.isArray(field.value) && field.value.length > 0
+  );
 
-  function handleparcelNumberToggle() {
-    if (showParcelNumberSelector) {
+  const [getCityNameByInseeCode] = useLazyQuery<
+    Pick<Query, "getCityNameByInseeCode">,
+    QueryGetCityNameByInseeCodeArgs
+  >(GET_CITY_NAME_BY_INSEE_CODE);
+
+  const [getCommuneByCoordinates] = useLazyQuery<
+    Pick<Query, "getCommuneByCoordinates">,
+    QueryGetCommuneByCoordinatesArgs
+  >(GET_COMMUNE_BY_COORDINATES);
+
+  function handleParcelNumberToggle() {
+    if (isEnabled) {
       setFieldValue(field.name, null, false);
+      setIsEnabled(false);
     } else {
-      setFieldValue(field.name, [newParcelNumber], false);
+      setFieldValue(field.name, [], false);
+      setIsEnabled(true);
     }
   }
 
+  const handleAddParcel = useCallback(
+    async (parcel: ParcelFromMap) => {
+      if (isDuplicateParcel(values, parcel)) return;
+
+      // GPS coordinate mode (non-cadastered land)
+      if (parcel.x != null && parcel.y != null) {
+        const { data } = await getCommuneByCoordinates({
+          variables: { lat: parcel.x, lng: parcel.y }
+        });
+        const commune = data?.getCommuneByCoordinates;
+        const newParcelNumber: ParcelNumber = {
+          city: commune?.city ?? "",
+          inseeCode: commune?.inseeCode,
+          x: parcel.x,
+          y: parcel.y
+        };
+
+        setFieldValue(field.name, [...values, newParcelNumber], false);
+
+        return;
+      }
+
+      // Cadastre mode
+      const { prefix, section, number } = splitParcelNumber(
+        parcel.parcelNumber
+      );
+
+      const { data } = await getCityNameByInseeCode({
+        variables: { inseeCode: parcel.inseeCode }
+      });
+      const city = data?.getCityNameByInseeCode ?? "";
+
+      const newParcelNumber: ParcelNumber = {
+        city,
+        inseeCode: parcel.inseeCode,
+        prefix,
+        section,
+        number
+      };
+
+      setFieldValue(field.name, [...values, newParcelNumber], false);
+    },
+    [
+      values,
+      field.name,
+      setFieldValue,
+      getCityNameByInseeCode,
+      getCommuneByCoordinates
+    ]
+  );
+
+  const handleRemoveParcel = useCallback(
+    (index: number) => {
+      setFieldValue(
+        field.name,
+        values.filter((_, i) => i !== index),
+        false
+      );
+    },
+    [values, field.name, setFieldValue]
+  );
+
+  const tags = useMemo(() => values.map(formatParcelLabel), [values]);
+
   return (
     <div>
-      <TdSwitch
-        checked={showParcelNumberSelector}
-        onChange={handleparcelNumberToggle}
-        label="Je souhaite ajouter une parcelle cadastrale pour la traçabilité des terres et sédiments (optionnel)"
-      />
+      <div className="fr-mb-2w">
+        <TdSwitch
+          checked={isEnabled}
+          onChange={handleParcelNumberToggle}
+          label="Je souhaite ajouter une parcelle cadastrale pour la traçabilité des terres et sédiments (optionnel)"
+        />
+      </div>
 
-      {showParcelNumberSelector && (
-        <FieldArray
-          name={field.name}
-          render={arrayHelpers => (
-            <div>
-              {values.map((parcelNumber, index) => (
-                <div
-                  className="tw-p-4 tw-mb-4 tw-border-2 tw-rounded"
-                  key={index}
-                >
-                  <div className="tw-float-right tw-m-4">
-                    <button
-                      type="button"
-                      onClick={() => arrayHelpers.remove(index)}
-                      aria-label="Supprimer"
-                    >
-                      <IconDelete1 aria-hidden />
-                    </button>
-                  </div>
-                  <div className="form__row">
-                    <label>
-                      Commune sur laquelle se trouve la parcelle
-                      <Field
-                        type="text"
-                        name={`wasteDetails.parcelNumbers.${index}.city`}
-                        className="td-input td-input--medium"
-                      />
-                    </label>
-                  </div>
-                  <div className="form__row">
-                    <label>
-                      Code INSEE de la commune
-                      <Field
-                        type="text"
-                        name={`wasteDetails.parcelNumbers.${index}.inseeCode`}
-                        className="td-input td-input--small"
-                      />
-                    </label>
-                  </div>
-
-                  <ParcelDetails {...{ index, parcelNumber, arrayHelpers }} />
-                </div>
-              ))}
-              <div className="form__row">
-                <button
-                  className="btn btn--outline-primary btn--small"
-                  type="button"
-                  onClick={() => arrayHelpers.push(newParcelNumber)}
-                >
-                  Ajouter un numéro de parcelle
-                </button>
-              </div>
-            </div>
-          )}
+      {isEnabled && (
+        <FormikParcelsVisualizer
+          disabled={false}
+          onAddParcel={handleAddParcel}
+          onRemoveParcel={handleRemoveParcel}
+          tags={tags}
         />
       )}
 
@@ -119,148 +220,6 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
           />
         </label>
         <TagsInput name="wasteDetails.analysisReferences" />
-      </div>
-    </div>
-  );
-}
-
-function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
-  const showParcelNumber = useMemo(() => {
-    return (
-      parcelNumber.prefix ||
-      parcelNumber.section ||
-      parcelNumber.number ||
-      !("x" in parcelNumber)
-    );
-  }, [parcelNumber]);
-
-  function handleGpsToggle(
-    parcelNumber: ParcelNumber,
-    index: number,
-    arrayHelpers: FieldArrayRenderProps
-  ) {
-    if (showParcelNumber) {
-      arrayHelpers.replace(index, {
-        city: parcelNumber.city,
-        inseeCode: parcelNumber.inseeCode,
-        x: 0,
-        y: 0
-      });
-    } else {
-      arrayHelpers.replace(index, {
-        city: parcelNumber.city,
-        inseeCode: parcelNumber.inseeCode,
-        prefix: "",
-        number: "",
-        section: ""
-      });
-    }
-  }
-
-  return (
-    <>
-      <div className="form__row">
-        {showParcelNumber ? (
-          <ParcelCadastral index={index} />
-        ) : (
-          <ParcelGps index={index} />
-        )}
-      </div>
-      <div className="form__row">
-        <TdSwitch
-          checked={!showParcelNumber}
-          onChange={() => handleGpsToggle(parcelNumber, index, arrayHelpers)}
-          label="Le domaine n'est pas cadastré, je n'ai pas les numéros de parcelle,
-          j'indique les coordonnées GPS (au format WGS 84)"
-        />
-      </div>
-    </>
-  );
-}
-
-function ParcelCadastral({ index }) {
-  return (
-    <div>
-      <p>
-        Si le numéro dont vous disposez ressemble à "000-AB-25", 000 est le
-        prefixe, AB la section, et 25 le numéro de parcelle. Pour retrouver le
-        numéro à partir d'une adresse, rendez-vous sur{" "}
-        <a
-          href="https://cadastre.data.gouv.fr/map"
-          target="_blank"
-          className="fr-link force-external-link-content force-underline-link"
-          rel="noreferrer"
-        >
-          le site du cadastre
-        </a>
-        , ou{" "}
-        <a
-          href="https://errial.georisques.gouv.fr/#/"
-          target="_blank"
-          className="fr-link force-external-link-content force-underline-link"
-          rel="noreferrer"
-        >
-          le site Errial
-        </a>
-      </p>
-      <div className="tw-flex tw-justify-between">
-        <div className="form__row">
-          <label>
-            Prefixe
-            <Field
-              type="text"
-              name={`wasteDetails.parcelNumbers.${index}.prefix`}
-              className="td-input td-input--small"
-            />
-          </label>
-        </div>
-        <div className="form__row">
-          <label>
-            Section
-            <Field
-              type="text"
-              name={`wasteDetails.parcelNumbers.${index}.section`}
-              className="td-input td-input--small"
-            />
-          </label>
-        </div>
-        <div className="form__row">
-          <label>
-            Numéro de parcelle
-            <Field
-              type="text"
-              name={`wasteDetails.parcelNumbers.${index}.number`}
-              className="td-input td-input--small"
-            />
-          </label>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ParcelGps({ index }) {
-  return (
-    <div>
-      <div className="form__row">
-        <label>
-          Coordonnée latitude au format WGS 84 (entre -90° et 90°)
-          <Field
-            type="number"
-            name={`wasteDetails.parcelNumbers.${index}.x`}
-            className="td-input td-input--medium"
-          />
-        </label>
-      </div>
-      <div className="form__row">
-        <label>
-          Coordonnée longitude au format WGS 84 (entre -180° et 180°)
-          <Field
-            type="number"
-            name={`wasteDetails.parcelNumbers.${index}.y`}
-            className="td-input td-input--medium"
-          />
-        </label>
       </div>
     </div>
   );

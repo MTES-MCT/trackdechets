@@ -54,6 +54,7 @@ export type RevisionRequestContent = Pick<
   Prisma.BsdaRevisionRequestCreateInput,
   | "wasteCode"
   | "wastePop"
+  | "wasteFamilyCode"
   | "packagings"
   | "wasteSealNumbers"
   | "wasteMaterialName"
@@ -290,6 +291,7 @@ async function getFlatContent(
 const schema = rawBsdaSchema
   .pick({
     wasteCode: true,
+    wasteFamilyCode: true,
     wastePop: true,
     wasteSealNumbers: true,
     wasteMaterialName: true,
@@ -343,6 +345,7 @@ const schema = rawBsdaSchema
     // The difference with the raw bsda schema is that most fields must not be empty
     const nonEmptyFields = [
       "wasteCode",
+      "wasteFamilyCode",
       "wastePop",
       "wasteSealNumbers",
       "wasteMaterialName",
@@ -384,6 +387,7 @@ const schema = rawBsdaSchema
 function getBsdaHistory(bsda: Bsda) {
   return {
     initialWasteCode: bsda.wasteCode,
+    initialWasteFamilyCode: bsda.wasteFamilyCode,
     initialWastePop: bsda.wastePop,
     initialPackagings: bsda.packagings,
     initialWasteSealNumbers: bsda.wasteSealNumbers,

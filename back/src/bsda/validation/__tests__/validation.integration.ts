@@ -54,6 +54,26 @@ describe("BSDA parsing", () => {
       expect(parsed).toBeDefined();
     });
 
+    test("when type is GATHERING, pickup site fields are nullified", () => {
+      const data: ZodBsda = {
+        ...bsda,
+        type: BsdaType.GATHERING,
+        emitterPickupSiteName: "Pickup site",
+        emitterPickupSiteAddress: "Pickup site address",
+        emitterPickupSiteCity: "Pickup site city",
+        emitterPickupSitePostalCode: "12345",
+        emitterPickupSiteInfos: "Pickup site infos"
+      };
+
+      const parsed = parseBsda(data, context);
+
+      expect(parsed.emitterPickupSiteName).toBeNull();
+      expect(parsed.emitterPickupSiteAddress).toBeNull();
+      expect(parsed.emitterPickupSiteCity).toBeNull();
+      expect(parsed.emitterPickupSitePostalCode).toBeNull();
+      expect(parsed.emitterPickupSiteInfos).toBeNull();
+    });
+
     test("when there is a foreign transporter and recepisse fields are null", async () => {
       const foreignTransporter = await companyFactory({
         orgId: "BE0541696005",

@@ -1,0 +1,9 @@
+"""
+Informations d'une commune française obtenues via l'API geo.api.gouv.fr.
+"""
+type Commune {
+  "Code INSEE de la commune (ex: 75056)"
+  inseeCode: String!
+  "Nom de la commune (ex: Paris)"
+  city: String!
+}

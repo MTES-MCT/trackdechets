@@ -10,7 +10,7 @@ import {
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-ui";
-import { BSDA_WASTES } from "@td/constants";
+import { BSDA_WASTES, WASTE_FAMILY_CODES } from "@td/constants";
 import React, { useEffect, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -43,7 +43,9 @@ import {
   NOUVELLE_DENOMINATION_USUELLE,
   NOUVELLE_DESC_TRAITEMENT,
   POP,
-  TITLE_REQUEST_LIST
+  TITLE_REQUEST_LIST,
+  CODE_FAMILLE,
+  NOUVEAU_CODE_FAMILLE
 } from "../../../Revision/wordingsRevision";
 import { bsdaPackagingTypes } from "../../../../../Forms/Components/PackagingList/helpers";
 import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
@@ -162,6 +164,9 @@ export function BsdaRequestRevision({ bsda }: Props) {
     setValue("waste.sealNumbers", newPlates);
   };
 
+  const getWasteFamilyLabel = (code?: string | null) =>
+    WASTE_FAMILY_CODES.find(item => item.value === code)?.label ?? "";
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>
@@ -198,6 +203,29 @@ export function BsdaRequestRevision({ bsda }: Props) {
                   {BSDA_WASTES.map(item => (
                     <option value={item.code} key={item.code}>
                       {item.code} - {item.description}
+                    </option>
+                  ))}
+                </Select>
+              </RhfReviewableField>
+              <RhfReviewableField
+                title={CODE_FAMILLE}
+                path="waste.familyCode"
+                value={getWasteFamilyLabel(bsda.waste?.familyCode)}
+                defaultValue={getWasteFamilyLabel(
+                  initialBsdaReview.waste.familyCode
+                )}
+              >
+                <Select
+                  label={NOUVEAU_CODE_FAMILLE}
+                  className="fr-col-8"
+                  nativeSelectProps={{
+                    ...register("waste.familyCode")
+                  }}
+                >
+                  <option value="">Sélectionnez une valeur...</option>
+                  {WASTE_FAMILY_CODES.map(item => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
                     </option>
                   ))}
                 </Select>

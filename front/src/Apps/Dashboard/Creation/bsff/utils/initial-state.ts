@@ -5,6 +5,7 @@ import {
   BsffType
 } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
+import { emptyBsffPackaging } from "../../../../Forms/Components/PackagingList/helpers";
 
 const getInitialEmitterCompany = (emitter?: BsffEmitterInput | null) => {
   return {
@@ -40,7 +41,7 @@ export default {
     description: "",
     adr: ""
   },
-  packagings: [],
+  packagings: [emptyBsffPackaging],
   weight: {
     isEstimate: false,
     value: null

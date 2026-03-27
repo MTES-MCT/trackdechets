@@ -8,6 +8,7 @@ import { ConditionBuilder, ConditionConfig } from "yup/lib/Condition";
 import {
   isBroker,
   isCollector,
+  isDisposalFacility,
   isTrader,
   isTransporter,
   isWasteCenter,
@@ -259,7 +260,8 @@ export const siretTests: SiretTests = {
           !(
             isCollector(company) ||
             isWasteProcessor(company) ||
-            isWasteCenter(company)
+            isWasteCenter(company) ||
+            isDisposalFacility(company)
           )
         ) {
           return ctx.createError({
