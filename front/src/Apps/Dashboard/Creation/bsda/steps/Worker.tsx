@@ -73,6 +73,10 @@ const Worker = () => {
               "worker.certification.organisation",
               workerSelected?.workerCertification?.organisation
             );
+          } else {
+            setValue("worker.certification.certificationNumber", null);
+            setValue("worker.certification.validityLimit", null);
+            setValue("worker.certification.organisation", null);
           }
         } else {
           setValue("worker.certification", null);
