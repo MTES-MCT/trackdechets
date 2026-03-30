@@ -111,8 +111,9 @@ type Mutation {
   """
   USAGE INTERNE
   Tente de désactiver un compte utilisateur (soft-delete et anonymisation)
+  Accepte un identifiant de base de données (ID) ou une adresse email.
   """
-  anonymizeUser(id: ID!): String!
+  anonymizeUser(idOrEmail: String!): String!
 
   """
   USAGE INTERNE

@@ -10,8 +10,8 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import Button from "@codegouvfr/react-dsfr/Button";
 
 const ANONYMIZE_USER = gql`
-  mutation anonymizeUser($id: ID!) {
-    anonymizeUser(id: $id)
+  mutation anonymizeUser($idOrEmail: String!) {
+    anonymizeUser(idOrEmail: $idOrEmail)
   }
 `;
 function AnonymizeUser() {
@@ -24,17 +24,19 @@ function AnonymizeUser() {
     <div>
       <Formik
         initialValues={{
-          id: ""
+          idOrEmail: ""
         }}
         onSubmit={async (values, { resetForm }) => {
           if (
             !window.confirm(
-              `Souhaitez-vous supprimer l'utilisateur ${values.id} ? (action irréversible)`
+              `Souhaitez-vous supprimer l'utilisateur ${values.idOrEmail} ? (action irréversible)`
             )
           ) {
             return;
           }
-          const res = await anonymizeUser({ variables: { id: values.id } });
+          const res = await anonymizeUser({
+            variables: { idOrEmail: values.idOrEmail }
+          });
           resetForm();
           !!res?.data?.anonymizeUser
             ? toast.success(
@@ -52,17 +54,17 @@ function AnonymizeUser() {
         {values => (
           <Form>
             <div className="form__row fr-mt-0 fr-mb-2w">
-              <Field name="id">
+              <Field name="idOrEmail">
                 {({ field }) => {
                   return (
                     <Input
-                      label="Identifiant de base de données du compte à
+                      label="Identifiant ou adresse email du compte à
                           anonymiser et désactiver définitivement"
                       hintText="Attention: action irreversible ! L'utilisateur sera
                             anonymisé et son compte définitivement désactivé."
                       nativeInputProps={{
                         ...field,
-                        placeholder: "userId"
+                        placeholder: "ID ou email"
                       }}
                       className="fr-col-8"
                     />
@@ -70,7 +72,7 @@ function AnonymizeUser() {
                 }}
               </Field>
 
-              <RedErrorMessage name="id" />
+              <RedErrorMessage name="idOrEmail" />
             </div>
             <div className="fr-col-8">
               {error && <DsfrNotificationError apolloError={error} />}
@@ -78,7 +80,7 @@ function AnonymizeUser() {
             <Button
               type="submit"
               priority="primary"
-              disabled={loading || !values?.values?.id}
+              disabled={loading || !values?.values?.idOrEmail}
               className="fr-mt-2w"
             >
               {loading ? "Suppression en cours..." : "Supprimer"}
