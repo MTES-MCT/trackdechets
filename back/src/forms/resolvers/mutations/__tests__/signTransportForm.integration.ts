@@ -23,6 +23,13 @@ const SIGN_TRANSPORT_FORM = `
       sentBy
       takenOverAt
       takenOverBy
+      transporter {
+        company {
+          contact
+          mail
+          phone
+        }
+      }
       temporaryStorageDetail {
         signedAt
         signedBy
@@ -1775,6 +1782,247 @@ describe("signTransportForm", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe("Le mode de transport est obligatoire");
+    });
+  });
+
+  describe("[TRA-17181] Transporter can update contact, email, phone at signature step", () => {
+    it("should update contact, email, phone", async () => {
+      // Given
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const transporter = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({ company: transporter.company });
+      const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+      const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+      const form = await formFactory({
+        ownerId: emitter.user.id,
+        opt: {
+          status: "SIGNED_BY_PRODUCER",
+          emitterCompanySiret: emitter.company.siret,
+          emitterCompanyName: emitter.company.name,
+          signedByTransporter: null,
+          sentAt: null,
+          sentBy: null,
+          emittedAt: emittedAt,
+          emittedBy: emitter.user.name,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterCompanyName: transporter.company.name,
+              transporterCompanyContact: "Old contact",
+              transporterCompanyMail: "old.email@mail.com",
+              transporterCompanyPhone: "0102030405",
+              number: 1
+            }
+          }
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(transporter.user);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: form.id,
+          input: {
+            takenOverAt: takenOverAt.toISOString() as unknown as Date,
+            takenOverBy: transporter.user.name,
+            transporterCompanyContact: "New contact",
+            transporterCompanyMail: "new.email@mail.com",
+            transporterCompanyPhone: "0605040302"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signTransportForm).toEqual(
+        expect.objectContaining({
+          status: "SENT",
+
+          signedByTransporter: true,
+          sentAt: takenOverAt.toISOString(),
+          sentBy: emitter.user.name,
+
+          takenOverAt: takenOverAt.toISOString(),
+          takenOverBy: transporter.user.name,
+          transporter: {
+            company: {
+              contact: "New contact",
+              mail: "new.email@mail.com",
+              phone: "0605040302"
+            }
+          }
+        })
+      );
+    });
+
+    it("user does not have to re-feed contact, email, phone", async () => {
+      // Given
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const transporter = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({ company: transporter.company });
+      const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+      const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+      const form = await formFactory({
+        ownerId: emitter.user.id,
+        opt: {
+          status: "SIGNED_BY_PRODUCER",
+          emitterCompanySiret: emitter.company.siret,
+          emitterCompanyName: emitter.company.name,
+          signedByTransporter: null,
+          sentAt: null,
+          sentBy: null,
+          emittedAt: emittedAt,
+          emittedBy: emitter.user.name,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterCompanyName: transporter.company.name,
+              transporterCompanyContact: "Old contact",
+              transporterCompanyMail: "old.email@mail.com",
+              transporterCompanyPhone: "0102030405",
+              number: 1
+            }
+          }
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(transporter.user);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: form.id,
+          input: {
+            takenOverAt: takenOverAt.toISOString() as unknown as Date,
+            takenOverBy: transporter.user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signTransportForm).toEqual(
+        expect.objectContaining({
+          status: "SENT",
+
+          signedByTransporter: true,
+          sentAt: takenOverAt.toISOString(),
+          sentBy: emitter.user.name,
+
+          takenOverAt: takenOverAt.toISOString(),
+          takenOverBy: transporter.user.name,
+          transporter: {
+            company: {
+              contact: "Old contact",
+              mail: "old.email@mail.com",
+              phone: "0102030405"
+            }
+          }
+        })
+      );
+    });
+
+    it("should update contact, phone, mail for transporter N", async () => {
+      // Given
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const transporter1 = await userWithCompanyFactory("ADMIN");
+      const transporter2 = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({ company: transporter1.company });
+      await transporterReceiptFactory({ company: transporter2.company });
+
+      const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+      const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+      const form = await formFactory({
+        ownerId: emitter.user.id,
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitter.company.siret,
+          emitterCompanyName: emitter.company.name,
+          signedByTransporter: null,
+          sentAt: emittedAt,
+          sentBy: emitter.user.name,
+          takenOverAt,
+          takenOverBy: transporter1.user.name,
+          emittedAt: emittedAt,
+          emittedBy: emitter.user.name,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter1.company.siret,
+              takenOverAt: new Date("2018-12-12T00:00:00.000Z"),
+              takenOverBy: transporter1.user.name,
+              transporterCompanyContact: "Old contact 1",
+              transporterCompanyMail: "old.email1@mail.com",
+              transporterCompanyPhone: "0102030401",
+              number: 1
+            }
+          }
+        }
+      });
+
+      await bsddTransporterFactory({
+        formId: form.id,
+        opts: {
+          transporterCompanySiret: transporter2.company.siret,
+          transporterCompanyContact: "Old contact 2",
+          transporterCompanyMail: "old.email2@mail.com",
+          transporterCompanyPhone: "0102030402"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(transporter2.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: form.id,
+          input: {
+            takenOverAt: takenOverAt.toISOString() as any,
+            takenOverBy: transporter2.user.name,
+            transporterCompanyContact: "New contact 2",
+            transporterCompanyMail: "new.email2@mail.com",
+            transporterCompanyPhone: "010505050505"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedForm = await prisma.form.findFirstOrThrow({
+        where: { id: form.id },
+        include: { transporters: true }
+      });
+
+      const transporters = getTransportersSync(updatedForm);
+
+      // Transporter 1 should not have been updated
+      expect(transporters[0].transporterCompanyContact).toEqual(
+        "Old contact 1"
+      );
+      expect(transporters[0].transporterCompanyMail).toEqual(
+        "old.email1@mail.com"
+      );
+      expect(transporters[0].transporterCompanyPhone).toEqual("0102030401");
+
+      // Transporter 2 should have been updated
+      expect(transporters[1].transporterCompanyContact).toEqual(
+        "New contact 2"
+      );
+      expect(transporters[1].transporterCompanyMail).toEqual(
+        "new.email2@mail.com"
+      );
+      expect(transporters[1].transporterCompanyPhone).toEqual("010505050505");
+
+      expect(updatedForm.currentTransporterOrgId).toEqual(
+        transporter2.company.siret
+      );
     });
   });
 });
