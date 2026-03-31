@@ -187,8 +187,19 @@ export const getPublishErrorTabIds = (
   const publishErrorTabIds = [
     ...new Set(
       apiErrors?.map(apiError => {
-        if (apiError.path?.[0] && typeof apiError.path[0] === "string") {
-          return pathPrefixToTab[bsdType](apiError.path[0]);
+        const name = (apiError.path ?? []).join(".");
+        const pathPrefix = apiError.path?.[0];
+
+        if (
+          bsdType === BsdType.Bsvhu &&
+          apiError.code === "too_big" &&
+          name.startsWith("identificationNumbers")
+        ) {
+          return TabId.none;
+        }
+
+        if (pathPrefix && typeof pathPrefix === "string") {
+          return pathPrefixToTab[bsdType](pathPrefix);
         }
         return null;
       })
@@ -207,11 +218,25 @@ export const getPublishErrorMessages = (
   const publishErrorMessages =
     apiErrors
       ?.map(apiError => {
-        const errorPath = apiError?.path;
+        const errorPath = apiError?.path ?? [];
         const pathPrefix = errorPath?.[0];
-        const tabId = pathPrefixToTab[bsdType](pathPrefix);
         const name = errorPath.join(".");
-        const message = apiError.message;
+        let tabId =
+          pathPrefix && typeof pathPrefix === "string"
+            ? pathPrefixToTab[bsdType](pathPrefix)
+            : null;
+
+        let message = apiError.message;
+
+        if (
+          bsdType === BsdType.Bsvhu &&
+          apiError.code === "too_big" &&
+          name.startsWith("identificationNumbers")
+        ) {
+          tabId = TabId.none;
+          message =
+            'Le champ "Détail des identifications" ne doit pas dépasser 250 caractères.';
+        }
         return { tabId, name, message };
       })
       .filter(
@@ -242,7 +267,7 @@ export const getErrorTabIds = (
   return errorTabIds;
 };
 
-export const handleGraphQlError = (err: ApolloError) => {
+export const handleGraphQlError = (err: ApolloError): NormalizedError[] => {
   const firstGqlError = err.graphQLErrors[0];
   if (!firstGqlError) {
     return [
@@ -254,22 +279,43 @@ export const handleGraphQlError = (err: ApolloError) => {
     ];
   }
 
-  const issues = firstGqlError?.extensions?.issues as NormalizedError[];
+  const issues = firstGqlError?.extensions?.issues as
+    | Array<{
+        code?: string;
+        path?: Array<string | number>;
+        message?: string;
+      }>
+    | undefined;
   if (issues?.length) {
-    const errorsWithEmptyPath = issues.filter(f => !f.path.length);
-    if (errorsWithEmptyPath.length) {
+    const normalizedIssues: NormalizedError[] = issues.map(issue => ({
+      code: issue.code ?? "unknown",
+      path:
+        Array.isArray(issue.path) && issue.path.length > 0
+          ? issue.path.map(String)
+          : ["none"],
+      message:
+        issue.message ?? firstGqlError.message ?? "Une erreur est survenue"
+    }));
+
+    const errorsWithNonePath = normalizedIssues.filter(
+      issue => !issue.path?.length || issue.path[0] === "none"
+    );
+
+    if (errorsWithNonePath.length) {
       toastApolloError(err);
     }
-    return issues;
+    return normalizedIssues;
   }
 
   // other case like forbidden, we need to display an error anyway ...
   return [
     {
-      code: firstGqlError?.extensions?.code as string,
+      code: (firstGqlError?.extensions?.code as string) ?? "unknown",
       path: ["none"],
       message:
-        firstGqlError?.message ?? (firstGqlError?.extensions?.message as string)
+        firstGqlError?.message ??
+        (firstGqlError?.extensions?.message as string) ??
+        "Une erreur est survenue"
     }
   ];
 };
