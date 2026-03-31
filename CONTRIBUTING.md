@@ -609,6 +609,14 @@ La table RegistryLookup est utilisée afin de générer les registres d'export V
 
 `npx nx run back:rebuild-registry-lookup SSD BSDA`
 
+**Pour reconstruire le lookup d’une seule entrée**
+
+Il faut préciser un seul type et l’identifiant de l’entrée (`publicId` pour les types registre RNDTS, `readableId` pour les BSD) :
+
+`npx nx run back:rebuild-registry-lookup INCOMING_TEXS --id=<publicId>`
+
+Options optionnelles : `--page-size`, `--threads` (ex. `--page-size 500 --threads 4`).
+
 valeurs possibles :
 
 - BSDD

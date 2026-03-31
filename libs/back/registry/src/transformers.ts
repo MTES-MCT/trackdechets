@@ -231,7 +231,10 @@ function getCellValue(cell: Excel.Cell) {
     return richTextValue.richText.map(rt => rt.text).join("");
   }
 
-  if (cell.type === Excel.ValueType.Formula) {
+  if (
+    cell.type === Excel.ValueType.Formula ||
+    (cell.type === Excel.ValueType.String && typeof cell.value === "object")
+  ) {
     const formulaValue = cell.value as Excel.CellFormulaValue;
     return formulaValue.result !== undefined ? String(formulaValue.result) : "";
   }

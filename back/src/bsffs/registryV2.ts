@@ -28,8 +28,10 @@ import { splitAddress } from "../common/addresses";
 import { getBsffSubType } from "../common/subTypes";
 import { kgToTonRegistryV2 } from "../common/converter";
 import {
+  checkRegistryLookupExistsForDiscovery,
   deleteRegistryLookup,
   generateDateInfos,
+  type MissingLookupEntry,
   rebuildRegistryLookupGeneric
 } from "@td/registry";
 import { Nullable } from "../types";
@@ -1417,21 +1419,51 @@ export const updateRegistryLookup = async (
   });
 };
 
+const bsffBaseWhere = {
+  isDeleted: false,
+  isDraft: false
+};
+
+export const discoverMissingLookups = async (
+  items: MinimalBsffForLookup[]
+): Promise<MissingLookupEntry[]> => {
+  const missing: MissingLookupEntry[] = [];
+  for (const bsff of items) {
+    const expectedLookups = bsffToLookupCreateInputs(bsff);
+    for (const lookup of expectedLookups) {
+      const exists = await checkRegistryLookupExistsForDiscovery({
+        id: lookup.id,
+        exportRegistryType: lookup.exportRegistryType,
+        siret: lookup.siret
+      });
+      if (!exists) {
+        missing.push({
+          id: bsff.id,
+          exportRegistryType: lookup.exportRegistryType,
+          siret: lookup.siret,
+          createdAt: bsff.createdAt.toISOString()
+        });
+      }
+    }
+  }
+  return missing;
+};
+
 export const rebuildRegistryLookup =
   rebuildRegistryLookupGeneric<MinimalBsffForLookup>({
     name: "BSFF",
-    getTotalCount: () =>
+    getTotalCount: (ids?: string[]) =>
       prisma.bsff.count({
         where: {
-          isDeleted: false,
-          isDraft: false
+          ...bsffBaseWhere,
+          ...(ids?.length ? { id: { in: ids } } : {})
         }
       }),
-    findMany: (pageSize, cursorId) =>
+    findMany: (pageSize, cursorId, ids?: string[]) =>
       prisma.bsff.findMany({
         where: {
-          isDeleted: false,
-          isDraft: false
+          ...bsffBaseWhere,
+          ...(ids?.length ? { id: { in: ids } } : {})
         },
         take: pageSize,
         skip: cursorId ? 1 : 0,
@@ -1448,7 +1480,8 @@ export const rebuildRegistryLookup =
         createArray = createArray.concat(createInputs);
       }
       return createArray;
-    }
+    },
+    discoverMissingLookups
   });
 
 export const lookupUtils = {

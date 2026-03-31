@@ -50,7 +50,7 @@ export async function saveOutgoingTexsLine({
       return;
     default:
       await prisma.$transaction(async tx => {
-        const registryOutgoingTexs = await prisma.registryOutgoingTexs.create({
+        const registryOutgoingTexs = await tx.registryOutgoingTexs.create({
           data: {
             ...persistedData,
             createdBy: { connect: { id: createdById } },

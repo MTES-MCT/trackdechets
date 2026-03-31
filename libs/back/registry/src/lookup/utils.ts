@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from "@td/prisma";
 import { prisma } from "@td/prisma";
+import { RegistryExportType } from "@td/prisma";
 import { v7 as uuidv7 } from "uuid";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { clearLine, cursorTo } from "readline";
@@ -48,9 +49,39 @@ export const deleteRegistryLookup = async (
   return;
 };
 
+/** Returns true if a RegistryLookup row exists for the given key (used by discovery mode). */
+export const checkRegistryLookupExistsForDiscovery = async (params: {
+  id: string;
+  exportRegistryType: RegistryExportType;
+  siret: string;
+}): Promise<boolean> => {
+  const found = await prisma.registryLookup.findUnique({
+    where: {
+      idExportTypeAndSiret: {
+        id: params.id,
+        exportRegistryType: params.exportRegistryType,
+        siret: params.siret
+      }
+    },
+    select: { id: true }
+  });
+  return found !== null;
+};
+
+/** Entry describing a missing RegistryLookup (used by discovery mode). */
+export interface MissingLookupEntry {
+  id: string;
+  publicId?: string;
+  readableId?: string;
+  exportRegistryType?: string;
+  siret: string;
+  createdAt: string;
+}
+
 export class RegistryLogger {
   private lastUpdate: number = Date.now();
   private registryType: string;
+  private discovery: boolean;
   private globalStart: number;
   private processingHistory: { timestamp: number; count: number }[] = [];
   private readonly HISTORY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -63,10 +94,15 @@ export class RegistryLogger {
     196, 202, 208, 214, 220, 226, 190, 154, 118, 82, 46
   ];
 
-  constructor(registryType: string) {
+  constructor(registryType: string, discovery: boolean) {
     this.registryType = registryType;
+    this.discovery = discovery;
     this.globalStart = performance.now();
-    console.log(`⚙️  [${registryType}] rebuilding registry lookup...`);
+    console.log(
+      `⚙️  [${registryType}] ${
+        discovery ? "discovering" : "rebuilding"
+      } registry lookup...`
+    );
   }
 
   logDelete(): void {
@@ -188,7 +224,11 @@ export class RegistryLogger {
           : "";
 
       process.stdout.write(
-        `⏳ [${this.registryType}] Processing: ${progressBar} ${percent}% (${displayCurrent}/${total})${overflowNote} ${rateDisplay} ${etaDisplay}${pendingWritesDisplay}`
+        `⏳ [${this.registryType}] ${
+          this.discovery ? "Discovering" : "Rebuilding"
+        } registry lookup: ${progressBar} ${percent}% (${displayCurrent}/${total})${overflowNote} ${rateDisplay} ${etaDisplay}${
+          this.discovery ? "" : pendingWritesDisplay
+        }`
       );
       this.lastUpdate = now;
     }
@@ -216,10 +256,41 @@ export class RegistryLogger {
       )}s\n🚀 [${this.registryType}] Final speed profile: ${progressBar}`
     );
   }
+
+  logDiscovery(missing: MissingLookupEntry[]): void {
+    if (missing.length === 0) {
+      return;
+    }
+    console.log(
+      `\n🔍 [${this.registryType}] ${
+        missing.length
+      } missing RegistryLookup entr${missing.length === 1 ? "y" : "ies"}:\n`
+    );
+    const trimmed = missing.slice(0, 10);
+    for (const entry of trimmed) {
+      const parts = [
+        `  id=${entry.id}`,
+        entry.publicId != null ? `publicId=${entry.publicId}` : null,
+        entry.readableId != null ? `readableId=${entry.readableId}` : null,
+        entry.exportRegistryType != null
+          ? `exportType=${entry.exportRegistryType}`
+          : null,
+        `siret=${entry.siret}`,
+        `createdAt=${entry.createdAt}`
+      ].filter(Boolean);
+      console.log(`  [${this.registryType}] Missing: ${parts.join(" ")}`);
+    }
+    if (missing.length > 10) {
+      console.log(`  ... and ${missing.length - 10} more`);
+    }
+  }
 }
 
-export const createRegistryLogger = (registryType: string): RegistryLogger => {
-  return new RegistryLogger(registryType);
+export const createRegistryLogger = (
+  registryType: string,
+  discovery: boolean
+): RegistryLogger => {
+  return new RegistryLogger(registryType, discovery);
 };
 
 export const rebuildRegistryLookupGeneric =
@@ -227,24 +298,31 @@ export const rebuildRegistryLookupGeneric =
     name,
     getTotalCount,
     toLookupData,
-    findMany
+    findMany,
+    discoverMissingLookups
   }: {
     name: string;
-    getTotalCount: () => Promise<number>;
-    findMany: (pageSize: number, cursorId: string | null) => Promise<T[]>;
+    getTotalCount: (ids?: string[]) => Promise<number>;
+    findMany: (
+      pageSize: number,
+      cursorId: string | null,
+      ids?: string[]
+    ) => Promise<T[]>;
     toLookupData: (items: T[]) => Prisma.RegistryLookupUncheckedCreateInput[];
+    discoverMissingLookups: (items: T[]) => Promise<MissingLookupEntry[]>;
   }) =>
-  async (pageSize = 100, threads = 4) => {
-    const logger = createRegistryLogger(name);
+  async (pageSize = 100, threads = 4, ids?: string[], discovery = false) => {
+    const logger = createRegistryLogger(name, discovery);
 
     // First, get total count for progress calculation
-    const total = await getTotalCount();
+    const total = await getTotalCount(ids);
 
     let done = false;
     let cursorId: string | null = null;
     let processedCount = 0;
     let operationId = 0;
     const pendingWrites = new Map<number, Promise<void>>();
+    const allMissing: MissingLookupEntry[] = [];
 
     const processWrite = async (items: T[]) => {
       const createArray = toLookupData(items);
@@ -275,20 +353,31 @@ export const rebuildRegistryLookupGeneric =
       logger.logProgress(processedCount, total, pendingWrites.size);
     };
 
+    const processDiscovery = async (items: T[]) => {
+      const batchMissing = await discoverMissingLookups(items);
+      allMissing.push(...batchMissing);
+      processedCount += items.length;
+      logger.logProgress(processedCount, total, pendingWrites.size);
+    };
+
     while (!done) {
       // Sequential read
-      const items = await findMany(pageSize, cursorId);
+      const items = await findMany(pageSize, cursorId, ids);
 
-      // Start the write operation
-      const currentOperationId = operationId++;
-      const writePromise = processWrite(items).finally(() => {
-        pendingWrites.delete(currentOperationId);
-      });
-      pendingWrites.set(currentOperationId, writePromise);
+      if (discovery) {
+        await processDiscovery(items);
+      } else {
+        // Start the write operation
+        const currentOperationId = operationId++;
+        const writePromise = processWrite(items).finally(() => {
+          pendingWrites.delete(currentOperationId);
+        });
+        pendingWrites.set(currentOperationId, writePromise);
 
-      // If we've reached max concurrency, wait for one write to complete
-      if (pendingWrites.size >= threads) {
-        await Promise.race(pendingWrites.values());
+        // If we've reached max concurrency, wait for one write to complete
+        if (pendingWrites.size >= threads) {
+          await Promise.race(pendingWrites.values());
+        }
       }
 
       if (items.length < pageSize) {
@@ -298,10 +387,14 @@ export const rebuildRegistryLookupGeneric =
       cursorId = items[items.length - 1].id;
     }
 
-    // Wait for any remaining writes to complete
-    if (pendingWrites.size > 0) {
+    // Wait for any remaining writes to complete (non-discovery mode only)
+    if (!discovery && pendingWrites.size > 0) {
       await Promise.all(pendingWrites.values());
     }
 
     logger.logCompletion(processedCount);
+    if (discovery) {
+      logger.logDiscovery(allMissing);
+    }
+    return allMissing;
   };
