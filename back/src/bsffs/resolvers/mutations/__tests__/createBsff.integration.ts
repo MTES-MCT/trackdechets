@@ -1,16 +1,24 @@
-import { BsffPackagingType, BsffType, UserRole } from "@td/prisma";
+import {
+  BsffPackagingType,
+  BsffType,
+  Company,
+  User,
+  UserRole
+} from "@td/prisma";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "@td/constants";
 import type {
   Mutation,
   MutationCreateBsffArgs,
-  BsffOperationCode
+  BsffOperationCode,
+  BsffInput
 } from "@td/codegen-back";
 import {
   siretify,
   userWithCompanyFactory,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  companyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
@@ -80,7 +88,7 @@ const createInput = (emitter, transporter, destination) => ({
 });
 
 describe("Mutation.createBsff", () => {
-  afterEach(resetDatabase);
+  afterAll(resetDatabase);
 
   it("should allow user to create a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -503,5 +511,203 @@ describe("Mutation.createBsff", () => {
           "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
       })
     ]);
+  });
+
+  describe("dormant sirets", () => {
+    let user: User;
+    let emitter: Company;
+    let destination: Company;
+    let transporter: Company;
+    let bsffInput: BsffInput;
+
+    // eslint-disable-next-line prefer-const
+    let searchCompanyMock = jest.fn().mockReturnValue({});
+    let makeClientLocal: typeof makeClient;
+
+    beforeAll(async () => {
+      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
+        name: "Emitter"
+      });
+      user = emitterCompanyAndUser.user;
+      emitter = emitterCompanyAndUser.company;
+      destination = await companyFactory({ name: "Destination" });
+      transporter = await companyFactory({ name: "Transporter" });
+
+      bsffInput = {
+        type: BsffType.COLLECTE_PETITES_QUANTITES,
+        emitter: {
+          company: {
+            siret: emitter.siret,
+            name: emitter.name,
+            address: "Rue de la carcasse",
+            contact: "Contact emitter",
+            phone: "0101010101",
+            mail: "emitter@mail.com"
+          }
+        },
+        transporter: {
+          company: {
+            siret: transporter.siret,
+            name: transporter.name,
+            address: "address",
+            contact: "contact",
+            phone: "0101010101",
+            mail: "transporter@mail.com"
+          }
+        },
+        destination: {
+          company: {
+            siret: destination.siret,
+            name: destination.name,
+            address: "address",
+            contact: "contact",
+            phone: "0101010101",
+            mail: "destination@mail.com"
+          },
+          plannedOperationCode: "R12" as BsffOperationCode
+        },
+        waste: {
+          code: BSFF_WASTE_CODES[0],
+          adr: "Mention ADR",
+          description: "R410"
+        },
+        weight: {
+          value: 1,
+          isEstimate: true
+        },
+        packagings: [
+          {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "123",
+            weight: 1,
+            volume: 1
+          }
+        ]
+      };
+
+      // Mock les appels à la base SIRENE
+      jest.mock("../../../../companies/search", () => ({
+        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+        ...jest.requireActual("../../../../companies/search"),
+        searchCompany: searchCompanyMock
+      }));
+
+      // Ré-importe makeClient pour que searchCompany soit bien mocké
+      jest.resetModules();
+      makeClientLocal = require("../../../../__tests__/testClient")
+        .default as typeof makeClient;
+    });
+
+    afterAll(async () => {
+      jest.resetAllMocks();
+      await resetDatabase();
+    });
+
+    describe("closed company", () => {
+      const mockCloseCompany = (siretToClose: string | null) => {
+        searchCompanyMock.mockImplementation((siret: string) => {
+          return {
+            siret,
+            etatAdministratif: siret === siretToClose ? "F" : "O",
+            address: "Company address",
+            name: "Company name"
+          };
+        });
+      };
+
+      const testCreatingBsffWithClosedSiret = async (
+        siret: string | null | undefined
+      ) => {
+        // Given
+        mockCloseCompany(siret!);
+
+        // When
+        const { mutate } = makeClientLocal(user);
+        const { errors } = await mutate<Pick<Mutation, "createBsff">>(
+          CREATE_BSFF,
+          {
+            variables: {
+              input: bsffInput
+            }
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          `L'établissement ${siret} est fermé selon le répertoire SIRENE`
+        );
+      };
+
+      it.each(["emitter", "transporter", "destination"])(
+        "should not allow creating a BSFF with a closed %p siret",
+        async role => {
+          const siret = bsffInput?.[role]?.company?.siret;
+          await testCreatingBsffWithClosedSiret(siret);
+        }
+      );
+    });
+
+    describe("dormant company", () => {
+      const mockOpenCompany = () => {
+        searchCompanyMock.mockImplementation((siret: string) => {
+          return {
+            siret,
+            etatAdministratif: "O",
+            address: "Company address",
+            name: "Company name"
+          };
+        });
+      };
+
+      const testCreatingBsffWithDormantSiret = async (
+        siret: string | null | undefined
+      ) => {
+        // Given
+        mockOpenCompany();
+
+        // Reset previous companies
+        await prisma.company.updateMany({
+          data: {
+            isDormantSince: null
+          }
+        });
+
+        // Make target company go dormant
+        await prisma.company.update({
+          where: {
+            siret: siret!
+          },
+          data: {
+            isDormantSince: new Date()
+          }
+        });
+
+        // When
+        const { mutate } = makeClientLocal(user);
+        const { errors } = await mutate<Pick<Mutation, "createBsff">>(
+          CREATE_BSFF,
+          {
+            variables: {
+              input: bsffInput
+            }
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+        );
+      };
+
+      it.each(["emitter", "transporter", "destination"])(
+        "should not allow creating a BSFF with a dormant %p siret",
+        async role => {
+          const siret = bsffInput?.[role]?.company?.siret;
+          await testCreatingBsffWithDormantSiret(siret);
+        }
+      );
+    });
   });
 });

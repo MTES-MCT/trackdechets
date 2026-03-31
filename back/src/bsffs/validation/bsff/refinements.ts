@@ -15,6 +15,7 @@ import {
   bsffEditionRules,
   bsffPackagingEditionRules,
   bsffTransporterEditionRules,
+  getSealedFields,
   isBsffFieldRequired,
   isBsffPackagingFieldRequired,
   isBsffTransporterFieldRequired
@@ -38,6 +39,7 @@ import {
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
 } from "../../../common/validation/zod/refinement";
+import { CompanyRole } from "../../../common/validation/zod/schema";
 import { MAX_WEIGHT_BY_ROAD_TONNES } from "../../../common/validation";
 
 // Date de la MAJ 2024.07.1 introduisant un changement
@@ -53,12 +55,28 @@ const v2024091 = new Date("2024-09-24");
  * Ce refinement permet de vérifier que les établissements présents sur le
  * BSFF sont bien inscrits sur Trackdéchets avec le bon profil
  */
-export const checkCompanies: Refinement<ParsedZodBsff> = async (
-  bsff,
-  zodContext
+export const checkCompanies = async (
+  bsff: ParsedZodBsff,
+  zodContext: RefinementCtx,
+  bsffValidationContext: BsffValidationContext
 ) => {
-  await isEmitterRefinement(bsff.emitterCompanySiret, BsdType.BSFF, zodContext);
-  await isDestinationRefinement(bsff.destinationCompanySiret, zodContext);
+  const sealedFields = await getSealedFields(bsff, bsffValidationContext);
+
+  await isEmitterRefinement(
+    bsff.emitterCompanySiret,
+    BsdType.BSFF,
+    zodContext,
+    false,
+    !sealedFields.includes("emitterCompanySiret")
+  );
+  await isDestinationRefinement(
+    bsff.destinationCompanySiret,
+    zodContext,
+    "DESTINATION",
+    CompanyRole.Destination,
+    undefined,
+    !sealedFields.includes("destinationCompanySiret")
+  );
 
   for (const transporter of bsff.transporters ?? []) {
     await isTransporterRefinement(
@@ -67,7 +85,8 @@ export const checkCompanies: Refinement<ParsedZodBsff> = async (
         transporterRecepisseIsExempted:
           transporter.transporterRecepisseIsExempted ?? false
       },
-      zodContext
+      zodContext,
+      !sealedFields.includes("transporters")
     );
     await isRegisteredVatNumberRefinement(
       transporter.transporterCompanyVatNumber,

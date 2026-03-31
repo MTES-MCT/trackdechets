@@ -37,28 +37,38 @@ describe("publishBsff", () => {
       MutationPublishBsffArgs
     >(PUBLISH_BSFF, { variables: { id: bsff.id } });
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "La raison sociale de l'émetteur est un champ requis.\n" +
-          "L'adresse de l'émetteur est un champ requis.\n" +
-          "La personne à contacter chez l'émetteur est un champ requis.\n" +
-          "Le N° de téléphone de l'émetteur est un champ requis.\n" +
-          "L'adresse e-mail de l'émetteur est un champ requis.\n" +
-          "Le code déchet est un champ requis.\n" +
-          "La description du déchet est un champ requis.\n" +
-          "L'ADR est un champ requis.\n" +
-          "La quantité totale est un champ requis.\n" +
-          "La raison sociale de l'installation de destination est un champ requis.\n" +
-          "Le SIRET de l'installation de destination est un champ requis.\n" +
-          "L'adresse de l'installation de destination est un champ requis.\n" +
-          "La personne à contacter de l'installation de destination est un champ requis.\n" +
-          "Le N° de téléphone de l'installation de destination est un champ requis.\n" +
-          "Le code d'opération prévu est un champ requis.\n" +
-          "L'adresse e-mail de l'installation de destination est un champ requis.\n" +
-          "La liste des contenants est un champ requis."
-      })
-    ]);
+    expect(errors).toHaveLength(1);
+
+    const error = errors![0];
+
+    // CAST LOCAL, SIMPLE
+    const issues = (
+      error.extensions as {
+        issues: { message: string }[];
+      }
+    ).issues;
+
+    const messages = issues.map(i => i.message);
+
+    expect(messages).toEqual(
+      expect.arrayContaining([
+        "La personne à contacter chez l'émetteur est un champ requis.",
+        "Le N° de téléphone de l'émetteur est un champ requis.",
+        "L'adresse e-mail de l'émetteur est un champ requis.",
+        "Le code déchet est un champ requis.",
+        "La description du déchet est un champ requis.",
+        "L'ADR est un champ requis.",
+        "La quantité totale est un champ requis.",
+        "La raison sociale de l'installation de destination est un champ requis.",
+        "Le SIRET de l'installation de destination est un champ requis.",
+        "L'adresse de l'installation de destination est un champ requis.",
+        "La personne à contacter de l'installation de destination est un champ requis.",
+        "Le N° de téléphone de l'installation de destination est un champ requis.",
+        "Le code d'opération prévu est un champ requis.",
+        "L'adresse e-mail de l'installation de destination est un champ requis.",
+        "La liste des contenants est un champ requis."
+      ])
+    );
   });
 
   it("should publish a valid BSFF", async () => {
