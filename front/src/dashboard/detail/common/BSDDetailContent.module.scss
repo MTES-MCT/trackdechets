@@ -31,12 +31,12 @@
   }
   &Columns {
     display: flex;
-    flex-direction: column;    
+    flex-direction: column;
     @include desktop {
       flex-direction: row;
     }
   }
-  &Intermediate{
+  &Intermediate {
     display: flex;
     flex-direction: column;
     flex: 0 0 33%;
@@ -161,12 +161,12 @@
       flex-direction: row;
     }
   }
-  &IntermediaryPanel{
+  &IntermediaryPanel {
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 20px 0;
     display: flex;
-    flex-direction: column;    
+    flex-direction: column;
     @include desktop {
       flex-direction: row;
     }
