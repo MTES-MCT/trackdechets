@@ -1,4 +1,10 @@
-import { BsffPackagingType, BsffType, Company, User, UserRole } from "@td/prisma";
+import {
+  BsffPackagingType,
+  BsffType,
+  Company,
+  User,
+  UserRole
+} from "@td/prisma";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "@td/constants";

@@ -49,9 +49,8 @@ jest.mock("../../../../companies/search", () => ({
   searchCompany: jest.fn()
 }));
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { searchCompany: mockSearchCompany } = require(
-  "../../../../companies/search"
-) as { searchCompany: jest.Mock };
+const { searchCompany: mockSearchCompany } =
+  require("../../../../companies/search") as { searchCompany: jest.Mock };
 
 const SIGN = gql`
   mutation Sign($id: ID!, $input: BsffSignatureInput!) {
@@ -1606,8 +1605,7 @@ describe("Mutation.signBsff", () => {
       mockSearchCompany.mockImplementation((siret: string) =>
         Promise.resolve({
           siret,
-          etatAdministratif:
-            siret === bsff.emitterCompanySiret ? "F" : "O",
+          etatAdministratif: siret === bsff.emitterCompanySiret ? "F" : "O",
           address: "Company address",
           name: "Company name"
         })
@@ -1650,8 +1648,7 @@ describe("Mutation.signBsff", () => {
       mockSearchCompany.mockImplementation((siret: string) =>
         Promise.resolve({
           siret,
-          etatAdministratif:
-            siret === bsff.emitterCompanySiret ? "F" : "O",
+          etatAdministratif: siret === bsff.emitterCompanySiret ? "F" : "O",
           address: "Company address",
           name: "Company name"
         })
