@@ -39,6 +39,14 @@ const BsffType = {
   REEXPEDITION: "REEXPEDITION"
 } as const;
 
+const ZodBsffPackagingEnum = z.enum([
+  "BOUTEILLE",
+  "CONTENEUR",
+  "CITERNE",
+  "AUTRE",
+  ""
+]);
+
 const zodCompany = z
   .object({
     siret: z.string().nullish(),
@@ -92,8 +100,6 @@ export const ZodOperationEnum = z
   })
   .nullish();
 
-export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
-
 const rawBsffPackagingSchema = z.object({
   type: z.nativeEnum(BsffPackagingType),
   other: z.string().max(250).nullish(),
@@ -105,6 +111,78 @@ const rawBsffPackagingSchema = z.object({
     })
     .max(250)
     .min(1, "Conditionnements : le numéro d'identification est requis")
+});
+
+const bsffPackagingSchema = z
+  .object({
+    type: ZodBsffPackagingEnum.nullish().transform(val =>
+      val === "" ? null : val
+    ),
+    other: z.string().nullish(),
+    weight: z.coerce.number().nonnegative().nullish(),
+    volume: z.coerce.number().nonnegative().nullish(),
+    numero:  z.string().nullish()
+  })
+  .refine(val => val.type !== "AUTRE" || !!val.other, {
+    path: ["other"],
+    message:
+      "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
+  });
+
+const bsffGroupingOrForwardingSchema = z.object({
+  id: z.string(),
+  bsffId: z.string().nullish(),
+  numero: z.string().nullish(),
+  type: z.nativeEnum(BsffPackagingType),
+  weight: z.coerce.number().nonnegative().nullish(),
+  volume: z.number().nonnegative().nullish(),
+  acceptation: z
+    .object({
+      wasteCode: z.string().nullish(),
+      wasteDescription: z.string().nullish(),
+      weight: z.coerce.number().nonnegative().nullish()
+    })
+    .nullish(),
+  waste: z
+    .object({
+      code: z.string().nullish(),
+      adr: z.string().nullish(),
+      weightValue: z.coerce.number().nonnegative().nullish(),
+      description: z.string().max(250).nullish()
+    })
+    .nullish(),
+  plannedOperationCode: ZodOperationEnum,
+  bsff: z.object({
+  emitter: z
+    .object({
+      company: zodCompany.nullish()
+    })
+    .nullish()
+}),
+  /*destination: z
+    .object({
+      company: zodCompany.nullish(),
+       customInfo: z.string().max(250).nullish(),
+      cap: z.string().max(250).nullish(),
+      reception: z
+        .object({
+        date: z.coerce.date().nullish(),
+        signature: zodSignature
+        })
+        .nullish(),
+       plannedOperationCode: ZodOperationEnum
+    })
+    .nullish(),*/
+  packagings: z.array(bsffPackagingSchema).nullish(),
+  nextBsff: z
+  .object({
+    emitter: z
+      .object({
+        company: zodCompany.nullish()
+      })
+      .nullish()
+  })
+  .nullish(),
 });
 
 export const rawBsffSchema = z.object({
@@ -169,9 +247,15 @@ export const rawBsffSchema = z.object({
     .optional(),
   packagings: z.array(rawBsffPackagingSchema).nullish(),
   ficheInterventions: z.string().max(250).array().nullish(),
-  forwarding: z.array(z.string().max(250)).nullish(),
   repackaging: z.array(z.string().max(250)).nullish(),
-  grouping: z.array(z.string().max(250)).nullish()
+  grouping: z.array(bsffGroupingOrForwardingSchema).optional().nullish(),
+  forwarding: bsffGroupingOrForwardingSchema.nullish()
 });
 
+type ZodBsffPackagingEnum = z.infer<typeof ZodBsffPackagingEnum>;
+
 export type ZodBsff = z.infer<typeof rawBsffSchema>;
+
+export type ZodBsffGroupingOrForwarding = z.infer<
+  typeof bsffGroupingOrForwardingSchema
+>;

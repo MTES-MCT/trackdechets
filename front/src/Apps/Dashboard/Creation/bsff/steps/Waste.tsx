@@ -15,6 +15,9 @@ import EstimatedQuantityTooltip from "../../../../../common/components/Estimated
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 import RhfBsffPackagingList from "../components/RhfBsffPackagingList";
+import Alert from "@codegouvfr/react-dsfr/Alert";
+import BsffSelectableWasteTableWrapper from "../components/BsffSelectableWasteTableWrapper";
+import MyBsffCompanySelector from "../components/MyBsffComapnySelector";
 
 const WasteBsff = () => {
   const methods = useFormContext();
@@ -52,6 +55,15 @@ const WasteBsff = () => {
       : "";
   const fieldIsHidden =
     bsffType === BsffType.Groupement || bsffType === BsffType.Reexpedition;
+
+  const instruction =
+    bsffType === BsffType.Groupement
+      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'un groupement. Les contenants à regrouper doivent avoir le même code déchet."
+      : bsffType === BsffType.Reconditionnement
+      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'un reconditionnement."
+      : bsffType === BsffType.Reexpedition
+      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'une réexpédition. Les contenants à réexpédier doivent faire partie du même bordereau initial et avoir le même code déchet."
+      : "";
 
   return (
     <>
@@ -101,11 +113,19 @@ const WasteBsff = () => {
             }
           ]}
         />
-
         <h4 className="form__section-heading">{heading}</h4>
-        {(bsffType === BsffType.Reconditionnement ||
-          bsffType === BsffType.Reexpedition ||
-          bsffType === BsffType.Groupement) && <span> liste etablissment</span>}
+
+        {instruction && (
+          <>
+            <Alert
+              description={instruction}
+              severity="info"
+              small
+              className="fr-mb-2w"
+            />
+            <BsffSelectableWasteTableWrapper type={bsffType} bsffId={id} />
+          </>
+        )}
 
         <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
         <Select
@@ -126,7 +146,6 @@ const WasteBsff = () => {
             </option>
           ))}
         </Select>
-
         <Input
           className="fr-col-md-8"
           label="Dénomination usuelle du déchet"
@@ -149,7 +168,6 @@ const WasteBsff = () => {
             (formState.errors.waste?.["adr"]?.message as string) ?? ""
           }
         />
-
         <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
         {!fieldIsHidden && (
           <RhfBsffPackagingList
