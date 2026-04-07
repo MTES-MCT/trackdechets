@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Input objects | Documentation technique de l&#x27;API Trackdéchets</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Input objects | Documentation technique de l&#x27;API Trackdéchets"><meta data-rh="true" name="description" content="AcceptedFormInput"><meta data-rh="true" property="og:description" content="AcceptedFormInput"><link data-rh="true" rel="icon" href="/img/trackdechets.png"><link data-rh="true" rel="canonical" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects" hreflang="en"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://2UK4UF9U8K-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Input objects","item":"https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Documentation technique de l&#39;API Trackdéchets" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.d1285a78.css">
-<script src="/assets/js/runtime~main.95d4d4ff.js" defer="defer"></script>
-<script src="/assets/js/main.5369bb7b.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.81a78fa6.js" defer="defer"></script>
+<script src="/assets/js/main.8496b9bc.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -396,7 +396,10 @@ Format de chaque plaque: 4 à 12 caractères</p></td></tr><tr><td><p>emittedAt<b
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Numéro de la plaque d&#x27;immatriculation transporteur.
 Jusqu&#x27;à 2 plaques séparées par une virgule ex: AZ-12-TR, AQ-34-JK
 Format de chaque plaque: 4 à 12 caractères</p></td></tr><tr><td><p>transporterTransportMode<br>
-<a href="enums#transportmode"><code>TransportMode</code></a></p></td><td><p>Le mode de transport utilisé par le transporteur</p></td></tr></tbody></table>
+<a href="enums#transportmode"><code>TransportMode</code></a></p></td><td><p>Le mode de transport utilisé par le transporteur</p></td></tr><tr><td><p>transporterCompanyContact<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Coordonnées de l&#x27;entreprise de transport (contact, mail, téléphone)</p></td></tr><tr><td><p>transporterCompanyMail<br>
+<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>transporterCompanyPhone<br>
+<a href="scalars#string"><code>String</code></a></p></td><td></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="stringfilter">StringFilter<a href="#stringfilter" class="hash-link" aria-label="Direct link to StringFilter" title="Direct link to StringFilter">​</a></h2>
 <p>Filtre pour les chaîne de caractères</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -433,7 +436,7 @@ Format de chaque plaque: 4 à 12 caractères</p></td></tr><tr><td><p>transporter
 <a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom de la personne en charge de la réception du déchet (case 13).</p><p>Max: 250 caractères</p></td></tr><tr><td><p>receivedAt<br>
 <a href="scalars#datetime"><code>DateTime!</code></a></p></td><td><p>Date à laquelle le déchet a été reçu (case 13)</p></td></tr><tr><td><p>signedAt<br>
 <a href="scalars#datetime"><code>DateTime</code></a></p></td><td><p>Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d&#x27;aujourd&#x27;hui.</p></td></tr><tr><td><p>quantityReceived<br>
-<a href="scalars#float"><code>Float!</code></a></p></td><td><p>Quantité réelle présentée en tonnes (case 13)</p><p>Doit être inférieure à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.</p></td></tr><tr><td><p>quantityRefused<br>
+<a href="scalars#float"><code>Float!</code></a></p></td><td><p>Quantité réelle pr ésentée en tonnes (case 13)</p><p>Doit être inférieure à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.</p></td></tr><tr><td><p>quantityRefused<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>Quantité refusée nette:</p><ul><li>doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.</li><li>doit être égale à 0 si le déchet est totalement accepté.</li><li>doit être égale à quantityReceived si le déchet est totalement refusé.</li></ul></td></tr><tr><td><p>quantityType<br>
 <a href="enums#quantitytype"><code>QuantityType!</code></a></p></td><td><p>Réelle ou estimée</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="tempstoreracceptedforminput">TempStorerAcceptedFormInput<a href="#tempstoreracceptedforminput" class="hash-link" aria-label="Direct link to TempStorerAcceptedFormInput" title="Direct link to TempStorerAcceptedFormInput">​</a></h2>
@@ -477,7 +480,7 @@ Format de chaque plaque: 4 à 12 caractères</p></td></tr><tr><td><p>customInfo<
 <a href="scalars#int"><code>Int!</code></a></p></td><td><p>Code de signature permettant d&#x27;authentifier l&#x27;émetteur</p></td></tr><tr><td><p>signatureAuthor<br>
 <a href="enums#signatureauthor"><code>SignatureAuthor</code></a></p></td><td><p>Dénomination de l&#x27;auteur de la signature, par défaut il s&#x27;agit de l&#x27;émetteur</p></td></tr><tr><td><p>sentBy<br>
 <a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom de la personne responsable de l&#x27;envoi du déchet (case 9).</p><p>Max: 250 caractères</p></td></tr><tr><td><p>signedByProducer<br>
-<a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>Si oui on non le BSD a été signé par l&#x27;émetteur</p></td></tr><tr><td><p>packagingInfos<br>
+<a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>Si oui on non le BSD a ét é signé par l&#x27;émetteur</p></td></tr><tr><td><p>packagingInfos<br>
 <a href="inputObjects#packaginginfoinput"><code>[PackagingInfoInput!]</code></a></p></td><td><p>Conditionnements</p></td></tr><tr><td><p>packagings<br>
 <a href="enums#packagings"><code>[Packagings]</code></a></p></td><td><p>DEPRECATED - Conditionnement</p></td></tr><tr><td><p>quantity<br>
 <a href="scalars#float"><code>Float!</code></a></p></td><td><p>Poids en tonnes</p><p>Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.</p></td></tr><tr><td><p>onuCode<br>
