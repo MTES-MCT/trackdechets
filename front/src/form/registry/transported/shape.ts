@@ -1,6 +1,5 @@
 import { type UseFormSetValue } from "react-hook-form";
 import { FormShape } from "../builder/types";
-import { BaleCodeTreeSelector } from "../common/BaleCodeTreeSelector";
 import { ReportFor } from "../common/ReportFor";
 import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
@@ -103,19 +102,15 @@ export const transportedFormShape: FormShape = [
         style: { className: "fr-col-md-10" }
       },
       {
-        Component: BaleCodeTreeSelector,
-        props: {
-          name: "wasteCodeBale",
-          label: Labels.wasteCodeBale,
-          infoLabel: InfoLabels.wasteCodeBale,
-          required: false
-        },
-        shape: "custom",
-        names: ["wasteCodeBale"],
+        name: "wasteCodeBale",
+        shape: "generic",
+        label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
-        style: { parentClassName: "fr-grid-row--bottom tw-relative" }
+        type: "text",
+        style: { className: "fr-col-md-4" }
       },
       {
         name: "wastePop",

@@ -4,7 +4,6 @@ import {
   SSD_PROCESSING_OPERATIONS_CODES
 } from "@td/constants";
 import { FormShape } from "../builder/types";
-import { BaleCodeTreeSelector } from "../common/BaleCodeTreeSelector";
 import { CompanySelector } from "../common/CompanySelector";
 import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
@@ -82,19 +81,15 @@ export const ssdFormShape: FormShape = [
         style: { className: "fr-col-12 fr-col-md-10" }
       },
       {
-        Component: BaleCodeTreeSelector,
-        props: {
-          name: "wasteCodeBale",
-          label: Labels.wasteCodeBale,
-          infoLabel: InfoLabels.wasteCodeBale,
-          required: false
-        },
-        shape: "custom",
-        names: ["wasteCodeBale"],
+        name: "wasteCodeBale",
+        shape: "generic",
+        label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
-        style: { parentClassName: "fr-grid-row--bottom tw-relative" }
+        type: "text",
+        style: { className: "fr-col-md-4" }
       },
       {
         Component: SecondaryWasteCodes,
