@@ -69,6 +69,7 @@ export default {
       nextDestination: null
     }
   },
+  nextBsff: null,
   transporters: [initialTransporter],
   ficheInterventions: [],
   previousPackagings: [],
