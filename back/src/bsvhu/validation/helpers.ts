@@ -14,6 +14,7 @@ import { safeInput } from "../../common/converter";
 import { objectDiff } from "../../forms/workflow/diff";
 import { AllBsvhuSignatureType } from "../types";
 import { UserInputError } from "../../common/errors";
+import { getTransportersSync } from "../database";
 
 export function graphqlInputToZodBsvhuTransporter(
   input: BsvhuTransporterInput
@@ -126,6 +127,7 @@ export function prismaToZodBsvhu(bsvhu: PrismaBsvhuForParsing): ZodBsvhu {
     destinationPlannedOperationCode,
     destinationOperationCode,
     intermediaries,
+    transporters,
     ...data
   } = bsvhu;
 
@@ -138,6 +140,10 @@ export function prismaToZodBsvhu(bsvhu: PrismaBsvhuForParsing): ZodBsvhu {
     intermediaries: intermediaries.map(i => {
       const { bsvhuId, id, createdAt, ...intermediaryData } = i;
       return { ...intermediaryData, address: intermediaryData.address! };
+    }),
+    transporters: getTransportersSync({ transporters }).map(t => {
+      const { createdAt, updatedAt, number, ...transporterData } = t;
+      return transporterData;
     })
   };
 }

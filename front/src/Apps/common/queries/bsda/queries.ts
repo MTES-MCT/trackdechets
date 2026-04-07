@@ -5,6 +5,16 @@ export const GET_BSDA = gql`
   query Bsda($id: ID!) {
     bsda(id: $id) {
       ...FullBsda
+      metadata {
+        errors {
+          message
+          path
+          requiredFor
+        }
+        fields {
+          sealed
+        }
+      }
     }
   }
   ${FullBsdaFragment}

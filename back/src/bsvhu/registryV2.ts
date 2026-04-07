@@ -331,6 +331,18 @@ export const toOutgoingWasteV2 = (
     city: destinationCompanyCity,
     country: destinationCompanyCountry
   } = splitAddress(bsvhu.destinationCompanyAddress);
+
+  const destinationFinalOperationCompanySiret =
+    bsvhu.destinationOperationNextDestinationCompanySiret ??
+    bsvhu.destinationOperationNextDestinationCompanyVatNumber ??
+    bsvhu.destinationOperationNextDestinationCompanyExtraEuropeanId ??
+    null;
+
+  const destinationFinalOperationCompanySirets =
+    destinationFinalOperationCompanySiret
+      ? [destinationFinalOperationCompanySiret]
+      : null;
+
   return {
     ...emptyOutgoingWasteV2,
     id: bsvhu.id,
@@ -455,7 +467,7 @@ export const toOutgoingWasteV2 = (
     nextDestinationPlannedOperationCodes: null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
-    destinationFinalOperationCompanySirets: null,
+    destinationFinalOperationCompanySirets,
     destinationFinalOperationCodes: null,
     destinationFinalOperationWeights: null,
     gistridNumber: null,
@@ -860,6 +872,18 @@ export const toManagedWasteV2 = (
     city: destinationCompanyCity,
     country: destinationCompanyCountry
   } = splitAddress(bsvhu.destinationCompanyAddress);
+
+  const destinationFinalOperationCompanySiret =
+    bsvhu.destinationOperationNextDestinationCompanySiret ??
+    bsvhu.destinationOperationNextDestinationCompanyVatNumber ??
+    bsvhu.destinationOperationNextDestinationCompanyExtraEuropeanId ??
+    null;
+
+  const destinationFinalOperationCompanySirets =
+    destinationFinalOperationCompanySiret
+      ? [destinationFinalOperationCompanySiret]
+      : null;
+
   return {
     ...emptyManagedWasteV2,
     id: bsvhu.id,
@@ -1035,7 +1059,7 @@ export const toManagedWasteV2 = (
     nextDestinationPlannedOperationCodes: null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
-    destinationFinalOperationCompanySirets: null,
+    destinationFinalOperationCompanySirets,
     destinationFinalOperationCodes: null,
     destinationFinalOperationWeights: null,
     gistridNumber: null,
@@ -1126,6 +1150,18 @@ export const toAllWasteV2 = (
     city: destinationCompanyCity,
     country: destinationCompanyCountry
   } = splitAddress(bsvhu.destinationCompanyAddress);
+
+  const destinationFinalOperationCompanySiret =
+    bsvhu.destinationOperationNextDestinationCompanySiret ??
+    bsvhu.destinationOperationNextDestinationCompanyVatNumber ??
+    bsvhu.destinationOperationNextDestinationCompanyExtraEuropeanId ??
+    null;
+
+  const destinationFinalOperationCompanySirets =
+    destinationFinalOperationCompanySiret
+      ? [destinationFinalOperationCompanySiret]
+      : null;
+
   return {
     ...emptyAllWasteV2,
     id: bsvhu.id,
@@ -1305,7 +1341,7 @@ export const toAllWasteV2 = (
     nextDestinationPlannedOperationCodes: null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
-    destinationFinalOperationCompanySirets: null,
+    destinationFinalOperationCompanySirets,
     destinationFinalOperationCodes: null,
     destinationFinalOperationWeights: null,
     gistridNumber: null,

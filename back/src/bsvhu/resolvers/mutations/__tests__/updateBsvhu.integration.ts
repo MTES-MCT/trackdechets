@@ -942,6 +942,73 @@ describe("Mutation.Vhu.update", () => {
     expect(updatedBsvhu.containsElectricOrHybridVehicles).toBeTruthy();
   });
 
+  it(
+    "should not raise sealed field error when updating a signed BSVHU" +
+      " with the same transporter IDs",
+    async () => {
+      // Given: a BSVHU signed by the producer with two transporters
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const transporter1Company = await companyFactory({
+        companyTypes: ["TRANSPORTER"]
+      });
+      await transporterReceiptFactory({ company: transporter1Company });
+      const transporter2Company = await companyFactory({
+        companyTypes: ["TRANSPORTER"]
+      });
+      await transporterReceiptFactory({ company: transporter2Company });
+
+      const bsvhu = await bsvhuFactory({
+        userId: emitter.user.id,
+        opt: {
+          status: BsvhuStatus.SIGNED_BY_PRODUCER,
+          emitterCompanySiret: emitter.company.siret,
+          emitterEmissionSignatureAuthor: "The Emitter",
+          emitterEmissionSignatureDate: new Date(),
+          transporters: {
+            createMany: {
+              data: [
+                {
+                  number: 1,
+                  transporterCompanySiret: transporter1Company.siret
+                },
+                {
+                  number: 2,
+                  transporterCompanySiret: transporter2Company.siret
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      const transporters = await prisma.bsvhuTransporter.findMany({
+        where: { bsvhuId: bsvhu.id },
+        orderBy: { number: "asc" }
+      });
+
+      expect(transporters).toHaveLength(2);
+
+      // When: we "update" the BSVHU passing the exact same transporter IDs
+      // (this is what the frontend does when saving without touching transporter fields)
+      const { mutate } = makeClient(emitter.user);
+      const { data, errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+        UPDATE_VHU_FORM,
+        {
+          variables: {
+            id: bsvhu.id,
+            input: {
+              transporters: transporters.map(t => t.id)
+            }
+          }
+        }
+      );
+
+      // Then: no sealed field error should occur
+      expect(errors).toBeUndefined();
+      expect(data.updateBsvhu.id).toBe(bsvhu.id);
+    }
+  );
+
   it("should not allow user to update containsElectricOrHybridVehicles if VHU is processed", async () => {
     // Given
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);

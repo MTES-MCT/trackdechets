@@ -207,7 +207,9 @@ export const contextualBsffSchema = (context: BsffValidationContext) => {
  */
 export const contextualBsffSchemaAsync = (context: BsffValidationContext) => {
   return refinedBsffSchema
-    .superRefine(checkCompanies)
+    .superRefine((bsff, zodContext) =>
+      checkCompanies(bsff, zodContext, context)
+    )
     .transform((bsff: ParsedZodBsff) => runTransformers(bsff, context))
     .superRefine(
       // run le check sur les champs requis après les transformations

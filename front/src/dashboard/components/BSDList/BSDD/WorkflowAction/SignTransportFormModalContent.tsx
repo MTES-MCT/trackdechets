@@ -31,6 +31,7 @@ import {
 } from "../../../../../Apps/common/queries/bsdd/queries";
 import { cleanPackagings } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 import { packagingInfo } from "../../../../../form/bsdd/utils/schema";
+import { FormTransporterInfo } from "./FormTransporterInfo";
 
 const validationSchema = yup.object({
   takenOverAt: yup.date().required("La date de prise en charge est requise"),
@@ -42,6 +43,9 @@ const validationSchema = yup.object({
     .string()
     .nullable()
     .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+  transporterCompanyContact: yup.string().max(250),
+  transporterCompanyPhone: yup.string().max(20),
+  transporterCompanyMail: yup.string().max(250).email(),
   update: yup.object({ packagingInfos: yup.array().of(packagingInfo) })
 });
 interface SignTransportFormModalProps {
@@ -132,6 +136,8 @@ export default function SignTransportFormModalContent({
 
   const TODAY = new Date();
 
+  console.log("form", form);
+
   return (
     <Formik
       initialValues={{
@@ -140,6 +146,9 @@ export default function SignTransportFormModalContent({
         securityCode: "",
         transporterNumberPlate: signingTransporter?.numberPlate ?? "",
         transporterTransportMode: signingTransporter?.mode ?? null,
+        transporterCompanyContact: signingTransporter?.company?.contact ?? "",
+        transporterCompanyMail: signingTransporter?.company?.mail ?? "",
+        transporterCompanyPhone: signingTransporter?.company?.phone ?? "",
         emitter: { type: form?.emitter?.type },
         update: {
           quantity: form.wasteDetails?.quantity ?? 0,
@@ -183,7 +192,10 @@ export default function SignTransportFormModalContent({
                 takenOverBy: values.takenOverBy,
                 transporterNumberPlate: values.transporterNumberPlate,
                 transporterTransportMode:
-                  values.transporterTransportMode as TransportMode
+                  values.transporterTransportMode as TransportMode,
+                transporterCompanyContact: values.transporterCompanyContact,
+                transporterCompanyMail: values.transporterCompanyMail,
+                transporterCompanyPhone: values.transporterCompanyPhone
               },
               securityCode: values.securityCode
                 ? Number(values.securityCode)
@@ -208,6 +220,8 @@ export default function SignTransportFormModalContent({
             les informations ci-dessus sont correctes. En signant ce document,
             je déclare prendre en charge le déchet.
           </p>
+
+          <FormTransporterInfo transporter={signingTransporter} />
 
           <div className="form__row">
             <label>

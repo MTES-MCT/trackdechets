@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const getNextTab = (tabIds: string[], currentTabId: string) => {
   const idx = tabIds.indexOf(currentTabId);
@@ -48,6 +48,8 @@ const BSDPreviewTabs = ({
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
   };
+
+  const { siret } = useParams<{ siret: string }>();
 
   return (
     <>
@@ -110,7 +112,7 @@ const BSDPreviewTabs = ({
               <Button
                 id="id_close"
                 priority="primary"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate(`/dashboard/${siret}/bsds/all`)}
               >
                 Fermer
               </Button>

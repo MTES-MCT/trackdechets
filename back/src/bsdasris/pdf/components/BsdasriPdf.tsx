@@ -205,16 +205,21 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               checked={bsdasri?.emitter?.emission?.weight?.isEstimate === false}
               readOnly
             />{" "}
-            réelle
+            Réelle
             <br />
             <input
               type="checkbox"
               checked={bsdasri?.emitter?.emission?.weight?.isEstimate === true}
               readOnly
             />{" "}
-            Estimée
-            <br />
-            "QUANTITÉ ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR
+            <span style={{ whiteSpace: "nowrap" }}>
+              Estimée{" "}
+              {bsdasri?.emitter?.emission?.weight?.isEstimate ? (
+                <>("Quantité estimée conformément au 5.4.1.1.3.2" de l'ADR)</>
+              ) : (
+                ""
+              )}
+            </span>
           </div>
         </div>
         {/* End PRED */}
@@ -341,7 +346,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               }
               readOnly
             />{" "}
-            réelle <span> - </span>
+            Réelle <span> - </span>
             <input
               type="checkbox"
               checked={
@@ -349,9 +354,14 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               }
               readOnly
             />{" "}
-            Estimée
-            <br />
-            "QUANTITÉ ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR
+            <span style={{ whiteSpace: "nowrap" }}>
+              Estimée{" "}
+              {bsdasri?.transporter?.transport?.weight?.isEstimate ? (
+                <>("Quantité estimée conformément au 5.4.1.1.3.2" de l'ADR)</>
+              ) : (
+                ""
+              )}
+            </span>
           </div>
         </div>
         {/* End Transporter */}

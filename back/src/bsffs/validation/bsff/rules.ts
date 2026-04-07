@@ -702,8 +702,7 @@ export async function checkBsffSealedFields(
 
   const updatedFields = getUpdatedFields(persisted, bsff);
 
-  const currentSignatureType =
-    context.currentSignatureType ?? getCurrentSignatureType(persisted);
+  const currentSignatureType = getCurrentSignatureType(persisted);
 
   // Some signatures may be skipped, so always check all the hierarchy
   const signaturesToCheck = getSignatureAncestors(currentSignatureType);
@@ -820,8 +819,7 @@ export async function getSealedFields(
   bsff: ZodBsff,
   context: BsffValidationContext
 ): Promise<(keyof BsffEditionRules)[]> {
-  const currentSignatureType =
-    context.currentSignatureType ?? getCurrentSignatureType(bsff);
+  const currentSignatureType = getCurrentSignatureType(bsff);
   // Some signatures may be skipped, so always check all the hierarchy
   const signaturesToCheck = getSignatureAncestors(currentSignatureType);
 
