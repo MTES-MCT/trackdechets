@@ -5,6 +5,25 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2026.04.1] 07/04/2026
+
+#### :nail_care: Améliorations
+
+- BSFF : Ne pas permettre de viser un SIRET fermé sur un bordereau, mais permettre de finaliser un BSFF qui aurait un SIRET fermé - BSFF (BUG : impossible de signer la réception ou créer un BSFF suite après la fermeture d'un établissement) [PR 4717] (https://github.com/MTES-MCT/trackdechets/pull/4717)
+- BSDD : Permettre au transporteur de modifier ses champs de contact ainsi que le mode de transport à sa signature [PR 4713] (https://github.com/MTES-MCT/trackdechets/pull/4713)
+- Trackdéchets : Modifier le message informatif sur le partage du nom usuel avec d'autres utilisateurs à la création d'un établissement [PR 4721] (https://github.com/MTES-MCT/trackdechets/pull/4721)
+
+#### :bug: Corrections de bugs
+
+- BSVHU : afficher un message d'erreur lorsque la publication est bloquée car le champ "Détail des identifications" dépasse 250 caractères [PR 4728] (https://github.com/MTES-MCT/trackdechets/pull/4728)
+- BSVHU : Permettre à l'utilisateur de modifier des champs non scellés lorsque cela est possible, même si un des transporteurs visés a procédé à l'enlèvement du déchet [PR 4718] (https://github.com/MTES-MCT/trackdechets/pull/4718)
+- Sur les BSDASRI, afficher la mention "quantité estimée conformément au 5.4.1.1.3.2" uniquement lorsque la case "Ce poids est estimé" est cochée [PR 4726] (https://github.com/MTES-MCT/trackdechets/pull/4726)
+- BSDA : Rediriger correctement l'utilisateur à la fermeture d'un [PR 4715] (https://github.com/MTES-MCT/trackdechets/pull/4715)
+- BSDA : Impossible d’enregistrer les modifications réalisés sans message d’erreur [PR 4707] (https://github.com/MTES-MCT/trackdechets/pull/4707)
+- BSDA : Appliquer les règles de gestion des champs scellés en back dans le front [PR 4720] (https://github.com/MTES-MCT/trackdechets/pull/4720)
+- VHU : masquer le sélecteur d'entreprise lorsque la case "L'installation n'a pas de SIRET" est cochée [PR 4727] (https://github.com/MTES-MCT/trackdechets/pull/4727)
+- BSFF : impossibilité de signer l’acceptation - Bouton "corriger' inactif sur la modale. [PR 4714] (https://github.com/MTES-MCT/trackdechets/pull/4714)
+
 # [2026.03.1] 10/03/2026
 
 #### :nail_care: Améliorations
