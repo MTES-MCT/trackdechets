@@ -65,6 +65,10 @@ type RuleContext<T extends ZodBsda | ZodBsdaTransporter> = {
   // Liste des "rôles" que l'utilisateur a sur le BSDA (ex: émetteur, transporteur, etc).
   // Permet de conditionner un check a un rôle. Ex: "Ce champ est modifiable mais uniquement par l'émetteur"
   userFunctions: BsdaUserFunctions;
+  // Rendre la fonction qui utilise ce context plus
+  // tolérente pour que les champs TTR ne soit plus
+  // grisés en mode lecture seulement
+  isReadOnly?: boolean;
 };
 
 // Fonction permettant de définir une signature de champ requis ou
@@ -165,7 +169,9 @@ const sealedFromEmissionExceptAddOrRemoveNextDestination: GetBsdaSignatureTypeFn
   // then I can either add or remove a nextDestination. To do so I need to edit the destination.
   if (
     (isEmitter || isWorker || isTransporter || isDestination) &&
-    (isAddingNextDestination || isRemovingNextDestination)
+    (isAddingNextDestination ||
+      isRemovingNextDestination ||
+      context?.isReadOnly)
   ) {
     return "TRANSPORT";
   }
@@ -997,7 +1003,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
 export const getRequiredAndSealedFieldPaths = async (
   bsda: ZodBsda,
   currentSignatures: AllBsdaSignatureType[],
-  user: User | undefined
+  user: User | undefined,
+  isReadOnly?: boolean //optional
 ): Promise<{
   sealed: EditionRulePath[];
 }> => {
@@ -1009,7 +1016,8 @@ export const getRequiredAndSealedFieldPaths = async (
     if (path && sealed) {
       const isSealed = isBsdaFieldSealed(sealed, bsda, currentSignatures, {
         persisted: bsda,
-        userFunctions
+        userFunctions,
+        isReadOnly
       });
       if (isSealed) {
         sealedFields.push(path);
