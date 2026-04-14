@@ -121,7 +121,7 @@ const bsffPackagingSchema = z
     other: z.string().nullish(),
     weight: z.coerce.number().nonnegative().nullish(),
     volume: z.coerce.number().nonnegative().nullish(),
-    numero:  z.string().nullish()
+    numero: z.string().nullish()
   })
   .refine(val => val.type !== "AUTRE" || !!val.other, {
     path: ["other"],
@@ -153,12 +153,12 @@ const bsffGroupingOrForwardingSchema = z.object({
     .nullish(),
   plannedOperationCode: ZodOperationEnum,
   bsff: z.object({
-  emitter: z
-    .object({
-      company: zodCompany.nullish()
-    })
-    .nullish()
-}),
+    emitter: z
+      .object({
+        company: zodCompany.nullish()
+      })
+      .nullish()
+  }),
   /*destination: z
     .object({
       company: zodCompany.nullish(),
@@ -175,14 +175,14 @@ const bsffGroupingOrForwardingSchema = z.object({
     .nullish(),*/
   packagings: z.array(bsffPackagingSchema).nullish(),
   nextBsff: z
-  .object({
-    emitter: z
-      .object({
-        company: zodCompany.nullish()
-      })
-      .nullish()
-  })
-  .nullish(),
+    .object({
+      emitter: z
+        .object({
+          company: zodCompany.nullish()
+        })
+        .nullish()
+    })
+    .nullish()
 });
 
 export const rawBsffSchema = z.object({

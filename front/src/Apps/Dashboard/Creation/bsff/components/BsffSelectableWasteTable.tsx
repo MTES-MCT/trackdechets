@@ -84,7 +84,7 @@ export default function BsffSelectableWasteTable({
       const checked = selected?.some(
         selectedBsff => selectedBsff.bsffId === bsffPackaging.bsffId
       );
-      const firstSelectedBsff = selected && selected.length > 0 && selected[0];
+      /* const firstSelectedBsff = selected && selected.length > 0 && selected[0];
       let isDisabled = false;
       if (firstSelectedBsff) {
         if (pickerType === BsffType.Groupement) {
@@ -94,6 +94,22 @@ export default function BsffSelectableWasteTable({
         } else {
           isDisabled = firstSelectedBsff?.bsffId !== bsffPackaging.bsffId;
         }
+      }*/
+      const firstSelectedBsff =
+        selected && selected.length > 0 ? selected[0] : null;
+
+      const selectedWasteCode =
+        firstSelectedBsff?.acceptation?.wasteCode ??
+        firstSelectedBsff?.waste?.code;
+
+      const currentWasteCode =
+        bsffPackaging?.acceptation?.wasteCode ??
+        bsffPackaging?.bsff?.waste?.code;
+
+      let isDisabled = false;
+
+      if (selectedWasteCode) {
+        isDisabled = currentWasteCode !== selectedWasteCode;
       }
 
       return [

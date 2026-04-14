@@ -28,20 +28,25 @@ import { mergeBsffPackagings } from "../../../../../common/bsffPackagings";
 type SelectableWasteTableWrapperProps = {
   type: BsffType;
   bsffId: string;
+  emitterCompany: any;
 };
 
 function BsffSelectableWasteTableWrapper({
   type,
-  bsffId
+  bsffId,
+  emitterCompany
 }: SelectableWasteTableWrapperProps) {
+  const { watch, setValue, control } = useFormContext();
   const { siret } = useParams<{ siret: string }>();
   const [idFilter, setIdFilter] = useState("");
   const [wasteCodeFilter, setWasteCodeFilter] = useState("");
   const [numeroFilter, setNumeroFilter] = useState("");
   const [emetteurSiretFilter, setEmetteurSiretFilter] = useState("");
   const [debouncing, setDebouncing] = useState(false);
-
-  const { watch, setValue, control } = useFormContext();
+  const destinationSiret = emitterCompany?.siret;
+  /*const destinationSiret = useMemo(() => {
+  return emitterCompany?.siret ?? null;
+}, [emitterCompany?.siret]);*/
 
   const { append, remove } = useFieldArray({
     control,
@@ -78,12 +83,12 @@ function BsffSelectableWasteTableWrapper({
       },
       bsff: {
         destination: {
-          company: { siret: { _eq: siret } }
+          company: { siret: { _eq: destinationSiret } }
         }
       },
       nextBsff: null
     };
-  }, [bsffId, codeFilter, siret]);
+  }, [bsffId, codeFilter, destinationSiret]);
 
   const where: BsffPackagingWhere = useMemo(() => {
     return {
@@ -102,6 +107,11 @@ function BsffSelectableWasteTableWrapper({
                 company: { siret: { _eq: emetteurSiretFilter } }
               }
             }
+            /* nextBsff: {
+              emitter: {
+                company: { siret: { _eq: emetteurSiretFilter } }
+              }
+            }*/
           }
         : {})
     };
@@ -159,9 +169,9 @@ function BsffSelectableWasteTableWrapper({
         : initialState.packagings
     );
 
-    const emitterCompany =
+    /* const emitterCompany =
       firstGroupedBsff?.bsff?.emitter?.company ?? initialState!.emitter.company;
-    setValue("emitter.company", emitterCompany);
+    setValue("emitter.company", emitterCompany);*/
 
     const { ...nextBsffCompany } =
       firstGroupedBsff?.nextBsff?.emitter?.company ?? getInitialCompany();
@@ -193,9 +203,10 @@ function BsffSelectableWasteTableWrapper({
       forwardingBsff?.packagings ?? initialState.packagings
     );
 
-    const emitterCompany =
-      forwardingBsff?.nextBsff?.emitter?.company ?? initialState!.emitter.company;
-    setValue("emitter.company", emitterCompany);
+    /*  const emitterCompany =
+      forwardingBsff?.nextBsff?.emitter?.company ??
+      initialState!.emitter.company;
+    setValue("emitter.company", emitterCompany);*/
 
     const { ...nextBsffCompany } =
       forwardingBsff?.nextBsff?.emitter?.company ?? getInitialCompany();
@@ -279,16 +290,22 @@ function BsffSelectableWasteTableWrapper({
             ({ id }) => id === bsbsffPackaging.bsffId
           );
           const isSelected = clickedBsffIndex >= 0;*/
-const clickedBsffIndex = grouping!.findIndex(
-  ({ bsffId }) => bsffId === bsbsffPackaging.bsffId
-);
-const isSelected = clickedBsffIndex >= 0;
-          console.log("ddd", bsbsffPackaging.numero, bsbsffPackaging.weight, bsbsffPackaging.volume,bsbsffPackaging.type);
+          const clickedBsffIndex = grouping!.findIndex(
+            ({ bsffId }) => bsffId === bsbsffPackaging.bsffId
+          );
+          const isSelected = clickedBsffIndex >= 0;
+          console.log(
+            "ddd",
+            bsbsffPackaging.numero,
+            bsbsffPackaging.weight,
+            bsbsffPackaging.volume,
+            bsbsffPackaging.type
+          );
           if (isSelected) {
             remove(clickedBsffIndex);
-             onGroupingChange([
-    ...grouping.filter(g => g.bsffId !== bsbsffPackaging.bsffId)
-  ]);
+            onGroupingChange([
+              ...grouping.filter(g => g.bsffId !== bsbsffPackaging.bsffId)
+            ]);
           } else {
             append(bsbsffPackaging as ZodBsffGroupingOrForwarding);
             onGroupingChange([
