@@ -465,13 +465,13 @@ const DestinationBsda = () => {
                       "Je souhaite ajouter une installation intermédiaire de transit ou de groupement d'amiante",
                     nativeInputProps: {
                       onChange: onNextDestinationToggle,
-                      checked: hasNextDestination
+                      checked: hasNextDestination,
+                      disabled: sealedFields.includes(
+                        `destination.company.siret`
+                      )
                     }
                   }
                 ]}
-                disabled={sealedFields.includes(
-                  `destination.operation.nextDestination`
-                )}
               />
             </div>
 

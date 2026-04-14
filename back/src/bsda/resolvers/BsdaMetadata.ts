@@ -65,7 +65,8 @@ export const Metadata: BsdaMetadataResolvers = {
     return getRequiredAndSealedFieldPaths(
       zodBsda,
       currentSignatureAncestors,
-      context.user ?? undefined
+      context.user ?? undefined,
+      true
     );
   },
   latestRevision: async (metadata: BsdaMetadata & { id: string }) => {
