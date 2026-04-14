@@ -3,10 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { BsffPackaging, BsffType } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
-import {
-  bsffPackagingTypes,
-  emptyBsffPackaging
-} from "../../../../Forms/Components/PackagingList/helpers";
+import { bsffPackagingTypes } from "../../../../Forms/Components/PackagingList/helpers";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { BSFF_WASTES } from "@td/constants";
 import Select from "@codegouvfr/react-dsfr/Select";
@@ -27,6 +24,21 @@ const WasteBsff = () => {
   const bsffType = watch("type");
   const packagings = watch("packagings");
   const weight = watch("weight", {});
+  const idCompany = watch("idCompany");
+  const emitterCompany = watch("emitter.company");
+
+  const isSpecialType = [
+    BsffType.Groupement,
+    BsffType.Reexpedition,
+    BsffType.Reconditionnement
+  ].includes(bsffType);
+
+  // true si une entreprise est sélectionnée
+  const hasEmitterCompany =
+    !!emitterCompany && (emitterCompany?.orgId || emitterCompany?.siret);
+
+  // On cache UNIQUEMENT si :
+  const hideAfterCompanySelector = isSpecialType && !hasEmitterCompany;
 
   // Calcul du poids total
   const totalWeightNumber = packagings.reduce(
@@ -115,124 +127,150 @@ const WasteBsff = () => {
         />
         <h4 className="form__section-heading">{heading}</h4>
 
-        {instruction && (
+        {heading && (
           <>
-            <Alert
-              description={instruction}
-              severity="info"
-              small
-              className="fr-mb-2w"
-            />
-            <BsffSelectableWasteTableWrapper type={bsffType} bsffId={id} />
+            <MyBsffCompanySelector
+              value="emitter.company"
+              onChange={company => {
+                console.log(company);
+                setValue("emitter.company", company);
+              }}
+            ></MyBsffCompanySelector>
           </>
         )}
+        {!hideAfterCompanySelector && (
+          <>
+            {instruction && (
+              <>
+                <Alert
+                  description={instruction}
+                  severity="info"
+                  small
+                  className="fr-mb-2w"
+                />
+                <BsffSelectableWasteTableWrapper
+                  type={bsffType}
+                  bsffId={id}
+                  emitterCompany={emitterCompany}
+                />
+              </>
+            )}
 
-        <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
-        <Select
-          className="fr-col-md-8 fr-mt-2w"
-          label="Code déchet"
-          nativeSelectProps={{
-            ...register("waste.code")
-          }}
-          state={formState.errors.waste?.["code"] ? "error" : "default"}
-          stateRelatedMessage={formState.errors.waste?.["code"]?.message}
-          disabled={sealedFields.includes("waste.code") || wasteCodeDisabled}
-        >
-          <option value="">Sélectionnez une valeur</option>
-
-          {BSFF_WASTES.map(item => (
-            <option value={item.code} key={item.code}>
-              {item.code} - {item.description}
-            </option>
-          ))}
-        </Select>
-        <Input
-          className="fr-col-md-8"
-          label="Dénomination usuelle du déchet"
-          disabled={sealedFields.includes("waste.description")}
-          nativeInputProps={{
-            ...register("waste.description")
-          }}
-          state={formState.errors.waste?.["description"] ? "error" : "default"}
-          stateRelatedMessage={formState.errors.waste?.["description"]?.message}
-        />
-        <Input
-          className="fr-col-md-8 fr-mt-4w"
-          label="Mentions au titre des règlements RID, ADNR, IMDG"
-          disabled={sealedFields.includes(`waste.adr`)}
-          nativeInputProps={{
-            ...register("waste.adr")
-          }}
-          state={formState.errors.waste?.["adr"] && "error"}
-          stateRelatedMessage={
-            (formState.errors.waste?.["adr"]?.message as string) ?? ""
-          }
-        />
-        <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
-        {!fieldIsHidden && (
-          <RhfBsffPackagingList
-            disabled={sealedFields.includes(`packagings`)}
-            fieldName="packagings"
-            packagingTypes={bsffPackagingTypes}
-          />
-        )}
-        <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>
-        <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
-          <div className="fr-col-md-3">
-            <NonScrollableInput
-              label="Poids total en kilo"
-              disabled={sealedFields.includes("weight.value")}
-              nativeInputProps={{
-                inputMode: "decimal",
-                step: "0.000001",
-                type: "number",
-                ...register("weight.value")
+            <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
+            <Select
+              className="fr-col-md-8 fr-mt-2w"
+              label="Code déchet"
+              nativeSelectProps={{
+                ...register("waste.code")
               }}
-              state={formState.errors?.weight?.["value"] && "error"}
+              state={formState.errors.waste?.["code"] ? "error" : "default"}
+              stateRelatedMessage={formState.errors.waste?.["code"]?.message}
+              disabled={
+                sealedFields.includes("waste.code") || wasteCodeDisabled
+              }
+            >
+              <option value="">Sélectionnez une valeur</option>
+
+              {BSFF_WASTES.map(item => (
+                <option value={item.code} key={item.code}>
+                  {item.code} - {item.description}
+                </option>
+              ))}
+            </Select>
+            <Input
+              className="fr-col-md-8"
+              label="Dénomination usuelle du déchet"
+              disabled={sealedFields.includes("waste.description")}
+              nativeInputProps={{
+                ...register("waste.description")
+              }}
+              state={
+                formState.errors.waste?.["description"] ? "error" : "default"
+              }
               stateRelatedMessage={
-                (formState.errors?.weight?.["value"]?.message as string) ?? ""
+                formState.errors.waste?.["description"]?.message
               }
             />
-
-            <p className="fr-info-text fr-mt-5v">
-              Soit {(weight.value || 0) / 1000} tonne
-            </p>
-          </div>
-
-          <div className="fr-col-md-6">
-            <RadioButtons
-              legend="Cette quantité est"
-              disabled={sealedFields.includes("weight.isEstimate")}
-              orientation="horizontal"
-              state={formState.errors?.weight?.["isEstimate"] && "error"}
+            <Input
+              className="fr-col-md-8 fr-mt-4w"
+              label="Mentions au titre des règlements RID, ADNR, IMDG"
+              disabled={sealedFields.includes(`waste.adr`)}
+              nativeInputProps={{
+                ...register("waste.adr")
+              }}
+              state={formState.errors.waste?.["adr"] && "error"}
               stateRelatedMessage={
-                (formState.errors?.weight?.["isEstimate"]?.message as string) ??
-                ""
+                (formState.errors.waste?.["adr"]?.message as string) ?? ""
               }
-              options={[
-                {
-                  label: "Réelle",
-                  nativeInputProps: {
-                    onChange: () => setValue("weight.isEstimate", false),
-
-                    checked: weight.isEstimate === false
-                  }
-                },
-                {
-                  label: (
-                    <span>
-                      Estimée <EstimatedQuantityTooltip />
-                    </span>
-                  ),
-                  nativeInputProps: {
-                    onChange: () => setValue("weight.isEstimate", true),
-                    checked: weight.isEstimate === true
-                  }
-                }
-              ]}
             />
-          </div>
-        </div>
+            <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
+            {!fieldIsHidden && (
+              <RhfBsffPackagingList
+                disabled={sealedFields.includes(`packagings`)}
+                fieldName="packagings"
+                packagingTypes={bsffPackagingTypes}
+              />
+            )}
+            <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>
+            <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
+              <div className="fr-col-md-3">
+                <NonScrollableInput
+                  label="Poids total en kilo"
+                  disabled={sealedFields.includes("weight.value")}
+                  nativeInputProps={{
+                    inputMode: "decimal",
+                    step: "0.000001",
+                    type: "number",
+                    ...register("weight.value")
+                  }}
+                  state={formState.errors?.weight?.["value"] && "error"}
+                  stateRelatedMessage={
+                    (formState.errors?.weight?.["value"]?.message as string) ??
+                    ""
+                  }
+                />
+
+                <p className="fr-info-text fr-mt-5v">
+                  Soit {(weight.value || 0) / 1000} tonne
+                </p>
+              </div>
+
+              <div className="fr-col-md-6">
+                <RadioButtons
+                  legend="Cette quantité est"
+                  disabled={sealedFields.includes("weight.isEstimate")}
+                  orientation="horizontal"
+                  state={formState.errors?.weight?.["isEstimate"] && "error"}
+                  stateRelatedMessage={
+                    (formState.errors?.weight?.["isEstimate"]
+                      ?.message as string) ?? ""
+                  }
+                  options={[
+                    {
+                      label: "Réelle",
+                      nativeInputProps: {
+                        onChange: () => setValue("weight.isEstimate", false),
+
+                        checked: weight.isEstimate === false
+                      }
+                    },
+                    {
+                      label: (
+                        <span>
+                          Estimée <EstimatedQuantityTooltip />
+                        </span>
+                      ),
+                      nativeInputProps: {
+                        onChange: () => setValue("weight.isEstimate", true),
+                        checked: weight.isEstimate === true
+                      }
+                    }
+                  ]}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
