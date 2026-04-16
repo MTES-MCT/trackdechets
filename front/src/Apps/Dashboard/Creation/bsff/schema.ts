@@ -136,6 +136,7 @@ const bsffGroupingOrForwardingSchema = z.object({
   type: z.nativeEnum(BsffPackagingType),
   weight: z.coerce.number().nonnegative().nullish(),
   volume: z.number().nonnegative().nullish(),
+  other: z.string().nullish(),
   acceptation: z
     .object({
       wasteCode: z.string().nullish(),

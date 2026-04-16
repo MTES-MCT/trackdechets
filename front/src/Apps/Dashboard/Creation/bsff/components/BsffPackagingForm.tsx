@@ -11,6 +11,7 @@ import React, { useMemo } from "react";
 import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 import { numberToString } from "../../bspaoh/utils/numbers";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import { useFormContext } from "react-hook-form";
 
 export type PackagingFormProps = {
   // Valeur de `packaging` provenant du store Formik ou RHF
@@ -65,7 +66,8 @@ function BsffPackagingForm({
       })),
     [packagingTypes]
   );
-
+  const methods = useFormContext();
+  const { register, setValue, watch, formState } = methods;
   return (
     <>
       {/* ALERT METIER */}
@@ -109,7 +111,8 @@ function BsffPackagingForm({
               type: "number",
               inputMode: "decimal",
               step: "0.001",
-              ...inputProps.volume
+              ...inputProps.volume,
+              ...register("volume")
             }}
           />
 
@@ -128,7 +131,8 @@ function BsffPackagingForm({
               type: "number",
               inputMode: "decimal",
               step: "0.001",
-              ...inputProps.weight
+              ...inputProps.weight,
+              ...register("weight")
             }}
           />
         </div>
@@ -142,7 +146,7 @@ function BsffPackagingForm({
               disabled={disabled}
               state={errors?.other && touched?.other ? "error" : "default"}
               stateRelatedMessage={errors?.other}
-              nativeInputProps={inputProps.other}
+              nativeInputProps={{ ...inputProps.other, ...register("other") }}
             />
           </div>
         </div>
@@ -154,7 +158,7 @@ function BsffPackagingForm({
             disabled={disabled}
             state={errors?.numero && touched?.numero ? "error" : "default"}
             stateRelatedMessage={errors?.numero}
-            nativeInputProps={inputProps.numero}
+            nativeInputProps={{ ...inputProps.numero, ...register("other") }}
           />
         </div>
       </div>

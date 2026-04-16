@@ -23,7 +23,6 @@ import { debounce } from "../../../../../common/helper";
 import { MAX_BSFF_COUNT_TABLE_DISPLAY } from "./BsffSelectableWasteTable";
 import { ZodBsffGroupingOrForwarding } from "../schema";
 import { OPERATION } from "../utils/constants";
-import { mergeBsffPackagings } from "../../../../../common/bsffPackagings";
 
 type SelectableWasteTableWrapperProps = {
   type: BsffType;
@@ -151,7 +150,11 @@ function BsffSelectableWasteTableWrapper({
 
   function onGroupingChange(grouping: ZodBsffGroupingOrForwarding[]) {
     const firstGroupedBsff = grouping?.[0];
-    setValue("waste.code", firstGroupedBsff?.waste?.code ?? "");
+
+    setValue(
+      "waste.code",
+      firstGroupedBsff?.acceptation?.wasteCode ?? firstGroupedBsff?.waste?.code
+    );
     setValue(
       "weight.value",
       grouping?.reduce((prev, cur) => {
@@ -159,15 +162,34 @@ function BsffSelectableWasteTableWrapper({
         return prev + (weight ?? 0);
       }, 0) ?? 0
     );
+    const allPackagings = grouping.flatMap(g => {
+      // si packagings existe → priorité
+      if (g.packagings?.length) {
+        return g.packagings;
+      }
 
-    setValue(
+      // fallback mapping manuel
+      return [
+        {
+          type: g.type ?? null,
+          volume: g.volume ?? null,
+          numero: g.numero ?? null,
+          weight: g.weight ?? null,
+          other: g.other ?? null
+        }
+      ];
+    });
+    setValue("packagings", allPackagings);
+    //console.log("packagings from grouping", grouping);
+    //console.log('sss',firstGroupedBsff?.packagings );
+    /*setValue(
       "packagings",
       grouping.length
         ? mergeBsffPackagings(
             grouping.flatMap(bsff => (bsff.packagings as BsffPackaging[]) ?? [])
           )
         : initialState.packagings
-    );
+    );*/
 
     /* const emitterCompany =
       firstGroupedBsff?.bsff?.emitter?.company ?? initialState!.emitter.company;
@@ -180,11 +202,15 @@ function BsffSelectableWasteTableWrapper({
 
   function onForwardingChange(forwarding: ZodBsffGroupingOrForwarding | null) {
     const forwardingBsff = forwarding;
+    console.log("mmm", forwardingBsff);
+
+    // setValue("volume.value", forwardingBsff?.volume ?? "" );
 
     setValue(
       "waste.code",
-      forwardingBsff?.waste?.code ?? initialState!.waste!.code
+      forwardingBsff?.acceptation?.wasteCode ?? forwardingBsff?.waste?.code
     );
+
     setValue(
       "waste.description",
       forwardingBsff?.waste?.description ?? initialState!.waste!.description
@@ -198,11 +224,25 @@ function BsffSelectableWasteTableWrapper({
       "weight.value",
       forwardingBsff?.acceptation?.weight ?? forwardingBsff?.weight ?? 0
     );
-    setValue(
-      "packagings",
-      forwardingBsff?.packagings ?? initialState.packagings
-    );
+    const allPackagings = grouping.flatMap(g => {
+      // si packagings existe → priorité
+      if (g.packagings?.length) {
+        return g.packagings;
+      }
 
+      // fallback mapping manuel
+      return [
+        {
+          type: g.type ?? null,
+          volume: g.volume ?? null,
+          numero: g.numero ?? null,
+          weight: g.weight ?? null,
+          other: g.other ?? null
+        }
+      ];
+    });
+    setValue("packagings", allPackagings);
+    // console.log('forw',forwardingBsff?.packagings );
     /*  const emitterCompany =
       forwardingBsff?.nextBsff?.emitter?.company ??
       initialState!.emitter.company;
@@ -307,7 +347,14 @@ function BsffSelectableWasteTableWrapper({
               ...grouping.filter(g => g.bsffId !== bsbsffPackaging.bsffId)
             ]);
           } else {
-            append(bsbsffPackaging as ZodBsffGroupingOrForwarding);
+            append({
+              bsffId: bsbsffPackaging.bsffId,
+              type: bsbsffPackaging.type ?? null,
+              volume: bsbsffPackaging.volume ?? null,
+              numero: bsbsffPackaging.numero ?? null,
+              weight: bsbsffPackaging.weight ?? null,
+              other: bsbsffPackaging.other ?? null
+            } as ZodBsffGroupingOrForwarding);
             onGroupingChange([
               ...grouping,
               bsbsffPackaging as ZodBsffGroupingOrForwarding
