@@ -5,13 +5,10 @@ import {
   Query,
   BsffType,
   QueryBsffsArgs,
-  BsffWhere,
-  BsffPackaging,
   BsffPackagingWhere,
   BsffOperationCode
 } from "@td/codegen-ui";
 import { InlineLoader } from "../../../../common/Components";
-
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import BsffSelectableWasteTable from "./BsffSelectableWasteTable";
 import { getInitialCompany } from "../../../../common/data/initialState";
@@ -22,10 +19,8 @@ import { debounce } from "../../../../../common/helper";
 
 import { MAX_BSFF_COUNT_TABLE_DISPLAY } from "./BsffSelectableWasteTable";
 import { ZodBsffGroupingOrForwarding } from "../schema";
-import { OPERATION } from "../utils/constants";
-import { mergeBsffPackagings } from "../../../../../common/bsffPackagings";
 
-type SelectableWasteTableWrapperProps = {
+type Props = {
   type: BsffType;
   bsffId: string;
   emitterCompany: any;
@@ -35,64 +30,58 @@ function BsffSelectableWasteTableWrapper({
   type,
   bsffId,
   emitterCompany
-}: SelectableWasteTableWrapperProps) {
+}: Props) {
   const { watch, setValue, control } = useFormContext();
   const { siret } = useParams<{ siret: string }>();
+
   const [idFilter, setIdFilter] = useState("");
   const [wasteCodeFilter, setWasteCodeFilter] = useState("");
   const [numeroFilter, setNumeroFilter] = useState("");
   const [emetteurSiretFilter, setEmetteurSiretFilter] = useState("");
   const [debouncing, setDebouncing] = useState(false);
+
   const destinationSiret = emitterCompany?.siret;
-  /*const destinationSiret = useMemo(() => {
-  return emitterCompany?.siret ?? null;
-}, [emitterCompany?.siret]);*/
 
   const { append, remove } = useFieldArray({
     control,
-    name: `grouping`
+    name: "grouping"
   });
 
-  const forwarding: ZodBsffGroupingOrForwarding | null = watch(
-    "forwarding",
-    null
-  );
-  const grouping: ZodBsffGroupingOrForwarding[] = watch("grouping", []);
+  const forwarding = watch("forwarding", null);
+  const grouping = watch("grouping", []);
 
+  // 🔹 FILTER OPERATION
   const codeFilter = useMemo(() => {
     switch (type) {
       case BsffType.Groupement:
-        // Groupement peut avoir D13 et R12
+                // Groupement peut avoir D13 et R12
         return { _in: [BsffOperationCode.D13, BsffOperationCode.R12] };
       case BsffType.Reconditionnement:
-        // Reconditionnement : D14
+                // Reconditionnement : D14
         return { _in: [BsffOperationCode.D14] };
       case BsffType.Reexpedition:
-        // Réexpédition : D15 et R13
+                // Réexpédition : D15 et R13
         return { _in: [BsffOperationCode.D15, BsffOperationCode.R13] };
       default:
         return {};
     }
   }, [type]);
 
-  const baseWhere: BsffPackagingWhere = useMemo(() => {
-    return {
-      operation: {
-        code: codeFilter,
-        noTraceability: false
-      },
-      bsff: {
-        destination: {
-          company: { siret: { _eq: destinationSiret } }
-        }
-      },
-      nextBsff: null
-    };
-  }, [bsffId, codeFilter, destinationSiret]);
+  const baseWhere: BsffPackagingWhere = useMemo(() => ({
+    operation: {
+      code: codeFilter,
+      noTraceability: false
+    },
+    bsff: {
+      destination: {
+        company: { siret: { _eq: destinationSiret } }
+      }
+    },
+    nextBsff: null
+  }), [bsffId,codeFilter, destinationSiret]);
 
-  const where: BsffPackagingWhere = useMemo(() => {
-    return {
-      ...baseWhere,
+  const where = useMemo(() => ({
+    ...baseWhere,
       ...(idFilter.length > 0 ? { id: { _eq: idFilter } } : {}),
       ...(wasteCodeFilter.length > 0
         ? { acceptation: { wasteCode: { _contains: wasteCodeFilter } } }
@@ -102,20 +91,13 @@ function BsffSelectableWasteTableWrapper({
         : {}),
       ...(emetteurSiretFilter.length > 0
         ? {
-            bsff: {
-              emitter: {
-                company: { siret: { _eq: emetteurSiretFilter } }
-              }
-            }
-            /* nextBsff: {
-              emitter: {
-                company: { siret: { _eq: emetteurSiretFilter } }
-              }
-            }*/
-          }
-        : {})
-    };
-  }, [baseWhere, idFilter, wasteCodeFilter, numeroFilter, emetteurSiretFilter]);
+      bsff: {
+        emitter: {
+          company: { siret: { _eq: emetteurSiretFilter } }
+        }
+      }
+    }: {})
+  }), [baseWhere, idFilter, wasteCodeFilter, numeroFilter, emetteurSiretFilter]);
 
   const { data, loading, error, refetch } = useQuery<
     Pick<Query, "bsffPackagings">,
@@ -128,92 +110,78 @@ function BsffSelectableWasteTableWrapper({
     fetchPolicy: "network-only"
   });
 
-  const debouncedRefetch = React.useMemo(() => {
-    return debounce((where: BsffWhere) => {
-      try {
-        refetch({
-          where
-        });
-      } catch (err: any) {
-        console.error(err);
-        return;
-      }
-      setDebouncing(false);
-    }, 500);
-  }, [refetch]);
+  const debouncedRefetch = useMemo(() => debounce((where) => {
+    refetch({ where });
+    setDebouncing(false);
+  }, 500), [refetch]);
 
   React.useEffect(() => {
     setDebouncing(true);
     debouncedRefetch(where);
-  }, [where, debouncedRefetch]);
+  }, [where]);
 
   const isForwardingPicker = type === BsffType.Reexpedition;
 
-  function onGroupingChange(grouping: ZodBsffGroupingOrForwarding[]) {
-    const firstGroupedBsff = grouping?.[0];
-    setValue("waste.code", firstGroupedBsff?.waste?.code ?? "");
-    setValue(
-      "weight.value",
-      grouping?.reduce((prev, cur) => {
-        const weight = cur.acceptation?.weight ?? cur.weight;
-        return prev + (weight ?? 0);
-      }, 0) ?? 0
+function onGroupingChange(grouping: ZodBsffGroupingOrForwarding[]) {
+  const first = grouping?.[0];
+
+  setValue(
+    "waste.code",
+    first?.acceptation?.wasteCode ?? first?.waste?.code
+  );
+
+  setValue(
+    "weight.value",
+    grouping.reduce(
+      (sum, g) => sum + (g.acceptation?.weight ?? g.weight ?? 0),
+      0
+    )
+  );
+
+  const allPackagings = grouping.flatMap(g => {
+    if (g.packagings?.length) {
+      return g.packagings;
+    }
+
+    return [
+      {
+        type: g.type ?? null,
+        volume: g.volume ?? null,
+        numero: g.numero ?? "",
+        weight: g.acceptation?.weight ?? g.weight ?? null,
+        other: g.other ?? null
+      }
+    ];
+  });
+
+  setValue("packagings", allPackagings);
+
+  const nextCompany =
+    first?.nextBsff?.emitter?.company ?? getInitialCompany();
+
+  setValue("nextBsff.company", nextCompany);
+}
+
+  function onForwardingChange(fwd: ZodBsffGroupingOrForwarding | null) {
+    setValue("waste.code",
+      fwd?.acceptation?.wasteCode ?? fwd?.waste?.code
     );
 
-    setValue(
-      "packagings",
-      grouping.length
-        ? mergeBsffPackagings(
-            grouping.flatMap(bsff => (bsff.packagings as BsffPackaging[]) ?? [])
-          )
-        : initialState.packagings
+    setValue("weight.value",
+      fwd?.acceptation?.weight ?? fwd?.weight ?? 0
     );
 
-    /* const emitterCompany =
-      firstGroupedBsff?.bsff?.emitter?.company ?? initialState!.emitter.company;
-    setValue("emitter.company", emitterCompany);*/
+    setValue("packagings",
+      fwd?.packagings ?? initialState.packagings
+    );
 
-    const { ...nextBsffCompany } =
-      firstGroupedBsff?.nextBsff?.emitter?.company ?? getInitialCompany();
-    setValue("nextBsff.company", nextBsffCompany);
+    const nextCompany =
+      fwd?.nextBsff?.emitter?.company ?? getInitialCompany();
+
+    setValue("nextBsff.company", nextCompany);
   }
 
-  function onForwardingChange(forwarding: ZodBsffGroupingOrForwarding | null) {
-    const forwardingBsff = forwarding;
-
-    setValue(
-      "waste.code",
-      forwardingBsff?.waste?.code ?? initialState!.waste!.code
-    );
-    setValue(
-      "waste.description",
-      forwardingBsff?.waste?.description ?? initialState!.waste!.description
-    );
-    setValue(
-      "waste.adr",
-      forwardingBsff?.waste?.adr ?? initialState!.waste!.adr
-    );
-
-    setValue(
-      "weight.value",
-      forwardingBsff?.acceptation?.weight ?? forwardingBsff?.weight ?? 0
-    );
-    setValue(
-      "packagings",
-      forwardingBsff?.packagings ?? initialState.packagings
-    );
-
-    /*  const emitterCompany =
-      forwardingBsff?.nextBsff?.emitter?.company ??
-      initialState!.emitter.company;
-    setValue("emitter.company", emitterCompany);*/
-
-    const { ...nextBsffCompany } =
-      forwardingBsff?.nextBsff?.emitter?.company ?? getInitialCompany();
-    setValue("nextBsff.company", nextBsffCompany);
-  }
-
-  if (error) {
+if (error) {
     return (
       <Alert
         severity="error"
@@ -244,88 +212,76 @@ function BsffSelectableWasteTableWrapper({
   }
 
   const bsffPackagings =
-    data?.bsffPackagings?.edges?.map(({ node: packaging }) => packaging) ?? [];
+  data?.bsffPackagings?.edges?.map(e => e.node) ?? [];
+
   const total = data?.bsffPackagings?.totalCount ?? 0;
 
   if (isForwardingPicker) {
     return (
       <>
         <BsffSelectableWasteTable
-          onClick={bsbsffPackaging => {
-            const isSelected = forwarding?.bsffId === bsbsffPackaging.bsffId;
+          onClick={item => {
+            const isSelected = forwarding?.bsffId === item.bsffId;
+
             if (isSelected) {
               setValue("forwarding", null);
               onForwardingChange(null);
             } else {
-              setValue(
-                "forwarding",
-                bsbsffPackaging as ZodBsffGroupingOrForwarding
-              );
-              onForwardingChange(bsbsffPackaging);
+              setValue("forwarding", item);
+              onForwardingChange(item);
             }
           }}
           bsffPackagings={bsffPackagings}
           pickerType={BsffType.Reexpedition}
           selected={forwarding ? [forwarding] : []}
-          idFilter={idFilter}
-          wasteCodeFilter={wasteCodeFilter}
-          numeroFilter={numeroFilter}
-          emetteurSiretFilter={emetteurSiretFilter}
-          setIdFilter={setIdFilter}
-          setNumeroFilter={setNumeroFilter}
-          setWasteCodeFilter={setWasteCodeFilter}
-          setEmetteurSiretFilter={setEmetteurSiretFilter}
-          total={total}
+          {...{
+            idFilter,
+            wasteCodeFilter,
+            numeroFilter,
+            emetteurSiretFilter,
+            setIdFilter,
+            setWasteCodeFilter,
+            setNumeroFilter,
+            setEmetteurSiretFilter,
+            total
+          }}
         />
         {loading && <InlineLoader />}
       </>
     );
   }
 
+  // 🔁 GROUPING
   return (
     <>
       <BsffSelectableWasteTable
-        onClick={bsbsffPackaging => {
-          /*const clickedBsffIndex = grouping!.findIndex(
-            ({ id }) => id === bsbsffPackaging.bsffId
-          );
-          const isSelected = clickedBsffIndex >= 0;*/
-          const clickedBsffIndex = grouping!.findIndex(
-            ({ bsffId }) => bsffId === bsbsffPackaging.bsffId
-          );
-          const isSelected = clickedBsffIndex >= 0;
-          console.log(
-            "ddd",
-            bsbsffPackaging.numero,
-            bsbsffPackaging.weight,
-            bsbsffPackaging.volume,
-            bsbsffPackaging.type
-          );
+        onClick={item => {
+          const index = grouping.findIndex(g => g.bsffId === item.bsffId);
+          const isSelected = index >= 0;
+
           if (isSelected) {
-            remove(clickedBsffIndex);
-            onGroupingChange([
-              ...grouping.filter(g => g.bsffId !== bsbsffPackaging.bsffId)
-            ]);
+            remove(index);
+            onGroupingChange(grouping.filter(g => g.bsffId !== item.bsffId));
           } else {
-            append(bsbsffPackaging as ZodBsffGroupingOrForwarding);
-            onGroupingChange([
-              ...grouping,
-              bsbsffPackaging as ZodBsffGroupingOrForwarding
-            ]);
+            // ✅ IMPORTANT : on garde l'objet COMPLET
+            append(item);
+            onGroupingChange([...grouping, item]);
           }
         }}
         bsffPackagings={bsffPackagings}
         pickerType={BsffType.Groupement}
         selected={grouping}
-        idFilter={idFilter}
-        wasteCodeFilter={wasteCodeFilter}
-        numeroFilter={numeroFilter}
-        emetteurSiretFilter={emetteurSiretFilter}
-        setIdFilter={setIdFilter}
-        setNumeroFilter={setNumeroFilter}
-        setWasteCodeFilter={setWasteCodeFilter}
-        setEmetteurSiretFilter={setEmetteurSiretFilter}
-        total={total}
+        {...{
+          idFilter,
+          wasteCodeFilter,
+          numeroFilter,
+          emetteurSiretFilter,
+          setIdFilter,
+          setWasteCodeFilter,
+          setNumeroFilter,
+          setEmetteurSiretFilter,
+          total
+        }}
       />
       {loading && <InlineLoader />}
     </>

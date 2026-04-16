@@ -56,6 +56,9 @@ function BsffPackagingList({
   // RG métier
 
   const isReconditionnement = bsffType === BsffType.Reconditionnement;
+  const isGroupement = bsffType === BsffType.Groupement;
+  const isReexpedition = bsffType === BsffType.Reexpedition;
+  const showbutton = isReconditionnement || isGroupement || isReexpedition;
 
   const maxPackagings = isReconditionnement ? 1 : Infinity;
 
@@ -97,7 +100,7 @@ function BsffPackagingList({
       ))}
 
       {/* BOUTON AJOUT */}
-      {!disabled && canAdd && (
+      {!disabled && canAdd && !showbutton && (
         <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
           <button
             type="button"
