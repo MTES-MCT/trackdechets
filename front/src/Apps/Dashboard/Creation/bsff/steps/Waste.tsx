@@ -132,7 +132,6 @@ const WasteBsff = () => {
             <MyBsffCompanySelector
               value="emitter.company"
               onChange={company => {
-                console.log(company);
                 setValue("emitter.company", company);
               }}
             ></MyBsffCompanySelector>
@@ -204,11 +203,11 @@ const WasteBsff = () => {
               }
             />
             <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
-              <RhfBsffPackagingList
-                    disabled={sealedFields.includes(`packagings`)}
-                    fieldName="packagings"
-                    packagingTypes={bsffPackagingTypes}
-                  />
+            <RhfBsffPackagingList
+              disabled={sealedFields.includes(`packagings`)}
+              fieldName="packagings"
+              packagingTypes={bsffPackagingTypes}
+            />
             <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>
             <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
               <div className="fr-col-md-3">

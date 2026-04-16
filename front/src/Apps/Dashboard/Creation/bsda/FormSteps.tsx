@@ -224,7 +224,7 @@ const BsdaFormSteps = ({
   };
 
   async function saveBsda(values: BsdaInput, draft: boolean): Promise<any> {
-    console.log("dhhhhhhhhhhh")
+    console.log("dhhhhhhhhhhh");
     const bsdaInput = await saveTransporters(values as BsdaValues);
 
     // Careful. Legacy BSDAs have a `waste.isSubjectToADR` field

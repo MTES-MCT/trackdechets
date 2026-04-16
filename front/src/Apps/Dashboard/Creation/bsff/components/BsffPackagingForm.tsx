@@ -13,8 +13,6 @@ import { numberToString } from "../../bspaoh/utils/numbers";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { useFormContext } from "react-hook-form";
 
-
-
 export type PackagingFormProps = {
   // Valeur de `packaging` provenant du store Formik ou RHF
   packaging: PackagingInfoInput | BsffPackagingInput;
@@ -133,7 +131,7 @@ function BsffPackagingForm({
               type: "number",
               inputMode: "decimal",
               step: "0.001",
-              ...inputProps.weight,
+              ...inputProps.weight
             }}
           />
         </div>
@@ -149,9 +147,8 @@ function BsffPackagingForm({
               stateRelatedMessage={errors?.other}
               nativeInputProps={{
                 type: "number",
-                ...
-                inputProps.other
-              }}  
+                ...inputProps.other
+              }}
             />
           </div>
         </div>
@@ -163,12 +160,11 @@ function BsffPackagingForm({
             disabled={disabled}
             state={errors?.numero && touched?.numero ? "error" : "default"}
             stateRelatedMessage={errors?.numero}
-              nativeInputProps={{
-                type: "number",
-                ...
-                inputProps.weight
-              }}          
-            />
+            nativeInputProps={{
+              type: "number",
+              ...inputProps.numero
+            }}
+          />
         </div>
       </div>
     </>

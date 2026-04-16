@@ -76,17 +76,17 @@ const FormStepsContent = ({
       });
   };
 
-const onErrors = (errors) => {
-  console.log("ZOD ERRORS 👉", errors);
+  const onErrors = errors => {
+    console.log("ZOD ERRORS 👉", errors);
 
-  if (!errors) return;
+    if (!errors) return;
 
-  Object.entries(errors).forEach(([field, error]) => {
-    console.log(`❌ FIELD: ${field}`, error);
-  });
+    Object.entries(errors).forEach(([field, error]) => {
+      console.log(`❌ FIELD: ${field}`, error);
+    });
 
-  scrollToTop();
-};
+    scrollToTop();
+  };
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
     scrollToTop();
@@ -106,9 +106,9 @@ const onErrors = (errors) => {
               isPrevStepDisabled={selectedTabId === firstTabId}
               isNextStepDisabled={selectedTabId === lastTabId}
               onSubmit={useformMethods.handleSubmit(
-  (data, e) => onSubmit(data, e),
-  (errors) => onErrors(errors) // ✅ IMPORTANT
-)}
+                (data, e) => onSubmit(data, e),
+                errors => onErrors(errors) // ✅ IMPORTANT
+              )}
               onCancel={() => navigate(-1)}
               onPrevTab={() => {
                 setSelectedTabId(getPrevTab(tabIds, selectedTabId));

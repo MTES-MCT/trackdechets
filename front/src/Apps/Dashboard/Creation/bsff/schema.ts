@@ -56,7 +56,7 @@ const zodCompany = z
     contact: z.string().nullish(),
     phone: z.string().nullish(),
     mail: z.string().nullish(),
-    address: z.string().nullish(),
+    address: z.string().nullish()
   })
   .nullish();
 
@@ -120,22 +120,25 @@ const bsffPackagingSchema = z
     type: z.nativeEnum(BsffPackagingType),
     other: z.string().max(250).nullish(),
     quantity: z.coerce.number().nonnegative().nullish(),
-    volume: z.coerce.number({
-      required_error: "Conditionnements : le volume doit être supérieure à 0"
-    })
-    .positive("Conditionnements : le volume doit être supérieur à 0")
-    .max(250),
-    weight: z.coerce.number({
-      required_error: "Conditionnements : le poids doit être supérieur à 0"
-    })
-    .positive("Conditionnements : le poids doit être supérieur à 0")
-    .max(250),
+    volume: z.coerce
+      .number({
+        required_error: "Conditionnements : le volume doit être supérieure à 0"
+      })
+      .positive("Conditionnements : le volume doit être supérieur à 0")
+      .max(250),
+    weight: z.coerce
+      .number({
+        required_error: "Conditionnements : le poids doit être supérieur à 0"
+      })
+      .positive("Conditionnements : le poids doit être supérieur à 0")
+      .max(250),
     numero: z
-    .string({
-      required_error: "Conditionnements : le numéro d'identification est requis"
-    })
-    .max(250)
-    .min(1, "Conditionnements : le numéro d'identification est requis")
+      .string({
+        required_error:
+          "Conditionnements : le numéro d'identification est requis"
+      })
+      .max(250)
+      .min(1, "Conditionnements : le numéro d'identification est requis")
   })
   .refine(val => val.type !== "AUTRE" || !!val.other, {
     path: ["other"],
@@ -203,18 +206,18 @@ const bsffGroupingOrForwardingSchema = z.object({
 //   numero: z.string({
 //     required_error: "Numéro de fiche d'intervention requis"
 //   }).min(1, "Le numéro ne peut pas être vide"),
- 
+
 //   weight: z.preprocess(
 //     val => val === "" ? null : val,
 //     z.coerce.number({
 //       required_error: "Le poids est requis"
 //     }).positive("Le poids doit être supérieur à 0")
 //   ),
- 
+
 //   postalCode: z.string({
 //     required_error: "Code postal requis"
 //   }).min(1, "Le code postal ne peut pas être vide"),
- 
+
 //   detenteur: z.object({
 //     isPrivateIndividual: z.boolean().optional(),
 //     company: zodCompany
@@ -223,8 +226,6 @@ const bsffGroupingOrForwardingSchema = z.object({
 //   }),
 //     operateur: z.string().nullish(),
 // });
- 
-
 
 export const rawBsffSchema = z.object({
   id: z.string().nullish(),
@@ -246,21 +247,25 @@ export const rawBsffSchema = z.object({
       description: z.string().max(250).nullish()
     })
     .nullish(),
- weight: z.object({
-    value: z.coerce.number().nonnegative().nullish(),
-    isEstimate: z.boolean().nullish()
-  }).nullish(),
+  weight: z
+    .object({
+      value: z.coerce.number().nonnegative().nullish(),
+      isEstimate: z.boolean().nullish()
+    })
+    .nullish(),
 
-  destination: z.object({
-    company: zodCompany,
-    customInfo: z.string().max(250).nullish(),
-    cap: z.string().max(250).nullish(),
-    reception: z.object({
-      date: z.coerce.date().nullish(),
-      signature: zodSignature
-    }),
-    plannedOperationCode: ZodOperationEnum
-  }).nullish(),
+  destination: z
+    .object({
+      company: zodCompany,
+      customInfo: z.string().max(250).nullish(),
+      cap: z.string().max(250).nullish(),
+      reception: z.object({
+        date: z.coerce.date().nullish(),
+        signature: zodSignature
+      }),
+      plannedOperationCode: ZodOperationEnum
+    })
+    .nullish(),
   detenteurCompanySirets: z.array(z.string().max(250)).optional().nullish(),
   transporters: z
     .array(
@@ -301,4 +306,3 @@ export type ZodBsff = z.infer<typeof rawBsffSchema>;
 export type ZodBsffGroupingOrForwarding = z.infer<
   typeof bsffGroupingOrForwardingSchema
 >;
- 
