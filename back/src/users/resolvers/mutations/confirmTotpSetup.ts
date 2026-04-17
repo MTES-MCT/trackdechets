@@ -18,10 +18,24 @@ const BCRYPT_SALT_ROUNDS = 10;
  * La saisie est insensible à la casse et le tiret est ignoré à la validation.
  */
 function generateRecoveryCode(): string {
-  const bytes = randomBytes(10);
-  const raw = Array.from(bytes)
-    .map(b => RECOVERY_CODE_CHARS[b % RECOVERY_CODE_CHARS.length])
-    .join("");
+  const charsetLength = RECOVERY_CODE_CHARS.length;
+  const maxUnbiased = Math.floor(256 / charsetLength) * charsetLength;
+  const chars: string[] = [];
+
+  while (chars.length < 10) {
+    const bytes = randomBytes(10 - chars.length);
+    for (const b of bytes) {
+      if (b >= maxUnbiased) {
+        continue;
+      }
+      chars.push(RECOVERY_CODE_CHARS[b % charsetLength]);
+      if (chars.length === 10) {
+        break;
+      }
+    }
+  }
+
+  const raw = chars.join("");
   return `${raw.slice(0, 5)}-${raw.slice(5, 10)}`;
 }
 
