@@ -19,6 +19,11 @@ describe("editProfile", () => {
 
   it("should allow setting fields", async () => {
     await editProfile("userId", { name: "John Doe" });
+    mockUpdateUser.mockResolvedValueOnce({
+      id: "userId",
+      totpSeed: null,
+      activatedAt: null
+    });
     expect(mockUpdateUser).toHaveBeenCalledWith({
       where: { id: "userId" },
       data: { name: "John Doe" }

@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import TotpSetupWizard from "./TotpSetupWizard";
-import TotpDisableModal from "./TotpDisableModal";
 import { useApolloClient } from "@apollo/client";
 import { GET_ME } from "../Account";
 
-// Cadenas fermé — fill blanc (#F5F5FE) : visible sur le bouton primary (fond bleu)
 const LockClosedIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +23,6 @@ const LockClosedIcon = () => (
   </svg>
 );
 
-// Cadenas ouvert — fill bleu DSFR (#000091) : visible sur le bouton secondary (fond blanc)
 const LockOpenIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -51,16 +48,10 @@ type Props = {
 
 export default function AccountAuthentication({ totpEnabled }: Props) {
   const [showSetupWizard, setShowSetupWizard] = useState(false);
-  const [showDisableModal, setShowDisableModal] = useState(false);
   const client = useApolloClient();
 
   const handleSetupSuccess = () => {
     setShowSetupWizard(false);
-    client.refetchQueries({ include: [GET_ME] });
-  };
-
-  const handleDisableSuccess = () => {
-    setShowDisableModal(false);
     client.refetchQueries({ include: [GET_ME] });
   };
 
@@ -73,11 +64,8 @@ export default function AccountAuthentication({ totpEnabled }: Props) {
           <p className="fr-text--bold fr-mb-3w">
             L'authentification TOTP est activée sur votre compte
           </p>
-          {/* Bouton secondary (fond blanc) : icône cadenas ouvert bleu foncé */}
-          <Button
-            priority="secondary"
-            onClick={() => setShowDisableModal(true)}
-          >
+
+          <Button priority="secondary">
             Désactiver l'authentification TOTP
             <LockOpenIcon />
           </Button>
@@ -87,7 +75,7 @@ export default function AccountAuthentication({ totpEnabled }: Props) {
           <p className="fr-text--bold fr-mb-3w">
             L'authentification TOTP n'est pas activée sur votre compte
           </p>
-          {/* Bouton primary (fond bleu) : icône cadenas fermé blanc */}
+
           <Button onClick={() => setShowSetupWizard(true)} className="fr-mb-3w">
             Activer l'authentification TOTP
             <LockClosedIcon />
@@ -120,13 +108,6 @@ export default function AccountAuthentication({ totpEnabled }: Props) {
         <TotpSetupWizard
           onSuccess={handleSetupSuccess}
           onClose={() => setShowSetupWizard(false)}
-        />
-      )}
-
-      {showDisableModal && (
-        <TotpDisableModal
-          onSuccess={handleDisableSuccess}
-          onClose={() => setShowDisableModal(false)}
         />
       )}
     </div>
