@@ -138,4 +138,26 @@ type Mutation {
   subscribeToNotifications(
     input: SubscribeToNotificationsInput!
   ): [CompanyPrivate!]!
+
+  """
+  USAGE INTERNE
+  Initie la configuration TOTP : génère un secret et retourne l'URL otpauth
+  pour affichage en QR code. Le secret est stocké temporairement (non activé).
+  """
+  generateTotpSetup: TotpSetup!
+
+  """
+  USAGE INTERNE
+  Confirme la configuration TOTP en validant le premier code généré par
+  l'application d'authentification. Active le TOTP et retourne les codes
+  de récupération à usage unique (affichage unique).
+  """
+  confirmTotpSetup(code: String!): TotpRecoveryCodes!
+
+  """
+  USAGE INTERNE
+  Désactive le TOTP sur le compte de l'utilisateur connecté.
+  Nécessite un code TOTP valide pour confirmer l'action.
+  """
+  disableTotp(code: String!): User!
 }

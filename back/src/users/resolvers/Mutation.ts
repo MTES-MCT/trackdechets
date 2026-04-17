@@ -1,6 +1,9 @@
 import type { MutationResolvers } from "@td/codegen-back";
 import signup from "./mutations/signup";
 import changePassword from "./mutations/changePassword";
+import generateTotpSetup from "./mutations/generateTotpSetup";
+import confirmTotpSetup from "./mutations/confirmTotpSetup";
+import disableTotp from "./mutations/disableTotp";
 import createPasswordResetRequest from "./mutations/createPasswordResetRequest";
 import resendActivationEmail from "./mutations/resendActivationEmail";
 import editProfile from "./mutations/editProfile";
@@ -44,7 +47,10 @@ const Mutation: MutationResolvers = {
   revokeAllAccessTokens,
   changeUserRole,
   subscribeToCompanyNotifications,
-  subscribeToNotifications
+  subscribeToNotifications,
+  generateTotpSetup,
+  confirmTotpSetup,
+  disableTotp
 };
 
 export default Mutation;
