@@ -9,7 +9,8 @@ const meResolver: QueryResolvers["me"] = async (parent, args, context) => {
     // companies are resolved through a separate resolver (User.companies)
     isAdmin: user.isAdmin && !!user.totpActivatedAt && !!user.totpSeed,
     companies: [],
-    featureFlags: []
+    featureFlags: [],
+    totpEnabled: !!user.totpSeed && !!user.activatedAt
   };
 };
 
