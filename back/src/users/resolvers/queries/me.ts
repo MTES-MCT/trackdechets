@@ -10,7 +10,7 @@ const meResolver: QueryResolvers["me"] = async (parent, args, context) => {
     isAdmin: user.isAdmin && !!user.totpActivatedAt && !!user.totpSeed,
     companies: [],
     featureFlags: [],
-    totpEnabled: !!user.totpSeed && !!user.activatedAt
+    totpEnabled: !!user?.totpSeed && !!user?.activatedAt
   };
 };
 
