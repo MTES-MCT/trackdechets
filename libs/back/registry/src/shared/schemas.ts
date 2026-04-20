@@ -138,8 +138,9 @@ export const wasteDescriptionSchema = z
     "La dénomination usuelle du déchet ne peut pas dépasser 300 caractères"
   );
 
-export const wasteCodeBaleSchema = z.enum(WASTE_CODES_BALE).nullish();
-
+export const wasteCodeBaleSchema = z
+  .enum(WASTE_CODES_BALE as [string, ...string[]])
+  .nullish();
 export const getOperationCodeSchema = (
   operationCodes: TdOperationCodeEnum = ALL_TD_PROCESSING_OPERATIONS_CODES
 ) =>
