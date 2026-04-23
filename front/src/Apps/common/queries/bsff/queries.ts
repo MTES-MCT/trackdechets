@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { FullBsffFragment, PreviousBsffPackagingFragment } from "../fragments";
+import { FicheInterventionFragment, FullBsffFragment, PreviousBsffPackagingFragment } from "../fragments";
 
 export const GET_BSFF_FORM = gql`
   query Bsff($id: ID!) {
@@ -11,11 +11,12 @@ export const GET_BSFF_FORM = gql`
 `;
 
 export const GET_PREVIOUS_PACKAGINGS = gql`
-  query BsffPackagings($where: BsffPackagingWhere, $first: Int) {
-    bsffPackagings(where: $where, first: $first) {
+  query BsffPackagings($where: BsffPackagingWhere, $first: Int, $after: ID) {
+    bsffPackagings(where: $where, first: $first, after: $after) {
       totalCount
       pageInfo {
         hasNextPage
+        endCursor
       }
       edges {
         cursor
@@ -62,4 +63,31 @@ export const PDF_BSFF_FORM = gql`
       token
     }
   }
+`;
+
+export const PUBLISH_BSFF = gql`
+  mutation PublishBsff($id: ID!) {
+    publishBsff(id: $id) {
+      id
+      isDraft
+    }
+  }
+`;
+
+export const CREATE_BSFF = gql`
+  mutation CreateBsff($input: BsffInput!) {
+    createBsff(input: $input) {
+      ...FullBsff
+    }
+  }
+  ${FullBsffFragment}
+`;
+
+export const CREATE_BSFF_FICHE_INTERVENTION = gql`
+  mutation CreateBsffFicheIntervention($input: BsffFicheInterventionInput!) {
+    createFicheInterventionBsff(input: $input) {
+      ...FicheInterventionFragment
+    }
+  }
+  ${FicheInterventionFragment}
 `;

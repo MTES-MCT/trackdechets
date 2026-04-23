@@ -785,6 +785,7 @@ export const dropdownCreateLinks = (siret, location) => [
   {
     title: dropdown_create_bsff,
     route: generatePath(routes.dashboard.bsffs.create, { siret }),
+    state: { background: location },
     icon: <IconBSFF />
   },
   {

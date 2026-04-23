@@ -24,10 +24,10 @@ interface FormStepsContentProps {
   draftCtaLabel: string;
   mainCtaLabel: string;
   tabsContent: {
-    waste: React.JSX.Element;
-    emitter: React.JSX.Element;
-    transporter: React.JSX.Element;
-    destination: React.JSX.Element;
+    waste?: React.JSX.Element;
+    emitter?: React.JSX.Element;
+    transporter?: React.JSX.Element;
+    destination?: React.JSX.Element;
   };
   setPublishErrors: (normalizedErrors: NormalizedError[]) => void;
   errorTabIds?: TabId[];
@@ -76,10 +76,17 @@ const FormStepsContent = ({
       });
   };
 
-  const onErrors = () => {
-    scrollToTop();
-  };
+const onErrors = (errors) => {
+  console.log("ZOD ERRORS 👉", errors);
 
+  if (!errors) return;
+
+  Object.entries(errors).forEach(([field, error]) => {
+    console.log(`❌ FIELD: ${field}`, error);
+  });
+
+  scrollToTop();
+};
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
     scrollToTop();
@@ -99,9 +106,9 @@ const FormStepsContent = ({
               isPrevStepDisabled={selectedTabId === firstTabId}
               isNextStepDisabled={selectedTabId === lastTabId}
               onSubmit={useformMethods.handleSubmit(
-                (data, e) => onSubmit(data, e),
-                () => onErrors()
-              )}
+  (data, e) => onSubmit(data, e),
+  (errors) => onErrors(errors) // ✅ IMPORTANT
+)}
               onCancel={() => navigate(-1)}
               onPrevTab={() => {
                 setSelectedTabId(getPrevTab(tabIds, selectedTabId));
