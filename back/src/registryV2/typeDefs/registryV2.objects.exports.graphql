@@ -1715,6 +1715,14 @@ type AllWasteV2 {
   intermediary3CompanySiret: String
   "La raison sociale de l'intermédiaire n°3"
   intermediary3CompanyName: String
+  "Le SIRET de l'intermédiaire n°4"
+  intermediary4CompanySiret: String
+  "La raison sociale de l'intermédiaire n°4"
+  intermediary4CompanyName: String
+  "Le SIRET de l'intermédiaire n°5"
+  intermediary5CompanySiret: String
+  "La raison sociale de l'intermédiaire n°5"
+  intermediary5CompanyName: String
 
   "Approvisionnement direct (pipeline, convoyeur)"
   isDirectSupply: Boolean
