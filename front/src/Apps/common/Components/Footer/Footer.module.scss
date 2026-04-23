@@ -1,0 +1,72 @@
+.footer {
+  background: white;
+  border-top: 2px solid #000091;
+  padding: 32px;
+  font-size: 14px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.logos {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.rf {
+  display: flex;
+  gap: 12px;
+
+  img {
+    width: 60px;
+  }
+
+  p {
+    margin: 0;
+    font-style: italic;
+    font-size: 13px;
+  }
+}
+
+.brgm {
+  height: 48px;
+}
+
+.description {
+  max-width: 520px;
+
+  p {
+    margin: 0 0 16px;
+  }
+}
+
+.links a {
+  margin-right: 24px;
+  font-weight: 500;
+}
+
+hr {
+  margin: 24px 0;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+
+  span {
+    opacity: 0.4;
+  }
+}
+
+.licence {
+  margin-top: 16px;
+  font-size: 12px;
+}

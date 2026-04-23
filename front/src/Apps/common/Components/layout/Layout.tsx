@@ -11,6 +11,7 @@ import PageTitle from "../PageTitle/PageTitle";
 import A11ySkipLinks from "../A11ySkipLinks/A11ySkipLinks";
 import { ConsentBanner } from "../ConsentBanner/ConsentBanner";
 import { envConfig } from "../../../../common/envConfig";
+import Footer from "../Footer/Footer";
 interface AuthProps {
   v2banner?: JSX.Element;
   isAuthenticated?: boolean;
@@ -105,6 +106,7 @@ export default function Layout({
       <Outlet />
       <PageTitle />
       <ConsentBanner />
+      <Footer />
     </>
   );
 }
