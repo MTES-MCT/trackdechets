@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { gql, useMutation } from "@apollo/client";
 import QRCode from "react-qr-code";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -65,6 +65,7 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
   const [savedConfirmed, setSavedConfirmed] = useState(false);
   const [showSavedError, setShowSavedError] = useState(false);
   const [copied, setCopied] = useState(false);
+  const copyTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const stepIndex = STEPS.indexOf(step);
   const totalSteps = STEPS.length;
@@ -99,8 +100,20 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
     }
   };
 
-  const handleCopyCodes = () => {
-    navigator.clipboard.writeText(recoveryCodes.join("\n"));
+  const handleCopyCodes = async () => {
+    const text = recoveryCodes.join("\n");
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Fallback : textarea dans la modal pour éviter le focus trap
+      const el = copyTextareaRef.current;
+      if (el) {
+        el.value = text;
+        el.focus();
+        el.select();
+        document.execCommand("copy");
+      }
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -133,10 +146,25 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
   };
 
   const title = "Activez l'authentification TOTP";
+  const CopyRecoveryCodeIcone = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M11.3333 1.33325V2.66659H13.338C13.7033 2.66659 14 2.96325 14 3.32859V14.0046C13.9996 14.37 13.7035 14.6662 13.338 14.6666H2.662C2.29654 14.6662 2.00037 14.37 2 14.0046V3.32859C2 2.96325 2.29667 2.66659 2.662 2.66659H4.66667V1.33325H11.3333ZM4.66667 3.99992H3.33333V13.3333H12.6667V3.99992H11.3333V5.33325H4.66667V3.99992ZM10 2.66659H6V3.99992H10V2.66659Z"
+        fill="#000091"
+      />
+    </svg>
+  );
 
   return (
     <TdModal isOpen onClose={onClose} ariaLabel={title} title={title} size="L">
-      {/* Stepper DSFR */}
       <div className="fr-stepper fr-mb-3w">
         <h2 className="fr-stepper__title">
           {STEP_LABELS[step]}
@@ -160,17 +188,18 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
       {/* Étape 1 : Explication */}
       {step === "explanation" && (
         <div>
-          <p>
+          <p className="fr-mb-3w">
             Un code unique vous sera demandé à chaque nouvelle session. Pour
             l'obtenir, vous devez utiliser une application mobile.
           </p>
-          <p>
+          <p className="fr-mb-3w">
             Si vous n'avez pas encore d'application, nous vous conseillons
             d'utiliser l'outil opensource{" "}
             <a
               href="https://freeotp.github.io/"
               target="_blank"
               rel="noopener noreferrer"
+              className="fr-link"
             >
               FreeOTP Authenticator
             </a>
@@ -181,9 +210,8 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
             <DsfrNotificationError apolloError={generateError} />
           )}
 
-          {/* Checkbox avec validation au clic (bouton non bloqué) */}
           <div
-            className={`fr-checkbox-group fr-mb-3w${
+            className={`fr-checkbox-group fr-mb-2w${
               showAppError ? " fr-checkbox-group--error" : ""
             }`}
           >
@@ -210,8 +238,12 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
           </div>
 
           <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
-            <Button priority="secondary" onClick={onClose}>
-              Annuler
+            <Button
+              priority="secondary"
+              disabled={step === "explanation"}
+              onClick={onClose}
+            >
+              Précédent
             </Button>
             <Button disabled={generating} onClick={goToQrCode}>
               Continuer
@@ -223,9 +255,11 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
       {/* Étape 2 : QR code + saisie du code (fusionnés) */}
       {step === "qrcode" && (
         <div>
-          <p className="fr-text--bold">
-            Scannez ce QRcode avec votre application
-          </p>
+          <h3 className="fr-h1">
+            <p className="fr-text--lead">
+              Scannez ce QRcode avec votre application
+            </p>
+          </h3>
 
           {qrCodeUrl && (
             <div className="fr-mb-2w" style={{ textAlign: "center" }}>
@@ -265,11 +299,12 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
             </div>
           )}
 
-          {/* Input avec état d'erreur DSFR natif */}
           <div className="fr-col-md-8">
+            <label className="fr-label fr-text--bold fr-²">
+              Insérez le code généré par votre application
+            </label>
             <Input
-              label="Insérez le code généré par votre application"
-              hintText="Entrez le code à usage unique"
+              label="Entrez le code à usage unique"
               state={confirmError ? "error" : "default"}
               stateRelatedMessage={
                 confirmError ? "Le code est incorrect" : undefined
@@ -336,7 +371,7 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
             </div>
           </div>
 
-          <ul className="fr-btns-group fr-btns-group--inline fr-mb-3w">
+          <ul className="fr-btns-group--inline fr-mb-3w">
             <li>
               <Button
                 priority="secondary"
@@ -350,12 +385,10 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
             <li>
               <Button
                 priority="secondary"
-                iconId={
-                  copied ? "fr-icon-check-line" : "fr-icon-clipboard-line"
-                }
-                iconPosition="left"
                 onClick={handleCopyCodes}
+                className="fr-ml-1w"
               >
+                <CopyRecoveryCodeIcone />
                 {copied ? "Copié !" : "Copier"}
               </Button>
             </li>
@@ -388,7 +421,10 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
             )}
           </div>
 
-          <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
+          <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline fr-mt-3w">
+            <Button priority="secondary" onClick={() => setStep("recovery")}>
+              Précédent
+            </Button>
             <Button onClick={handleFinish}>Activer</Button>
           </div>
         </div>
@@ -401,11 +437,18 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
           <div className="fr-alert fr-alert--success fr-mb-3w" role="alert">
             <p>Votre double authentification est bien activée</p>
           </div>
-          <div className="fr-btns-group fr-btns-group--right">
+          <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
             <Button onClick={onSuccess}>Fermer</Button>
           </div>
         </div>
       )}
+      <textarea
+        ref={copyTextareaRef}
+        aria-hidden="true"
+        readOnly
+        style={{ position: "absolute", left: "-9999px", top: 0, opacity: 0 }}
+        tabIndex={-1}
+      />
     </TdModal>
   );
 }

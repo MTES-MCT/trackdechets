@@ -57,8 +57,6 @@ export default function AccountAuthentication({ totpEnabled }: Props) {
 
   return (
     <div>
-      <h3 className="fr-h3">Authentification à deux facteurs (TOTP)</h3>
-
       {totpEnabled ? (
         <>
           <p className="fr-text--bold fr-mb-3w">
@@ -80,14 +78,14 @@ export default function AccountAuthentication({ totpEnabled }: Props) {
             Activer l'authentification TOTP
             <LockClosedIcon />
           </Button>
-          <p className="fr-text--bold fr-mb-1w">
+          <p className="fr-mb-3w">
             Sécurisez votre compte avec la double authentification !
           </p>
-          <p className="fr-mb-1w">
+          <p className="fr-mb-3w">
             Protégez votre compte est primordial, et la sécurité apportée par un
             simple mot de passe n'est pas toujours suffisante.
           </p>
-          <p className="fr-mb-1w">
+          <p className="fr-mb-3w">
             En activant la double authentification, vous augmentez votre niveau
             de sécurité : votre mot de passe seul ne suffira plus à compromettre
             votre compte, il faudra en plus être en possession de votre
