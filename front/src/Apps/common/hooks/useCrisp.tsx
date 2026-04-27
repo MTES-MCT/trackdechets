@@ -5,7 +5,7 @@ import { useEffect } from "react";
  * CRISP HOOK (SAFE + SPA FRIENDLY)
  * ========================
  *
- * 🎯 Objectif :
+ *  Objectif :
  * - Charger Crisp uniquement si activé
  * - Garder la session utilisateur (historique conversation)
  * - Éviter les reload et les destructions agressives
@@ -58,7 +58,7 @@ export function useCrisp(enabled: boolean) {
      * CAS 2 : CRISP DÉSACTIVÉ
      * ========================
      *
-     * ⚠️ IMPORTANT :
+     *  IMPORTANT :
      * On NE supprime PAS la session
      * On NE reset PAS les cookies
      * → sinon perte de conversation utilisateur
@@ -72,7 +72,7 @@ export function useCrisp(enabled: boolean) {
       (window as any).$crisp.push(["do", "chat:hide"]);
     }
 
-    // ❌ volontairement NON utilisé :
+    //  volontairement NON utilisé :
     // - session:reset (perd les conversations)
     // - suppression iframe
     // - delete window.$crisp
