@@ -20,6 +20,12 @@ export const onTotpActivated: MailTemplate<{ name: string }> = {
   templateId: templateIds.LAYOUT
 };
 
+export const onTotpRecoveryUsed: MailTemplate<{ name: string }> = {
+  subject: "Récupération de votre compte Trackdéchets",
+  body: mustacheRenderer("totp-recovery.html"),
+  templateId: templateIds.LAYOUT
+};
+
 export const onTotpDisabled: MailTemplate<{ name: string }> = {
   subject: "Double authentification désactivée sur votre compte Trackdéchets",
   body: mustacheRenderer("totp-disabled.html"),

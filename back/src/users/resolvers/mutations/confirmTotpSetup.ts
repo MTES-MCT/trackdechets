@@ -103,6 +103,7 @@ const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
       where: { id: dbUser.id },
       data: {
         totpActivatedAt: now,
+        totpSetupRequired: false,
         // Mise à jour de passwordUpdatedAt pour invalider les sessions des autres appareils
         passwordUpdatedAt: now
       }

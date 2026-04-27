@@ -4,13 +4,17 @@ import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../companies/converters";
 
 const userResolvers: UserResolvers = {
-  // Indique si le TOTP est activé sur le compte
   totpEnabled: parent => {
     const p = parent as {
       totpActivatedAt?: Date | null;
       totpSeed?: string | null;
     };
     return !!p.totpActivatedAt && !!p.totpSeed;
+  },
+
+  totpSetupRequired: parent => {
+    const p = parent as { totpSetupRequired?: boolean | null };
+    return p.totpSetupRequired ?? false;
   },
 
   // Returns the list of companies a user belongs to
