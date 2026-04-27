@@ -26,8 +26,20 @@ export default function AppFooter() {
   const [hydrated, setHydrated] = useState(false);
   const [draft, setDraft] = useState<Consent>(DEFAULT_CONSENT);
 
+  const [bannerVisible, setBannerVisible] = useState(false);
+
   const allAccepted = draft.crisp && draft.matomo;
   const allRefused = !draft.crisp && !draft.matomo;
+
+  const acceptAll = () => {
+    saveConsent({ crisp: true, matomo: true });
+    setBannerVisible(false);
+  };
+
+  const refuseAll = () => {
+    saveConsent({ crisp: false, matomo: false });
+    setBannerVisible(false);
+  };
 
   const openModal = () => {
     setDraft(consent);
@@ -44,6 +56,7 @@ export default function AppFooter() {
     if (!saved) {
       setConsent(DEFAULT_CONSENT);
       setHydrated(true);
+      setBannerVisible(true); // afficher banner
       return;
     }
 
@@ -53,6 +66,7 @@ export default function AppFooter() {
     } catch {
       localStorage.removeItem(STORAGE_KEY);
       setConsent(DEFAULT_CONSENT);
+      setBannerVisible(true);
     }
 
     setHydrated(true);
@@ -68,6 +82,7 @@ export default function AppFooter() {
     setConsent(newConsent);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newConsent));
     setIsOpen(false);
+    setBannerVisible(false); // 👈 important
     if (crispChanged) {
       // 🔥 approche GéoRisques
       window.location.reload();
@@ -362,6 +377,69 @@ export default function AppFooter() {
           </div>
         </div>
       </Modal>
+
+      {bannerVisible && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "2.5rem",
+            left: "2.5rem",
+            maxHeight: "calc(100% - 5rem)",
+            maxWidth: "40rem",
+            width: "calc(100% - 5rem)",
+            padding: "2rem",
+            background: "white",
+            zIndex: 100,
+            borderRadius: "8px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+            border: "1px solid #E5E5E5",
+            overflowY: "auto"
+          }}
+        >
+          <h3
+            style={{
+              fontSize: "1.25rem",
+              fontWeight: 600,
+              marginBottom: "0.5rem"
+            }}
+          >
+            Nous utilisons des cookies
+          </h3>
+
+          <p
+            style={{
+              fontSize: "0.875rem",
+              marginBottom: "1rem",
+              color: "var(--text-default-grey)"
+            }}
+          >
+            En poursuivant votre navigation sur ce site, vous acceptez
+            l’utilisation de cookies pour collecter des statistiques afin
+            d’optimiser les services du site.
+          </p>
+
+          <div
+            style={{
+              marginTop: "2rem",
+              display: "flex",
+              flexDirection: "row-reverse",
+              gap: "8px"
+            }}
+          >
+            <button className="fr-btn" onClick={acceptAll}>
+              Accepter
+            </button>
+
+            <button className="fr-btn" onClick={refuseAll}>
+              Refuser
+            </button>
+
+            <button className="fr-btn fr-btn--tertiary" onClick={openModal}>
+              En savoir plus
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
