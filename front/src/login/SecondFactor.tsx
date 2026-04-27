@@ -6,6 +6,7 @@ import routes from "../Apps/routes";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import RecoveryCodeModal from "./RecoveryCodeModal";
 
 import styles from "./Login.module.scss";
 import { envConfig } from "../common/envConfig";
@@ -45,10 +46,24 @@ function Countdown({ timestamp }: { timestamp: number }) {
 
 export default function SecondFactor() {
   const location = useLocation();
-  const [totp, setTotp] = useState("");
   const queries = queryString.parse(location.search);
   const formRef = createRef<HTMLFormElement>();
   const { VITE_API_ENDPOINT } = envConfig;
+
+  // Compute recovery error before hooks so we can initialize showRecoveryModal
+  const { errorCode: stateErrorCode } = (location.state || {}) as {
+    errorCode?: string;
+  };
+  const stateCode = Array.isArray(stateErrorCode)
+    ? stateErrorCode[0]
+    : stateErrorCode;
+  const isRecoveryErrorInitial =
+    stateCode === "INVALID_RECOVERY_CODE" || stateCode === "RECOVERY_LOCKOUT";
+
+  const [totp, setTotp] = useState("");
+  const [showRecoveryModal, setShowRecoveryModal] = useState(
+    isRecoveryErrorInitial
+  );
 
   if (queries.errorCode || queries.returnTo) {
     const { errorCode, returnTo, username, lockout = 0 } = queries;
@@ -66,6 +81,8 @@ export default function SecondFactor() {
   const isLockout = code === "TOTP_LOCKOUT";
   const isAccountSuspended = code === "ACCOUNT_SUSPENDED";
   const isInvalidTotp = code === "INVALID_TOTP" || code === "MISSING_TOTP";
+  const isRecoveryError =
+    code === "INVALID_RECOVERY_CODE" || code === "RECOVERY_LOCKOUT";
 
   const topAlert = isLockout ? (
     <div className="fr-grid-row fr-mb-3w">
@@ -96,7 +113,7 @@ export default function SecondFactor() {
             de cette demande, contactez notre support via l'Assistance
             Trackdéchets.{" "}
             <a
-              href="https://faq.trackdechets.fr/contact"
+              href="https://faq.trackdechets.fr"
               className="fr-link"
               target="_blank"
               rel="noopener noreferrer"
@@ -112,6 +129,13 @@ export default function SecondFactor() {
 
   return (
     <div className={styles.onboardingWrapper}>
+      {showRecoveryModal && (
+        <RecoveryCodeModal
+          onClose={() => setShowRecoveryModal(false)}
+          errorCode={isRecoveryError ? code : undefined}
+          returnTo={returnTo}
+        />
+      )}
       <form
         ref={formRef}
         action={`${VITE_API_ENDPOINT}/otp`}
@@ -154,13 +178,10 @@ export default function SecondFactor() {
                 label="Code d'identification"
               />
 
-              {/* TRA-17923 : ce bouton ouvrira la modale de récupération */}
               <button
                 type="button"
                 className="fr-link fr-mb-2w"
-                onClick={() => {
-                  /* TODO TRA-17923 */
-                }}
+                onClick={() => setShowRecoveryModal(true)}
               >
                 Je n'ai pas accès à l'application
               </button>

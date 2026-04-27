@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Query } from "@td/codegen-ui";
 import React, { useContext, useMemo, useCallback } from "react";
+import TotpSetupWizard from "../../Apps/Account/AccountAuthentication/TotpSetupWizard";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -11,6 +12,7 @@ type AuthContextType = {
         isAdmin?: boolean | null;
         trackingConsent: boolean;
         trackingConsentUntil?: string | null;
+        totpSetupRequired?: boolean | null;
       }
     | undefined;
   refreshUser: () => Promise<void>;
@@ -30,6 +32,7 @@ export const GET_ME = gql`
       isAdmin
       trackingConsent
       trackingConsentUntil
+      totpSetupRequired
     }
   }
 `;
@@ -76,9 +79,18 @@ export function AuthProvider({ children }: React.PropsWithChildren<{}>) {
       await refetchMe();
     }
   }, [refetchMe, isAuthenticated]);
+  const mustReconfigureTotp = isAuthenticated && !!user?.totpSetupRequired;
+
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, refreshUser }}>
       {children}
+      {mustReconfigureTotp && (
+        <TotpSetupWizard
+          isReconfiguration
+          onSuccess={refreshUser}
+          onClose={() => undefined}
+        />
+      )}
     </AuthContext.Provider>
   );
 }

@@ -55,7 +55,8 @@ enum LoginErrorCode {
   INVALID_CAPTCHA = "INVALID_CAPTCHA",
   TOTP_TIMEOUT_OR_MISSING_SESSION = "TOTP_TIMEOUT_OR_MISSING_SESSION",
   MISSING_TOTP = "MISSING_TOTP",
-  INVALID_TOTP = "INVALID_TOTP"
+  INVALID_TOTP = "INVALID_TOTP",
+  MFA_RESET_IN_PROGRESS = "MFA_RESET_IN_PROGRESS"
 }
 
 // verbose error message and related errored field
@@ -144,6 +145,11 @@ passport.use(
         if (!user.isActive) {
           return done(null, false, {
             ...getLoginError(username).NOT_ACTIVATED
+          });
+        }
+        if (user.totpSetupRequired) {
+          return done(null, false, {
+            code: LoginErrorCode.MFA_RESET_IN_PROGRESS
           });
         }
         if (needsTotp) {

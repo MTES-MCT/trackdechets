@@ -49,4 +49,7 @@ type User {
 
   "Indique si l'authentification TOTP est activée sur le compte"
   totpEnabled: Boolean!
+
+  "Indique que l'utilisateur doit reconfigurer son TOTP suite à une récupération de compte"
+  totpSetupRequired: Boolean!
 }

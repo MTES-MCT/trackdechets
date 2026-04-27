@@ -29,6 +29,7 @@ type Step = "explanation" | "qrcode" | "recovery" | "success";
 type Props = {
   onSuccess: () => void;
   onClose: () => void;
+  isReconfiguration?: boolean;
 };
 
 const STEP_LABELS: Record<Step, string> = {
@@ -47,8 +48,8 @@ const NEXT_STEP_LABELS: Partial<Record<Step, string>> = {
 
 const STEPS: Step[] = ["explanation", "qrcode", "recovery", "success"];
 
-export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
-  const [step, setStep] = useState<Step>("explanation");
+export default function TotpSetupWizard({ onSuccess, onClose, isReconfiguration = false }: Props) {
+  const [step, setStep] = useState<Step>(isReconfiguration ? "qrcode" : "explanation");
 
   // Étape 1
   const [appInstalled, setAppInstalled] = useState(false);
@@ -145,7 +146,9 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
     setStep("success");
   };
 
-  const title = "Activez l'authentification TOTP";
+  const title = isReconfiguration
+    ? "Reconfigurez votre authentification TOTP"
+    : "Activez l'authentification TOTP";
   const CopyRecoveryCodeIcone = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -326,9 +329,11 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
           </div>
 
           <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline fr-mt-3w">
-            <Button priority="secondary" onClick={() => setStep("explanation")}>
-              Précédent
-            </Button>
+            {!isReconfiguration && (
+              <Button priority="secondary" onClick={() => setStep("explanation")}>
+                Précédent
+              </Button>
+            )}
             <Button
               disabled={totpCode.length !== 6 || confirming}
               onClick={handleConfirmCode}

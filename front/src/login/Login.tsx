@@ -58,6 +58,28 @@ function getErrorMessage(errorCode: string): {
     };
   }
 
+  if (errorCode === "MFA_RESET_IN_PROGRESS") {
+    return {
+      title: "MFA en cours de réinitialisation",
+      description: (
+        <>
+          La reconfiguration du MFA est en cours sur votre compte. Merci de
+          vérifier vos e-mails. Si vous n'êtes pas à l'origine de cette
+          demande, contactez notre support via{" "}
+          <a
+            href="https://faq.trackdechets.fr/contact"
+            className="fr-link force-underline-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            l'Assistance Trackdéchets
+          </a>
+          .
+        </>
+      )
+    };
+  }
+
   return {
     description: "Courriel ou mot de passe incorrect"
   };
