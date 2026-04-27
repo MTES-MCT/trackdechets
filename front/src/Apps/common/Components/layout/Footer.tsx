@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../Modal/Modal";
-import {useCrisp} from "../../hooks/useCrisp";
+import { useCrisp } from "../../hooks/useCrisp";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
-
+import styles from "./Footer.module.scss";
 /**
  * ========================
  * TYPES
@@ -25,6 +25,10 @@ export default function AppFooter() {
   const [consent, setConsent] = useState<Consent>(DEFAULT_CONSENT);
   const [hydrated, setHydrated] = useState(false);
   const [draft, setDraft] = useState<Consent>(DEFAULT_CONSENT);
+
+  const allAccepted = draft.crisp && draft.matomo;
+  const allRefused = !draft.crisp && !draft.matomo;
+
   const openModal = () => {
     setDraft(consent);
     setIsOpen(true);
@@ -60,14 +64,14 @@ export default function AppFooter() {
    * ========================
    */
   const saveConsent = (newConsent: Consent) => {
-      const crispChanged = newConsent.crisp !== consent.crisp;
+    const crispChanged = newConsent.crisp !== consent.crisp;
     setConsent(newConsent);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newConsent));
     setIsOpen(false);
-  if (crispChanged) {
+    if (crispChanged) {
       // 🔥 approche GéoRisques
-  window.location.reload();
-  }
+      window.location.reload();
+    }
   };
 
   /**
@@ -245,14 +249,14 @@ export default function AppFooter() {
         size="XL"
         hasFooter
       >
-        <div className="dsfr-Modal">
+        <div className="fr-mb-3w">
           {/* ================= HEADER ================= */}
-          <div className="dsfr-Modal-header">
-            <h1 className="dsfr-Modal-title">
+          <div className="fr-mb-2w">
+            <h1 className="fr-h3 fr-mb-1w">
               Les informations que nous collectons
             </h1>
 
-            <p className="dsfr-Modal-description">
+            <p className="fr-text--md fr-mb-0">
               Ici, vous pouvez voir et personnaliser les informations que nous
               collectons sur vous.{" "}
               <a
@@ -266,97 +270,93 @@ export default function AppFooter() {
           </div>
 
           {/* ================= BODY ================= */}
-          <div className="dsfr-Modal-body">
-            {/* ACTIONS GLOBAL */}
-            <div className="dsfr-AppToggles fr-mb-2w">
-              <button
-                type="button"
-                className="fr-btn fr-btn--secondary dsfr-AppToggles-button"
-                onClick={() =>
-                  setDraft({
-                    crisp: true,
-                    matomo: true
-                  })
-                }
-              >
-                Tout accepter
-              </button>
 
-              <button
-                type="button"
-                className="fr-btn fr-btn--secondary dsfr-AppToggles-button"
-                onClick={() =>
-                  setDraft({
-                    crisp: false,
-                    matomo: false
-                  })
-                }
-              >
-                Tout refuser
-              </button>
-            </div>
-
-            {/* ================= LIST ================= */}
-            <ul className="dsfr-AppList">
-              {/* CRISP */}
-              <li className="dsfr-AppList-item dsfr-AppList-item--crisp-chatbot">
-                <div className="dsfr-AppItem">
-                  <ToggleSwitch
-                    label="Chatbox Crisp"
-                    checked={draft.crisp}
-                    onChange={() => setDraft({ ...draft, crisp: !draft.crisp })}
-                  />
-
-                  <div className="dsfr-AppItem-fullDescription">
-                    <p>
-                      Le Crisp chatbox, qui opère sur le site web Géorisques,
-                      utilise des cookies. Ce dépôt est soumis à votre
-                      consentement pour l’utilisation du service. Les cookies
-                      sont uniquement utilisés conformément à ses éléments : Ces
-                      cookies sont nécessaires aux fonctionnalités du chatbox et
-                      ont une durée d’expiration de 6 mois. Ces cookies lient un
-                      utilisateur à une seule session, détruite après 30 minutes
-                      après leur dernier accès au site. Les cookies ne sont pas
-                      utilisés à des fins de traçage. L'adresse IP de
-                      l'utilisateur est stockée dans un serveur mémorisant les
-                      données de la session de navigation lié au cookie. La
-                      durée de conservation est à minima d’un an. Vous pouvez
-                      consulter le détail des informations sur la page
-                    </p>
-                  </div>
-                </div>
-              </li>
-
-              {/* MATOMO */}
-
-              <li className="dsfr-AppList-item dsfr-AppList-item--crisp-chatbot">
-                <div className="dsfr-AppItem">
-                  <ToggleSwitch
-                    label="Matomo"
-                    checked={draft.matomo}
-                    onChange={() =>
-                      setDraft({ ...draft, matomo: !draft.matomo })
-                    }
-                  />
-
-                  <div className="dsfr-AppItem-fullDescription">
-                    <p>
-                      Ces cookies nous permettent de réaliser des statistiques
-                      sur les visites sur le site de manière totalement anonyme.
-                    </p>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          {/* ================= FOOTER ================= */}
-          <div className="dsfr-Modal-footer">
+          {/* ACTIONS GLOBAL */}
+          <div className="fr-btns-group fr-btns-group--inline fr-btns-group--right fr-mb-4w">
             <button
               type="button"
-              className="fr-btn dsfr-Modal-saveButton"
-              onClick={() => saveConsent(draft)}
+              className="fr-btn"
+              disabled={allAccepted}
+              onClick={() =>
+                setDraft({
+                  crisp: true,
+                  matomo: true
+                })
+              }
             >
+              Tout accepter
+            </button>
+
+            <button
+              type="button"
+              className="fr-btn fr-btn--secondary"
+              disabled={allRefused}
+              onClick={() =>
+                setDraft({
+                  crisp: false,
+                  matomo: false
+                })
+              }
+            >
+              Tout refuser
+            </button>
+          </div>
+
+          <hr className="fr-mb-3w" />
+          {/* ================= LIST ================= */}
+
+          {/* CRISP */}
+
+          <section className="fr-mb-4w">
+            <ToggleSwitch
+              label="Chatbox Crisp"
+              checked={draft.crisp}
+              onChange={() => setDraft({ ...draft, crisp: !draft.crisp })}
+              classes={{
+                label: styles.label
+              }}
+            />
+
+            <p className="fr-text--sm fr-mt-2w fr-ml-9w">
+              Le Crisp chatbox, qui opère sur le site web Géorisques, utilise
+              des cookies. Ce dépôt est soumis à votre consentement pour
+              l’utilisation du service. Les cookies sont uniquement utilisés
+              conformément à ses éléments : Ces cookies sont nécessaires aux
+              fonctionnalités du chatbox et ont une durée d’expiration de 6
+              mois. Ces cookies lient un utilisateur à une seule session,
+              détruite après 30 minutes après leur dernier accès au site. Les
+              cookies ne sont pas utilisés à des fins de traçage. L'adresse IP
+              de l'utilisateur est stockée dans un serveur mémorisant les
+              données de la session de navigation lié au cookie. La durée de
+              conservation est à minima d’un an. Vous pouvez consulter le détail
+              des informations sur la page
+            </p>
+          </section>
+
+          <hr className="fr-mb-4w" />
+          {/* MATOMO */}
+
+          <section className="fr-mb-4w">
+            <ToggleSwitch
+              label="Matomo"
+              checked={draft.matomo}
+              onChange={() => setDraft({ ...draft, matomo: !draft.matomo })}
+              classes={{
+                label: styles.label
+              }}
+            />
+
+            <p className="fr-text--sm fr-mt-2w fr-ml-9w">
+              Ces cookies nous permettent de réaliser des statistiques sur les
+              visites sur le site de manière totalement anonyme.
+            </p>
+          </section>
+
+          <hr className="fr-mb-4w" />
+
+          {/* ================= FOOTER ================= */}
+          <div className="fr-btns-group fr-btns-group--inline fr-btns-group--right fr-mb-4w">
+            <button className="fr-btn" onClick={() => saveConsent(draft)}>
               Sauvegarder
             </button>
           </div>
