@@ -1402,6 +1402,10 @@ export const toAllWasteV2 = (
     intermediary2CompanyName: bsdd.intermediaries?.[1]?.name ?? null,
     intermediary3CompanySiret: bsdd.intermediaries?.[2]?.siret ?? null,
     intermediary3CompanyName: bsdd.intermediaries?.[2]?.name ?? null,
+    intermediary4CompanySiret: bsdd.intermediaries?.[3]?.siret ?? null,
+    intermediary4CompanyName: bsdd.intermediaries?.[3]?.name ?? null,
+    intermediary5CompanySiret: bsdd.intermediaries?.[4]?.siret ?? null,
+    intermediary5CompanyName: bsdd.intermediaries?.[4]?.name ?? null,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     isDirectSupply: bsdd.isDirectSupply,
     transporter1CompanySiret: bsdd.transporterCompanySiret?.length

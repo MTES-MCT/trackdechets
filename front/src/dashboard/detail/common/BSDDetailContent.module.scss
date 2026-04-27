@@ -36,6 +36,15 @@
       flex-direction: row;
     }
   }
+  &Intermediate {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 33%;
+
+    @include desktop {
+      flex-direction: row;
+    }
+  }
   &Grid {
     display: inline-grid;
     grid-template-columns: minmax(auto, 0.75fr) minmax(auto, 0.75fr);
@@ -148,8 +157,19 @@
   }
   &TabPanel {
     display: flex;
-
     flex-direction: column;
+
+    @include desktop {
+      flex-direction: row;
+    }
+  }
+  &IntermediaryPanel {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px 0;
+    display: flex;
+    flex-direction: column;
+
     @include desktop {
       flex-direction: row;
     }
