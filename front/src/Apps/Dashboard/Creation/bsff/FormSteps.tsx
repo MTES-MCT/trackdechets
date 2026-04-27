@@ -255,164 +255,6 @@ const BsffFormSteps = ({
     return isEmpty ? undefined : company;
   }
 
-  // async function saveBsff(values: ZodBsff, draft: boolean) {
-  //   const {
-  //     transporters = [],
-  //     destination,
-  //     packagings,
-  //     type,
-  //     grouping = [],
-  //     forwarding,
-  //     repackaging = [],
-  //     waste,
-  //     ficheInterventions = [],
-  //     emitter,
-  //     weight
-  //   } = values;
-
-  //   // TRANSPORTERS
-  //   let transporterIds: string[] = [];
-  //   try {
-  //     transporterIds = await Promise.all(
-  //       transporters
-  //         .filter(t => t && (t.company?.siret || t.company?.vatNumber))
-  //         .map(t => saveBsffTransporter(t))
-  //     );
-  //   } catch {
-  //     return;
-  //   }
-
-  //   // FICHE INTERVENTIONS
-  //   let ficheInterventionIds: string[] = [];
-
-  //   if (ficheInterventions?.length) {
-  //     try {
-  //       ficheInterventionIds = await Promise.all(
-  //         ficheInterventions.map(async fi => {
-  //           //Déjà existante (édition)
-  //           if ((fi as any)?.id) return (fi as any).id;
-
-  //           //Nouvelle fiche → créer via API
-  //           const { data } = await createFicheIntervention({
-  //             variables: {
-  //               input: {
-  //                 numero: fi.numero,
-  //                 weight: Number(fi.weight),
-  //                 postalCode: fi.postalCode,
-  //                 detenteur: fi.detenteur,
-  //                 operateur: {
-  //                   company: cleanCompany(emitter?.company)
-  //                 }
-  //               }
-  //             }
-  //           });
-
-  //           return data?.createFicheInterventionBsff?.id ?? null;
-  //         })
-  //       );
-
-  //       //Nettoyage des null
-  //       ficheInterventionIds = ficheInterventionIds.filter(
-  //         (id): id is string => !!id
-  //       );
-  //     } catch (err) {
-  //       console.error("Erreur création fiche intervention", err);
-  //       return;
-  //     }
-  //   }
-
-  //   //  CLEAN DATA
-  //   const cleanWaste = waste?.code
-  //     ? {
-  //         code: waste.code,
-  //         adr: waste.adr?.trim() || null,
-  //         description: waste.description?.trim() || null
-  //       }
-  //     : undefined;
-
-  //   const cleanDestination: BsffDestinationInput | undefined = destination
-  //     ? {
-  //         cap: destination.cap ?? undefined,
-  //         company: cleanCompany(destination.company),
-  //         customInfo: destination.customInfo ?? undefined,
-  //         plannedOperationCode: destination.plannedOperationCode ?? undefined,
-  //         reception: destination.reception?.date
-  //           ? { date: destination.reception.date.toISOString() }
-  //           : undefined
-  //       }
-  //     : undefined;
-
-  //   const cleanPackagings =
-  //     type && [BsffType.Groupement, BsffType.Reexpedition].includes(type)
-  //       ? undefined
-  //       : packagings?.map(p => ({
-  //           type: p.type,
-  //           numero: p.numero,
-  //           other: p.other ?? null,
-  //           volume: p.volume ?? null,
-  //           weight: Number(p.weight ?? 0)
-  //         }));
-
-  //   // ================= INPUT =================
-  //   const input: BsffInput = {
-  //     type,
-  //     emitter: emitter
-  //       ? {
-  //           ...emitter,
-  //           company: cleanCompany(emitter.company)
-  //         }
-  //       : undefined,
-  //     waste: cleanWaste,
-  //     weight: {
-  //       value: Number(weight?.value ?? 0),
-  //       isEstimate: weight?.isEstimate ?? false
-  //     },
-  //     destination: cleanDestination,
-  //     transporters: transporterIds,
-  //     ficheInterventions: ficheInterventionIds,
-  //     packagings: cleanPackagings,
-  //     forwarding:
-  //       type === BsffType.Reexpedition
-  //         ? forwarding?.id
-  //           ? [forwarding.id]
-  //           : []
-  //         : [],
-  //     repackaging:
-  //       type === BsffType.Reconditionnement ? repackaging.map(r => r.id) : [],
-  //     grouping:
-  //       type === BsffType.Groupement ? grouping?.map(g => g.id) ?? [] : []
-  //   };
-
-  //   //  UPDATE
-  //   if (bsffState.id) {
-  //     if (draft) {
-  //       return updateBsff({ variables: { id: bsffState.id, input } });
-  //     }
-
-  //     await updateBsff({ variables: { id: bsffState.id, input } });
-
-  //     try {
-  //       return await publishBsff({ variables: { id: bsffState.id } });
-  //     } catch (err: any) {
-  //       const normalizedErrors = handleGraphQlError(err);
-  //       setPublishErrors(normalizedErrors);
-  //       throw err;
-  //     }
-  //   }
-
-  //   // CREATE =================
-  //   if (draft) {
-  //     return createDraftBsff({ variables: { input } });
-  //   }
-
-  //   try {
-  //     return await createBsff({ variables: { input } });
-  //   } catch (err: any) {
-  //     const normalizedErrors = handleGraphQlError(err);
-  //     setPublishErrors(normalizedErrors);
-  //     throw err;
-  //   }
-  // }
   async function saveBsff(values: ZodBsff, draft: boolean) {
     try {
       const transporterIds = await getTransporterIds(values.transporters);
@@ -442,30 +284,34 @@ const BsffFormSteps = ({
     );
   }
   async function getFicheInterventionIds(values: ZodBsff) {
-    const { ficheInterventions = [], emitter } = values;
+    const ficheInterventions = values.ficheInterventions ?? [];
+    const { emitter } = values;
 
     if (!ficheInterventions.length) return [];
 
     const ids = await Promise.all(
-      ficheInterventions.map(async fi => {
-        if ((fi as any)?.id) return fi.id;
+      ficheInterventions
+        // Ne jamais envoyer une fiche sans les champs obligatoires
+        .filter(fi => fi.numero && fi.postalCode && fi.weight && fi.weight > 0)
+        .map(async fi => {
+          if ((fi as any)?.id) return fi.id;
 
-        const { data } = await createFicheIntervention({
-          variables: {
-            input: {
-              numero: fi.numero,
-              weight: Number(fi.weight),
-              postalCode: fi.postalCode,
-              detenteur: fi.detenteur,
-              operateur: {
-                company: cleanCompany(emitter?.company)
+          const { data } = await createFicheIntervention({
+            variables: {
+              input: {
+                numero: fi.numero!,
+                weight: Number(fi.weight!),
+                postalCode: fi.postalCode!,
+                detenteur: fi.detenteur,
+                operateur: {
+                  company: cleanCompany(emitter?.company)
+                }
               }
             }
-          }
-        });
+          });
 
-        return data?.createFicheInterventionBsff?.id ?? null;
-      })
+          return data?.createFicheInterventionBsff?.id ?? null;
+        })
     );
 
     return ids.filter((id): id is string => !!id);
@@ -479,16 +325,16 @@ const BsffFormSteps = ({
       destination,
       packagings,
       type,
-      grouping = [],
+      grouping,
       forwarding,
-      repackaging = [],
+      repackaging,
       waste,
       emitter,
       weight
     } = values;
 
     return {
-      type,
+      type: type as unknown as BsffType,
       emitter: emitter
         ? { ...emitter, company: cleanCompany(emitter.company) }
         : undefined,
@@ -506,12 +352,15 @@ const BsffFormSteps = ({
       destination: buildDestination(destination),
       transporters: transporterIds,
       ficheInterventions: ficheInterventionIds,
-      packagings: buildPackagings(type, packagings),
+      packagings: buildPackagings(type as unknown as BsffType, packagings),
       forwarding:
         type === BsffType.Reexpedition && forwarding?.id ? [forwarding.id] : [],
       repackaging:
-        type === BsffType.Reconditionnement ? repackaging.map(r => r.id) : [],
-      grouping: type === BsffType.Groupement ? grouping.map(g => g.id) : []
+        type === BsffType.Reconditionnement
+          ? (repackaging ?? []).map(r => r.id)
+          : [],
+      grouping:
+        type === BsffType.Groupement ? (grouping ?? []).map(g => g.id) : []
     };
   }
 
@@ -531,7 +380,10 @@ const BsffFormSteps = ({
     };
   }
 
-  function buildPackagings(type: BsffType, packagings: any[]) {
+  function buildPackagings(
+    type: BsffType,
+    packagings: any[] | null | undefined
+  ) {
     if ([BsffType.Groupement, BsffType.Reexpedition].includes(type)) {
       return undefined;
     }

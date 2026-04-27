@@ -77,12 +77,12 @@ const FormStepsContent = ({
   };
 
   const onErrors = errors => {
-    console.log("ZOD ERRORS 👉", errors);
+    console.log(errors);
 
     if (!errors) return;
 
     Object.entries(errors).forEach(([field, error]) => {
-      console.log(`❌ FIELD: ${field}`, error);
+      console.log(`${field}`, error);
     });
 
     scrollToTop();

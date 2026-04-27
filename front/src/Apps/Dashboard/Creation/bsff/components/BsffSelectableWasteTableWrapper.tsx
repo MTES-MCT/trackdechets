@@ -172,7 +172,7 @@ function BsffSelectableWasteTableWrapper({
     setValue(
       "weight.value",
       grouping.reduce(
-        (sum, g) => sum + (g.acceptation?.weight ?? g.weight ?? 0),
+        (sum, g) => sum + (g.acceptation?.weight ?? g.acceptation?.weight ?? 0),
         0
       )
     );
@@ -185,9 +185,9 @@ function BsffSelectableWasteTableWrapper({
       return [
         {
           type: g.type ?? null,
-          volume: g.volume ?? null,
+          volume: g.volume ?? 0,
           numero: g.numero ?? "",
-          weight: g.acceptation?.weight ?? g.weight ?? null,
+          weight: g.acceptation?.weight ?? 0,
           other: g.other ?? null
         }
       ];
@@ -210,7 +210,7 @@ function BsffSelectableWasteTableWrapper({
         type: p.type ?? null,
         volume: p.volume ?? null,
         numero: p.numero ?? "",
-        weight: p.acceptation?.weight ?? p.weight ?? null,
+        weight: p.acceptation?.weight ?? p.acceptation?.weight ?? null,
         other: p.other ?? null
       }
     ];
@@ -219,7 +219,10 @@ function BsffSelectableWasteTableWrapper({
   function onForwardingChange(fwd: ZodBsffGroupingOrForwarding | null) {
     setValue("waste.code", fwd?.acceptation?.wasteCode ?? fwd?.waste?.code);
 
-    setValue("weight.value", fwd?.acceptation?.weight ?? fwd?.weight ?? 0);
+    setValue(
+      "weight.value",
+      fwd?.acceptation?.weight ?? fwd?.acceptation?.weight ?? 0
+    );
 
     const packagings = fwd?.packagings?.length
       ? fwd.packagings
@@ -229,7 +232,7 @@ function BsffSelectableWasteTableWrapper({
             type: fwd.type ?? null,
             volume: fwd.volume ?? null,
             numero: fwd.numero ?? "",
-            weight: fwd.acceptation?.weight ?? fwd.weight ?? null,
+            weight: fwd.acceptation?.weight ?? fwd.acceptation?.weight ?? null,
             other: fwd.other ?? null
           }
         ]

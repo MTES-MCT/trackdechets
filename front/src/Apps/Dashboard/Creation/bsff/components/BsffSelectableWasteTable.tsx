@@ -236,8 +236,10 @@ export default function BsffSelectableWasteTable({
                     {selectedBsff.bsffId} -{" "}
                     {selectedBsff.acceptation?.wasteCode ??
                       selectedBsff.waste?.code}
-                    {selectedBsff.weight
-                      ? ` - ${new Decimal(selectedBsff.weight).toFixed(6)} T`
+                    {selectedBsff.acceptation?.weight
+                      ? ` - ${new Decimal(
+                          selectedBsff.acceptation?.weight
+                        ).toFixed(6)} T`
                       : ""}
                   </div>
                 ))}

@@ -39,14 +39,6 @@ const BsffType = {
   REEXPEDITION: "REEXPEDITION"
 } as const;
 
-// const ZodBsffPackagingEnum = z.enum([
-//   "BOUTEILLE",
-//   "CONTENEUR",
-//   "CITERNE",
-//   "AUTRE",
-//   ""
-// ]);
-
 const zodCompany = z
   .object({
     siret: z.string().nullish(),
@@ -99,24 +91,8 @@ export const ZodOperationEnum = z
   })
   .nullish();
 
-// const rawBsffPackagingSchema = z.object({
-//   type: z.nativeEnum(BsffPackagingType),
-//   other: z.string().max(250).nullish(),
-//   volume: z.number().nonnegative().nullish(),
-//   weight: z.coerce.number().nonnegative().nullish(),
-//   numero: z
-//     .string({
-//       required_error: "Conditionnements : le numéro d'identification est requis"
-//     })
-//     .max(250)
-//     .min(1, "Conditionnements : le numéro d'identification est requis")
-// });
-
 const bsffPackagingSchema = z
   .object({
-    // type: ZodBsffPackagingEnum.nullish().transform(val =>
-    // val === "" ? null : val
-    // ),
     type: z.nativeEnum(BsffPackagingType),
     other: z.string().max(250).nullish(),
     quantity: z.coerce.number().nonnegative().nullish(),
@@ -176,20 +152,6 @@ const bsffGroupingOrForwardingSchema = z.object({
       })
       .nullish()
   }),
-  /*destination: z
-    .object({
-      company: zodCompany.nullish(),
-       customInfo: z.string().max(250).nullish(),
-      cap: z.string().max(250).nullish(),
-      reception: z
-        .object({
-        date: z.coerce.date().nullish(),
-        signature: zodSignature
-        })
-        .nullish(),
-       plannedOperationCode: ZodOperationEnum
-    })
-    .nullish(),*/
   packagings: z.array(bsffPackagingSchema).nullish(),
   nextBsff: z
     .object({
@@ -201,105 +163,117 @@ const bsffGroupingOrForwardingSchema = z.object({
     })
     .nullish()
 });
-// const ficheInterventionSchema = z.object({
-//   id: z.string().nullish(), // ← ajouter ceci
-//   numero: z.string({
-//     required_error: "Numéro de fiche d'intervention requis"
-//   }).min(1, "Le numéro ne peut pas être vide"),
 
-//   weight: z.preprocess(
-//     val => val === "" ? null : val,
-//     z.coerce.number({
-//       required_error: "Le poids est requis"
-//     }).positive("Le poids doit être supérieur à 0")
-//   ),
-
-//   postalCode: z.string({
-//     required_error: "Code postal requis"
-//   }).min(1, "Le code postal ne peut pas être vide"),
-
-//   detenteur: z.object({
-//     isPrivateIndividual: z.boolean().optional(),
-//     company: zodCompany
-//   }, {
-//     required_error: "Détenteur requis"
-//   }),
-//     operateur: z.string().nullish(),
-// });
-
-export const rawBsffSchema = z.object({
+const ficheInterventionSchema = z.object({
   id: z.string().nullish(),
-  type: z
-    .nativeEnum(BsffType)
-    .nullish()
-    .transform(t => t ?? BsffType.COLLECTE_PETITES_QUANTITES),
-  emitter: z
-    .object({
-      company: zodCompany,
-      customInfo: z.string().max(250).nullish(),
-      emission: zodSignature
-    })
-    .nullish(),
-  waste: z
-    .object({
-      code: ZodWasteCodeEnum,
-      adr: z.string().max(750).nullish(),
-      description: z.string().max(250).nullish()
-    })
-    .nullish(),
-  weight: z
-    .object({
-      value: z.coerce.number().nonnegative().nullish(),
-      isEstimate: z.boolean().nullish()
-    })
-    .nullish(),
-
-  destination: z
-    .object({
-      company: zodCompany,
-      customInfo: z.string().max(250).nullish(),
-      cap: z.string().max(250).nullish(),
-      reception: z.object({
-        date: z.coerce.date().nullish(),
-        signature: zodSignature
-      }),
-      plannedOperationCode: ZodOperationEnum
-    })
-    .nullish(),
-  detenteurCompanySirets: z.array(z.string().max(250)).optional().nullish(),
-  transporters: z
-    .array(
-      z
-        .object({
-          id: z.string().nullish(),
-          number: z.coerce.number().nonnegative().nullish(),
-          company: zodCompany,
-          customInfo: z.string().nullish(),
-          recepisse: z.object({
-            isExempted: z.boolean().nullish(),
-            number: z.string().nullish(),
-            department: z.string().nullish(),
-            validityLimit: z.coerce.date().nullish()
-          }),
-          transport: z.object({
-            mode: z.nativeEnum(TransportMode).nullish(),
-            plates: z.array(z.string()),
-            takenOverAt: z.coerce.date().nullish(),
-            signature: zodSignature
-          })
-        })
-        .nullish()
-    )
-    .max(5, "Vous ne pouvez pas ajouter plus de 5 transporteurs")
-    .optional(),
-  packagings: z.array(bsffPackagingSchema).nullish(),
-  // ficheInterventions: z.array(ficheInterventionSchema).optional().nullish(),
-  repackaging: z.array(bsffGroupingOrForwardingSchema).optional().nullish(),
-  grouping: z.array(bsffGroupingOrForwardingSchema).optional().nullish(),
-  forwarding: bsffGroupingOrForwardingSchema.nullish()
+  numero: z.string().nullish(),
+  weight: z.coerce.number().nullish(),
+  postalCode: z.string().nullish(),
+  detenteur: z.object({
+    isPrivateIndividual: z.boolean().optional(),
+    company: zodCompany
+  })
 });
 
-// type ZodBsffPackagingEnum = z.infer<typeof ZodBsffPackagingEnum>;
+export const rawBsffSchema = z
+  .object({
+    id: z.string().nullish(),
+    type: z
+      .nativeEnum(BsffType)
+      .nullish()
+      .transform(t => t ?? BsffType.COLLECTE_PETITES_QUANTITES),
+    emitter: z
+      .object({
+        company: zodCompany,
+        customInfo: z.string().max(250).nullish(),
+        emission: zodSignature
+      })
+      .nullish(),
+    waste: z
+      .object({
+        code: ZodWasteCodeEnum,
+        adr: z.string().max(750).nullish(),
+        description: z.string().max(250).nullish()
+      })
+      .nullish(),
+    weight: z
+      .object({
+        value: z.coerce.number().nonnegative().nullish(),
+        isEstimate: z.boolean().nullish()
+      })
+      .nullish(),
+    destination: z
+      .object({
+        company: zodCompany,
+        customInfo: z.string().max(250).nullish(),
+        cap: z.string().max(250).nullish(),
+        reception: z.object({
+          date: z.coerce.date().nullish(),
+          signature: zodSignature
+        }),
+        plannedOperationCode: ZodOperationEnum
+      })
+      .nullish(),
+    detenteurCompanySirets: z.array(z.string().max(250)).optional().nullish(),
+    transporters: z
+      .array(
+        z
+          .object({
+            id: z.string().nullish(),
+            number: z.coerce.number().nonnegative().nullish(),
+            company: zodCompany,
+            customInfo: z.string().nullish(),
+            recepisse: z.object({
+              isExempted: z.boolean().nullish(),
+              number: z.string().nullish(),
+              department: z.string().nullish(),
+              validityLimit: z.coerce.date().nullish()
+            }),
+            transport: z.object({
+              mode: z.nativeEnum(TransportMode).nullish(),
+              plates: z.array(z.string()),
+              takenOverAt: z.coerce.date().nullish(),
+              signature: zodSignature
+            })
+          })
+          .nullish()
+      )
+      .max(5, "Vous ne pouvez pas ajouter plus de 5 transporteurs")
+      .optional(),
+    packagings: z.array(bsffPackagingSchema).nullish(),
+    ficheInterventions: z.array(ficheInterventionSchema).optional().nullish(),
+    repackaging: z.array(bsffGroupingOrForwardingSchema).optional().nullish(),
+    grouping: z.array(bsffGroupingOrForwardingSchema).optional().nullish(),
+    forwarding: bsffGroupingOrForwardingSchema.nullish()
+  })
+  .superRefine((data, ctx) => {
+    // Valider ficheInterventions seulement pour COLLECTE_PETITES_QUANTITES
+    if (data.type !== BsffType.COLLECTE_PETITES_QUANTITES) return;
+
+    (data.ficheInterventions ?? []).forEach((fi, index) => {
+      if (!fi.numero || fi.numero.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["ficheInterventions", index, "numero"],
+          message: "Le numéro de fiche d'intervention est requis"
+        });
+      }
+      if (!fi.postalCode || fi.postalCode.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["ficheInterventions", index, "postalCode"],
+          message: "Le code postal est requis"
+        });
+      }
+      if (!fi.weight || fi.weight <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["ficheInterventions", index, "weight"],
+          message: "Le poids doit être supérieur à 0"
+        });
+      }
+    });
+  });
 
 export type ZodBsff = z.infer<typeof rawBsffSchema>;
 
