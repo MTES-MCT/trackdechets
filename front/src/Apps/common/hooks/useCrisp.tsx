@@ -33,10 +33,12 @@ export function useCrisp(enabled: boolean) {
           "81e9b326-1c34-427a-b5ab-2e004ffa180a";
 
         /**
-         * Injection du script Crisp
-         * → charge le widget chat
+         * SECURITY HOTSPOT (S5725)
+         * External script loaded from trusted SaaS provider (Crisp).
+         * No Subresource Integrity (SRI) available because script is dynamically served and not versioned.
+         * Risk accepted: required for chat feature.
          */
-        const script = document.createElement("script");
+        const script = document.createElement("script"); // NOSONAR
         script.src = "https://client.crisp.chat/l.js";
         script.async = true;
         script.id = "crisp-script";
