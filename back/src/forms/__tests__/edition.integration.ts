@@ -522,7 +522,7 @@ describe("checkEditionRules", () => {
     expect(checked).toEqual(true);
   });
 
-  it("should not be possible to change intermediaries when the form is signed by emitter", async () => {
+  it("should be possible to change intermediaries when the form is signed by emitter (before RECEIVED)", async () => {
     const destination = await userWithCompanyFactory("MEMBER");
     const intermediary1 = await userWithCompanyFactory("MEMBER");
     const intermediary2 = await userWithCompanyFactory("MEMBER");
@@ -538,12 +538,10 @@ describe("checkEditionRules", () => {
     const fullForm = await getFullForm(form);
     const input: UpdateFormInput = {
       id: form.id,
-      intermediaries: [toIntermediaryCompany(intermediary2.company)] // try changing the intermediary
+      intermediaries: [toIntermediaryCompany(intermediary2.company)]
     };
     const checkFn = () => checkEditionRules(fullForm, input, destination.user);
-    await expect(checkFn).rejects.toThrow(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : intermediaries"
-    );
+    await expect(checkFn()).resolves.toBe(true);
   });
 
   it("should be possible to resend same intermediaries info when the form is is signed by emitter", async () => {

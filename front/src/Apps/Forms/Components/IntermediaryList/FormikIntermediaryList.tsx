@@ -81,7 +81,10 @@ function FormikIntermediaryList({
                       }
                     }}
                   />
-                  <CompanyContactInfo fieldName={`intermediaries.${idx}`} />
+                  <CompanyContactInfo
+                    disabled={disabled}
+                    fieldName={`intermediaries.${idx}`}
+                  />
                   {values.intermediaries.length > 1 && (
                     <button
                       type="button"
@@ -102,6 +105,7 @@ function FormikIntermediaryList({
                   <button
                     type="button"
                     className="fr-btn fr-btn--secondary"
+                    disabled={disabled}
                     onClick={() => {
                       push(getInitialCompany());
                     }}
