@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import TotpSetupWizard from "./TotpSetupWizard";
+import DisableTotpModal from "./DisableTotpModal";
 import { useApolloClient } from "@apollo/client";
 import { GET_ME } from "../Account";
 
@@ -48,10 +49,16 @@ type Props = {
 
 export default function AccountAuthentication({ totpEnabled }: Props) {
   const [showSetupWizard, setShowSetupWizard] = useState(false);
+  const [showDisableModal, setShowDisableModal] = useState(false);
   const client = useApolloClient();
 
   const handleSetupSuccess = () => {
     setShowSetupWizard(false);
+    client.refetchQueries({ include: [GET_ME] });
+  };
+
+  const handleDisableSuccess = () => {
+    setShowDisableModal(false);
     client.refetchQueries({ include: [GET_ME] });
   };
 
@@ -63,7 +70,10 @@ export default function AccountAuthentication({ totpEnabled }: Props) {
             L'authentification TOTP est activée sur votre compte
           </p>
 
-          <Button priority="secondary">
+          <Button
+            priority="secondary"
+            onClick={() => setShowDisableModal(true)}
+          >
             Désactiver l'authentification TOTP
             <LockOpenIcon />
           </Button>
@@ -106,6 +116,13 @@ export default function AccountAuthentication({ totpEnabled }: Props) {
         <TotpSetupWizard
           onSuccess={handleSetupSuccess}
           onClose={() => setShowSetupWizard(false)}
+        />
+      )}
+
+      {showDisableModal && (
+        <DisableTotpModal
+          onSuccess={handleDisableSuccess}
+          onClose={() => setShowDisableModal(false)}
         />
       )}
     </div>
