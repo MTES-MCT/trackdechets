@@ -39,13 +39,13 @@ const BsffType = {
   REEXPEDITION: "REEXPEDITION"
 } as const;
 
-const ZodBsffPackagingEnum = z.enum([
-  "BOUTEILLE",
-  "CONTENEUR",
-  "CITERNE",
-  "AUTRE",
-  ""
-]);
+// const ZodBsffPackagingEnum = z.enum([
+//   "BOUTEILLE",
+//   "CONTENEUR",
+//   "CITERNE",
+//   "AUTRE",
+//   ""
+// ]);
 
 const zodCompany = z
   .object({
