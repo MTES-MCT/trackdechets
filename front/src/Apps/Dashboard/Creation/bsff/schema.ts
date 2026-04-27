@@ -99,18 +99,18 @@ export const ZodOperationEnum = z
   })
   .nullish();
 
-const rawBsffPackagingSchema = z.object({
-  type: z.nativeEnum(BsffPackagingType),
-  other: z.string().max(250).nullish(),
-  volume: z.number().nonnegative().nullish(),
-  weight: z.coerce.number().nonnegative().nullish(),
-  numero: z
-    .string({
-      required_error: "Conditionnements : le numéro d'identification est requis"
-    })
-    .max(250)
-    .min(1, "Conditionnements : le numéro d'identification est requis")
-});
+// const rawBsffPackagingSchema = z.object({
+//   type: z.nativeEnum(BsffPackagingType),
+//   other: z.string().max(250).nullish(),
+//   volume: z.number().nonnegative().nullish(),
+//   weight: z.coerce.number().nonnegative().nullish(),
+//   numero: z
+//     .string({
+//       required_error: "Conditionnements : le numéro d'identification est requis"
+//     })
+//     .max(250)
+//     .min(1, "Conditionnements : le numéro d'identification est requis")
+// });
 
 const bsffPackagingSchema = z
   .object({
@@ -294,12 +294,12 @@ export const rawBsffSchema = z.object({
     .optional(),
   packagings: z.array(bsffPackagingSchema).nullish(),
   // ficheInterventions: z.array(ficheInterventionSchema).optional().nullish(),
-  repackaging: z.array(z.string().max(250)).nullish(),
+  repackaging: z.array(bsffGroupingOrForwardingSchema).optional().nullish(),
   grouping: z.array(bsffGroupingOrForwardingSchema).optional().nullish(),
   forwarding: bsffGroupingOrForwardingSchema.nullish()
 });
 
-type ZodBsffPackagingEnum = z.infer<typeof ZodBsffPackagingEnum>;
+// type ZodBsffPackagingEnum = z.infer<typeof ZodBsffPackagingEnum>;
 
 export type ZodBsff = z.infer<typeof rawBsffSchema>;
 

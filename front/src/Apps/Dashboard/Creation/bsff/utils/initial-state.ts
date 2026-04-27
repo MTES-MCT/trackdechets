@@ -74,5 +74,6 @@ export default {
   ficheInterventions: [],
   previousPackagings: [],
   grouping: [],
-  forwarding: null
+  forwarding: null,
+  repackaging: []
 };

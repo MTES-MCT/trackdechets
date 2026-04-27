@@ -1,9 +1,8 @@
 import React from "react";
 import { RenderPackagingFormProps } from "./BsffPackagingList";
-import { useFormContext, useController } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { BsffPackagingType, Packagings } from "@td/codegen-ui";
 import BsffPackagingForm from "./BsffPackagingForm";
-import Decimal from "decimal.js";
 
 /**
  * Wrapper qui permet de contrôler le composant <PackagingForm /> avec React Hook Form
@@ -18,7 +17,7 @@ function RhfBsffPackagingForm({
 }: RenderPackagingFormProps) {
   const fieldPath = (name: string) => `${fieldName}.${idx}.${name}`;
 
-  const { control, register, getFieldState, formState, setValue, resetField } =
+  const { register, getFieldState, formState, setValue, resetField } =
     useFormContext();
 
   const { error: errorVolume, isTouched: isTouchedVolume } = getFieldState(

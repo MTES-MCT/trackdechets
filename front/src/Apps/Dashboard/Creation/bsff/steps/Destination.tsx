@@ -114,7 +114,7 @@ const DestinationBsff = () => {
 
       <div className="form__row">
         <Input
-          label="CAP"
+          label="CAP (optionnel)"
           nativeInputProps={{
             ...register("destination.cap")
           }}

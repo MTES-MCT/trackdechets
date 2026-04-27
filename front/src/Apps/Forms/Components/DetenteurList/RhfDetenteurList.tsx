@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
-import Button from "@codegouvfr/react-dsfr/Button";
 import { BsdType } from "@td/codegen-ui";
 import { DetenteurAccordion } from "../DetenteurAccordion/DetenteurAccordion";
 import { RhfDetenteurForm } from "../DetenteurForm/RhfDetenteurForm";

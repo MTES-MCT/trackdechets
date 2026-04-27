@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import {
   Query,
@@ -10,14 +9,15 @@ import {
 } from "@td/codegen-ui";
 import { InlineLoader } from "../../../../common/Components";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import BsffSelectableWasteTable from "./BsffSelectableWasteTable";
+import BsffSelectableWasteTable, {
+  MAX_BSFF_COUNT_TABLE_DISPLAY
+} from "./BsffSelectableWasteTable";
 import { getInitialCompany } from "../../../../common/data/initialState";
 import { GET_PREVIOUS_PACKAGINGS } from "../../../../common/queries/bsff/queries";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import initialState from "../utils/initial-state";
 import { debounce } from "../../../../../common/helper";
 
-import { MAX_BSFF_COUNT_TABLE_DISPLAY } from "./BsffSelectableWasteTable";
 import { ZodBsffGroupingOrForwarding } from "../schema";
 
 type Props = {
@@ -32,7 +32,6 @@ function BsffSelectableWasteTableWrapper({
   emitterCompany
 }: Props) {
   const { watch, setValue, control } = useFormContext();
-  const { siret } = useParams<{ siret: string }>();
 
   const [idFilter, setIdFilter] = useState("");
   const [wasteCodeFilter, setWasteCodeFilter] = useState("");
@@ -49,18 +48,16 @@ function BsffSelectableWasteTableWrapper({
 
   const forwarding = watch("forwarding", null);
   const grouping = watch("grouping", []);
+  const repackaging = watch("repackaging", []);
 
-  // 🔹 FILTER OPERATION
+  // FILTER OPERATION
   const codeFilter = useMemo(() => {
     switch (type) {
       case BsffType.Groupement:
-        // Groupement peut avoir D13 et R12
         return { _in: [BsffOperationCode.D13, BsffOperationCode.R12] };
       case BsffType.Reconditionnement:
-        // Reconditionnement : D14
         return { _in: [BsffOperationCode.D14] };
       case BsffType.Reexpedition:
-        // Réexpédition : D15 et R13
         return { _in: [BsffOperationCode.D15, BsffOperationCode.R13] };
       default:
         return {};
@@ -78,7 +75,9 @@ function BsffSelectableWasteTableWrapper({
           company: { siret: { _eq: destinationSiret } }
         }
       },
-      nextBsff: null
+      nextBsff: bsffId
+        ? {} // en édition, on accepte ceux liés au BSFF courant
+        : null // en création, on veut ceux sans nextBsff
     }),
     [bsffId, codeFilter, destinationSiret]
   );
@@ -131,6 +130,38 @@ function BsffSelectableWasteTableWrapper({
     debouncedRefetch(where);
   }, [where]);
 
+  const bsffPackagings = data?.bsffPackagings?.edges?.map(e => e.node) ?? [];
+  const total = data?.bsffPackagings?.totalCount ?? 0;
+
+  React.useEffect(() => {
+    if (!bsffPackagings.length) return;
+
+    if (type === BsffType.Groupement && grouping.length > 0) {
+      const matched = bsffPackagings.filter(p =>
+        grouping.some(g => g.id === p.id)
+      );
+      if (matched.length > 0) {
+        setValue("grouping", matched);
+      }
+    }
+
+    if (type === BsffType.Reconditionnement && repackaging.length > 0) {
+      const matched = bsffPackagings.filter(p =>
+        repackaging.some(r => r.id === p.id)
+      );
+      if (matched.length > 0) {
+        setValue("repackaging", matched);
+      }
+    }
+
+    if (type === BsffType.Reexpedition && forwarding) {
+      const matched = bsffPackagings.find(p => p.id === forwarding.id);
+      if (matched) {
+        setValue("forwarding", matched);
+      }
+    }
+  }, [bsffPackagings.length, type]);
+
   const isForwardingPicker = type === BsffType.Reexpedition;
 
   function onGroupingChange(grouping: ZodBsffGroupingOrForwarding[]) {
@@ -169,19 +200,47 @@ function BsffSelectableWasteTableWrapper({
 
     setValue("nextBsff.company", nextCompany);
   }
+  function mapPackaging(p: ZodBsffGroupingOrForwarding) {
+    if (p.packagings?.length) {
+      return p.packagings;
+    }
+    return [
+      {
+        id: p.id ?? null,
+        type: p.type ?? null,
+        volume: p.volume ?? null,
+        numero: p.numero ?? "",
+        weight: p.acceptation?.weight ?? p.weight ?? null,
+        other: p.other ?? null
+      }
+    ];
+  }
 
   function onForwardingChange(fwd: ZodBsffGroupingOrForwarding | null) {
     setValue("waste.code", fwd?.acceptation?.wasteCode ?? fwd?.waste?.code);
 
     setValue("weight.value", fwd?.acceptation?.weight ?? fwd?.weight ?? 0);
 
-    setValue("packagings", fwd?.packagings ?? initialState.packagings);
+    const packagings = fwd?.packagings?.length
+      ? fwd.packagings
+      : fwd
+      ? [
+          {
+            type: fwd.type ?? null,
+            volume: fwd.volume ?? null,
+            numero: fwd.numero ?? "",
+            weight: fwd.acceptation?.weight ?? fwd.weight ?? null,
+            other: fwd.other ?? null
+          }
+        ]
+      : initialState.packagings;
+
+    setValue("packagings", packagings);
 
     const nextCompany = fwd?.nextBsff?.emitter?.company ?? getInitialCompany();
 
     setValue("nextBsff.company", nextCompany);
   }
-
   if (error) {
     return (
       <Alert
@@ -212,16 +271,13 @@ function BsffSelectableWasteTableWrapper({
     );
   }
 
-  const bsffPackagings = data?.bsffPackagings?.edges?.map(e => e.node) ?? [];
-
-  const total = data?.bsffPackagings?.totalCount ?? 0;
-
+  //  FORWARDING
   if (isForwardingPicker) {
     return (
       <>
         <BsffSelectableWasteTable
           onClick={item => {
-            const isSelected = forwarding?.bsffId === item.bsffId;
+            const isSelected = forwarding?.id === item.id;
 
             if (isSelected) {
               setValue("forwarding", null);
@@ -251,19 +307,69 @@ function BsffSelectableWasteTableWrapper({
     );
   }
 
-  // 🔁 GROUPING
+  // RECONDITIONNEMENT
+  if (type === BsffType.Reconditionnement) {
+    return (
+      <>
+        <BsffSelectableWasteTable
+          onClick={item => {
+            const isSelected = repackaging.find(r => r.id === item.id);
+
+            let updated: typeof repackaging;
+
+            if (isSelected) {
+              updated = repackaging.filter(r => r.id !== item.id);
+            } else if (!item.id) {
+              const withoutManual = repackaging.filter(r => r.id);
+              updated = [...withoutManual, item];
+            } else {
+              updated = [...repackaging, item];
+            }
+
+            setValue("repackaging", updated);
+            setValue("packagings", updated.flatMap(mapPackaging));
+
+            // ✅ Recalcul du poids total
+            setValue(
+              "weight.value",
+              updated.reduce(
+                (sum, r) => sum + (r.acceptation?.weight ?? r.weight ?? 0),
+                0
+              )
+            );
+          }}
+          bsffPackagings={bsffPackagings}
+          pickerType={BsffType.Reconditionnement}
+          selected={repackaging}
+          {...{
+            idFilter,
+            wasteCodeFilter,
+            numeroFilter,
+            emetteurSiretFilter,
+            setIdFilter,
+            setWasteCodeFilter,
+            setNumeroFilter,
+            setEmetteurSiretFilter,
+            total
+          }}
+        />
+        {loading && <InlineLoader />}
+      </>
+    );
+  }
+
+  //  GROUPING
   return (
     <>
       <BsffSelectableWasteTable
         onClick={item => {
-          const index = grouping.findIndex(g => g.bsffId === item.bsffId);
+          const index = grouping.findIndex(g => g.id === item.id); // ← id
           const isSelected = index >= 0;
 
           if (isSelected) {
             remove(index);
-            onGroupingChange(grouping.filter(g => g.bsffId !== item.bsffId));
+            onGroupingChange(grouping.filter(g => g.id !== item.id)); // ← id
           } else {
-            // ✅ IMPORTANT : on garde l'objet COMPLET
             append(item);
             onGroupingChange([...grouping, item]);
           }

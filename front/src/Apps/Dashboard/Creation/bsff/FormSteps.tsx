@@ -15,7 +15,6 @@ import {
   BsffTransporterInput,
   TransportMode,
   BsffDestinationInput,
-  BsffOperationCode,
   MutationCreateFicheInterventionBsffArgs
 } from "@td/codegen-ui";
 
@@ -47,7 +46,6 @@ import EmitterBsff from "./steps/Emitter";
 import DestinationBsff from "./steps/Destination";
 import TransporterBsff from "./steps/Transporter";
 import DetenteurBsff from "./steps/Detenteur";
-import { omitDeep } from "@apollo/client/utilities";
 import { isForeignVat } from "@td/constants";
 import {
   getErrorTabIds,
@@ -151,8 +149,19 @@ const BsffFormSteps = ({
         },
         {
           path: "forwarding",
+          getComputedValue: (initialValue, actualValue) => {
+            if (Array.isArray(actualValue)) {
+              return actualValue[0] ?? initialValue;
+            }
+            return actualValue ?? initialValue;
+          }
+        },
+        {
+          path: "repackaging",
           getComputedValue: (initialValue, actualValue) =>
-            actualValue ?? initialValue
+            Array.isArray(actualValue) && actualValue.length
+              ? actualValue
+              : initialValue
         },
         {
           path: "transporters",
@@ -248,7 +257,6 @@ const BsffFormSteps = ({
 
   async function saveBsff(values: ZodBsff, draft: boolean) {
     const {
-      id,
       transporters = [],
       destination,
       packagings,
@@ -317,8 +325,8 @@ const BsffFormSteps = ({
     const cleanWaste = waste?.code
       ? {
           code: waste.code,
-          adr: waste.adr ?? null,
-          description: waste.description ?? null
+          adr: waste.adr?.trim() || null,
+          description: waste.description?.trim() || null
         }
       : undefined;
 
@@ -369,12 +377,13 @@ const BsffFormSteps = ({
             ? [forwarding.id]
             : []
           : [],
-      repackaging: type === BsffType.Reconditionnement ? repackaging : [],
+      repackaging:
+        type === BsffType.Reconditionnement ? repackaging.map(r => r.id) : [],
       grouping:
         type === BsffType.Groupement ? grouping?.map(g => g.id) ?? [] : []
     };
 
-    // ================= UPDATE =================
+    //  UPDATE
     if (bsffState.id) {
       if (draft) {
         return updateBsff({ variables: { id: bsffState.id, input } });

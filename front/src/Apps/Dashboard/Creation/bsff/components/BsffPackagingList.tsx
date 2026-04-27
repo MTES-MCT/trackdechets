@@ -6,7 +6,7 @@ import {
 } from "@td/codegen-ui";
 import React from "react";
 import { PackagingFormProps } from "./BsffPackagingForm";
-import { useFormContext, useWatch } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 import { emptyBsddPackaging } from "../../../../Forms/Components/PackagingList/helpers";
 
 // Props passé à l'implémentation concrète (Formik ou RHF)
@@ -58,47 +58,60 @@ function BsffPackagingList({
   const isReconditionnement = bsffType === BsffType.Reconditionnement;
   const isGroupement = bsffType === BsffType.Groupement;
   const isReexpedition = bsffType === BsffType.Reexpedition;
-  const showbutton = isReconditionnement || isGroupement || isReexpedition;
+  const showbutton = isGroupement || isReexpedition;
+  const repackaging: any[] = useWatch({ name: "repackaging" }) ?? [];
 
-  const maxPackagings = isReconditionnement ? 1 : Infinity;
+  const tableIds = new Set(
+    isReconditionnement ? repackaging.map(r => r.id).filter(Boolean) : []
+  );
 
-  const canAdd = packagingInfos.length < maxPackagings;
+  const isFromTable = (p: PackagingInfoInput) =>
+    isReconditionnement && tableIds.has((p as any).id);
+
+  const manualCount = isReconditionnement
+    ? packagingInfos.filter(p => !isFromTable(p)).length
+    : 0;
+
+  const canAdd = !isReconditionnement || manualCount < 1;
   return (
     <>
       {/* MESSAGE INFO */}
-      {packagingInfos.length >= maxPackagings && (
+      {isReconditionnement && manualCount >= 1 && (
         <div className="fr-alert fr-alert--info fr-mb-4w">
           Un seul contenant est autorisé dans le cadre d'un reconditionnement.
           Ex. : 1 citerne
         </div>
       )}
-      {packagingInfos.map((p, idx) => (
-        <div key={idx}>
-          {children({
-            fieldName,
-            packagingTypes,
-            packagingsLength: packagingInfos.length,
-            idx,
-            packaging: p,
-            disabled
-          })}
+      {packagingInfos.map((p, idx) => {
+        const fromTable = isFromTable(p);
 
-          {packagingInfos.length > 1 && (
-            <>
-              <button
-                type="button"
-                disabled={disabled}
-                className="fr-btn fr-btn--tertiary fr-mb-2w"
-                onClick={() => remove(idx)}
-              >
-                Supprimer
-              </button>
-              <hr />
-            </>
-          )}
-        </div>
-      ))}
+        return (
+          <div key={idx}>
+            {children({
+              fieldName,
+              packagingTypes,
+              packagingsLength: packagingInfos.length,
+              idx,
+              packaging: p,
+              disabled: disabled || fromTable
+            })}
 
+            {!fromTable && packagingInfos.length > 1 && !showbutton && (
+              <>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  className="fr-btn fr-btn--tertiary fr-mb-2w"
+                  onClick={() => remove(idx)}
+                >
+                  Supprimer
+                </button>
+                <hr />
+              </>
+            )}
+          </div>
+        );
+      })}
       {/* BOUTON AJOUT */}
       {!disabled && canAdd && !showbutton && (
         <div className="fr-grid-row fr-grid-row--right fr-mb-4w">

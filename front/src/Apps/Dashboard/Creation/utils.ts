@@ -58,10 +58,8 @@ export type IconIdName =
 const getDestinationTabLabel = (bsdType: SupportedBsdTypes) => {
   if (bsdType === BsdType.Bspaoh) {
     return "Crématorium";
-  } else if (bsdType === BsdType.Bsda) {
-    return "Destinataire";
   } else {
-    return "Destination finale";
+    return "Destinataire";
   }
 };
 
@@ -214,7 +212,6 @@ const pathPrefixToTab = {
     return null;
   },
 
-  // ✅ AJOUT BSFF (MANQUANT)
   [BsdType.Bsff]: (pathPrefix: string): TabId | null => {
     if (
       pathPrefix.startsWith("emitter") ||

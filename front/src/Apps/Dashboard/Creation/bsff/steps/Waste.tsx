@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { BsffPackaging, BsffType } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
@@ -20,12 +20,29 @@ const WasteBsff = () => {
   const methods = useFormContext();
   const { register, setValue, watch, formState } = methods;
   const sealedFields = useContext(SealedFieldsContext);
+
   const id = watch("id", null);
   const bsffType = watch("type");
   const packagings = watch("packagings");
   const weight = watch("weight", {});
-  const idCompany = watch("idCompany");
   const emitterCompany = watch("emitter.company");
+
+  const prevTypeRef = useRef<BsffType | undefined>(bsffType);
+
+  useEffect(() => {
+    if (prevTypeRef.current !== bsffType) {
+      if (!id) {
+        setValue("packagings", []);
+        setValue("grouping", []);
+        setValue("forwarding", null);
+        setValue("waste.code", "");
+        setValue("waste.description", "");
+        setValue("waste.adr", "");
+        setValue("weight", { value: "", isEstimate: false });
+      }
+    }
+    prevTypeRef.current = bsffType;
+  }, [bsffType, setValue, id]);
 
   const isSpecialType = [
     BsffType.Groupement,
@@ -33,31 +50,27 @@ const WasteBsff = () => {
     BsffType.Reconditionnement
   ].includes(bsffType);
 
-  // true si une entreprise est sélectionnée
   const hasEmitterCompany =
     !!emitterCompany && (emitterCompany?.orgId || emitterCompany?.siret);
 
-  // On cache UNIQUEMENT si :
   const hideAfterCompanySelector = isSpecialType && !hasEmitterCompany;
-
-  // Calcul du poids total
-  const totalWeightNumber = packagings.reduce(
+  const totalWeightNumber = (packagings ?? []).reduce(
     (acc: number, packaging: BsffPackaging) =>
-      acc + (Number(packaging.weight) || 0),
+      acc + (Number(packaging?.weight) || 0),
     0
   );
+
   const totalWeight = totalWeightNumber === 0 ? "" : totalWeightNumber;
 
-  // Mise à jour du formulaire
   useEffect(() => {
     setValue("weight.value", totalWeight);
   }, [totalWeight, setValue]);
 
   const wasteCodeDisabled = [
     BsffType.Groupement,
-    BsffType.Reconditionnement,
     BsffType.Reexpedition
   ].includes(bsffType);
+
   const heading =
     bsffType === BsffType.Groupement
       ? "Installation de tri, transit, regroupement ou traitement"
@@ -65,8 +78,6 @@ const WasteBsff = () => {
         bsffType === BsffType.Reexpedition
       ? "Installation de tri, transit, regroupement"
       : "";
-  // const fieldIsHidden =
-  //   bsffType === BsffType.Groupement || bsffType === BsffType.Reexpedition;
 
   const instruction =
     bsffType === BsffType.Groupement
@@ -80,6 +91,7 @@ const WasteBsff = () => {
   return (
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
+
       <div className="fr-col">
         <WasteRadioGroup
           title="Type de bordereau"
@@ -125,18 +137,18 @@ const WasteBsff = () => {
             }
           ]}
         />
+
         <h4 className="form__section-heading">{heading}</h4>
 
         {heading && (
-          <>
-            <MyBsffCompanySelector
-              value="emitter.company"
-              onChange={company => {
-                setValue("emitter.company", company);
-              }}
-            ></MyBsffCompanySelector>
-          </>
+          <MyBsffCompanySelector
+            value={emitterCompany}
+            onChange={company => {
+              setValue("emitter.company", company);
+            }}
+          />
         )}
+
         {!hideAfterCompanySelector && (
           <>
             {instruction && (
@@ -147,6 +159,7 @@ const WasteBsff = () => {
                   small
                   className="fr-mb-2w"
                 />
+
                 <BsffSelectableWasteTableWrapper
                   type={bsffType}
                   bsffId={id}
@@ -156,12 +169,11 @@ const WasteBsff = () => {
             )}
 
             <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
+
             <Select
               className="fr-col-md-8 fr-mt-2w"
               label="Code déchet"
-              nativeSelectProps={{
-                ...register("waste.code")
-              }}
+              nativeSelectProps={{ ...register("waste.code") }}
               state={formState.errors.waste?.["code"] ? "error" : "default"}
               stateRelatedMessage={formState.errors.waste?.["code"]?.message}
               disabled={
@@ -169,20 +181,18 @@ const WasteBsff = () => {
               }
             >
               <option value="">Sélectionnez une valeur</option>
-
               {BSFF_WASTES.map(item => (
                 <option value={item.code} key={item.code}>
                   {item.code} - {item.description}
                 </option>
               ))}
             </Select>
+
             <Input
               className="fr-col-md-8"
               label="Dénomination usuelle du déchet"
               disabled={sealedFields.includes("waste.description")}
-              nativeInputProps={{
-                ...register("waste.description")
-              }}
+              nativeInputProps={{ ...register("waste.description") }}
               state={
                 formState.errors.waste?.["description"] ? "error" : "default"
               }
@@ -190,25 +200,32 @@ const WasteBsff = () => {
                 formState.errors.waste?.["description"]?.message
               }
             />
+
             <Input
               className="fr-col-md-8 fr-mt-4w"
               label="Mentions au titre des règlements RID, ADNR, IMDG"
-              disabled={sealedFields.includes(`waste.adr`)}
-              nativeInputProps={{
-                ...register("waste.adr")
-              }}
+              disabled={sealedFields.includes("waste.adr")}
+              nativeInputProps={{ ...register("waste.adr") }}
               state={formState.errors.waste?.["adr"] && "error"}
               stateRelatedMessage={
                 (formState.errors.waste?.["adr"]?.message as string) ?? ""
               }
             />
+
             <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
             <RhfBsffPackagingList
-              disabled={sealedFields.includes(`packagings`)}
+              disabled={
+                sealedFields.includes("packagings") ||
+                bsffType === BsffType.Groupement ||
+                bsffType === BsffType.Reexpedition
+                // ← Reconditionnement : pas disabled, modifiable manuellement
+              }
               fieldName="packagings"
               packagingTypes={bsffPackagingTypes}
             />
+
             <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>
+
             <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
               <div className="fr-col-md-3">
                 <NonScrollableInput
@@ -222,8 +239,7 @@ const WasteBsff = () => {
                   }}
                   state={formState.errors?.weight?.["value"] && "error"}
                   stateRelatedMessage={
-                    (formState.errors?.weight?.["value"]?.message as string) ??
-                    ""
+                    formState.errors?.weight?.["value"]?.message ?? ""
                   }
                 />
 
@@ -239,15 +255,13 @@ const WasteBsff = () => {
                   orientation="horizontal"
                   state={formState.errors?.weight?.["isEstimate"] && "error"}
                   stateRelatedMessage={
-                    (formState.errors?.weight?.["isEstimate"]
-                      ?.message as string) ?? ""
+                    formState.errors?.weight?.["isEstimate"]?.message ?? ""
                   }
                   options={[
                     {
                       label: "Réelle",
                       nativeInputProps: {
                         onChange: () => setValue("weight.isEstimate", false),
-
                         checked: weight.isEstimate === false
                       }
                     },

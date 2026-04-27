@@ -46,17 +46,18 @@ export default function BsffSelectableWasteTable({
   setEmetteurSiretFilter
 }: SelectableWasteTableProps) {
   const hasMore = bsffPackagings.length > 0 && total > bsffPackagings.length;
+
   const filteredBsffs = useMemo(() => {
     return bsffPackagings.filter(bsffPackaging => {
       if (idFilter.length > 0 && !bsffPackaging.bsffId.includes(idFilter)) {
         return false;
       }
 
-      // filtre par code déchet (acceptation ou BSFF)
       const packagingWasteCode =
         bsffPackaging?.acceptation?.wasteCode ??
         bsffPackaging.bsff?.waste?.code ??
         "";
+
       if (
         wasteCodeFilter.length > 0 &&
         !packagingWasteCode.includes(wasteCodeFilter)
@@ -75,6 +76,7 @@ export default function BsffSelectableWasteTable({
       ) {
         return false;
       }
+
       return true;
     });
   }, [bsffPackagings, idFilter, wasteCodeFilter, emetteurSiretFilter]);
@@ -82,25 +84,13 @@ export default function BsffSelectableWasteTable({
   const renderTable = () => {
     const rows = filteredBsffs.map(bsffPackaging => {
       const checked = selected?.some(
-        selectedBsff => selectedBsff.bsffId === bsffPackaging.bsffId
+        selectedBsff => selectedBsff.id === bsffPackaging.id // ← id au lieu de bsffId
       );
-      /* const firstSelectedBsff = selected && selected.length > 0 && selected[0];
-      let isDisabled = false;
-      if (firstSelectedBsff) {
-        if (pickerType === BsffType.Groupement) {
-          isDisabled =
-            bsffPackaging.bsffId !== firstSelectedBsff.bsffId &&
-            bsffPackaging.bsff.waste?.code !== firstSelectedBsff.waste?.code;
-        } else {
-          isDisabled = firstSelectedBsff?.bsffId !== bsffPackaging.bsffId;
-        }
-      }*/
-      const firstSelectedBsff =
+      const firstSelected =
         selected && selected.length > 0 ? selected[0] : null;
 
       const selectedWasteCode =
-        firstSelectedBsff?.acceptation?.wasteCode ??
-        firstSelectedBsff?.waste?.code;
+        firstSelected?.acceptation?.wasteCode ?? firstSelected?.waste?.code;
 
       const currentWasteCode =
         bsffPackaging?.acceptation?.wasteCode ??
@@ -108,9 +98,16 @@ export default function BsffSelectableWasteTable({
 
       let isDisabled = false;
 
-      if (selectedWasteCode) {
-        isDisabled = currentWasteCode !== selectedWasteCode;
+      if (pickerType === BsffType.Reexpedition) {
+        if (selected.length > 0) {
+          isDisabled = !selected.some(s => s.id === bsffPackaging.id);
+        }
+      } else if (pickerType === BsffType.Groupement) {
+        if (selectedWasteCode) {
+          isDisabled = currentWasteCode !== selectedWasteCode;
+        }
       }
+      const wasteCode = currentWasteCode;
 
       return [
         <SingleCheckbox
@@ -119,36 +116,47 @@ export default function BsffSelectableWasteTable({
               label: "",
               nativeInputProps: {
                 checked,
-                onChange: _ => {
-                  onClick(bsffPackaging);
-                },
+                onChange: () => onClick(bsffPackaging),
                 disabled: isDisabled
               }
             }
           ]}
         />,
-        <div style={{ wordBreak: "break-word", wordWrap: "break-word" }}>
-          {bsffPackaging.bsffId}
-        </div>,
-        bsffPackaging.acceptation?.wasteCode ?? bsffPackaging.bsff.waste?.code,
-        bsffPackaging.numero, // numéro contenant
+        <div style={{ wordBreak: "break-word" }}>{bsffPackaging.bsffId}</div>,
+        wasteCode,
+
+        <div></div>,
+        <div></div>,
+        <div></div>,
+        <div></div>,
+        <div></div>,
+        <div></div>,
+
+        bsffPackaging.numero,
+
         bsffPackaging.bsff.emitter?.company?.name
-          ? `${bsffPackaging.bsff.emitter?.company?.name} - ${bsffPackaging.bsff.emitter?.company?.orgId}`
+          ? `${bsffPackaging.bsff.emitter.company.name} - ${bsffPackaging.bsff.emitter.company.orgId}`
           : "Non renseigné"
       ];
     });
 
-    // En tête du tableau
     const headers = [
       "",
       "N° bordereau",
       "Code déchet",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
       "N° contenant",
       "Émetteur initial"
     ];
+
     return (
       <Table
-        caption="Sélection des bordereaux à ajouter" // accessibilité
+        caption="Sélection des bordereaux à ajouter"
         noCaption
         headers={headers}
         data={rows}
@@ -158,6 +166,7 @@ export default function BsffSelectableWasteTable({
 
   return (
     <>
+      {/* FILTRES */}
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
           <Input
@@ -168,6 +177,7 @@ export default function BsffSelectableWasteTable({
             }}
           />
         </div>
+
         <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
           <Input
             label="Code déchet"
@@ -177,6 +187,7 @@ export default function BsffSelectableWasteTable({
             }}
           />
         </div>
+
         <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
           <Input
             label="N° contenant"
@@ -186,6 +197,7 @@ export default function BsffSelectableWasteTable({
             }}
           />
         </div>
+
         <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
           <Input
             label="Émetteur initial"
@@ -197,6 +209,7 @@ export default function BsffSelectableWasteTable({
         </div>
       </div>
 
+      {/* ALERT + ACCORDION */}
       {(hasMore || (selected && selected.length > 0)) && (
         <div className="fr-grid-row fr-grid-row--gutters">
           {hasMore && (
@@ -208,14 +221,13 @@ export default function BsffSelectableWasteTable({
                   <div>
                     Pour des raisons de performance, le tableau ci-dessous
                     n'affiche que les {MAX_BSFF_COUNT_TABLE_DISPLAY} derniers
-                    bordereaux sur un total de {total} bordereaux. Vous pouvez
-                    sélectionner des bordereaux individuellement en utilisant le
-                    filtre par numéro de bordereau.
+                    bordereaux sur un total de {total} bordereaux.
                   </div>
                 }
               />
             </div>
           )}
+
           {selected && selected.length > 0 && (
             <div className="fr-col-12">
               <Accordion label="Afficher la liste des bordereaux annexés">
@@ -223,12 +235,9 @@ export default function BsffSelectableWasteTable({
                   <div key={selectedBsff.bsffId}>
                     {selectedBsff.bsffId} -{" "}
                     {selectedBsff.acceptation?.wasteCode ??
-                      selectedBsff.waste?.code ??
-                      ""}
+                      selectedBsff.waste?.code}
                     {selectedBsff.weight
-                      ? ` - ${new Decimal(selectedBsff.weight ?? 0).toFixed(
-                          6
-                        )} T`
+                      ? ` - ${new Decimal(selectedBsff.weight).toFixed(6)} T`
                       : ""}
                   </div>
                 ))}
@@ -239,7 +248,6 @@ export default function BsffSelectableWasteTable({
       )}
 
       {renderTable()}
-      <div>lenght: ${bsffPackagings.length}</div>
     </>
   );
 }

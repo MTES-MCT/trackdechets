@@ -47,64 +47,44 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
       {/*  CAS TRACER FLUIDE */}
       {isTracerFluide && (
         <>
-          <h4 className="fr-mt-4w fr-mb-3w">Détenteur</h4>
-
-          <div className="fr-grid-row fr-grid-row--gutters">
-            <div className="fr-col-md-8">
-              <Controller
-                control={control}
-                name={`${companyField}.name`}
-                render={({ field }) => (
-                  <Input
-                    label="SIRET ou raison sociale"
-                    nativeInputProps={field}
-                  />
-                )}
-              />
-            </div>
-
-            <div className="fr-col-md-4">
-              <Controller
-                control={control}
-                name={`${companyField}.postalCode`}
-                render={({ field }) => (
-                  <Input label="Code postal" nativeInputProps={field} />
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="fr-mt-3w">
-            <Controller
-              control={control}
-              name={`${companyField}.contact`}
-              render={({ field }) => (
-                <Input label="Personne à contacter" nativeInputProps={field} />
-              )}
-            />
-          </div>
+          <h4 className="fr-mt-4w">Détenteur</h4>
 
           <div className="fr-grid-row fr-grid-row--gutters fr-mt-3w">
-            <div className="fr-col-md-6">
-              <Controller
-                control={control}
-                name={`${companyField}.phone`}
-                render={({ field }) => (
-                  <Input label="Téléphone" nativeInputProps={field} />
-                )}
-              />
-            </div>
+            <div className="fr-container">
+              <CompanySelectorWrapper
+                orgId={orgId}
+                selectedCompanyOrgId={selectedOrgId}
+                onCompanySelected={company => {
+                  if (!company) return;
 
-            <div className="fr-col-md-6">
-              <Controller
-                control={control}
-                name={`${companyField}.mail`}
-                render={({ field }) => (
-                  <Input label="Courriel" nativeInputProps={field} />
-                )}
+                  setValue(`${companyField}.orgId`, company.orgId);
+                  setValue(`${companyField}.siret`, company.siret);
+                  setValue(`${companyField}.name`, company.name);
+                  setValue(`${companyField}.address`, company.address);
+                  setValue(`${companyField}.contact`, company.contact);
+                  setValue(`${companyField}.phone`, company.contactPhone);
+                  setValue(`${companyField}.mail`, company.contactEmail);
+
+                  // ← synchronise l'émetteur avec le détenteur pour TracerFluide
+                  if (isTracerFluide) {
+                    setValue("emitter.company", {
+                      orgId: company.orgId,
+                      siret: company.siret,
+                      vatNumber: company.vatNumber ?? null,
+                      name: company.name ?? "",
+                      address: company.address ?? "",
+                      contact: company.contact ?? "",
+                      phone: company.contactPhone ?? "",
+                      mail: company.contactEmail ?? "",
+                      country: company.codePaysEtrangerEtablissement ?? null
+                    });
+                  }
+                }}
               />
             </div>
           </div>
+
+          <CompanyContactInfo fieldName={companyField} key={selectedOrgId} />
 
           <hr className="fr-mt-4w" />
         </>
