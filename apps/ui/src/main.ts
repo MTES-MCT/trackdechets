@@ -23,7 +23,9 @@ const CONNECT_SRC = [
   "https://openmaptiles.github.io",
   "https://s3.fr-par.scw.cloud",
   "https://stats.beta.gouv.fr",
-  "https://data.geopf.fr"
+  "https://data.geopf.fr",
+  "https://client.crisp.chat",
+  "https://*.crisp.chat"
 ];
 
 const WORKER_SRC = ["blob:"]; // needed for MapBox
@@ -44,8 +46,19 @@ app.use(
         fontSrc: ["'self'", "https:", "data:"],
         objectSrc: ["'self'", "data:"],
         frameAncestors: "'none'",
-        frameSrc: ["'self'", "data:"],
-        imgSrc: ["'self'", "data:", "http:"], // allow oauth applications logos
+        frameSrc: [
+          "'self'",
+          "data:",
+          "https://client.crisp.chat",
+          "https://*.crisp.chat"
+        ],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "http:",
+          "https://client.crisp.chat",
+          "https://*.crisp.chat"
+        ], // allow oauth applications logos
         scriptSrc: ["'self'", "https:", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
         mediaSrc: ["'self'", "data:"]
