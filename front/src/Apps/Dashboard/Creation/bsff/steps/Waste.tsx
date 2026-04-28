@@ -203,7 +203,7 @@ const WasteBsff = () => {
 
             <Input
               className="fr-col-md-8 fr-mt-4w"
-              label="Mentions au titre des règlements RID, ADNR, IMDG"
+              label="Mentions au titre des règlements RID, ADNR, IMDG (optionnel)"
               disabled={sealedFields.includes("waste.adr")}
               nativeInputProps={{ ...register("waste.adr") }}
               state={formState.errors.waste?.["adr"] && "error"}
@@ -211,7 +211,9 @@ const WasteBsff = () => {
                 (formState.errors.waste?.["adr"]?.message as string) ?? ""
               }
             />
-
+            <p className="fr-info-text">
+              A remplir obligatoirement si vous êtes concernés par un ADR
+            </p>
             <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
             <RhfBsffPackagingList
               disabled={
@@ -229,7 +231,7 @@ const WasteBsff = () => {
             <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
               <div className="fr-col-md-3">
                 <NonScrollableInput
-                  label="Poids total en kilo"
+                  label="Poids total en kilos"
                   disabled={sealedFields.includes("weight.value")}
                   nativeInputProps={{
                     inputMode: "decimal",
