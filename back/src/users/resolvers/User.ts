@@ -4,6 +4,15 @@ import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../companies/converters";
 
 const userResolvers: UserResolvers = {
+  // Indique si le TOTP est activé sur le compte
+  totpEnabled: parent => {
+    const p = parent as {
+      totpActivatedAt?: Date | null;
+      totpSeed?: string | null;
+    };
+    return !!p.totpActivatedAt && !!p.totpSeed;
+  },
+
   // Returns the list of companies a user belongs to
   // Information from TD and s3ic are merged in a separate resolver (CompanyPrivate.installation)
   // to make up an instance of CompanyPrivate
