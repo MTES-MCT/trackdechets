@@ -132,7 +132,7 @@ export default function AppFooter() {
                 <li className="fr-footer__content-item">
                   <a
                     className="fr-footer__content-link"
-                    href="https://assistance.trackdechets.beta.gouv.fr/"
+                    href="https://faq.trackdechets.fr/"
                     rel="noopener external"
                     target="_blank"
                   >

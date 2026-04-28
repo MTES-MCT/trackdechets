@@ -24,8 +24,11 @@ const CONNECT_SRC = [
   "https://s3.fr-par.scw.cloud",
   "https://stats.beta.gouv.fr",
   "https://data.geopf.fr",
+  // Crisp
   "https://client.crisp.chat",
-  "https://*.crisp.chat"
+  "https://*.crisp.chat",
+  "wss://client.relay.crisp.chat",
+  "wss://*.crisp.chat"
 ];
 
 const WORKER_SRC = ["blob:"]; // needed for MapBox
