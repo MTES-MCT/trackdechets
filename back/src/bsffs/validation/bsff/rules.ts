@@ -402,7 +402,7 @@ export const bsffEditionRules: BsffEditionRules = {
   },
   wasteAdr: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    // required: { from: "EMISSION" },
     readableFieldName: "L'ADR",
     path: ["waste", "adr"]
   },

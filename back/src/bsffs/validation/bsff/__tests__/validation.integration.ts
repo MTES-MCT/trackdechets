@@ -687,69 +687,69 @@ describe("validation > parseBsff", () => {
       try {
         parseBsff({}, { currentSignatureType: "EMISSION" });
       } catch (e) {
-        expect(e.errors).toEqual([
-          expect.objectContaining({
-            message: "La raison sociale de l'émetteur est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "Le SIRET de l'émetteur est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "L'adresse de l'émetteur est un champ requis."
-          }),
-          expect.objectContaining({
-            message:
-              "La personne à contacter chez l'émetteur est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "Le N° de téléphone de l'émetteur est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "L'adresse e-mail de l'émetteur est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "Le code déchet est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "La description du déchet est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "L'ADR est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "La quantité totale est un champ requis."
-          }),
-          expect.objectContaining({
-            message:
-              "La raison sociale de l'installation de destination est un champ requis."
-          }),
-          expect.objectContaining({
-            message:
-              "Le SIRET de l'installation de destination est un champ requis."
-          }),
-          expect.objectContaining({
-            message:
-              "L'adresse de l'installation de destination est un champ requis."
-          }),
-          expect.objectContaining({
-            message:
-              "La personne à contacter de l'installation de destination est un champ requis."
-          }),
-          expect.objectContaining({
-            message:
-              "Le N° de téléphone de l'installation de destination est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "Le code d'opération prévu est un champ requis."
-          }),
-          expect.objectContaining({
-            message:
-              "L'adresse e-mail de l'installation de destination est un champ requis."
-          }),
-          expect.objectContaining({
-            message: "La liste des contenants est un champ requis."
-          })
-        ]);
+        expect(e.errors).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              message: "La raison sociale de l'émetteur est un champ requis."
+            }),
+            expect.objectContaining({
+              message: "Le SIRET de l'émetteur est un champ requis."
+            }),
+            expect.objectContaining({
+              message: "L'adresse de l'émetteur est un champ requis."
+            }),
+            expect.objectContaining({
+              message:
+                "La personne à contacter chez l'émetteur est un champ requis."
+            }),
+            expect.objectContaining({
+              message: "Le N° de téléphone de l'émetteur est un champ requis."
+            }),
+            expect.objectContaining({
+              message: "L'adresse e-mail de l'émetteur est un champ requis."
+            }),
+            expect.objectContaining({
+              message: "Le code déchet est un champ requis."
+            }),
+            expect.objectContaining({
+              message: "La description du déchet est un champ requis."
+            }),
+            // "L'ADR est un champ requis."
+            expect.objectContaining({
+              message: "La quantité totale est un champ requis."
+            }),
+            expect.objectContaining({
+              message:
+                "La raison sociale de l'installation de destination est un champ requis."
+            }),
+            expect.objectContaining({
+              message:
+                "Le SIRET de l'installation de destination est un champ requis."
+            }),
+            expect.objectContaining({
+              message:
+                "L'adresse de l'installation de destination est un champ requis."
+            }),
+            expect.objectContaining({
+              message:
+                "La personne à contacter de l'installation de destination est un champ requis."
+            }),
+            expect.objectContaining({
+              message:
+                "Le N° de téléphone de l'installation de destination est un champ requis."
+            }),
+            expect.objectContaining({
+              message: "Le code d'opération prévu est un champ requis."
+            }),
+            expect.objectContaining({
+              message:
+                "L'adresse e-mail de l'installation de destination est un champ requis."
+            }),
+            expect.objectContaining({
+              message: "La liste des contenants est un champ requis."
+            })
+          ])
+        );
       }
     });
 

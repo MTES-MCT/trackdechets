@@ -1,6 +1,8 @@
 import {
   BsdaPackagingInput,
   BsdaPackagingType,
+  BsffPackagingInput,
+  BsffPackagingType,
   PackagingInfoInput,
   Packagings
 } from "@td/codegen-ui";
@@ -19,6 +21,14 @@ export const emptyBsddPackaging: PackagingInfoInput = {
 export const emptyBsdaPackaging: BsdaPackagingInput = {
   type: "" as BsdaPackagingType,
   quantity: null as any as number
+};
+
+export const emptyBsffPackaging: BsffPackagingInput = {
+  numero: "" as any as string,
+  other: "",
+  type: "" as BsffPackagingType,
+  volume: "" as any as number,
+  weight: "" as any as number
 };
 
 /**
@@ -76,8 +86,15 @@ export const bsdaPackagingTypes = [
   BsdaPackagingType.Other
 ];
 
+export const bsffPackagingTypes = [
+  BsffPackagingType.Bouteille,
+  BsffPackagingType.Citerne,
+  BsffPackagingType.Conteneur,
+  BsffPackagingType.Autre
+];
+
 export const packagingTypeLabels: Record<
-  Packagings | BsdaPackagingType,
+  Packagings | BsdaPackagingType | BsffPackagingType,
   string
 > = {
   [Packagings.Benne]: "Benne",
@@ -91,5 +108,7 @@ export const packagingTypeLabels: Record<
   [BsdaPackagingType.DepotBag]: "Dépôt-bag",
   [BsdaPackagingType.PaletteFilme]: "Palette filmée",
   [BsdaPackagingType.SacRenforce]: "Sac renforcé",
-  [BsdaPackagingType.Other]: "Autre"
+  [BsdaPackagingType.Other]: "Autre",
+  [BsffPackagingType.Bouteille]: "Bouteille",
+  [BsffPackagingType.Conteneur]: "Conteneur"
 };

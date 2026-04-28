@@ -57,7 +57,7 @@ describe("publishBsff", () => {
         "L'adresse e-mail de l'émetteur est un champ requis.",
         "Le code déchet est un champ requis.",
         "La description du déchet est un champ requis.",
-        "L'ADR est un champ requis.",
+        //"L'ADR est un champ requis.",
         "La quantité totale est un champ requis.",
         "La raison sociale de l'installation de destination est un champ requis.",
         "Le SIRET de l'installation de destination est un champ requis.",

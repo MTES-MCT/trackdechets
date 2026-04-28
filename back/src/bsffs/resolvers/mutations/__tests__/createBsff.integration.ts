@@ -303,7 +303,7 @@ describe("Mutation.createBsff", () => {
           "L'adresse e-mail de l'émetteur est un champ requis.\n" +
           "Le code déchet est un champ requis.\n" +
           "La description du déchet est un champ requis.\n" +
-          "L'ADR est un champ requis.\n" +
+          //  "L'ADR est un champ requis.\n" +
           "La quantité totale est un champ requis.\n" +
           "La raison sociale de l'installation de destination est un champ requis.\n" +
           "Le SIRET de l'installation de destination est un champ requis.\n" +

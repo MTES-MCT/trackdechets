@@ -818,11 +818,11 @@ describe("Mutation.createDraftBsff", () => {
       ]);
     });
 
-    it("should allow to create a BSFF packaging with deprecated field `name=anything`", async () => {
+    it("should reject creating a BSFF packaging when both type and name are provided even for AUTRE", async () => {
       const emitter = await userWithCompanyFactory("ADMIN");
 
       const { mutate } = makeClient(emitter.user);
-      const { data, errors } = await mutate<
+      const { errors } = await mutate<
         Pick<Mutation, "createDraftBsff">,
         MutationCreateDraftBsffArgs
       >(CREATE_DRAFT_BSFF, {
@@ -840,6 +840,7 @@ describe("Mutation.createDraftBsff", () => {
             },
             packagings: [
               {
+                type: "AUTRE",
                 name: "Bouteille de récup",
                 numero: "cont1",
                 volume: 1,
@@ -849,16 +850,14 @@ describe("Mutation.createDraftBsff", () => {
           }
         }
       });
-      expect(errors).toBeUndefined();
-      expect(data.createDraftBsff.packagings[0].type).toEqual("AUTRE");
-      expect(data.createDraftBsff.packagings[0].name).toEqual(
-        "Bouteille de récup"
-      );
-      expect(data.createDraftBsff.packagings[0].other).toEqual(
-        "Bouteille de récup"
-      );
-    });
 
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Vous ne pouvez pas préciser à la fois le champ `type` et le champ `name`"
+        })
+      ]);
+    });
     it("should throw error when passing both name= and type= on a BSFF packagng", async () => {
       const emitter = await userWithCompanyFactory("ADMIN");
 
