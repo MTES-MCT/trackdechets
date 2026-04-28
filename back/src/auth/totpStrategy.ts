@@ -5,23 +5,22 @@ import { prisma, User } from "@td/prisma";
 import { sanitizeEmail } from "../utils";
 import { addSeconds } from "date-fns";
 
-const TOTP_LOCK_FACTOR = 5;
+const TOTP_MAX_FAILS = 5;
+const TOTP_LOCK_SECONDS = 300; // 5 minutes after TOTP_MAX_FAILS consecutive failures
 
-const increaseLock = async (user?: User) => {
-  if (!user) {
-    return null;
-  }
-  if (user.totpLockedUntil && user.totpLockedUntil > new Date()) {
-    // ignore if user tries before lock expiration
-    return null;
-  }
+const increaseLock = async (
+  user: User
+): Promise<{ totpFails: number; totpLockedUntil: Date | null }> => {
   const totpFails = user.totpFails + 1;
-  const totpLockedUntil = addSeconds(new Date(), totpFails * TOTP_LOCK_FACTOR);
+  const totpLockedUntil =
+    totpFails >= TOTP_MAX_FAILS
+      ? addSeconds(new Date(), TOTP_LOCK_SECONDS)
+      : null;
   await prisma.user.update({
     where: { id: user.id },
     data: { totpFails, totpLockedUntil }
   });
-  return totpLockedUntil;
+  return { totpFails, totpLockedUntil };
 };
 
 const resetLock = async (user: User) => {
@@ -40,21 +39,13 @@ export class TotpStrategy extends PassportStrategy {
   /**
    * Authenticate request
    *
-   * This is the core method that Passport will call
-   * when using this strategy
-   *
-   *  Lockout logic:
-   *  - each time a wrong totp is submitted,
-   *      - the `totpFails` count is increased
-   *      - the `totpLockedUntil` is set to `totpFails` * 5 s  in the future
-   *      - the lockout params is returned alongside the error code, allowing the UI to handle the response querytsring and inform the user
-   *  - during lockout period, totp submission are ignored
-   *  - once lockout expired, successful totp submission resets `totpFails` and `totpLockedUntil`
-   *
-   * @param req - The request object
+   * Lockout logic:
+   *  - fails 1 to TOTP_MAX_FAILS-1: INVALID_TOTP, no lockout (user can retry immediately)
+   *  - fail TOTP_MAX_FAILS (5th): TOTP_LOCKOUT, account blocked for TOTP_LOCK_SECONDS (5 min)
+   *  - any attempt during active lockout: TOTP_LOCKOUT returned immediately
+   *  - successful code after expired lockout: resets totpFails and totpLockedUntil
    */
   async authenticate(req: Request): Promise<void> {
-    // Extract credentials from request
     const { totp } = req.body;
     const userEmail = req.session?.preloggedUser?.userEmail;
     const expire = req.session?.preloggedUser?.expire;
@@ -62,12 +53,12 @@ export class TotpStrategy extends PassportStrategy {
     if (!expire || !userEmail) {
       return this.fail({ code: "TOTP_TIMEOUT_OR_MISSING_SESSION" }, 401);
     }
+
     const user = await prisma.user.findUnique({
       where: { email: sanitizeEmail(userEmail) }
     });
 
     if (new Date(expire) < new Date()) {
-      // prelogging expired, user will be redirected to login
       delete req.session.preloggedUser;
       await resetLock(user!);
       return this.fail({ code: "TOTP_TIMEOUT_OR_MISSING_SESSION" }, 401);
@@ -79,17 +70,20 @@ export class TotpStrategy extends PassportStrategy {
 
     if (user?.totpLockedUntil && user.totpLockedUntil > new Date()) {
       const lockout = user.totpLockedUntil.getTime();
-      return this.fail({ code: `TOTP_LOCKOUT`, lockout }, 401);
+      return this.fail({ code: "TOTP_LOCKOUT", lockout }, 401);
     }
 
-    // Call verify function to validate the totp
     try {
       const verifiedUser = await this.verifyTotp(totp, user);
       if (!verifiedUser) {
-        // increase lockout time (fail * TOTP_LOCK_FACTOR seconds)
-        const totpLockedUntil = await increaseLock(user!);
-        const lockout = totpLockedUntil?.getTime();
-        return this.fail({ code: "INVALID_TOTP", lockout }, 401);
+        const { totpFails, totpLockedUntil } = await increaseLock(user!);
+        if (totpFails >= TOTP_MAX_FAILS) {
+          return this.fail(
+            { code: "TOTP_LOCKOUT", lockout: totpLockedUntil!.getTime() },
+            401
+          );
+        }
+        return this.fail({ code: "INVALID_TOTP" }, 401);
       }
       await resetLock(user!);
       this.success(verifiedUser);
