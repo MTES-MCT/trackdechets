@@ -82,9 +82,9 @@ export default function AppFooter() {
     setConsent(newConsent);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newConsent));
     setIsOpen(false);
-    setBannerVisible(false); // 👈 important
+    setBannerVisible(false); // important
     if (crispChanged) {
-      // 🔥 approche GéoRisques
+      // reload
       window.location.reload();
     }
   };
@@ -124,9 +124,8 @@ export default function AppFooter() {
             {/* CONTENT */}
             <div className="fr-footer__content">
               <p className="fr-footer__content-desc">
-                Trackdéchets est un service numérique de l'Etat incubé à la
-                Fabrique Numérique du Ministère de la Transition écologique,
-                membre du réseau d’incubateurs beta.gouv.fr
+                Trackdéchets est un service numérique du Ministère en charge de
+                l'environnement.
               </p>
 
               <ul className="fr-footer__content-list">
@@ -219,7 +218,7 @@ export default function AppFooter() {
                 </a>
               </li>
 
-              {/* 🍪 COOKIE MANAGEMENT */}
+              {/* COOKIE MANAGEMENT */}
               <li className="fr-footer__bottom-item">
                 <button
                   type="button"
