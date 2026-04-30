@@ -297,7 +297,8 @@ export const RegistryV2ExportModalProvider: React.FC<{
           CompanyType.WasteCenter,
           CompanyType.Collector,
           CompanyType.Worker,
-          CompanyType.EcoOrganisme
+          CompanyType.EcoOrganisme,
+          CompanyType.DisposalFacility
         ].includes(t)
       ).length > 0
     ) {
@@ -309,7 +310,8 @@ export const RegistryV2ExportModalProvider: React.FC<{
         [
           CompanyType.Wasteprocessor,
           CompanyType.WasteVehicles,
-          CompanyType.Collector
+          CompanyType.Collector,
+          CompanyType.DisposalFacility
         ].includes(t)
       ).length > 0
     ) {
