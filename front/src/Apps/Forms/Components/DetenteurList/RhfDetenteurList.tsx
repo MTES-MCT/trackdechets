@@ -19,6 +19,7 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
   });
 
   const type = watch("type");
+  const isTracerFluide = type === BsffType.TracerFluide;
 
   const INSTALLATION_TYPES = [
     BsffType.Reexpedition,
@@ -27,13 +28,18 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
   ];
 
   const isInstallationType = INSTALLATION_TYPES.includes(type);
+
   React.useEffect(() => {
-    if (fields.length === 0) {
+    if (!isTracerFluide && fields.length === 0) {
       insert(0, {});
     }
-  }, [fields.length, insert]);
+  }, [fields.length, insert, isTracerFluide]);
 
   const [expandedIdx, setExpandedIdx] = React.useState<number | null>(0);
+
+  if (isTracerFluide) {
+    return <RhfDetenteurForm orgId={orgId} fieldName={`${fieldName}.0`} />;
+  }
 
   return (
     <>

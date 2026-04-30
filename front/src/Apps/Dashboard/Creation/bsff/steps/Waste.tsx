@@ -203,7 +203,7 @@ const WasteBsff = () => {
 
             <Input
               className="fr-col-md-8 fr-mt-4w"
-              label="Mentions au titre des règlements RID, ADNR, IMDG (optionnel)"
+              label="Mentions au titre des règlements ADR, RID, ADNR, IMDG (optionnel)"
               disabled={sealedFields.includes("waste.adr")}
               nativeInputProps={{ ...register("waste.adr") }}
               state={formState.errors.waste?.["adr"] && "error"}
@@ -211,9 +211,7 @@ const WasteBsff = () => {
                 (formState.errors.waste?.["adr"]?.message as string) ?? ""
               }
             />
-            <p className="fr-info-text">
-              A remplir obligatoirement si vous êtes concernés par un ADR
-            </p>
+            <p className="fr-info-text">A renseigner si vous êtes concerné</p>
             <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
             <RhfBsffPackagingList
               disabled={

@@ -16,8 +16,10 @@ type Props = {
 
 export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   const { control, setValue, watch } = useFormContext();
-
+  const emitterCompany = watch("emitter.company");
   const type = watch("type");
+
+  const isCollectePetitesQuantites = type === BsffType.CollectePetitesQuantites;
 
   const INSTALLATION_TYPES = [
     BsffType.Reexpedition,
@@ -39,18 +41,36 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
     if (isPrivate) {
       setValue(`${companyField}.siret`, undefined);
       setValue(`${companyField}.orgId`, undefined);
+      setValue(
+        `${companyField}.name`,
+        watch(`${companyField}.contact`) || "Détenteur particulier"
+      );
     }
   }, [isPrivate, setValue, companyField]);
 
+  React.useEffect(() => {
+    if (isInstallationType && emitterCompany) {
+      setValue(companyField, {
+        orgId: emitterCompany.orgId,
+        siret: emitterCompany.siret,
+        name: emitterCompany.name,
+        address: emitterCompany.address,
+        contact: emitterCompany.contact,
+        phone: emitterCompany.phone,
+        mail: emitterCompany.mail
+      });
+    }
+  }, [isInstallationType, emitterCompany, setValue, companyField]);
+
   return (
-    <div className="fr-container">
+    <div className="fr-col-12">
       {/*  CAS TRACER FLUIDE */}
       {isTracerFluide && (
         <>
           <h4 className="fr-mt-4w">Détenteur</h4>
 
           <div className="fr-grid-row fr-grid-row--gutters fr-mt-3w">
-            <div className="fr-container">
+            <div className="fr-col-12">
               <CompanySelectorWrapper
                 orgId={orgId}
                 selectedCompanyOrgId={selectedOrgId}
@@ -104,7 +124,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
           <CompanySelectorWrapper
             orgId={orgId}
-            selectedCompanyOrgId={orgId}
+            selectedCompanyOrgId={emitterCompany?.orgId}
             disabled
             onCompanySelected={() => {}}
           />
@@ -119,17 +139,25 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
       {!isInstallationType && !isTracerFluide && (
         <>
           {/* FICHE INTERVENTION */}
-          <h4 className="fr-mt-4w">Fiche d’intervention</h4>
+          <h4 className="fr-mt-4w">Fiche d’intervention (optionnel) </h4>
 
           <div className="fr-grid-row fr-grid-row--gutters">
             <div className="fr-col-md-4">
               <Controller
                 control={control}
                 name={`${fieldName}.numero`}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <Input
                     label="N° de fiche d'intervention"
-                    nativeInputProps={field}
+                    state={fieldState.error ? "error" : "default"}
+                    stateRelatedMessage={fieldState.error?.message}
+                    nativeInputProps={{
+                      name: field.name,
+                      value: field.value ?? "",
+                      onChange: field.onChange,
+                      onBlur: field.onBlur,
+                      ref: field.ref
+                    }}
                   />
                 )}
               />
@@ -139,10 +167,18 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
               <Controller
                 control={control}
                 name={`${fieldName}.postalCode`}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <Input
                     label="Code postal de collecte"
-                    nativeInputProps={field}
+                    state={fieldState.error ? "error" : "default"}
+                    stateRelatedMessage={fieldState.error?.message}
+                    nativeInputProps={{
+                      name: field.name,
+                      value: field.value ?? "",
+                      onChange: field.onChange,
+                      onBlur: field.onBlur,
+                      ref: field.ref
+                    }}
                   />
                 )}
               />
@@ -152,14 +188,22 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
               <Controller
                 control={control}
                 name={`${fieldName}.weight`}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <Input
                     label="Poids total retiré en kilos"
-                    nativeInputProps={{ ...field, type: "number" }}
+                    state={fieldState.error ? "error" : "default"}
+                    stateRelatedMessage={fieldState.error?.message}
+                    nativeInputProps={{
+                      type: "number",
+                      value: field.value ?? "",
+                      onChange: e => {
+                        const val = e.target.value;
+                        field.onChange(val === "" ? undefined : Number(val));
+                      }
+                    }}
                   />
                 )}
               />
-
               {weight && (
                 <p className="fr-info-text">
                   Soit {(Number(weight) / 1000).toFixed(4)} tonne
@@ -187,15 +231,17 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
           {isPrivate ? (
             <>
               <div className="fr-grid-row fr-grid-row--gutters">
-                <div className="fr-col-md-6">
-                  <Controller
-                    control={control}
-                    name={`${companyField}.name`}
-                    render={({ field }) => (
-                      <Input label="Nom et prénom" nativeInputProps={field} />
-                    )}
-                  />
-                </div>
+                {!isCollectePetitesQuantites && (
+                  <div className="fr-col-md-6">
+                    <Controller
+                      control={control}
+                      name={`${companyField}.name`}
+                      render={({ field }) => (
+                        <Input label="Nom et prénom" nativeInputProps={field} />
+                      )}
+                    />
+                  </div>
+                )}
 
                 <div className="fr-col-md-6">
                   <Controller
@@ -231,7 +277,10 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                     control={control}
                     name={`${companyField}.phone`}
                     render={({ field }) => (
-                      <Input label="Téléphone" nativeInputProps={field} />
+                      <Input
+                        label="Téléphone (optionnel)"
+                        nativeInputProps={field}
+                      />
                     )}
                   />
                 </div>
@@ -251,7 +300,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
             <>
               {/* ENTREPRISE */}
               <div className="fr-grid-row fr-grid-row--gutters fr-mt-3w">
-                <div className="fr-container">
+                <div className="fr-col-12">
                   <CompanySelectorWrapper
                     orgId={orgId}
                     selectedCompanyOrgId={selectedOrgId}

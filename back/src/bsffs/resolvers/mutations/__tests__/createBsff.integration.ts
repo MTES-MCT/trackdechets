@@ -271,7 +271,7 @@ describe("Mutation.createBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
+          "Vous ne pouvez pas crée un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
       })
     ]);
   });
@@ -302,7 +302,7 @@ describe("Mutation.createBsff", () => {
           "Le N° de téléphone de l'émetteur est un champ requis.\n" +
           "L'adresse e-mail de l'émetteur est un champ requis.\n" +
           "Le code déchet est un champ requis.\n" +
-          "La description du déchet est un champ requis.\n" +
+          "La dénomination usuelle du déchet est un champ requis.\n" +
           //  "L'ADR est un champ requis.\n" +
           "La quantité totale est un champ requis.\n" +
           "La raison sociale de l'installation de destination est un champ requis.\n" +

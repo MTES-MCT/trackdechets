@@ -712,7 +712,7 @@ describe("validation > parseBsff", () => {
               message: "Le code déchet est un champ requis."
             }),
             expect.objectContaining({
-              message: "La description du déchet est un champ requis."
+              message: "La dénomination usuelle du déchet est un champ requis."
             }),
             // "L'ADR est un champ requis."
             expect.objectContaining({

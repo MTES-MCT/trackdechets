@@ -166,9 +166,16 @@ const bsffGroupingOrForwardingSchema = z.object({
 
 const ficheInterventionSchema = z.object({
   id: z.string().nullish(),
-  numero: z.string().nullish(),
-  weight: z.coerce.number().nullish(),
-  postalCode: z.string().nullish(),
+
+  numero: z.string().max(250).optional().or(z.literal("")),
+
+  weight: z.preprocess(
+    val => (val === "" ? undefined : val),
+    z.number().positive("le poids doit être supérieur à 0").optional()
+  ),
+
+  postalCode: z.string().optional().or(z.literal("")),
+
   detenteur: z.object({
     isPrivateIndividual: z.boolean().optional(),
     company: zodCompany
@@ -247,10 +254,14 @@ export const rawBsffSchema = z
     forwarding: bsffGroupingOrForwardingSchema.nullish()
   })
   .superRefine((data, ctx) => {
-    // Valider ficheInterventions seulement pour COLLECTE_PETITES_QUANTITES
     if (data.type !== BsffType.COLLECTE_PETITES_QUANTITES) return;
 
     (data.ficheInterventions ?? []).forEach((fi, index) => {
+      const hasStarted =
+        !!fi.numero || !!fi.postalCode || fi.weight !== undefined;
+
+      if (!hasStarted) return;
+
       if (!fi.numero || fi.numero.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -258,6 +269,7 @@ export const rawBsffSchema = z
           message: "Le numéro de fiche d'intervention est requis"
         });
       }
+
       if (!fi.postalCode || fi.postalCode.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -265,6 +277,7 @@ export const rawBsffSchema = z
           message: "Le code postal est requis"
         });
       }
+
       if (!fi.weight || fi.weight <= 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -274,7 +287,6 @@ export const rawBsffSchema = z
       }
     });
   });
-
 export type ZodBsff = z.infer<typeof rawBsffSchema>;
 
 export type ZodBsffGroupingOrForwarding = z.infer<

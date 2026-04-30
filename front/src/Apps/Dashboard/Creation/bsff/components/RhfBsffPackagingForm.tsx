@@ -60,10 +60,6 @@ function RhfBsffPackagingForm({
   };
 
   const packagingType = packaging.type;
-  const weight = packaging.weight;
-  const other = packaging.other;
-  const numero = packaging.numero;
-  const volume = packaging.volume;
 
   return (
     <BsffPackagingForm
@@ -94,19 +90,15 @@ function RhfBsffPackagingForm({
           })
         },
         volume: {
-          value: volume ?? "",
           ...register(fieldPath("volume"))
         },
         weight: {
-          value: weight ?? "",
           ...register(fieldPath("weight"))
         },
         other: {
-          value: other ?? "",
           ...register(fieldPath("other"))
         },
         numero: {
-          value: numero ?? "",
           ...register(fieldPath("numero"))
         }
       }}
