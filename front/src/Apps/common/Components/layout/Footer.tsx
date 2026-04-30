@@ -332,7 +332,7 @@ export default function AppFooter() {
             />
 
             <p className="fr-text--sm fr-mt-2w fr-ml-9w">
-              Le Crisp chatbox, qui opère sur le site web Géorisques, utilise
+              Le Crisp chatbox, qui opère sur le site web Trackdéchets, utilise
               des cookies. Ce dépôt est soumis à votre consentement pour
               l’utilisation du service. Les cookies sont uniquement utilisés
               conformément à ses éléments : Ces cookies sont nécessaires aux
