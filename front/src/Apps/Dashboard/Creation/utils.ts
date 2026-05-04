@@ -220,7 +220,11 @@ const pathPrefixToTab = {
       return TabId.emitter;
     }
 
-    if (pathPrefix.startsWith("detenteur")) {
+    if (
+      pathPrefix.startsWith("detenteur") ||
+      pathPrefix.startsWith("company") ||
+      pathPrefix.startsWith("ficheInterventions")
+    ) {
       return TabId.detenteur;
     }
 
@@ -232,7 +236,11 @@ const pathPrefixToTab = {
       return TabId.destination;
     }
 
-    if (pathPrefix.startsWith("waste")) {
+    if (
+      pathPrefix.startsWith("waste") ||
+      pathPrefix.startsWith("packagings") ||
+      pathPrefix.startsWith("packaging")
+    ) {
       return TabId.waste;
     }
 

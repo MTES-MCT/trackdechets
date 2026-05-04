@@ -151,7 +151,7 @@ function BsffPackagingForm({
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-md-12 fr-col-12">
           <Input
-            label="N° de contenant (optionnel)"
+            label="N° de contenant"
             disabled={disabled}
             state={errors?.numero && touched?.numero ? "error" : "default"}
             stateRelatedMessage={errors?.numero}

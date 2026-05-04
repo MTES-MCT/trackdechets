@@ -178,6 +178,8 @@ const BsffFormSteps = ({
   );
   const methods = useForm<ZodBsff>({
     values: bsffState,
+    mode: "onChange",
+    reValidateMode: "onChange",
     resolver: async (data, context, options) => {
       return zodResolver(rawBsffSchema)(data, context, options);
     }
@@ -185,7 +187,9 @@ const BsffFormSteps = ({
 
   useEffect(() => {
     if (bsffState?.id && bsffQuery.data?.bsff?.id) {
-      methods.reset(bsffState);
+      methods.reset(bsffState, {
+        keepErrors: true
+      });
     }
   }, [bsffState, bsffQuery.data?.bsff?.id, methods]);
 
@@ -424,6 +428,10 @@ const BsffFormSteps = ({
   async function saveBsffTransporter(t: any): Promise<string> {
     const { id, takenOverAt, transport, ...input } = t;
 
+    const isExempted =
+      input.recepisse?.isExempted ||
+      isForeignVat(input?.company?.vatNumber) ||
+      transport?.mode !== TransportMode.Road;
     const cleanInput: BsffTransporterInput = {
       ...input,
       transport: {
@@ -432,9 +440,10 @@ const BsffFormSteps = ({
       },
       recepisse: {
         ...input.recepisse,
-        ...(input.recepisse?.isExempted ||
-        isForeignVat(input?.company?.vatNumber) ||
-        transport?.mode !== TransportMode.Road
+        validityLimit: !!input.recepisse?.validityLimit
+          ? new Date(input.recepisse.validityLimit).toISOString()
+          : null,
+        ...(isExempted
           ? {
               number: null,
               validityLimit: null,

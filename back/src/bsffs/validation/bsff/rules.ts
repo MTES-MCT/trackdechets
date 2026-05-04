@@ -397,7 +397,7 @@ export const bsffEditionRules: BsffEditionRules = {
   wasteDescription: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "La description du déchet",
+    readableFieldName: "La dénomination usuelle du déchet",
     path: ["waste", "description"]
   },
   wasteAdr: {

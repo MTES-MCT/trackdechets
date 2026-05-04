@@ -168,7 +168,7 @@ describe("Mutation.createDraftBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
+          "Vous ne pouvez pas crée un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
       })
     ]);
   });
