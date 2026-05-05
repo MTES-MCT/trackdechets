@@ -99,7 +99,7 @@ function BsffPackagingForm({
         </div>
         <div className="fr-col-md-4 fr-col-12">
           <NonScrollableInput
-            label={`Volume en litres (optionnel)`}
+            label={`Volume en litres`}
             className="fr-mb-2w"
             disabled={disabled}
             state={errors?.volume && touched?.volume ? "error" : "default"}

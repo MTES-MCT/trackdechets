@@ -37,12 +37,14 @@ type Props = {
   value: any;
   onChange: (company: any) => void;
   filter?: (companies: CompanyPrivate[]) => CompanyPrivate[];
+  disabled: boolean;
 };
 
 export default function MyBsffCompanySelector({
   value,
   onChange,
-  filter
+  filter,
+  disabled
 }: Props) {
   const company = value ?? getInitialCompany();
 
@@ -90,11 +92,11 @@ export default function MyBsffCompanySelector({
     <Select
       className="fr-col-md-8 fr-mt-2w"
       label="Établissement concerné"
+      disabled={disabled}
       nativeSelectProps={{
-        value: company.orgId,
+        value: company.orgId ?? company.siret,
         onChange: e => {
           const selected = companies.find(c => c.orgId === e.target.value);
-
           selected
             ? onCompanySelect(selected)
             : onCompanySelect(getInitialCompany());
@@ -104,7 +106,7 @@ export default function MyBsffCompanySelector({
       <option value="">Sélectionner un de vos établissements</option>
 
       {companies.map(c => {
-        const name = c.givenName || c.name;
+        const name = c.givenName && c.givenName !== "" ? c.givenName : c.name;
         return (
           <option key={c.orgId} value={c.orgId}>
             {name} - {c.orgId}

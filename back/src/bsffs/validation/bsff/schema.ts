@@ -106,10 +106,7 @@ const rawBsffSchema = z.object({
   createdAt: z.date().nullish(),
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
-  type: z
-    .nativeEnum(BsffType)
-    .nullish()
-    .transform(t => t ?? BsffType.COLLECTE_PETITES_QUANTITES),
+  type: z.nativeEnum(BsffType).default(BsffType.COLLECTE_PETITES_QUANTITES),
   emitterCompanyName: z.string().max(250).nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().max(250).nullish(),
