@@ -284,7 +284,15 @@ const BsffFormSteps = ({
     return Promise.all(
       transporters
         .filter(t => t && (t.company?.siret || t.company?.vatNumber))
-        .map(saveBsffTransporter)
+        .map(async t => {
+          const isSigned = !!t.transport?.signature?.date;
+
+          if (t.id && isSigned) {
+            return t.id;
+          }
+
+          return saveBsffTransporter(t);
+        })
     );
   }
   async function getFicheInterventionIds(values: ZodBsff) {
@@ -425,13 +433,17 @@ const BsffFormSteps = ({
       throw err;
     }
   }
+
   async function saveBsffTransporter(t: any): Promise<string> {
-    const { id, takenOverAt, transport, ...input } = t;
+    const { id, transport, ...input } = t;
+
+    const isSigned = !!t.transport?.signature?.date;
 
     const isExempted =
       input.recepisse?.isExempted ||
       isForeignVat(input?.company?.vatNumber) ||
       transport?.mode !== TransportMode.Road;
+
     const cleanInput: BsffTransporterInput = {
       ...input,
       transport: {
@@ -454,7 +466,7 @@ const BsffFormSteps = ({
     };
 
     if (id) {
-      if (!takenOverAt) {
+      if (!isSigned) {
         await updateBsffTransporter({
           variables: { id, input: cleanInput }
         });

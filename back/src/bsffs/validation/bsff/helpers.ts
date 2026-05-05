@@ -94,7 +94,7 @@ export async function graphQlInputToZodBsff(
 
   return safeInput({
     ...flatBsffInput,
-    type,
+    type: type ?? undefined,
     wasteCode: wasteCode as ZodWasteCodeEnum,
     transporters,
     packagings: packagings

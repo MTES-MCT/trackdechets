@@ -9,6 +9,16 @@ export const GET_BSFF_FORM = gql`
   query Bsff($id: ID!) {
     bsff(id: $id) {
       ...FullBsff
+      metadata {
+        errors {
+          message
+          path
+          requiredFor
+        }
+        fields {
+          sealed
+        }
+      }
     }
   }
   ${FullBsffFragment}

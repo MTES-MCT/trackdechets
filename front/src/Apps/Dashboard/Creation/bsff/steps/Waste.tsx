@@ -146,6 +146,7 @@ const WasteBsff = () => {
             onChange={company => {
               setValue("emitter.company", company);
             }}
+            disabled={sealedFields.includes("packagings")}
           />
         )}
 
@@ -164,12 +165,11 @@ const WasteBsff = () => {
                   type={bsffType}
                   bsffId={id}
                   emitterCompany={emitterCompany}
+                  disabled={sealedFields.includes("packagings")}
                 />
               </>
             )}
-
             <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
-
             <Select
               className="fr-col-md-8 fr-mt-2w"
               label="Code déchet"
@@ -187,7 +187,6 @@ const WasteBsff = () => {
                 </option>
               ))}
             </Select>
-
             <Input
               className="fr-col-md-8"
               label="Dénomination usuelle du déchet"
@@ -200,7 +199,6 @@ const WasteBsff = () => {
                 formState.errors.waste?.["description"]?.message
               }
             />
-
             <Input
               className="fr-col-md-8 fr-mt-4w"
               label="Mentions au titre des règlements ADR, RID, ADNR, IMDG (optionnel)"
@@ -223,9 +221,7 @@ const WasteBsff = () => {
               fieldName="packagings"
               packagingTypes={bsffPackagingTypes}
             />
-
             <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>
-
             <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
               <div className="fr-col-md-3">
                 <NonScrollableInput

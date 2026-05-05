@@ -24,12 +24,14 @@ type Props = {
   type: BsffType;
   bsffId: string;
   emitterCompany: any;
+  disabled: boolean;
 };
 
 function BsffSelectableWasteTableWrapper({
   type,
   bsffId,
-  emitterCompany
+  emitterCompany,
+  disabled
 }: Props) {
   const { watch, setValue, control } = useFormContext();
 
@@ -279,6 +281,7 @@ function BsffSelectableWasteTableWrapper({
     return (
       <>
         <BsffSelectableWasteTable
+          disabled={disabled}
           onClick={item => {
             const isSelected = forwarding?.id === item.id;
 
@@ -315,6 +318,7 @@ function BsffSelectableWasteTableWrapper({
     return (
       <>
         <BsffSelectableWasteTable
+          disabled={disabled}
           onClick={item => {
             const isSelected = repackaging.find(r => r.id === item.id);
 
@@ -365,6 +369,7 @@ function BsffSelectableWasteTableWrapper({
   return (
     <>
       <BsffSelectableWasteTable
+        disabled={disabled}
         onClick={item => {
           const index = grouping.findIndex(g => g.id === item.id); // ← id
           const isSelected = index >= 0;

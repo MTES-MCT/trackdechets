@@ -23,6 +23,7 @@ type SelectableWasteTableProps = {
   wasteCodeFilter: string;
   numeroFilter: string;
   emetteurSiretFilter: string;
+  disabled: boolean;
 
   setIdFilter: (id: string) => void;
   setWasteCodeFilter: (wasteCode: string) => void;
@@ -43,7 +44,8 @@ export default function BsffSelectableWasteTable({
   setIdFilter,
   setNumeroFilter,
   setWasteCodeFilter,
-  setEmetteurSiretFilter
+  setEmetteurSiretFilter,
+  disabled
 }: SelectableWasteTableProps) {
   const hasMore = bsffPackagings.length > 0 && total > bsffPackagings.length;
 
@@ -117,7 +119,7 @@ export default function BsffSelectableWasteTable({
               nativeInputProps: {
                 checked,
                 onChange: () => onClick(bsffPackaging),
-                disabled: isDisabled
+                disabled: disabled ? true : isDisabled
               }
             }
           ]}

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useContext } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -8,6 +8,7 @@ import { BsffType } from "@td/codegen-ui";
 import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DsfrfWorkSiteAddress from "../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
+import { SealedFieldsContext } from "../../../../Apps/Dashboard/Creation/context";
 
 type Props = {
   orgId?: string;
@@ -36,6 +37,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   const weight = watch(`${fieldName}.weight`);
   const isPrivate = watch(privateField);
   const selectedOrgId = watch(`${companyField}.orgId`);
+  const sealedFields = useContext(SealedFieldsContext);
 
   React.useEffect(() => {
     if (isPrivate) {
@@ -50,17 +52,27 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
   React.useEffect(() => {
     if (isInstallationType && emitterCompany) {
-      setValue(companyField, {
-        orgId: emitterCompany.orgId,
-        siret: emitterCompany.siret,
-        name: emitterCompany.name,
-        address: emitterCompany.address,
-        contact: emitterCompany.contact,
-        phone: emitterCompany.phone,
-        mail: emitterCompany.mail
-      });
+      const emitterIdentifier = emitterCompany.orgId || emitterCompany.siret;
+      if (!emitterIdentifier) return;
+
+      const current = watch(companyField);
+      const currentIdentifier = current?.orgId || current?.siret;
+      const isSameOrEmpty =
+        !currentIdentifier || currentIdentifier === emitterIdentifier;
+
+      if (isSameOrEmpty) {
+        setValue(companyField, {
+          orgId: emitterCompany.orgId,
+          siret: emitterCompany.siret,
+          name: emitterCompany.name,
+          address: emitterCompany.address,
+          contact: emitterCompany.contact,
+          phone: emitterCompany.phone,
+          mail: emitterCompany.mail
+        });
+      }
     }
-  }, [isInstallationType, emitterCompany, setValue, companyField]);
+  }, [isInstallationType, emitterCompany]);
 
   return (
     <div className="fr-col-12">
@@ -124,7 +136,9 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
           <CompanySelectorWrapper
             orgId={orgId}
-            selectedCompanyOrgId={emitterCompany?.orgId}
+            selectedCompanyOrgId={
+              watch(`${companyField}.orgId`) ?? watch(`${companyField}.siret`)
+            }
             disabled
             onCompanySelected={() => {}}
           />
@@ -158,6 +172,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       onBlur: field.onBlur,
                       ref: field.ref
                     }}
+                    disabled={sealedFields.includes("ficheInterventions")}
                   />
                 )}
               />
@@ -179,6 +194,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       onBlur: field.onBlur,
                       ref: field.ref
                     }}
+                    disabled={sealedFields.includes("ficheInterventions")}
                   />
                 )}
               />
@@ -201,6 +217,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                         field.onChange(val === "" ? undefined : Number(val));
                       }
                     }}
+                    disabled={sealedFields.includes("ficheInterventions")}
                   />
                 )}
               />
@@ -223,6 +240,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                 label="Le détenteur est un particulier"
                 checked={field.value ?? false}
                 onChange={checked => setValue(privateField, checked)}
+                disabled={sealedFields.includes("ficheInterventions")}
               />
             )}
           />
@@ -237,7 +255,11 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       control={control}
                       name={`${companyField}.name`}
                       render={({ field }) => (
-                        <Input label="Nom et prénom" nativeInputProps={field} />
+                        <Input
+                          label="Nom et prénom"
+                          nativeInputProps={field}
+                          disabled={sealedFields.includes("ficheInterventions")}
+                        />
                       )}
                     />
                   </div>
@@ -251,6 +273,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       <Input
                         label="Personne à contacter"
                         nativeInputProps={field}
+                        disabled={sealedFields.includes("ficheInterventions")}
                       />
                     )}
                   />
@@ -268,6 +291,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                     setValue(`${companyField}.postalCode`, details.postcode);
                   }}
                   designation="du détenteur"
+                  disabled={sealedFields.includes("ficheInterventions")}
                 />
               </div>
 
@@ -280,6 +304,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       <Input
                         label="Téléphone (optionnel)"
                         nativeInputProps={field}
+                        disabled={sealedFields.includes("ficheInterventions")}
                       />
                     )}
                   />
@@ -290,7 +315,11 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                     control={control}
                     name={`${companyField}.mail`}
                     render={({ field }) => (
-                      <Input label="Courriel" nativeInputProps={field} />
+                      <Input
+                        label="Courriel"
+                        nativeInputProps={field}
+                        disabled={sealedFields.includes("ficheInterventions")}
+                      />
                     )}
                   />
                 </div>
@@ -316,6 +345,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       setValue(`${companyField}.phone`, company.contactPhone);
                       setValue(`${companyField}.mail`, company.contactEmail);
                     }}
+                    disabled={sealedFields.includes("ficheInterventions")}
                   />
                 </div>
               </div>

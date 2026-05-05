@@ -287,6 +287,13 @@ function requireTransporterRecepisse(transporter: ZodBsffTransporter) {
   );
 }
 
+const packagingSealedFromEmissionExceptForEmitter: GetBsffSignatureTypeFn<
+  ZodBsffPackaging
+> = (_, context) => {
+  const { isEmitter } = context!.userFunctions;
+  return isEmitter ? "TRANSPORT" : "EMISSION";
+};
+
 /**
  * Régle de verrouillage des champs définie à partir d'une fonction.
  * Un champ appliquant cette règle est verrouillé à partir de la
@@ -560,45 +567,45 @@ export const bsffEditionRules: BsffEditionRules = {
 
 export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
   type: {
-    sealed: { from: "EMISSION" },
+    sealed: { from: packagingSealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "Le type de contenant",
     path: ["type"]
   },
   other: {
-    sealed: { from: "EMISSION" },
+    sealed: { from: packagingSealedFromEmissionExceptForEmitter },
     readableFieldName: "Le type de contenant",
     path: ["other"]
   },
   volume: {
-    sealed: { from: "EMISSION" },
+    sealed: { from: packagingSealedFromEmissionExceptForEmitter },
     // En attente de https://favro.com/organization/ab14a4f0460a99a9d64d4945/2c84e07578945e0ee8fb61f3?card=tra-14567
     // required: { from: "EMISSION" }
     readableFieldName: "Le volume du contenant",
     path: ["volume"]
   },
   weight: {
-    sealed: { from: "EMISSION" },
+    sealed: { from: packagingSealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "La masse du contenu",
     path: ["weight"]
   },
   emissionNumero: {
-    sealed: { from: "EMISSION" },
+    sealed: { from: packagingSealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "Le numéro de contenant à l'émission",
     path: ["numero"]
   },
   numero: {
     sealed: {
-      from: "EMISSION"
+      from: packagingSealedFromEmissionExceptForEmitter
     },
     required: { from: "EMISSION" },
     readableFieldName: "Le numéro de contenant",
     path: ["numero"]
   },
   previousPackagings: {
-    sealed: { from: "EMISSION" }
+    sealed: { from: packagingSealedFromEmissionExceptForEmitter }
   }
 };
 
@@ -656,30 +663,6 @@ export const getRequiredAndSealedFieldPaths = async (
       }
     }
   }
-
-  const packagings = bsff.packagings ?? [];
-  for (let i = 0; i < packagings.length; i++) {
-    const bsffPackaging = packagings[i];
-    for (const bsffPackagingField of Object.keys(bsffPackagingEditionRules)) {
-      const { sealed: bsffPackagingSealed, path: bsffPackagingPath } =
-        bsffPackagingEditionRules[
-          bsffPackagingField as keyof BsffPackagingEditableFields
-        ];
-      if (bsffPackagingSealed && bsffPackagingPath) {
-        const isSealed = isBsffPackagingFieldSealed(
-          bsffPackagingSealed,
-          bsffPackaging,
-          currentSignatures
-        );
-        if (isSealed) {
-          sealedFields.push(
-            ["packagings", `${i}`].concat(bsffPackagingPath) as EditionRulePath
-          );
-        }
-      }
-    }
-  }
-
   return {
     sealed: sealedFields
   };
@@ -901,13 +884,4 @@ export function isBsffPackagingFieldRequired(
   signatures: AllBsffSignatureType[]
 ) {
   return isRuleApplied(rule, bsffPackaging, signatures);
-}
-
-function isBsffPackagingFieldSealed(
-  rule: EditionRule<ZodBsffPackaging>,
-  bsffPackaging: ZodBsffPackaging,
-  signatures: AllBsffSignatureType[],
-  context?: RuleContext<ZodBsffPackaging>
-) {
-  return isRuleApplied(rule, bsffPackaging, signatures, context);
 }
