@@ -77,8 +77,7 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
     ...user,
     // companies are resolved through a separate resolver (User.companies)
     companies: [],
-    featureFlags: [],
-    totpEnabled: !!user.totpSeed && !!user.activatedAt
+    featureFlags: []
   };
 };
 

@@ -45,11 +45,6 @@ describe("changePassword", () => {
     userMock.mockResolvedValueOnce({
       password: hashedPassword
     });
-    updateUserMock.mockResolvedValueOnce({
-      id: "userId",
-      totpSeed: null,
-      activatedAt: null
-    });
 
     await changePassword("userId", {
       oldPassword: "oldPassword",

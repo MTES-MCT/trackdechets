@@ -46,8 +46,7 @@ export async function changePasswordFn(
     ...updatedUser,
     // companies are resolved through a separate resolver (User.companies)
     companies: [],
-    featureFlags: [],
-    totpEnabled: !!updatedUser?.totpSeed && !!updatedUser?.activatedAt
+    featureFlags: []
   };
 }
 

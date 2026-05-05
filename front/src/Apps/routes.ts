@@ -106,7 +106,6 @@ const routes = {
     index: "/account",
     info: "/account/info",
     notifications: "/account/notifications",
-    authentication: "/account/authentication",
     // Old routes to keep integrations from breaking
     companies: {
       create: {
@@ -245,7 +244,6 @@ export const titles = {
   "/account": "Mon compte — Trackdéchets",
   "/account/info": "Informations sur mon compte — Trackdéchets",
   "/account/notifications": "Mes notifications — Trackdéchets",
-  "/account/authentication": "Authentification — Trackdéchets",
   "/account/companies/new":
     "Ajouter un établissement producteur de déchets — Trackdéchets",
   "/account/companies/professional":

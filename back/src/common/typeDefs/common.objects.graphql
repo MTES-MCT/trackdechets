@@ -46,7 +46,4 @@ type User {
   trackingConsent: Boolean!
 
   trackingConsentUntil: DateTime
-
-  "Indique si l'authentification TOTP est activée sur le compte"
-  totpEnabled: Boolean!
 }
