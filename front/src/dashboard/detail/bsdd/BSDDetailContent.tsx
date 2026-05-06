@@ -310,7 +310,7 @@ const Broker = ({ broker }) => (
 );
 
 const Intermediary = ({ intermediary }) => (
-  <div className={styles.detailColumns}>
+  <div className={styles.detailIntermediate}>
     <div className={styles.detailGrid}>
       <dt>Établissement intermédiaire</dt>
       <dd>{intermediary?.name}</dd>
@@ -1120,7 +1120,7 @@ export default function BSDDetailContent({
             </TabPanel>
             {/* Intermdiaries tab panel */}
             {Boolean(form?.intermediaries?.length) && (
-              <TabPanel className={styles.detailTabPanel}>
+              <TabPanel className={styles.detailIntermediaryPanel}>
                 {form?.intermediaries?.map(intermediary => (
                   <Intermediary intermediary={intermediary} />
                 ))}

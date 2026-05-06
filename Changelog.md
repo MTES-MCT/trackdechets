@@ -5,6 +5,24 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2026.05.1] 05/05/2026
+
+#### :nail_care: Améliorations
+
+- BSFF => Refonte & DSFR :
+  [PR 4735] (https://github.com/MTES-MCT/trackdechets/pull/4735),
+  [PR 4746] (https://github.com/MTES-MCT/trackdechets/pull/4746) ,
+  [PR 4750] (https://github.com/MTES-MCT/trackdechets/pull/4750) ,
+  [PR 4751] (https://github.com/MTES-MCT/trackdechets/pull/4751)
+- Trackdéchets : Créer une liste de Codes déchets Bâle sur le même principe que la liste des codes déchets [PR 4737] (https://github.com/MTES-MCT/trackdechets/pull/4737)
+- BSDD : Permettre l'ajout de 2 intermédiaires supplémentaires - ÉTAPE 1 [PR 4738] (https://github.com/MTES-MCT/trackdechets/pull/4738)
+- BSDD : Permettre de modifier les intermédiaires jusqu'à la signature de la réception par la destination - ÉTAPE 2 [PR 4741] (https://github.com/MTES-MCT/trackdechets/pull/4741)
+
+#### :bug: Corrections de bugs
+
+- BSDA : Régression : impossible d’ajouter/modifier une installation d’entreposage provisoire (TTR) après signature de l’entreprise de travaux et avant signature du transporteur [PR 4734] (https://github.com/MTES-MCT/trackdechets/pull/4734)
+- Registre - Permettre à un établissement ayant le profil "Installation de valorisation de terres et sédiments" d’accéder à l’export du registre réglementaire entrant et sortant [PR 4748] (https://github.com/MTES-MCT/trackdechets/pull/4748)
+
 # [2026.04.1] 07/04/2026
 
 #### :nail_care: Améliorations

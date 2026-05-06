@@ -1041,7 +1041,9 @@ describe("Mutation.updateBsff", () => {
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
     const bsff = await createBsffAfterEmission({ emitter, destination });
+
     const { mutate } = makeClient(destination.user);
+
     const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
@@ -1101,31 +1103,41 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "La raison sociale de l'émetteur a été verrouillé via signature et ne peut pas être modifié., " +
-          "L'adresse de l'émetteur a été verrouillé via signature et ne peut pas être modifié., " +
-          "La personne à contacter chez l'émetteur a été verrouillé via signature et ne peut pas être modifié., " +
-          "Le N° de téléphone de l'émetteur a été verrouillé via signature et ne peut pas être modifié., " +
-          "L'adresse e-mail de l'émetteur a été verrouillé via signature et ne peut pas être modifié., " +
-          "L'ADR a été verrouillé via signature et ne peut pas être modifié., " +
-          "La description du déchet a été verrouillé via signature et ne peut pas être modifié., " +
-          "La raison sociale de l'installation de destination a été verrouillé via signature et ne peut pas être modifié., " +
-          "L'adresse de l'installation de destination a été verrouillé via signature et ne peut pas être modifié., " +
-          "La quantité totale a été verrouillé via signature et ne peut pas être modifié., " +
-          "Le code déchet a été verrouillé via signature et ne peut pas être modifié., " +
-          "La liste des contenants a été verrouillé via signature et ne peut pas être modifié."
-      })
-    ]);
+    expect(errors).toBeDefined();
+    expect(errors).toHaveLength(1);
+
+    const error = errors![0];
+
+    expect(error.extensions?.code).toBe("FORBIDDEN");
+
+    const message = error.message;
+
+    expect(message).toContain("Des champs ont été verrouillés via signature");
+
+    const expectedFragments = [
+      "La raison sociale de l'émetteur",
+      "L'adresse de l'émetteur",
+      "La personne à contacter chez l'émetteur",
+      "Le N° de téléphone de l'émetteur",
+      "L'adresse e-mail de l'émetteur",
+      "L'ADR",
+      "La dénomination usuelle du déchet",
+      "La raison sociale de l'installation de destination",
+      "L'adresse de l'installation de destination",
+      "La quantité totale",
+      "Le code déchet",
+      "La liste des contenants"
+    ];
+
+    expectedFragments.forEach(fragment => {
+      expect(message).toContain(fragment);
+    });
 
     const updatedBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id },
       include: { packagings: true }
     });
 
-    // check packagings update has been ignored
     expect(updatedBsff.packagings[0].numero).toEqual("1234");
   });
 

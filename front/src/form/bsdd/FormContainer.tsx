@@ -26,6 +26,7 @@ export default function FormContainer() {
                 (!!form.emittedAt && !isEmitter));
 
             const disabledAfterTransport = !!form && !!form.takenOverAt;
+            const intermediariesDisabled = !!form?.receivedAt;
 
             return (
               <>
@@ -41,7 +42,12 @@ export default function FormContainer() {
                   disabled={disabledAfterEmission}
                 />
                 <StepContainer
-                  component={Recipient}
+                  component={props => (
+                    <Recipient
+                      {...props}
+                      intermediariesDisabled={intermediariesDisabled}
+                    />
+                  )}
                   title="Destination du déchet"
                   disabled={disabledAfterEmission}
                 />

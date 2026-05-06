@@ -15,11 +15,13 @@ import "../Dashboard/dashboard.scss";
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
 import AccountNotifications from "./AccountNotifications/AccountNotifications";
+import AccountAuthentication from "./AccountAuthentication/AccountAuthentication";
 
 export const GET_ME = gql`
   {
     me {
       ...AccountInfoFragment
+      totpEnabled
     }
   }
   ${AccountInfo.fragments.me}
@@ -69,6 +71,15 @@ export default function Account() {
               element={
                 <AccountContentWrapper title="Applications et API">
                   <AccountApplications />
+                </AccountContentWrapper>
+              }
+            />
+
+            <Route
+              path={toRelative(routes.account.authentication)}
+              element={
+                <AccountContentWrapper title="Authentification">
+                  <AccountAuthentication totpEnabled={data.me.totpEnabled} />
                 </AccountContentWrapper>
               }
             />

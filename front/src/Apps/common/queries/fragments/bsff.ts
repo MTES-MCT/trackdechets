@@ -103,12 +103,11 @@ export const FicheInterventionFragment = gql`
     detenteur {
       isPrivateIndividual
       company {
-        name
-        siret
-        orgId
+        ...CompanyFragment
       }
     }
   }
+  ${companyFragment}
 `;
 
 export const FullBsffFragment = gql`

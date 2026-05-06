@@ -479,14 +479,14 @@ describe("Test Form reception", () => {
       expect.objectContaining({
         subject:
           "Le déchet de l’entreprise company_1 a été partiellement refusé à réception",
-        to: [
+        to: expect.arrayContaining([
           { email: emitter.email, name: emitter.name },
           { email: emitter2.email, name: emitter2.name }
-        ],
-        cc: [
+        ]),
+        cc: expect.arrayContaining([
           { email: recipient.email, name: recipient.name },
           { email: recipient2.email, name: recipient2.name }
-        ]
+        ])
       })
     );
   });

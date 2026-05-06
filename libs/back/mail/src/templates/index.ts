@@ -14,6 +14,18 @@ const { UI_HOST } = process.env;
 // URL permettant de gérer les préférences de notifications par e-mail
 const handlePreferencesUrl = `${UI_HOST}/account/notifications`;
 
+export const onTotpActivated: MailTemplate<{ name: string }> = {
+  subject: "Double authentification activée sur votre compte Trackdéchets",
+  body: mustacheRenderer("totp-activated.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const onTotpDisabled: MailTemplate<{ name: string }> = {
+  subject: "Double authentification désactivée sur votre compte Trackdéchets",
+  body: mustacheRenderer("totp-disabled.html"),
+  templateId: templateIds.LAYOUT
+};
+
 export const onSignup: MailTemplate<{ activationHash: string }> = {
   subject: "Activer votre compte sur Trackdéchets",
   body: mustacheRenderer("confirmation-de-compte.html"),

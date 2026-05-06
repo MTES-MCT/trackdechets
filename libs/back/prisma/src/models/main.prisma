@@ -931,6 +931,7 @@ model User {
   trackingConsentUntil DateTime?
 
   AccessToken           AccessToken[]
+  totpRecoveryCodes     TotpRecoveryCode[]
   applications          Application[]
   companyAssociations   CompanyAssociation[]
   featureFlags          FeatureFlag[]
@@ -959,6 +960,15 @@ model User {
   registryChangeAggregates   RegistryChangeAggregate[]
   registryTexsAnalysisFiles  RegistryTexsAnalysisFile[]
   adminRequests              AdminRequest[]             @relation("AdminRequestUser")
+}
+
+model TotpRecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum GovernmentPermission {

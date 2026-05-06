@@ -149,7 +149,7 @@ export async function checkCanCreate(user: User, bsffInput: BsffInput) {
     user,
     authorizedOrgIds,
     Permission.BsdCanCreate,
-    "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
+    "Vous ne pouvez pas crée un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
   );
 }
 

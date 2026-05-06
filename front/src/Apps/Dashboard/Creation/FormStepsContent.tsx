@@ -24,10 +24,10 @@ interface FormStepsContentProps {
   draftCtaLabel: string;
   mainCtaLabel: string;
   tabsContent: {
-    waste: React.JSX.Element;
-    emitter: React.JSX.Element;
-    transporter: React.JSX.Element;
-    destination: React.JSX.Element;
+    waste?: React.JSX.Element;
+    emitter?: React.JSX.Element;
+    transporter?: React.JSX.Element;
+    destination?: React.JSX.Element;
   };
   setPublishErrors: (normalizedErrors: NormalizedError[]) => void;
   errorTabIds?: TabId[];
@@ -76,10 +76,17 @@ const FormStepsContent = ({
       });
   };
 
-  const onErrors = () => {
+  const onErrors = errors => {
+    console.log(errors);
+
+    if (!errors) return;
+
+    Object.entries(errors).forEach(([field, error]) => {
+      console.log(`${field}`, error);
+    });
+
     scrollToTop();
   };
-
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
     scrollToTop();
@@ -100,7 +107,7 @@ const FormStepsContent = ({
               isNextStepDisabled={selectedTabId === lastTabId}
               onSubmit={useformMethods.handleSubmit(
                 (data, e) => onSubmit(data, e),
-                () => onErrors()
+                errors => onErrors(errors) // ✅ IMPORTANT
               )}
               onCancel={() => navigate(-1)}
               onPrevTab={() => {

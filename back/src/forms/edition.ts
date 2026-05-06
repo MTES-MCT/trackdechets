@@ -159,7 +159,7 @@ export const editionRules: {
   grouping: "EMISSION",
   transporters: "RECEPTION",
   forwardedIn: "EMISSION",
-  intermediaries: "EMISSION"
+  intermediaries: "RECEPTION"
 };
 
 export async function checkEditionRules(

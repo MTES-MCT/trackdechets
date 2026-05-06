@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { FormShape } from "../builder/types";
 import { ReportFor } from "../common/ReportFor";
+import { BaleCodeTreeSelector } from "../common/BaleCodeTreeSelector";
 import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
 import {
@@ -84,15 +85,19 @@ export const incomingWasteFormShape: FormShape = [
         style: { className: "fr-col-12 fr-col-md-10" }
       },
       {
-        name: "wasteCodeBale",
-        shape: "generic",
-        label: Labels.wasteCodeBale,
-        infoLabel: InfoLabels.wasteCodeBale,
+        Component: BaleCodeTreeSelector,
+        props: {
+          name: "wasteCodeBale",
+          label: Labels.wasteCodeBale,
+          infoLabel: InfoLabels.wasteCodeBale,
+          required: false
+        },
+        shape: "custom",
+        names: ["wasteCodeBale"],
         validation: {
           wasteCodeBale: optionalString
         },
-        type: "text",
-        style: { className: "fr-col-12 fr-col-md-4" }
+        style: { parentClassName: "fr-grid-row--bottom tw-relative" }
       },
       {
         name: "wastePop",

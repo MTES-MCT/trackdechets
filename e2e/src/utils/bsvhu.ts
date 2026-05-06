@@ -200,7 +200,7 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   await page
     .getByRole("tablist")
     .locator("button")
-    .filter({ hasText: "Destination finale" })
+    .filter({ hasText: "Destinataire" })
     .click();
 
   // Options should have changed
@@ -459,7 +459,7 @@ export const fixAndPublishBsvhu = async (page: Page, { id }) => {
   await page
     .getByRole("tablist")
     .locator("button")
-    .filter({ hasText: "Destination finale" })
+    .filter({ hasText: "Destinataire" })
     .click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
 

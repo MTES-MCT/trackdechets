@@ -84,6 +84,26 @@ type MembershipRequestForAdmin {
   createdAt: DateTime!
 }
 
+"""
+Résultat de l'initialisation de la configuration TOTP.
+Contient le secret en clair (pour saisie manuelle) et l'URL du QR code.
+"""
+type TotpSetup {
+  "Secret TOTP à saisir manuellement si le scan du QR code n'est pas possible"
+  secret: String!
+  "URL otpauth à encoder en QR code côté client"
+  qrCodeUrl: String!
+}
+
+"""
+Codes de récupération TOTP à usage unique.
+Affichés une seule fois lors de l'activation.
+"""
+type TotpRecoveryCodes {
+  "Liste des codes de récupération en clair (affichage unique)"
+  codes: [String!]!
+}
+
 type MembershipRequestEdge {
   cursor: String!
   node: MembershipRequestForAdmin!

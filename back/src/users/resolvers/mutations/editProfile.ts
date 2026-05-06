@@ -63,7 +63,8 @@ export async function editProfileFn(
     ...updatedUser,
     // companies are resolved through a separate resolver (User.companies)
     companies: [],
-    featureFlags: []
+    featureFlags: [],
+    totpEnabled: !!updatedUser?.totpSeed && !!updatedUser?.activatedAt
   };
 }
 

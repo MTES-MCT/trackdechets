@@ -11,10 +11,15 @@ import PageTitle from "../PageTitle/PageTitle";
 import A11ySkipLinks from "../A11ySkipLinks/A11ySkipLinks";
 import { ConsentBanner } from "../ConsentBanner/ConsentBanner";
 import { envConfig } from "../../../../common/envConfig";
+import Footer from "./Footer";
 interface AuthProps {
   v2banner?: JSX.Element;
   isAuthenticated?: boolean;
 }
+
+const isProdSandbox =
+  import.meta.env.VITE_ENV_NAME === "production" ||
+  import.meta.env.VITE_ENV_NAME === "sandbox";
 
 const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE, VITE_API_ENDPOINT } =
   envConfig;
@@ -105,6 +110,7 @@ export default function Layout({
       <Outlet />
       <PageTitle />
       <ConsentBanner />
+      {!isProdSandbox && <Footer />}
     </>
   );
 }

@@ -149,7 +149,19 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
     Pick<Mutation, "publishBsff">,
     MutationPublishBsffArgs
   >(PUBLISH_BSFF, {
-    variables: { id: bsd.id }
+    variables: { id: bsd.id },
+    onCompleted: () => {
+      toast.success(`Bordereau ${bsd.id} publié`, {
+        duration: TOAST_DURATION
+      });
+    },
+    onError: err => {
+      toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
+        duration: TOAST_DURATION
+      });
+      const normalizedErrors = handleGraphQlError(err);
+      setPublishErrors(normalizedErrors);
+    }
   });
 
   const [publishBsvhu, { loading: loadingBsvhu, error: errorBsvhu }] =
@@ -177,7 +189,6 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       PUBLISH_BSPAOH,
       {
         variables: { id: bsd.id },
-
         onCompleted: () => {
           toast.success(`Bordereau ${bsd.id} publié`, {
             duration: TOAST_DURATION
@@ -215,15 +226,14 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
         </DraftValidationWrapper>
       );
     }
+
     if (bsd.__typename === "Bsda") {
       return (
         <DraftValidationWrapper
           onClose={onClose}
           onSubmit={async () => {
             const res = await publishBsda({
-              variables: {
-                id: bsd.id
-              }
+              variables: { id: bsd.id }
             });
             if (!res.errors) {
               onClose();
@@ -260,13 +270,31 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
           onClose={onClose}
           onSubmit={async () => {
             const res = await publishBsff();
-            if (!res.errors) {
+            if (!res?.errors) {
               onClose();
             }
           }}
         >
           {loadingBsff && <Loader />}
-          {errorBsff && <NotificationError apolloError={errorBsff} />}
+          {errorBsff && (
+            <>
+              <NotificationError
+                className="action-error"
+                apolloError={errorBsff}
+              />
+              <Link
+                to={generatePath(routes.dashboard.bsffs.edit, {
+                  siret: currentSiret,
+                  id: bsd.id
+                })}
+                className="fr-btn fr-btn--primary"
+                onClick={onClose}
+                state={{ background: location, publishErrors: publishErrors }}
+              >
+                Mettre le bordereau à jour pour le publier
+              </Link>
+            </>
+          )}
         </DraftValidationWrapper>
       );
     }
@@ -278,9 +306,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             onClose={onClose}
             onSubmit={async () => {
               const res = await publishBsvhu({
-                variables: {
-                  id: bsd.id
-                }
+                variables: { id: bsd.id }
               });
               if (!res.errors) {
                 onClose();
@@ -319,9 +345,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             onClose={onClose}
             onSubmit={async () => {
               const res = await publishBspaoh({
-                variables: {
-                  id: bsd.id
-                }
+                variables: { id: bsd.id }
               });
               if (!res.errors) {
                 onClose();
@@ -354,6 +378,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       );
     }
   };
+
   return (
     <TdModal
       isOpen={isOpen}

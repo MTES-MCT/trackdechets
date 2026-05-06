@@ -1599,6 +1599,10 @@ export const EXHAUSTIVE_EXPORT_COLUMNS = {
   intermediary2CompanyName: { label: "Intermédiaire n°2 - Raison sociale" },
   intermediary3CompanySiret: { label: "Intermédiaire n°3 - SIRET" },
   intermediary3CompanyName: { label: "Intermédiaire n°3 - Raison sociale" },
+  intermediary4CompanySiret: { label: "Intermédiaire n°4 - SIRET" },
+  intermediary4CompanyName: { label: "Intermédiaire n°4 - Raison sociale" },
+  intermediary5CompanySiret: { label: "Intermédiaire n°5 - SIRET" },
+  intermediary5CompanyName: { label: "Intermédiaire n°5 - Raison sociale" },
   isDirectSupply: {
     label: "Transport direct (pipeline, convoyeur)",
     format: formatBoolean

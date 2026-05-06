@@ -108,9 +108,10 @@ export const packagingInfo: SchemaOf<Omit<PackagingInfoInput, "__typename">> =
     volume: number()
       .nullable()
       .moreThan(0, "Le volume doit être supérieur à 0"),
+    weight: number().nullable().notRequired(), // ← ajout
+    numero: string().nullable().notRequired(), // ← ajout
     identificationNumbers: array<String>().nullable()
   });
-
 const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
   object().shape({
     siret: string()

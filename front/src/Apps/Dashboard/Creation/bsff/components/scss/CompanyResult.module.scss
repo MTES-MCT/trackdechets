@@ -1,0 +1,42 @@
+.results {
+  list-style: none;
+  padding: 0;
+}
+
+.resultsItem {
+  background-color: #ebeff3;
+  border: 1px solid #ebeff3;
+
+  margin: 10px 0;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+
+  &.clickable {
+    cursor: pointer;
+  }
+
+  .content {
+    flex: 1;
+
+    p,
+    h6 {
+      margin: 0;
+    }
+  }
+
+  .icon {
+    color: #8393a7;
+    font-size: 1.5em;
+  }
+
+  &.clickable:hover .icon,
+  &.isSelected .icon {
+    color: #03bd5b;
+  }
+
+  &.isSelected {
+    border-color: #03bd5b;
+    background-color: #daf5e7;
+  }
+}
