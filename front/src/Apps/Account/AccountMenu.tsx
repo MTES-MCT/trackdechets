@@ -4,6 +4,10 @@ import { NavLink } from "react-router-dom";
 import routes from "../routes";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 
+const isProdSandbox =
+  import.meta.env.VITE_ENV_NAME === "production" ||
+  import.meta.env.VITE_ENV_NAME === "sandbox";
+
 export const AccountMenuContent = () => (
   <>
     <Accordion
@@ -37,18 +41,20 @@ export const AccountMenuContent = () => (
             Notifications
           </NavLink>
         </li>
-        <li className="tw-mb-1">
-          <NavLink
-            to={routes.account.authentication}
-            className={({ isActive }) =>
-              isActive
-                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-                : "sidebarv2__item sidebarv2__item--indented"
-            }
-          >
-            Authentification
-          </NavLink>
-        </li>
+        {!isProdSandbox && (
+          <li className="tw-mb-1">
+            <NavLink
+              to={routes.account.authentication}
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                  : "sidebarv2__item sidebarv2__item--indented"
+              }
+            >
+              Authentification
+            </NavLink>
+          </li>
+        )}
       </ul>
     </Accordion>
 

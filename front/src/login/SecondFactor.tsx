@@ -43,6 +43,10 @@ function Countdown({ timestamp }: { timestamp: number }) {
   return <span>dans {formatDuration(seconds)}.</span>;
 }
 
+const isProdSandbox =
+  import.meta.env.VITE_ENV_NAME === "production" ||
+  import.meta.env.VITE_ENV_NAME === "sandbox";
+
 export default function SecondFactor() {
   const location = useLocation();
   const [totp, setTotp] = useState("");
@@ -155,15 +159,17 @@ export default function SecondFactor() {
               />
 
               {/* TRA-17923 : ce bouton ouvrira la modale de récupération */}
-              <button
-                type="button"
-                className="fr-link fr-mb-2w"
-                onClick={() => {
-                  /* TODO TRA-17923 */
-                }}
-              >
-                Je n'ai pas accès à l'application
-              </button>
+              {!isProdSandbox && (
+                <button
+                  type="button"
+                  className="fr-link fr-mb-2w"
+                  onClick={() => {
+                    /* TODO TRA-17923 */
+                  }}
+                >
+                  Je n'ai pas accès à l'application
+                </button>
+              )}
             </div>
           </div>
 
