@@ -9,7 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
-- BSFF => Refonte & DSFR [PR 4735] (https://github.com/MTES-MCT/trackdechets/pull/4735),
+- BSFF => Refonte & DSFR :
+  [PR 4735] (https://github.com/MTES-MCT/trackdechets/pull/4735),
   [PR 4746] (https://github.com/MTES-MCT/trackdechets/pull/4746) ,
   [PR 4750] (https://github.com/MTES-MCT/trackdechets/pull/4750) ,
   [PR 4751] (https://github.com/MTES-MCT/trackdechets/pull/4751)
