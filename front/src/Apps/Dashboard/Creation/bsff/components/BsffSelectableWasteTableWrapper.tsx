@@ -33,14 +33,13 @@ function BsffSelectableWasteTableWrapper({
   emitterCompany,
   disabled
 }: Props) {
-  const { watch, setValue, control } = useFormContext();
+  const { watch, setValue, control, getValues } = useFormContext();
 
   const [idFilter, setIdFilter] = useState("");
   const [wasteCodeFilter, setWasteCodeFilter] = useState("");
   const [numeroFilter, setNumeroFilter] = useState("");
   const [emetteurSiretFilter, setEmetteurSiretFilter] = useState("");
   const [debouncing, setDebouncing] = useState(false);
-
   const destinationSiret = emitterCompany?.siret;
 
   const { append, remove } = useFieldArray({
@@ -334,9 +333,15 @@ function BsffSelectableWasteTableWrapper({
             }
 
             setValue("repackaging", updated);
-            setValue("packagings", updated.flatMap(mapPackaging));
 
-            // ✅ Recalcul du poids total
+            const currentPackagings: any[] = getValues("packagings") ?? [];
+            const manualPackagings = currentPackagings.filter(
+              (p: any) => !p.id
+            );
+
+            const tablePackagings = updated.flatMap(mapPackaging);
+            setValue("packagings", [...tablePackagings, ...manualPackagings]);
+
             setValue(
               "weight.value",
               updated.reduce(
