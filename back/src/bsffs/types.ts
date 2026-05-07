@@ -10,10 +10,10 @@ export type BsffWithTransporters = Prisma.BsffGetPayload<{
 
 export const BsffWithPackagingsInclude = {
   packagings: {
-      include: {
-        ficheInterventions: true
-      }
+    include: {
+      ficheInterventions: true
     }
+  }
 } satisfies Prisma.BsffInclude;
 
 export type BsffWithPackagings = Prisma.BsffGetPayload<{

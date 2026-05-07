@@ -606,8 +606,7 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
   },
   previousPackagings: {
     sealed: { from: packagingSealedFromEmissionExceptForEmitter }
-  }
-  ,
+  },
   ficheInterventions: {
     sealed: {
       from: "EMISSION"
