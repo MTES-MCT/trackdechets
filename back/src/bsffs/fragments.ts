@@ -65,6 +65,9 @@ export const fullBsff = gql`
       volume
       numero
       weight
+      ficheInterventions {
+        ...FullFicheIntervention
+      }
       acceptation {
         weight
         status

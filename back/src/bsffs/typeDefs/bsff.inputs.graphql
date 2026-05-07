@@ -250,6 +250,8 @@ input BsffPackagingInput {
   Min: 0kg
   """
   weight: Float!
+  "Fiches d'intervention associées"
+  ficheInterventions: [ID!]
 }
 
 input UpdateBsffPackagingInput {

@@ -27,7 +27,9 @@ export type ZodBsffTransporterTransformer = (
 
 export const BsffForParsingInclude = {
   transporters: true,
-  packagings: { include: { previousPackagings: true } },
+  packagings: {
+    include: { previousPackagings: true, ficheInterventions: true }
+  },
   ficheInterventions: true
 } satisfies Prisma.BsffInclude;
 

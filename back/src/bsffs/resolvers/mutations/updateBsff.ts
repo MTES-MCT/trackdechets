@@ -69,12 +69,21 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     data.packagings = {
       deleteMany: {},
       create: (packagings ?? []).map(packaging => {
-        const { id, previousPackagings, ...packagingData } = packaging;
+        const { id, previousPackagings, ficheInterventions, ...packagingData } =
+          packaging;
+
         return {
           ...packagingData,
           previousPackagings: {
             connect: (previousPackagings ?? []).map(id => ({ id }))
-          }
+          },
+          ...(ficheInterventions
+            ? {
+                ficheInterventions: {
+                  connect: ficheInterventions.map((id: string) => ({ id }))
+                }
+              }
+            : {})
         };
       })
     };
