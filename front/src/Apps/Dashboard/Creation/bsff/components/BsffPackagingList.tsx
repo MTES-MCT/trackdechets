@@ -4,115 +4,126 @@ import {
   PackagingInfoInput,
   Packagings
 } from "@td/codegen-ui";
-import React from "react";
+import React, { useRef } from "react";
 import { PackagingFormProps } from "./BsffPackagingForm";
 import { useWatch } from "react-hook-form";
 import { emptyBsddPackaging } from "../../../../Forms/Components/PackagingList/helpers";
 
-// Props passé à l'implémentation concrète (Formik ou RHF)
-// de PackagingForm dans le composant fonction enfant.
-export type RenderPackagingFormProps = Omit<
-  PackagingFormProps,
-  "inputProps" | "errors" | "touched"
-> & {
-  // Nom du champ de liste des conditionnements
+export interface RenderPackagingFormProps
+  extends Omit<PackagingFormProps, "inputProps" | "errors" | "touched"> {
   fieldName: string;
-  // Index du conditionnement courant
   idx: number;
-};
+}
 
 export type PackagingListProps = {
-  // Nom du champ de liste des conditionnements
   fieldName: string;
-  // Liste des types de conditionnement possible
-  // À ajuster en fonction du type de bordereau
   packagingTypes: (Packagings | BsffPackagingType)[];
-  // Valeur de `packagingInfos` provenant du store Formik ou RHF
   packagingInfos: PackagingInfoInput[];
-  // Permet de griser les champs
   disabled?: boolean;
-  // Ajoute un conditionnement à la fin de la liste
   push: (packaging: PackagingInfoInput) => void;
-  // Supprime le conditionnement situé à l'index `idx`
   remove: (idx: number) => void;
-  // Implémentation concrète de <PackagingForm />
+  onRemoveFromTable?: (id: string) => void;
   children: React.FC<RenderPackagingFormProps>;
 };
 
 function BsffPackagingList({
   fieldName,
   packagingTypes,
-  packagingInfos,
+  packagingInfos = [],
   push,
   remove,
+  onRemoveFromTable,
   disabled = false,
   children
 }: PackagingListProps) {
-  // récupère le type BSFF
-  const bsffType = useWatch({
-    name: "type"
-  });
+  const bsffType = useWatch({ name: "type" });
+  const repackaging: any[] = useWatch({ name: "repackaging" }) ?? [];
 
-  // RG métier
+  const stableKeys = useRef<Map<PackagingInfoInput, string>>(new Map());
+  const getStableKey = (p: PackagingInfoInput, idx: number): string => {
+    const id = (p as any).id;
+    if (id) return `table-${id}`;
+    if (!stableKeys.current.has(p)) {
+      stableKeys.current.set(p, `manual-${Date.now()}-${idx}-${Math.random()}`);
+    }
+    return stableKeys.current.get(p)!;
+  };
 
   const isReconditionnement = bsffType === BsffType.Reconditionnement;
   const isGroupement = bsffType === BsffType.Groupement;
   const isReexpedition = bsffType === BsffType.Reexpedition;
   const showbutton = isGroupement || isReexpedition;
-  const repackaging: any[] = useWatch({ name: "repackaging" }) ?? [];
 
-  const tableIds = new Set(
-    isReconditionnement ? repackaging.map(r => r.id).filter(Boolean) : []
+  const tableIds = new Set<string>(
+    isReconditionnement ? repackaging.map((r: any) => r.id).filter(Boolean) : []
   );
 
   const isFromTable = (p: PackagingInfoInput) =>
-    isReconditionnement && tableIds.has((p as any).id);
+    isReconditionnement && !!(p as any).id && tableIds.has((p as any).id);
 
   const manualCount = isReconditionnement
     ? packagingInfos.filter(p => !isFromTable(p)).length
     : 0;
 
   const canAdd = !isReconditionnement || manualCount < 1;
+
   return (
     <>
-      {/* MESSAGE INFO */}
       {isReconditionnement && manualCount >= 1 && (
         <div className="fr-alert fr-alert--info fr-mb-4w">
           Un seul contenant est autorisé dans le cadre d'un reconditionnement.
           Ex. : 1 citerne
         </div>
       )}
+
       {packagingInfos.map((p, idx) => {
         const fromTable = isFromTable(p);
+        const stableKey = getStableKey(p, idx);
 
         return (
-          <div key={idx}>
+          <div key={stableKey}>
             {children({
               fieldName,
               packagingTypes,
               packagingsLength: packagingInfos.length,
               idx,
               packaging: p,
-              disabled: disabled || fromTable
+              disabled
             })}
 
-            {!fromTable && packagingInfos.length > 1 && !showbutton && (
-              <>
-                <button
-                  type="button"
-                  disabled={disabled}
-                  className="fr-btn fr-btn--tertiary fr-mb-2w"
-                  onClick={() => remove(idx)}
-                >
-                  Supprimer
-                </button>
-                <hr />
-              </>
-            )}
+            {fromTable
+              ? !disabled && (
+                  <>
+                    <button
+                      type="button"
+                      className="fr-btn fr-btn--tertiary fr-mb-2w"
+                      onClick={() => onRemoveFromTable?.((p as any).id)}
+                    >
+                      Retirer
+                    </button>
+                    <hr />
+                  </>
+                )
+              : !disabled &&
+                !showbutton &&
+                (isReconditionnement
+                  ? tableIds.size > 0 || manualCount > 1
+                  : packagingInfos.length > 1) && (
+                  <>
+                    <button
+                      type="button"
+                      className="fr-btn fr-btn--tertiary fr-mb-2w"
+                      onClick={() => remove(idx)}
+                    >
+                      Supprimer
+                    </button>
+                    <hr />
+                  </>
+                )}
           </div>
         );
       })}
-      {/* BOUTON AJOUT */}
+
       {!disabled && canAdd && !showbutton && (
         <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
           <button

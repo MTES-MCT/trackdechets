@@ -100,20 +100,17 @@ const bsffPackagingSchema = z
       .number({
         required_error: "Conditionnements : le volume doit être supérieure à 0"
       })
-      .positive("Conditionnements : le volume doit être supérieur à 0")
-      .max(250),
+      .positive("Conditionnements : le volume doit être supérieur à 0"),
     weight: z.coerce
       .number({
         required_error: "Conditionnements : le poids doit être supérieur à 0"
       })
-      .positive("Conditionnements : le poids doit être supérieur à 0")
-      .max(250),
+      .positive("Conditionnements : le poids doit être supérieur à 0"),
     numero: z
       .string({
         required_error:
           "Conditionnements : le numéro d'identification est requis"
       })
-      .max(250)
       .min(1, "Conditionnements : le numéro d'identification est requis")
   })
   .refine(val => val.type !== "AUTRE" || !!val.other, {
