@@ -93,7 +93,7 @@ function BsffPackagingList({
               packagingsLength: packagingInfos.length,
               idx,
               packaging: p,
-              disabled: disabled || fromTable
+              disabled: disabled
             })}
 
             {!fromTable && packagingInfos.length > 1 && !showbutton && (
