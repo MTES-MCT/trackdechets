@@ -9,6 +9,7 @@ import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWr
 import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DsfrfWorkSiteAddress from "../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 import { SealedFieldsContext } from "../../../../Apps/Dashboard/Creation/context";
+import SingleCheckbox from "../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 type Props = {
   orgId?: string;
@@ -19,7 +20,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   const { control, setValue, watch } = useFormContext();
   const emitterCompany = watch("emitter.company");
   const type = watch("type");
-
+  const packagingInfos = watch("packagings");
   const isCollectePetitesQuantites = type === BsffType.CollectePetitesQuantites;
 
   const INSTALLATION_TYPES = [
@@ -73,6 +74,28 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
       }
     }
   }, [isInstallationType, emitterCompany]);
+
+  // toutes les fiches d'intervention du formulaire
+  const ficheInterventions = watch("ficheInterventions");
+
+  // le numéro saisi dans CETTE fiche
+  const currentNumero = watch(`${fieldName}.numero`);
+
+  // l'objet COMPLET correspondant au numéro
+  const currentFicheIntervention = ficheInterventions?.find(
+    fi => fi.numero === currentNumero
+  );
+
+  // DEBUG : objet réel lié au numéro
+  React.useEffect(() => {
+    if (currentNumero) {
+      console.log(" Numéro saisi :", currentNumero);
+      console.log(
+        " Objet fiche intervention lié :",
+        currentFicheIntervention
+      );
+    }
+  }, [currentNumero, currentFicheIntervention]);
 
   return (
     <div className="fr-col-12">
@@ -228,6 +251,68 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
               )}
             </div>
           </div>
+
+          {/* CONTENANTS RATTACHÉS */}
+          {packagingInfos.length > 0 && (
+            <>
+              <h4 className="fr-mt-4w">Contenants rattachés</h4>
+
+              <Controller
+                control={control}
+                name={`${fieldName}.contenantsRattaches`}
+                defaultValue={[]}
+                render={({ field }) => (
+                  <SingleCheckbox
+                    options={packagingInfos.map((packaging, index) => {
+                      const numero =
+                        packaging.numero ?? `Contenant ${index + 1}`;
+
+                      return {
+                        label: numero,
+                        nativeInputProps: {
+                          checked: field.value?.includes(numero),
+                          onChange: e => {
+                            const checked = e.target.checked;
+
+                            const nextValue = checked
+                              ? [...(field.value ?? []), numero]
+                              : (field.value ?? []).filter(
+                                  (n: string) => n !== numero
+                                );
+
+                            // 1. récupérer le numéro de fiche d’intervention du FORMULAIRE ACTUEL
+                            const ficheNumero = watch(`${fieldName}.numero`);
+
+                            // 2. retrouver l’objet complet dans la liste globale
+                            const ficheIntervention = (
+                              watch("ficheInterventions") ?? []
+                            ).find((f: any) => f.numero === ficheNumero);
+
+                            // 3. récupérer le packaging complet
+                            const selectedPackaging = packagingInfos.find(
+                              p => p.numero === numero
+                            );
+
+                            console.log(" CHECKBOX DEBUG", {
+                              ficheNumero,
+                              ficheIntervention,
+                              packagingNumero: numero,
+                              selectedPackaging,
+                              checked,
+                              nextValue
+                            });
+
+                            field.onChange(nextValue);
+                          }
+                        }
+                      };
+                    })}
+                  />
+                )}
+              />
+              <hr className="fr-mt-4w" />
+            </>
+          )}
 
           {/* DETENTEUR */}
           <h4 className="fr-mt-4w">Détenteur</h4>
