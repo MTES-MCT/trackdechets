@@ -105,3 +105,13 @@ export const CREATE_BSFF_FICHE_INTERVENTION = gql`
   }
   ${FicheInterventionFragment}
 `;
+export const UPDATE_BSFF_FICHE_INTERVENTION = gql`
+  mutation UpdateFicheInterventionBsff(
+    $id: ID!
+    $input: BsffFicheInterventionInput!
+  ) {
+    updateFicheInterventionBsff(id: $id, input: $input) {
+      id
+    }
+  }
+`;
