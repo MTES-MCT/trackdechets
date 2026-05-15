@@ -16,8 +16,10 @@ type Props = {
 };
 
 export function RhfDetenteurForm({ orgId, fieldName }: Props) {
-  const { control, setValue, watch } = useFormContext();
+  const { control, setValue, watch, getValues } = useFormContext();
+
   const emitterCompany = watch("emitter.company");
+
   const type = watch("type");
 
   const isCollectePetitesQuantites = type === BsffType.CollectePetitesQuantites;
@@ -29,54 +31,131 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   ];
 
   const isInstallationType = INSTALLATION_TYPES.includes(type);
+
   const isTracerFluide = type === BsffType.TracerFluide;
 
-  const companyField = `${fieldName}.detenteur.company`;
+  const companyField = isTracerFluide
+    ? "company"
+    : `${fieldName}.detenteur.company`;
+
   const privateField = `${fieldName}.detenteur.isPrivateIndividual`;
 
   const weight = watch(`${fieldName}.weight`);
+
   const isPrivate = watch(privateField);
+
   const selectedOrgId = watch(`${companyField}.orgId`);
+
   const sealedFields = useContext(SealedFieldsContext);
 
+  /**
+   * CAS PARTICULIER
+   */
   React.useEffect(() => {
     if (isPrivate) {
       setValue(`${companyField}.siret`, undefined);
       setValue(`${companyField}.orgId`, undefined);
+
       setValue(
         `${companyField}.name`,
-        watch(`${companyField}.contact`) || "Détenteur particulier"
+        watch(`${companyField}.contact`) ?? "Détenteur particulier"
       );
     }
-  }, [isPrivate, setValue, companyField]);
+  }, [isPrivate, setValue, companyField, watch]);
+
+  /**
+   * CAS INSTALLATION
+   *
+   * Préremplissage UNIQUE à l'initialisation
+   * sans écraser les modifications utilisateur.
+   */
+  const hasInitializedInstallationDetenteur = React.useRef(false);
 
   React.useEffect(() => {
-    if (isInstallationType && emitterCompany) {
-      const emitterIdentifier = emitterCompany.orgId || emitterCompany.siret;
-      if (!emitterIdentifier) return;
+    if (
+      !isInstallationType ||
+      !emitterCompany ||
+      hasInitializedInstallationDetenteur.current
+    ) {
+      return;
+    }
 
-      const current = watch(companyField);
-      const currentIdentifier = current?.orgId || current?.siret;
-      const isSameOrEmpty =
-        !currentIdentifier || currentIdentifier === emitterIdentifier;
+    const emitterIdentifier = emitterCompany.orgId || emitterCompany.siret;
 
-      if (isSameOrEmpty) {
-        setValue(companyField, {
-          orgId: emitterCompany.orgId,
-          siret: emitterCompany.siret,
-          name: emitterCompany.name,
-          address: emitterCompany.address,
-          contact: emitterCompany.contact,
-          phone: emitterCompany.phone,
-          mail: emitterCompany.mail
-        });
+    if (!emitterIdentifier) return;
+
+    const current = getValues(companyField);
+
+    const currentIdentifier = current?.orgId || current?.siret;
+
+    const isEmpty = !currentIdentifier;
+
+    const isSameCompany = currentIdentifier === emitterIdentifier;
+
+    /**
+     * On synchronise uniquement
+     * les champs structurels.
+     *
+     * Les champs éditables utilisateur
+     * ne doivent pas être écrasés.
+     */
+    if (isEmpty || isSameCompany) {
+      setValue(`${companyField}.orgId`, emitterCompany.orgId);
+
+      setValue(`${companyField}.siret`, emitterCompany.siret);
+
+      if (!current?.name) {
+        setValue(`${companyField}.name`, emitterCompany.name);
+      }
+
+      if (!current?.address) {
+        setValue(`${companyField}.address`, emitterCompany.address);
+      }
+
+      /**
+       * Préremplissage initial seulement
+       */
+      if (!current?.contact) {
+        setValue(`${companyField}.contact`, emitterCompany.contact);
+      }
+
+      if (!current?.phone) {
+        setValue(`${companyField}.phone`, emitterCompany.phone);
+      }
+
+      if (!current?.mail) {
+        setValue(`${companyField}.mail`, emitterCompany.mail);
       }
     }
-  }, [isInstallationType, emitterCompany]);
+
+    hasInitializedInstallationDetenteur.current = true;
+  }, [isInstallationType, emitterCompany, companyField, getValues, setValue]);
+
+  /**
+   * Helper synchronisation société
+   * sans écraser les modifications utilisateur
+   */
+  const syncCompanyWithoutOverriding = (company: any) => {
+    const current = getValues(companyField);
+
+    setValue(`${companyField}.orgId`, company.orgId);
+
+    setValue(`${companyField}.siret`, company.siret);
+
+    setValue(`${companyField}.name`, current?.name ?? company.name);
+
+    setValue(`${companyField}.address`, current?.address ?? company.address);
+
+    setValue(`${companyField}.contact`, current?.contact ?? company.contact);
+
+    setValue(`${companyField}.phone`, current?.phone ?? company.contactPhone);
+
+    setValue(`${companyField}.mail`, current?.mail ?? company.contactEmail);
+  };
 
   return (
     <div className="fr-col-12">
-      {/*  CAS TRACER FLUIDE */}
+      {/* CAS TRACER FLUIDE */}
       {isTracerFluide && (
         <>
           <h4 className="fr-mt-4w">Détenteur</h4>
@@ -85,43 +164,33 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
             <div className="fr-col-12">
               <CompanySelectorWrapper
                 orgId={orgId}
-                selectedCompanyOrgId={selectedOrgId}
+                selectedCompanyOrgId={
+                  watch("emitter.company.orgId") ??
+                  watch("emitter.company.siret")
+                }
                 onCompanySelected={company => {
                   if (!company) return;
-
-                  setValue(`${companyField}.orgId`, company.orgId);
-                  setValue(`${companyField}.siret`, company.siret);
-                  setValue(`${companyField}.name`, company.name);
-                  setValue(`${companyField}.address`, company.address);
-                  setValue(`${companyField}.contact`, company.contact);
-                  setValue(`${companyField}.phone`, company.contactPhone);
-                  setValue(`${companyField}.mail`, company.contactEmail);
-
-                  // ← synchronise l'émetteur avec le détenteur pour TracerFluide
-                  if (isTracerFluide) {
-                    setValue("emitter.company", {
-                      orgId: company.orgId,
-                      siret: company.siret,
-                      vatNumber: company.vatNumber ?? null,
-                      name: company.name ?? "",
-                      address: company.address ?? "",
-                      contact: company.contact ?? "",
-                      phone: company.contactPhone ?? "",
-                      mail: company.contactEmail ?? "",
-                      country: company.codePaysEtrangerEtablissement ?? null
-                    });
-                  }
+                  setValue(companyField, {
+                    orgId: company.orgId,
+                    siret: company.siret,
+                    vatNumber: company.vatNumber ?? null,
+                    name: company.name ?? "",
+                    address: company.address ?? "",
+                    contact: company.contact ?? "",
+                    phone: company.contactPhone ?? "",
+                    mail: company.contactEmail ?? "",
+                    country: company.codePaysEtrangerEtablissement ?? null
+                  });
                 }}
               />
             </div>
           </div>
 
-          <CompanyContactInfo fieldName={companyField} key={selectedOrgId} />
+          <CompanyContactInfo fieldName="emitter.company" />
 
           <hr className="fr-mt-4w" />
         </>
       )}
-
       {/* CAS INSTALLATION */}
       {isInstallationType && (
         <>
@@ -137,18 +206,17 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
           <CompanySelectorWrapper
             orgId={orgId}
             selectedCompanyOrgId={
-              watch(`${companyField}.orgId`) ?? watch(`${companyField}.siret`)
+              watch("emitter.company.orgId") ?? watch("emitter.company.siret")
             }
             disabled
             onCompanySelected={() => {}}
           />
 
-          <CompanyContactInfo fieldName={companyField} key={orgId} />
+          <CompanyContactInfo fieldName="emitter.company" />
 
           <hr className="fr-mt-4w" />
         </>
       )}
-
       {/* CAS NORMAL */}
       {!isInstallationType && !isTracerFluide && (
         <>
@@ -214,6 +282,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       value: field.value ?? "",
                       onChange: e => {
                         const val = e.target.value;
+
                         field.onChange(val === "" ? undefined : Number(val));
                       }
                     }}
@@ -221,6 +290,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                   />
                 )}
               />
+
               {weight && (
                 <p className="fr-info-text">
                   Soit {(Number(weight) / 1000).toFixed(4)} tonne
@@ -287,7 +357,9 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                   postalCode={watch(`${companyField}.postalCode`)}
                   onAddressSelection={details => {
                     setValue(`${companyField}.address`, details.name);
+
                     setValue(`${companyField}.city`, details.city);
+
                     setValue(`${companyField}.postalCode`, details.postcode);
                   }}
                   designation="du détenteur"
@@ -336,14 +408,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                     onCompanySelected={company => {
                       if (!company) return;
 
-                      setValue(`${companyField}.orgId`, company.orgId);
-                      setValue(`${companyField}.siret`, company.siret);
-                      setValue(`${companyField}.name`, company.name);
-                      setValue(`${companyField}.address`, company.address);
-
-                      setValue(`${companyField}.contact`, company.contact);
-                      setValue(`${companyField}.phone`, company.contactPhone);
-                      setValue(`${companyField}.mail`, company.contactEmail);
+                      syncCompanyWithoutOverriding(company);
                     }}
                     disabled={sealedFields.includes("ficheInterventions")}
                   />

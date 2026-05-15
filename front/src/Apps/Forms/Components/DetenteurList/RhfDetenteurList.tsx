@@ -38,7 +38,7 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
   const [expandedIdx, setExpandedIdx] = React.useState<number | null>(0);
 
   if (isTracerFluide) {
-    return <RhfDetenteurForm orgId={orgId} fieldName={`${fieldName}.0`} />;
+    return <RhfDetenteurForm orgId={orgId} fieldName="emitter" />;
   }
 
   return (
