@@ -15,7 +15,8 @@ import {
   BsffTransporterInput,
   TransportMode,
   BsffDestinationInput,
-  MutationCreateFicheInterventionBsffArgs
+  MutationCreateFicheInterventionBsffArgs,
+  MutationUpdateFicheInterventionBsffArgs
 } from "@td/codegen-ui";
 
 import { useMutation, useQuery } from "@apollo/client";
@@ -25,7 +26,8 @@ import {
   CREATE_BSFF,
   PUBLISH_BSFF,
   UPDATE_BSFF_FORM,
-  CREATE_BSFF_FICHE_INTERVENTION
+  CREATE_BSFF_FICHE_INTERVENTION,
+  UPDATE_BSFF_FICHE_INTERVENTION
 } from "../../../common/queries/bsff/queries";
 
 import {
@@ -133,6 +135,11 @@ const BsffFormSteps = ({
     Pick<Mutation, "createFicheInterventionBsff">,
     MutationCreateFicheInterventionBsffArgs
   >(CREATE_BSFF_FICHE_INTERVENTION);
+
+  const [updateFicheInterventionBsff] = useMutation<
+    Pick<Mutation, "updateFicheInterventionBsff">,
+    MutationUpdateFicheInterventionBsffArgs
+  >(UPDATE_BSFF_FICHE_INTERVENTION);
 
   const bsffState = useMemo(
     () =>
@@ -296,32 +303,57 @@ const BsffFormSteps = ({
     );
   }
   async function getFicheInterventionIds(values: ZodBsff) {
+    if (
+      [
+        BsffType.Groupement,
+        BsffType.Reexpedition,
+        BsffType.Reconditionnement,
+        BsffType.TracerFluide
+      ].includes(values.type as BsffType)
+    ) {
+      return [];
+    }
     const ficheInterventions = values.ficheInterventions ?? [];
-    const { emitter } = values;
-
     if (!ficheInterventions.length) return [];
 
     const ids = await Promise.all(
       ficheInterventions
-        // Ne jamais envoyer une fiche sans les champs obligatoires
         .filter(fi => fi.numero && fi.postalCode && fi.weight && fi.weight > 0)
         .map(async fi => {
-          if ((fi as any)?.id) return fi.id;
+          const detenteurCompany = fi.detenteur?.company;
+
+          const cleanedDetenteur = {
+            isPrivateIndividual: fi.detenteur?.isPrivateIndividual ?? false,
+            company: detenteurCompany
+              ? {
+                  siret: detenteurCompany.siret ?? null,
+                  name: detenteurCompany.name ?? null,
+                  address: detenteurCompany.address ?? null,
+                  contact: detenteurCompany.contact ?? null,
+                  phone: detenteurCompany.phone ?? null,
+                  mail: detenteurCompany.mail ?? null
+                }
+              : undefined
+          };
+
+          const ficheInput = {
+            numero: fi.numero!,
+            weight: Number(fi.weight),
+            postalCode: fi.postalCode!,
+            detenteur: cleanedDetenteur,
+            operateur: { company: cleanCompany(detenteurCompany) }
+          };
+
+          if (fi.id) {
+            await updateFicheInterventionBsff({
+              variables: { id: fi.id, input: ficheInput }
+            });
+            return fi.id;
+          }
 
           const { data } = await createFicheIntervention({
-            variables: {
-              input: {
-                numero: fi.numero!,
-                weight: Number(fi.weight!),
-                postalCode: fi.postalCode!,
-                detenteur: fi.detenteur,
-                operateur: {
-                  company: cleanCompany(emitter?.company)
-                }
-              }
-            }
+            variables: { input: ficheInput }
           });
-
           return data?.createFicheInterventionBsff?.id ?? null;
         })
     );
