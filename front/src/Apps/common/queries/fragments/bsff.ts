@@ -106,6 +106,13 @@ export const FicheInterventionFragment = gql`
         ...CompanyFragment
       }
     }
+    packagings {
+      id
+      numero
+      type
+      weight
+      volume
+    }
   }
   ${companyFragment}
 `;
@@ -134,6 +141,10 @@ export const FullBsffFragment = gql`
       numero
       volume
       weight
+      ficheInterventions {
+        id
+        numero
+      }
       acceptation {
         date
         status

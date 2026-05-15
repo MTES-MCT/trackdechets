@@ -176,7 +176,15 @@ const ficheInterventionSchema = z.object({
   detenteur: z.object({
     isPrivateIndividual: z.boolean().optional(),
     company: zodCompany
-  })
+  }),
+    packagings: z
+    .array(
+      z.object({
+        numero: z.string()
+      })
+    )
+    .optional()
+    .nullish()
 });
 
 export const rawBsffSchema = z

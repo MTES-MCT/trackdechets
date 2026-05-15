@@ -361,11 +361,15 @@ export async function createBsff(
               } = packaging;
               return {
                 ...packagingData,
-                ficheInterventions: {
-                  connect: (ficheInterventions ?? []).map(id => ({
-                    id
-                  }))
-                },
+                ...(ficheInterventions?.length
+                  ? {
+                      ficheInterventions: {
+                        connect: ficheInterventions.map(id => ({
+                          id
+                        }))
+                      }
+                    }
+                  : {}),
                 previousPackagings: {
                   connect: (previousPackagings ?? []).map(id => ({ id }))
                 }

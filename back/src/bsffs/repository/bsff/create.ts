@@ -45,13 +45,13 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
 
     // Si le BSFF a des fiches d'intervention et des packagings,
     // on fait le lien entre eux
-    if (fullBsff.ficheInterventions?.length && fullBsff.packagings?.length) {
-      await addBsffPackagingsFichesIntervention(
-        fullBsff.packagings,
-        fullBsff.ficheInterventions,
-        prisma
-      );
-    }
+    // if (fullBsff.ficheInterventions?.length && fullBsff.packagings?.length) {
+    //   await addBsffPackagingsFichesIntervention(
+    //     fullBsff.packagings,
+    //     fullBsff.ficheInterventions,
+    //     prisma
+    //   );
+    // }
 
     // update transporters ordering when connecting transporters records
     if (

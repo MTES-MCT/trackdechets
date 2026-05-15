@@ -19,7 +19,11 @@ const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsf
       user
     );
     await checkCanCreateFicheIntervention(user, input);
-    const flatInput = flattenFicheInterventionBsffInput(sirenifiedInput);
+
+    // 👇 On extrait packagings avant de flatten
+    const { packagings, ...ficheInterventionInput } = sirenifiedInput;
+
+    const flatInput = flattenFicheInterventionBsffInput(ficheInterventionInput);
 
     await validateFicheIntervention(flatInput);
 
@@ -27,7 +31,16 @@ const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsf
       getBsffFicheInterventionRepository(user);
 
     const ficheIntervention = await createFicheIntervention({
-      data: flatInput as Prisma.BsffFicheInterventionCreateInput
+      data: {
+        ...(flatInput as Prisma.BsffFicheInterventionCreateInput),
+        ...(packagings?.length
+          ? {
+              packagings: {
+                connect: packagings.map(id => ({ id }))
+              }
+            }
+          : {})
+      }
     });
 
     return expandFicheInterventionBsffFromDB(ficheIntervention);

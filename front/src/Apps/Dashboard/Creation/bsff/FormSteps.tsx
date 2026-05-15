@@ -1,3 +1,7 @@
+// ==========================
+// BSFF FORM STEPS
+// ==========================
+
 import {
   Bsff,
   BsdType,
@@ -19,6 +23,7 @@ import {
 } from "@td/codegen-ui";
 
 import { useMutation, useQuery } from "@apollo/client";
+
 import {
   CREATE_DRAFT_BSFF,
   GET_BSFF_FORM,
@@ -34,19 +39,34 @@ import {
 } from "../../../Forms/Components/query";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useMemo, createContext, useState, useEffect } from "react";
+
+import React, {
+  useMemo,
+  createContext,
+  useState,
+  useEffect
+} from "react";
+
 import { useForm } from "react-hook-form";
+
 import { rawBsffSchema, ZodBsff } from "./schema";
+
 import FormStepsContent from "../FormStepsContent";
+
 import { Loader } from "../../../common/Components";
+
 import initialState from "./utils/initial-state";
+
 import { getComputedState } from "../getComputedState";
+
 import WasteBsff from "./steps/Waste";
 import EmitterBsff from "./steps/Emitter";
 import DestinationBsff from "./steps/Destination";
 import TransporterBsff from "./steps/Transporter";
 import DetenteurBsff from "./steps/Detenteur";
+
 import { isForeignVat } from "@td/constants";
+
 import {
   getErrorTabIds,
   getPublishErrorMessages,
@@ -57,6 +77,7 @@ import {
 
 interface Props {
   bsdId?: string;
+
   publishErrorsFromRedirect?: {
     code: string;
     path: string[];
@@ -64,7 +85,9 @@ interface Props {
   }[];
 }
 
-export const BsffContext = createContext<Bsff | undefined>(undefined);
+export const BsffContext = createContext<Bsff | undefined>(
+  undefined
+);
 
 const BsffFormSteps = ({
   bsdId,
@@ -79,109 +102,154 @@ const BsffFormSteps = ({
     | undefined
   >();
 
-  // ================= QUERY =================
-  const bsffQuery = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(
-    GET_BSFF_FORM,
-    {
-      variables: { id: bsdId! },
-      skip: !bsdId,
-      fetchPolicy: "network-only"
-    }
-  );
+  // ======================================================
+  // QUERY
+  // ======================================================
+
+  const bsffQuery = useQuery<
+    Pick<Query, "bsff">,
+    QueryBsffArgs
+  >(GET_BSFF_FORM, {
+    variables: { id: bsdId! },
+    skip: !bsdId,
+    fetchPolicy: "network-only"
+  });
 
   const sealedFields = useMemo(
     () =>
       (bsffQuery?.data?.bsff?.metadata?.fields?.sealed ?? [])
         ?.map(f => f.join("."))
         .filter(Boolean),
+
     [bsffQuery.data]
   );
-  // ================= MUTATIONS =================
-  const [createDraftBsff, { loading: creating }] = useMutation<
-    Pick<Mutation, "createDraftBsff">,
-    MutationCreateDraftBsffArgs
-  >(CREATE_DRAFT_BSFF);
 
-  const [updateBsff, { loading: updating }] = useMutation<
-    Pick<Mutation, "updateBsff">,
-    MutationUpdateBsffArgs
-  >(UPDATE_BSFF_FORM);
+  // ======================================================
+  // MUTATIONS
+  // ======================================================
 
-  const [publishBsff, { loading: publishing }] = useMutation<
-    Pick<Mutation, "publishBsff">,
-    MutationPublishBsffArgs
-  >(PUBLISH_BSFF);
-
-  const [createBsffTransporter, { loading: creatingBsffTransporter }] =
+  const [createDraftBsff, { loading: creating }] =
     useMutation<
-      Pick<Mutation, "createBsffTransporter">,
-      MutationCreateBsffTransporterArgs
-    >(CREATE_BSFF_TRANSPORTER);
+      Pick<Mutation, "createDraftBsff">,
+      MutationCreateDraftBsffArgs
+    >(CREATE_DRAFT_BSFF);
 
-  const [updateBsffTransporter, { loading: updatingBsffTransporter }] =
+  const [updateBsff, { loading: updating }] =
     useMutation<
-      Pick<Mutation, "updateBsffTransporter">,
-      MutationUpdateBsffTransporterArgs
-    >(UPDATE_BSFF_TRANSPORTER);
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF_FORM);
 
-  const [createBsff, { loading: creatingBsff }] = useMutation<
-    Pick<Mutation, "createBsff">,
-    MutationCreateBsffArgs // ← vérifier que ce type existe dans @td/codegen-ui
-  >(CREATE_BSFF);
+  const [publishBsff, { loading: publishing }] =
+    useMutation<
+      Pick<Mutation, "publishBsff">,
+      MutationPublishBsffArgs
+    >(PUBLISH_BSFF);
+
+  const [
+    createBsffTransporter,
+    { loading: creatingBsffTransporter }
+  ] = useMutation<
+    Pick<Mutation, "createBsffTransporter">,
+    MutationCreateBsffTransporterArgs
+  >(CREATE_BSFF_TRANSPORTER);
+
+  const [
+    updateBsffTransporter,
+    { loading: updatingBsffTransporter }
+  ] = useMutation<
+    Pick<Mutation, "updateBsffTransporter">,
+    MutationUpdateBsffTransporterArgs
+  >(UPDATE_BSFF_TRANSPORTER);
+
+  const [createBsff, { loading: creatingBsff }] =
+    useMutation<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs
+    >(CREATE_BSFF);
 
   const [createFicheIntervention] = useMutation<
     Pick<Mutation, "createFicheInterventionBsff">,
     MutationCreateFicheInterventionBsffArgs
   >(CREATE_BSFF_FICHE_INTERVENTION);
 
+  // ======================================================
+  // FORM STATE
+  // ======================================================
+
   const bsffState = useMemo(
     () =>
       getComputedState(initialState, bsffQuery.data?.bsff, [
         {
           path: "packagings",
-          getComputedValue: (intialValue, actualValue) =>
-            actualValue.length ? actualValue : intialValue
+          getComputedValue: (initialValue, actualValue) =>
+            actualValue.length ? actualValue : initialValue
         },
         {
           path: "grouping",
           getComputedValue: (initialValue, actualValue) =>
-            actualValue?.length ? actualValue : initialValue
+            actualValue?.length
+              ? actualValue
+              : initialValue
         },
         {
           path: "forwarding",
-          getComputedValue: (initialValue, actualValue) => {
+          getComputedValue: (
+            initialValue,
+            actualValue
+          ) => {
             if (Array.isArray(actualValue)) {
               return actualValue[0] ?? initialValue;
             }
+
             return actualValue ?? initialValue;
           }
         },
         {
           path: "repackaging",
-          getComputedValue: (initialValue, actualValue) =>
-            Array.isArray(actualValue) && actualValue.length
+          getComputedValue: (
+            initialValue,
+            actualValue
+          ) =>
+            Array.isArray(actualValue) &&
+            actualValue.length
               ? actualValue
               : initialValue
         },
         {
           path: "transporters",
-          getComputedValue: (initialValue, actualValue) =>
-            actualValue?.length ? actualValue : initialValue
+          getComputedValue: (
+            initialValue,
+            actualValue
+          ) =>
+            actualValue?.length
+              ? actualValue
+              : initialValue
         },
         {
           path: "ficheInterventions",
-          getComputedValue: (initialValue, actualValue) =>
-            actualValue?.length ? actualValue : initialValue
+          getComputedValue: (
+            initialValue,
+            actualValue
+          ) =>
+            actualValue?.length
+              ? actualValue
+              : initialValue
         }
       ]),
     [bsffQuery.data]
   );
+
   const methods = useForm<ZodBsff>({
     values: bsffState,
     mode: "onChange",
     reValidateMode: "onChange",
     resolver: async (data, context, options) => {
-      return zodResolver(rawBsffSchema)(data, context, options);
+      return zodResolver(rawBsffSchema)(
+        data,
+        context,
+        options
+      );
     }
   });
 
@@ -191,35 +259,63 @@ const BsffFormSteps = ({
         keepErrors: true
       });
     }
-  }, [bsffState, bsffQuery.data?.bsff?.id, methods]);
+  }, [
+    bsffState,
+    bsffQuery.data?.bsff?.id,
+    methods
+  ]);
 
-  const errorsFromPublishApi = publishErrors || publishErrorsFromRedirect;
-  const publishErrorTabIds = getPublishErrorTabIds(
-    BsdType.Bsff,
-    errorsFromPublishApi
+  // ======================================================
+  // ERRORS
+  // ======================================================
+
+  const errorsFromPublishApi =
+    publishErrors || publishErrorsFromRedirect;
+
+  const publishErrorTabIds =
+    getPublishErrorTabIds(
+      BsdType.Bsff,
+      errorsFromPublishApi
+    );
+
+  const formStateErrorsKeys = Object.keys(
+    methods?.formState?.errors
   );
 
-  const formStateErrorsKeys = Object.keys(methods?.formState?.errors);
   const errorTabIds = getErrorTabIds(
     BsdType.Bsff,
     publishErrorTabIds,
     formStateErrorsKeys
   );
+
   const publishErrorMessages = useMemo(
-    () => getPublishErrorMessages(BsdType.Bsff, errorsFromPublishApi),
+    () =>
+      getPublishErrorMessages(
+        BsdType.Bsff,
+        errorsFromPublishApi
+      ),
+
     [errorsFromPublishApi]
   );
 
   useEffect(() => {
     for (const error of publishErrorMessages) {
-      methods.setError(error.name as keyof ZodBsff, {
-        type: "custom",
-        message: error.message
-      });
+      methods.setError(
+        error.name as keyof ZodBsff,
+        {
+          type: "custom",
+          message: error.message
+        }
+      );
     }
   }, [publishErrorMessages, methods]);
 
-  const [bsffContext, setBsffContext] = useState<Bsff | undefined>();
+  // ======================================================
+  // CONTEXT
+  // ======================================================
+
+  const [bsffContext, setBsffContext] =
+    useState<Bsff | undefined>();
 
   useEffect(() => {
     if (bsffQuery.data?.bsff?.id) {
@@ -227,13 +323,18 @@ const BsffFormSteps = ({
     }
   }, [bsffQuery.data?.bsff]);
 
+  // ======================================================
+  // TABS
+  // ======================================================
+
   const type = methods.watch("type");
 
   const tabsContent = useMemo(
     () => ({
       waste: <WasteBsff />,
       emitter:
-        type === BsffType.CollectePetitesQuantites ? (
+        type ===
+        BsffType.CollectePetitesQuantites ? (
           <EmitterBsff />
         ) : undefined,
       detenteur: <DetenteurBsff />,
@@ -243,6 +344,10 @@ const BsffFormSteps = ({
     [type]
   );
 
+  // ======================================================
+  // LOADING
+  // ======================================================
+
   const loading =
     creating ||
     publishing ||
@@ -250,24 +355,54 @@ const BsffFormSteps = ({
     updating ||
     creatingBsffTransporter ||
     updatingBsffTransporter;
-  const mainCtaLabel = bsffState.id ? "Enregistrer" : "Publier";
-  const draftCtaLabel = bsffState.id ? "" : "Enregistrer en brouillon";
+
+  const mainCtaLabel = bsffState.id
+    ? "Enregistrer"
+    : "Publier";
+
+  const draftCtaLabel = bsffState.id
+    ? ""
+    : "Enregistrer en brouillon";
+
+  // ======================================================
+  // HELPERS
+  // ======================================================
 
   function cleanCompany(company: any) {
     if (!company) return undefined;
-    const isEmpty = Object.values(company).every(v => !v);
+
+    const isEmpty = Object.values(company).every(
+      v => !v
+    );
+
     return isEmpty ? undefined : company;
   }
 
-  async function saveBsff(values: ZodBsff, draft: boolean) {
+  // ======================================================
+  // SAVE
+  // ======================================================
+
+  async function saveBsff(
+    values: ZodBsff,
+    draft: boolean
+  ) {
     try {
-      const transporterIds = await getTransporterIds(values.transporters);
-      const ficheInterventionIds = await getFicheInterventionIds(values);
+      const transporterIds =
+        await getTransporterIds(
+          values.transporters
+        );
+
+      const ficheInterventionMap =
+        await getFicheInterventionIds(values);
+
+      const ficheInterventionIds =
+        Object.values(ficheInterventionMap);
 
       const input = buildBsffInput(
         values,
         transporterIds,
-        ficheInterventionIds
+        ficheInterventionIds,
+        ficheInterventionMap
       );
 
       if (bsffState.id) {
@@ -280,12 +415,25 @@ const BsffFormSteps = ({
       throw err;
     }
   }
-  async function getTransporterIds(transporters: any[] = []) {
+
+  // ======================================================
+  // TRANSPORTERS
+  // ======================================================
+
+  async function getTransporterIds(
+    transporters: any[] = []
+  ) {
     return Promise.all(
       transporters
-        .filter(t => t && (t.company?.siret || t.company?.vatNumber))
+        .filter(
+          t =>
+            t &&
+            (t.company?.siret ||
+              t.company?.vatNumber)
+        )
         .map(async t => {
-          const isSigned = !!t.transport?.signature?.date;
+          const isSigned =
+            !!t.transport?.signature?.date;
 
           if (t.id && isSigned) {
             return t.id;
@@ -295,43 +443,84 @@ const BsffFormSteps = ({
         })
     );
   }
-  async function getFicheInterventionIds(values: ZodBsff) {
-    const ficheInterventions = values.ficheInterventions ?? [];
+
+  // ======================================================
+  // FICHE INTERVENTIONS
+  // ======================================================
+
+  async function getFicheInterventionIds(
+    values: ZodBsff
+  ) {
+    const ficheInterventions =
+      values.ficheInterventions ?? [];
+
     const { emitter } = values;
 
-    if (!ficheInterventions.length) return [];
+    if (!ficheInterventions.length) {
+      return {};
+    }
 
-    const ids = await Promise.all(
+    const entries = await Promise.all(
       ficheInterventions
-        // Ne jamais envoyer une fiche sans les champs obligatoires
-        .filter(fi => fi.numero && fi.postalCode && fi.weight && fi.weight > 0)
+        .filter(
+          fi =>
+            fi.numero &&
+            fi.postalCode &&
+            fi.weight &&
+            fi.weight > 0
+        )
         .map(async fi => {
-          if ((fi as any)?.id) return fi.id;
+          if ((fi as any)?.id) {
+            return [fi.numero, fi.id] as const;
+          }
 
-          const { data } = await createFicheIntervention({
-            variables: {
-              input: {
-                numero: fi.numero!,
-                weight: Number(fi.weight!),
-                postalCode: fi.postalCode!,
-                detenteur: fi.detenteur,
-                operateur: {
-                  company: cleanCompany(emitter?.company)
+          const { data } =
+            await createFicheIntervention({
+              variables: {
+                input: {
+                  numero: fi.numero!,
+                  weight: Number(fi.weight!),
+                  postalCode:
+                    fi.postalCode!,
+                  detenteur: fi.detenteur,
+                  operateur: {
+                    company: cleanCompany(
+                      emitter?.company
+                    )
+                  }
                 }
               }
-            }
-          });
+            });
 
-          return data?.createFicheInterventionBsff?.id ?? null;
+          const createdId =
+            data
+              ?.createFicheInterventionBsff
+              ?.id ?? null;
+
+          return [
+            fi.numero,
+            createdId
+          ] as const;
         })
     );
 
-    return ids.filter((id): id is string => !!id);
+    return Object.fromEntries(
+      entries.filter(([, id]) => !!id)
+    ) as Record<string, string>;
   }
+
+  // ======================================================
+  // BUILD INPUT
+  // ======================================================
+
   function buildBsffInput(
     values: ZodBsff,
     transporterIds: string[],
-    ficheInterventionIds: string[]
+    ficheInterventionIds: string[],
+    ficheInterventionMap: Record<
+      string,
+      string
+    >
   ): BsffInput {
     const {
       destination,
@@ -347,142 +536,308 @@ const BsffFormSteps = ({
 
     return {
       type: type as unknown as BsffType,
+
       emitter: emitter
-        ? { ...emitter, company: cleanCompany(emitter.company) }
+        ? {
+            ...emitter,
+            company: cleanCompany(
+              emitter.company
+            )
+          }
         : undefined,
+
       waste: waste?.code
         ? {
             code: waste.code,
-            adr: waste.adr?.trim() || null,
-            description: waste.description?.trim() || null
+            adr:
+              waste.adr?.trim() || null,
+            description:
+              waste.description?.trim() ||
+              null
           }
         : undefined,
+
       weight: {
         value: Number(weight?.value ?? 0),
-        isEstimate: weight?.isEstimate ?? false
+        isEstimate:
+          weight?.isEstimate ?? false
       },
-      destination: buildDestination(destination),
+
+      destination: buildDestination(
+        destination
+      ),
+
       transporters: transporterIds,
-      ficheInterventions: ficheInterventionIds,
-      packagings: buildPackagings(type as unknown as BsffType, packagings),
+
+      ficheInterventions:
+        ficheInterventionIds,
+
+      packagings: buildPackagings(
+        type as unknown as BsffType,
+        packagings,
+        values.ficheInterventions,
+        ficheInterventionMap
+      ),
+
       forwarding:
-        type === BsffType.Reexpedition && forwarding?.id ? [forwarding.id] : [],
-      repackaging:
-        type === BsffType.Reconditionnement
-          ? (repackaging ?? []).map(r => r.id)
+        type === BsffType.Reexpedition &&
+        forwarding?.id
+          ? [forwarding.id]
           : [],
+
+      repackaging:
+        type ===
+        BsffType.Reconditionnement
+          ? (repackaging ?? []).map(
+              r => r.id
+            )
+          : [],
+
       grouping:
-        type === BsffType.Groupement ? (grouping ?? []).map(g => g.id) : []
+        type === BsffType.Groupement
+          ? (grouping ?? []).map(
+              g => g.id
+            )
+          : []
     };
   }
+
+  // ======================================================
+  // DESTINATION
+  // ======================================================
 
   function buildDestination(
     destination: any
   ): BsffDestinationInput | undefined {
-    if (!destination) return undefined;
+    if (!destination) {
+      return undefined;
+    }
 
     return {
       cap: destination.cap ?? undefined,
-      company: cleanCompany(destination.company),
-      customInfo: destination.customInfo ?? undefined,
-      plannedOperationCode: destination.plannedOperationCode ?? undefined,
+
+      company: cleanCompany(
+        destination.company
+      ),
+
+      customInfo:
+        destination.customInfo ??
+        undefined,
+
+      plannedOperationCode:
+        destination.plannedOperationCode ??
+        undefined,
+
       reception: destination.reception?.date
-        ? { date: destination.reception.date.toISOString() }
+        ? {
+            date:
+              destination.reception.date.toISOString()
+          }
         : undefined
     };
   }
 
+  // ======================================================
+  // PACKAGINGS
+  // ======================================================
+
   function buildPackagings(
     type: BsffType,
-    packagings: any[] | null | undefined
+    packagings:
+      | any[]
+      | null
+      | undefined,
+    ficheInterventions:
+      | any[]
+      | null
+      | undefined,
+    ficheInterventionMap: Record<
+      string,
+      string
+    >
   ) {
-    if ([BsffType.Groupement, BsffType.Reexpedition].includes(type)) {
+    if (
+      [
+        BsffType.Groupement,
+        BsffType.Reexpedition
+      ].includes(type)
+    ) {
       return undefined;
     }
 
     return packagings?.map(p => ({
       type: p.type,
+
       numero: p.numero,
+
       other: p.other ?? null,
+
       volume: p.volume ?? null,
-      weight: Number(p.weight ?? 0)
+
+      weight: Number(p.weight ?? 0),
+
+      ficheInterventions:
+        ficheInterventions
+          ?.filter(fi =>
+            fi.packagings?.some(
+              (linkedPackaging: any) =>
+                linkedPackaging.numero ===
+                p.numero
+            )
+          )
+          .map(
+            fi =>
+              ficheInterventionMap[
+                fi.numero
+              ]
+          )
+          .filter(Boolean) ?? []
     }));
   }
-  async function handleUpdateFlow(input: BsffInput, draft: boolean) {
-    await updateBsff({ variables: { id: bsffState.id!, input } });
+
+  // ======================================================
+  // UPDATE FLOW
+  // ======================================================
+
+  async function handleUpdateFlow(
+    input: BsffInput,
+    draft: boolean
+  ) {
+    await updateBsff({
+      variables: {
+        id: bsffState.id!,
+        input
+      }
+    });
 
     if (draft) return;
 
     try {
-      return await publishBsff({ variables: { id: bsffState.id! } });
+      return await publishBsff({
+        variables: {
+          id: bsffState.id!
+        }
+      });
     } catch (err: any) {
-      setPublishErrors(handleGraphQlError(err));
+      setPublishErrors(
+        handleGraphQlError(err)
+      );
+
       throw err;
     }
   }
 
-  async function handleCreateFlow(input: BsffInput, draft: boolean) {
+  // ======================================================
+  // CREATE FLOW
+  // ======================================================
+
+  async function handleCreateFlow(
+    input: BsffInput,
+    draft: boolean
+  ) {
     if (draft) {
-      return createDraftBsff({ variables: { input } });
+      return createDraftBsff({
+        variables: { input }
+      });
     }
 
     try {
-      return await createBsff({ variables: { input } });
+      return await createBsff({
+        variables: { input }
+      });
     } catch (err: any) {
-      setPublishErrors(handleGraphQlError(err));
+      setPublishErrors(
+        handleGraphQlError(err)
+      );
+
       throw err;
     }
   }
 
-  async function saveBsffTransporter(t: any): Promise<string> {
+  // ======================================================
+  // SAVE TRANSPORTER
+  // ======================================================
+
+  async function saveBsffTransporter(
+    t: any
+  ): Promise<string> {
     const { id, transport, ...input } = t;
 
-    const isSigned = !!t.transport?.signature?.date;
+    const isSigned =
+      !!t.transport?.signature?.date;
 
     const isExempted =
       input.recepisse?.isExempted ||
-      isForeignVat(input?.company?.vatNumber) ||
-      transport?.mode !== TransportMode.Road;
+      isForeignVat(
+        input?.company?.vatNumber
+      ) ||
+      transport?.mode !==
+        TransportMode.Road;
 
-    const cleanInput: BsffTransporterInput = {
-      ...input,
-      transport: {
-        mode: transport?.mode,
-        plates: transport?.plates
-      },
-      recepisse: {
-        ...input.recepisse,
-        validityLimit: !!input.recepisse?.validityLimit
-          ? new Date(input.recepisse.validityLimit).toISOString()
-          : null,
-        ...(isExempted
-          ? {
-              number: null,
-              validityLimit: null,
-              department: null
-            }
-          : {})
-      }
-    };
+    const cleanInput: BsffTransporterInput =
+      {
+        ...input,
+
+        transport: {
+          mode: transport?.mode,
+          plates: transport?.plates
+        },
+
+        recepisse: {
+          ...input.recepisse,
+
+          validityLimit:
+            !!input.recepisse
+              ?.validityLimit
+              ? new Date(
+                  input.recepisse.validityLimit
+                ).toISOString()
+              : null,
+
+          ...(isExempted
+            ? {
+                number: null,
+                validityLimit: null,
+                department: null
+              }
+            : {})
+        }
+      };
 
     if (id) {
       if (!isSigned) {
         await updateBsffTransporter({
-          variables: { id, input: cleanInput }
+          variables: {
+            id,
+            input: cleanInput
+          }
         });
       }
+
       return id;
     }
 
-    const { data } = await createBsffTransporter({
-      variables: { input: cleanInput }
-    });
+    const { data } =
+      await createBsffTransporter({
+        variables: {
+          input: cleanInput
+        }
+      });
 
-    return data?.createBsffTransporter?.id ?? "";
+    return (
+      data?.createBsffTransporter?.id ??
+      ""
+    );
   }
 
+  // ======================================================
+  // RENDER
+  // ======================================================
+
   return (
-    <BsffContext.Provider value={bsffContext}>
+    <BsffContext.Provider
+      value={bsffContext}
+    >
       <FormStepsContent
         bsdType={BsdType.Bsff}
         draftCtaLabel={draftCtaLabel}
@@ -492,12 +847,16 @@ const BsffFormSteps = ({
         useformMethods={methods}
         tabsContent={tabsContent}
         sealedFields={sealedFields}
-        setPublishErrors={setPublishErrors}
+        setPublishErrors={
+          setPublishErrors
+        }
         errorTabIds={errorTabIds}
         genericErrorMessage={publishErrorMessages.filter(
-          error => error.tabId === TabId.none
+          error =>
+            error.tabId === TabId.none
         )}
       />
+
       {loading && <Loader />}
     </BsffContext.Provider>
   );
