@@ -322,6 +322,8 @@ type BsffFicheIntervention {
   operateur: BsffOperateur
   "Code postal du lieu où l'intervention a eu lieu."
   postalCode: String!
+  "Liste des contenants associés à cette fiche d'intervention."
+  packagings: [BsffPackaging!]!
 }
 
 "Informations sur le détenteur d'un équipement"

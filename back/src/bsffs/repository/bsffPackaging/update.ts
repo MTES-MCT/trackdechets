@@ -7,6 +7,7 @@ import { bsffEventTypes } from "../types";
 import { objectDiff } from "../../../forms/workflow/diff";
 import { getStatus } from "../../compat";
 import { buildUpdateBsff } from "../bsff/update";
+import { checkPackagingGroupIntegrity } from "./checkPackagingGroupIntegrity";
 
 export type UpdateBsffPackagingFn = (
   args: Prisma.BsffPackagingUpdateArgs,
@@ -19,11 +20,17 @@ export function buildUpdateBsffPackaging(
   return async (args, logMetadata?) => {
     const { prisma, user } = deps;
 
-    const previousBsffPackaging = await prisma.bsffPackaging.findUnique({
+    const previousBsffPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
       where: args.where
     });
     const bsffPackaging = await prisma.bsffPackaging.update(args);
-
+    if (args.data.bsff?.connect?.id) {
+      await checkPackagingGroupIntegrity(
+        previousBsffPackaging.id,
+        args.data.bsff.connect.id,
+        prisma
+      );
+    }
     const updateDiff = objectDiff(previousBsffPackaging, bsffPackaging);
     await prisma.event.create({
       data: {

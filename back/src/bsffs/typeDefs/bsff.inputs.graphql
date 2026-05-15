@@ -436,6 +436,8 @@ input BsffFicheInterventionInput {
   operateur: BsffOperateurInput!
   "Le code postal du lieu de collecte"
   postalCode: String!
+  "Identifiants des contenants à associer à cette fiche d'intervention"
+  packagings: [ID!]
 }
 
 """

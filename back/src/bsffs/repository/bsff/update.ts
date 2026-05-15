@@ -98,21 +98,21 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
 
     // Si le BSFF a des fiches d'intervention et des packagings,
     // on fait le lien entre eux
-    if (args.data.ficheInterventions || args.data.packagings) {
-      // D'abord on enlève les anciennes relations
-      await removeBsffPackagingsFichesIntervention(
-        previousBsff.packagings,
-        previousBsff.ficheInterventions,
-        prisma
-      );
+    // if (args.data.ficheInterventions || args.data.packagings) {
+    //   // D'abord on enlève les anciennes relations
+    //   await removeBsffPackagingsFichesIntervention(
+    //     previousBsff.packagings,
+    //     previousBsff.ficheInterventions,
+    //     prisma
+    //   );
 
-      // Puis on ajoute les nouvelles
-      await addBsffPackagingsFichesIntervention(
-        fullBsff.packagings,
-        fullBsff.ficheInterventions,
-        prisma
-      );
-    }
+    //   // Puis on ajoute les nouvelles
+    //   await addBsffPackagingsFichesIntervention(
+    //     fullBsff.packagings,
+    //     fullBsff.ficheInterventions,
+    //     prisma
+    //   );
+    // }
 
     const { updatedAt, ...updateDiff } = objectDiff(previousBsff, updatedBsff);
 
