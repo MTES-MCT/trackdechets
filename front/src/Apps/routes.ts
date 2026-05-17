@@ -76,7 +76,8 @@ const routes = {
     bsffs: {
       create: "/dashboard/:siret/bsffs/create",
       edit: "/dashboard/:siret/bsffs/edit/:id",
-      view: "/dashboard/:siret/bsffs/view/:id"
+      view: "/dashboard/:siret/bsffs/view/:id",
+      review: "/dashboard/:siret/bsffs/review/:id"
     },
     bsdas: {
       create: "/dashboard/:siret/bsdas/create",
@@ -229,6 +230,7 @@ export const titles = {
   "/dashboard/:siret/bsffs/create": "Créer un BSFF — Trackdéchets",
   "/dashboard/:siret/bsffs/edit/:id": "Modifier le BSFF — Trackdéchets",
   "/dashboard/:siret/bsffs/view/:id": "Aperçu du BSFF — Trackdéchets",
+  "/dashboard/:siret/bsffs/review/:id": "Réviser le BSFF — Trackdéchets",
   "/dashboard/:siret/bsdas/create": "Créer un BSDA — Trackdéchets",
   "/dashboard/:siret/bsdas/edit/:id": "Modifier le BSDA — Trackdéchets",
   "/dashboard/:siret/bsdas/view/:id": "Aperçu du BSDA — Trackdéchets",

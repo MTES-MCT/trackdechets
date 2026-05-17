@@ -16,6 +16,10 @@ import {
   GET_BSDASRI_REVISION_REQUESTS
 } from "../../../common/queries/reviews/BsdasriReviewQuery";
 import {
+  CANCEL_BSFF_REVISION_REQUEST,
+  GET_BSFF_REVISION_REQUESTS
+} from "../../../common/queries/reviews/BsffReviewQuery";
+import {
   CANCEL_FORM_REVISION_REQUEST,
   GET_FORM_REVISION_REQUESTS
 } from "../../../common/queries/reviews/BsddReviewsQuery";
@@ -48,6 +52,15 @@ const RevisionCancelFragment = ({
     ]
   });
 
+  const [cancelBsffRevisionRequest, { loading: cancelingBsff }] = useMutation<
+    Pick<Mutation, "cancelBsffRevisionRequest">,
+    MutationCancelBsffRevisionRequestArgs
+  >(CANCEL_BSFF_REVISION_REQUEST, {
+    refetchQueries: [
+      { query: GET_BSFF_REVISION_REQUESTS, variables: { siret } }
+    ]
+  });
+
   const [cancelBsdasriRevisionRequest, { loading: cancelingBsdasri }] =
     useMutation<
       Pick<Mutation, "cancelBsdasriRevisionRequest">,
@@ -69,6 +82,12 @@ const RevisionCancelFragment = ({
 
     if (bsdType === BsdType.Bsda) {
       await cancelBsdaRevisionRequest({
+        variables: { id: reviewId }
+      });
+    }
+
+    if (bsdType === BsdType.Bsff) {
+      await cancelBsffRevisionRequest({
         variables: { id: reviewId }
       });
     }
