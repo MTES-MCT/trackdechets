@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -35,7 +35,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   const isTracerFluide = type === BsffType.TracerFluide;
 
   const companyField = isTracerFluide
-    ? "company"
+    ? "emitter.company"
     : `${fieldName}.detenteur.company`;
 
   const privateField = `${fieldName}.detenteur.isPrivateIndividual`;
@@ -47,6 +47,12 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   const selectedOrgId = watch(`${companyField}.orgId`);
 
   const sealedFields = useContext(SealedFieldsContext);
+
+  const hasInitializedTracerFluide = useRef(false);
+  useEffect(() => {
+    if (!isTracerFluide || hasInitializedTracerFluide.current) return;
+    hasInitializedTracerFluide.current = true;
+  }, [isTracerFluide]);
 
   /**
    * CAS PARTICULIER
@@ -65,9 +71,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
   /**
    * CAS INSTALLATION
-   *
-   * Préremplissage UNIQUE à l'initialisation
-   * sans écraser les modifications utilisateur.
    */
   const hasInitializedInstallationDetenteur = React.useRef(false);
 
@@ -92,16 +95,8 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
     const isSameCompany = currentIdentifier === emitterIdentifier;
 
-    /**
-     * On synchronise uniquement
-     * les champs structurels.
-     *
-     * Les champs éditables utilisateur
-     * ne doivent pas être écrasés.
-     */
     if (isEmpty || isSameCompany) {
       setValue(`${companyField}.orgId`, emitterCompany.orgId);
-
       setValue(`${companyField}.siret`, emitterCompany.siret);
 
       if (!current?.name) {
@@ -112,9 +107,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
         setValue(`${companyField}.address`, emitterCompany.address);
       }
 
-      /**
-       * Préremplissage initial seulement
-       */
       if (!current?.contact) {
         setValue(`${companyField}.contact`, emitterCompany.contact);
       }
@@ -131,31 +123,21 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
     hasInitializedInstallationDetenteur.current = true;
   }, [isInstallationType, emitterCompany, companyField, getValues, setValue]);
 
-  /**
-   * Helper synchronisation société
-   * sans écraser les modifications utilisateur
-   */
   const syncCompanyWithoutOverriding = (company: any) => {
     const current = getValues(companyField);
 
     setValue(`${companyField}.orgId`, company.orgId);
-
     setValue(`${companyField}.siret`, company.siret);
-
     setValue(`${companyField}.name`, current?.name ?? company.name);
-
     setValue(`${companyField}.address`, current?.address ?? company.address);
-
     setValue(`${companyField}.contact`, current?.contact ?? company.contact);
-
     setValue(`${companyField}.phone`, current?.phone ?? company.contactPhone);
-
     setValue(`${companyField}.mail`, current?.mail ?? company.contactEmail);
   };
 
   return (
     <div className="fr-col-12">
-      {/* CAS TRACER FLUIDE */}
+      {/* CAS TRACER FLUIDE  */}
       {isTracerFluide && (
         <>
           <h4 className="fr-mt-4w">Détenteur</h4>
@@ -165,8 +147,8 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
               <CompanySelectorWrapper
                 orgId={orgId}
                 selectedCompanyOrgId={
-                  watch("emitter.company.orgId") ??
-                  watch("emitter.company.siret")
+                  watch(`${companyField}.orgId`) ??
+                  watch(`${companyField}.siret`)
                 }
                 onCompanySelected={company => {
                   if (!company) return;
@@ -186,11 +168,12 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
             </div>
           </div>
 
-          <CompanyContactInfo fieldName="emitter.company" />
+          <CompanyContactInfo fieldName={companyField} />
 
           <hr className="fr-mt-4w" />
         </>
       )}
+
       {/* CAS INSTALLATION */}
       {isInstallationType && (
         <>
@@ -217,11 +200,11 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
           <hr className="fr-mt-4w" />
         </>
       )}
+
       {/* CAS NORMAL */}
       {!isInstallationType && !isTracerFluide && (
         <>
-          {/* FICHE INTERVENTION */}
-          <h4 className="fr-mt-4w">Fiche d’intervention (optionnel) </h4>
+          <h4 className="fr-mt-4w">Fiche d'intervention (optionnel)</h4>
 
           <div className="fr-grid-row fr-grid-row--gutters">
             <div className="fr-col-md-4">
@@ -282,7 +265,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       value: field.value ?? "",
                       onChange: e => {
                         const val = e.target.value;
-
                         field.onChange(val === "" ? undefined : Number(val));
                       }
                     }}
@@ -299,7 +281,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
             </div>
           </div>
 
-          {/* DETENTEUR */}
           <h4 className="fr-mt-4w">Détenteur</h4>
 
           <Controller
@@ -315,7 +296,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
             )}
           />
 
-          {/* PARTICULIER */}
           {isPrivate ? (
             <>
               <div className="fr-grid-row fr-grid-row--gutters">
@@ -357,9 +337,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                   postalCode={watch(`${companyField}.postalCode`)}
                   onAddressSelection={details => {
                     setValue(`${companyField}.address`, details.name);
-
                     setValue(`${companyField}.city`, details.city);
-
                     setValue(`${companyField}.postalCode`, details.postcode);
                   }}
                   designation="du détenteur"
@@ -399,7 +377,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
             </>
           ) : (
             <>
-              {/* ENTREPRISE */}
               <div className="fr-grid-row fr-grid-row--gutters fr-mt-3w">
                 <div className="fr-col-12">
                   <CompanySelectorWrapper
@@ -407,7 +384,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                     selectedCompanyOrgId={selectedOrgId}
                     onCompanySelected={company => {
                       if (!company) return;
-
                       syncCompanyWithoutOverriding(company);
                     }}
                     disabled={sealedFields.includes("ficheInterventions")}
