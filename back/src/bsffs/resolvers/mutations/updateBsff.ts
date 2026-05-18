@@ -18,8 +18,12 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   const existingBsff = await getBsffOrNotFound({ id });
 
-  // Un premier transporteur est initialisé dans la mutation `createBsff`
-  // ce qui permet d'être certain que `transporter` est défini
+  if (existingBsff.type === "TRACER_FLUIDE" && input.emitter?.company) {
+    if (!input.emitter.company.contact) input.emitter.company.contact = null;
+    if (!input.emitter.company.phone) input.emitter.company.phone = null;
+    if (!input.emitter.company.mail) input.emitter.company.mail = null;
+  }
+
   const existingFirstTransporter = getFirstTransporterSync(existingBsff)!;
 
   await checkCanUpdate(user, existingBsff, input);
