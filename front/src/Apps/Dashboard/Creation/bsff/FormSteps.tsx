@@ -446,7 +446,17 @@ const BsffFormSteps = ({
     if (draft) return;
 
     try {
-      return await publishBsff({ variables: { id: bsffState.id! } });
+      const result = await publishBsff({ variables: { id: bsffState.id! } });
+      const currentCompany = methods.getValues("emitter.company");
+      if (currentCompany && input.emitter?.company) {
+        methods.setValue("emitter.company", {
+          ...currentCompany,
+          contact: input.emitter.company.contact ?? currentCompany.contact,
+          phone: input.emitter.company.phone ?? currentCompany.phone,
+          mail: input.emitter.company.mail ?? currentCompany.mail
+        });
+      }
+      return result;
     } catch (err: any) {
       setPublishErrors(handleGraphQlError(err));
       throw err;
