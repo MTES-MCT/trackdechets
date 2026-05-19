@@ -5,7 +5,8 @@ import {
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs,
   MutationSubmitFormRevisionRequestApprovalArgs,
-  MutationSubmitBsdasriRevisionRequestApprovalArgs
+  MutationSubmitBsdasriRevisionRequestApprovalArgs,
+  MutationSubmitBsffRevisionRequestApprovalArgs
 } from "@td/codegen-ui";
 import { useMutation } from "@apollo/client";
 import {
@@ -20,6 +21,10 @@ import {
   GET_BSDASRI_REVISION_REQUESTS,
   SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL
 } from "../../../common/queries/reviews/BsdasriReviewQuery";
+import {
+  GET_BSFF_REVISION_REQUESTS,
+  SUBMIT_BSFF_REVISION_REQUEST_APPROVAL
+} from "../../../common/queries/reviews/BsffReviewQuery";
 
 interface RevisionApproveFragmentProps {
   reviewId: string;
@@ -69,6 +74,18 @@ const RevisionApproveFragment = ({
     ]
   });
 
+  const [
+    submitBsffRevisionRequestApproval,
+    { loading: updatingBsff, error: errorBsff }
+  ] = useMutation<
+    Pick<Mutation, "submitBsffRevisionRequestApproval">,
+    MutationSubmitBsffRevisionRequestApprovalArgs
+  >(SUBMIT_BSFF_REVISION_REQUEST_APPROVAL, {
+    refetchQueries: [
+      { query: GET_BSFF_REVISION_REQUESTS, variables: { siret } }
+    ]
+  });
+
   const handleClose = () => onClose!();
 
   const handleRevisionReject = async () => {
@@ -80,6 +97,11 @@ const RevisionApproveFragment = ({
 
     if (bsdType === BsdType.Bsda) {
       await submitBsdaRevisionRequestApproval({
+        variables: { id: reviewId, isApproved: false }
+      });
+    }
+    if (bsdType === BsdType.Bsff) {
+      await submitBsffRevisionRequestApproval({
         variables: { id: reviewId, isApproved: false }
       });
     }
@@ -106,6 +128,12 @@ const RevisionApproveFragment = ({
       });
     }
 
+    if (bsdType === BsdType.Bsff) {
+      await submitBsffRevisionRequestApproval({
+        variables: { id: reviewId, isApproved: true }
+      });
+    }
+
     if (bsdType === BsdType.Bsdasri) {
       await submitBsdasriRevisionRequestApproval({
         variables: { id: reviewId, isApproved: true }
@@ -116,7 +144,7 @@ const RevisionApproveFragment = ({
 
   return (
     <>
-      {(errorBsda || errorForm || errorBsdasri) && (
+      {(errorBsda || errorForm || errorBsdasri || errorBsff) && (
         <div
           style={{ marginTop: "2em", marginBottom: "2em" }}
           className="notification notification--warning"
@@ -124,19 +152,24 @@ const RevisionApproveFragment = ({
           {errorForm?.message}
           {errorBsda?.message}
           {errorBsdasri?.message}
+          {errorBsff?.message}
         </div>
       )}
       <Button
         priority="primary"
         onClick={handleRevisionReject}
-        disabled={updatingForm || updatingBsda || updatingBsdasri}
+        disabled={
+          updatingForm || updatingBsda || updatingBsdasri || updatingBsff
+        }
       >
         Refuser
       </Button>
       <Button
         priority="primary"
         onClick={handleRevisionApprove}
-        disabled={updatingForm || updatingBsda || updatingBsdasri}
+        disabled={
+          updatingForm || updatingBsda || updatingBsdasri || updatingBsff
+        }
       >
         Approuver
       </Button>

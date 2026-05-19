@@ -23,6 +23,8 @@ import { ExtraSignatureType } from "../../dashboard/components/BSDList/BSDasri/t
 import { RouteBsdaRequestRevision } from "./Components/RevisionRequestList/bsda/request";
 import { RouteBsdasriRequestRevision } from "./Components//RevisionRequestList/bsdasri/request";
 import { RouteBsddRequestRevision } from "./Components//RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
+import { RouteBsffRequestRevision } from "./Components/RevisionRequestList/bsff/request";
+
 import {
   RouteBSDasrisView,
   RouteBSDDsView,
@@ -181,6 +183,11 @@ function DashboardRoutes() {
           <Route
             path={toRelative(routes.dashboard.bsdas.review)}
             element={<RouteBsdaRequestRevision />}
+          />
+
+          <Route
+            path={toRelative(routes.dashboard.bsffs.review)}
+            element={<RouteBsffRequestRevision />}
           />
 
           <Route
@@ -480,6 +487,20 @@ function DashboardRoutes() {
                   size={reviewModalSize}
                 >
                   <RouteBsdaRequestRevision />
+                </Modal>
+              }
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsffs.review)}
+              element={
+                <Modal
+                  onClose={goBack}
+                  ariaLabel="Demande de révision"
+                  isOpen
+                  size={reviewModalSize}
+                >
+                  <RouteBsffRequestRevision />
                 </Modal>
               }
             />

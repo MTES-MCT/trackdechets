@@ -847,6 +847,8 @@ export const getRevisionPath = bsd => {
       return routes.dashboard.bsdds.review;
     case BsdType.Bsda:
       return routes.dashboard.bsdas.review;
+    case BsdType.Bsff:
+      return routes.dashboard.bsffs.review;
     case BsdType.Bsdasri:
       return routes.dashboard.bsdasris.review;
     default:
