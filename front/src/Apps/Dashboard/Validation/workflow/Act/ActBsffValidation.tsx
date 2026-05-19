@@ -1,10 +1,10 @@
 import React from "react";
 import { Bsff, BsffStatus } from "@td/codegen-ui";
-import { SignEmission } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignEmission";
-import { SignTransport } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignTransport";
-import { SignReception } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignReception";
 import { SignPackagings } from "../../bsff/SignPackagings";
 import SignBsffPackagingModal from "../../bsff/SignBsffPackagingModal";
+import SignBsffEmission from "../../bsff/SignBsffEmission";
+import SignBsffTransport from "../../bsff/SignBsffTransport";
+import { SignBsffReception } from "../../bsff/SignBsffReception";
 
 interface ActBsffValidationProps {
   bsd: Bsff;
@@ -25,11 +25,11 @@ const ActBsffValidation = ({
   };
 
   const renderInitialModal = () => {
-    return <SignEmission bsffId={bsd.id} {...actionButtonAdapterProps} />;
+    return <SignBsffEmission bsffId={bsd.id} onClose={onClose} />;
   };
 
   const renderSignedByEmitterModal = () => {
-    return <SignTransport bsffId={bsd.id} {...actionButtonAdapterProps} />;
+    return <SignBsffTransport bsffId={bsd.id} onClose={onClose} />;
   };
 
   const renderSentModal = () => {
@@ -38,10 +38,10 @@ const ActBsffValidation = ({
     );
 
     if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
-      return <SignTransport bsffId={bsd.id} {...actionButtonAdapterProps} />;
+      return <SignBsffTransport bsffId={bsd.id} onClose={onClose} />;
     }
 
-    return <SignReception bsffId={bsd.id} {...actionButtonAdapterProps} />;
+    return <SignBsffReception bsffId={bsd.id} onClose={onClose} />;
   };
 
   const renderReceivedModal = () => {
