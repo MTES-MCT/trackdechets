@@ -303,6 +303,7 @@ const BsffFormSteps = ({
     );
   }
   async function getFicheInterventionIds(values: ZodBsff) {
+    const emitterCompany = values.emitter?.company;
     if (
       [
         BsffType.Groupement,
@@ -341,7 +342,7 @@ const BsffFormSteps = ({
             weight: Number(fi.weight),
             postalCode: fi.postalCode!,
             detenteur: cleanedDetenteur,
-            operateur: { company: cleanCompany(detenteurCompany) }
+            operateur: { company: cleanCompany(emitterCompany) }
           };
 
           if (fi.id) {
