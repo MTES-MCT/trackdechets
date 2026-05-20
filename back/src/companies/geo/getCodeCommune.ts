@@ -3,7 +3,8 @@ import { logger } from "@td/logger";
 import { removeSpecialCharsExceptHyphens } from "../../utils";
 
 // https://adresse.data.gouv.fr/api-doc/adresse
-export const ADRESSE_DATA_GOUV_FR_URL = "https://api-adresse.data.gouv.fr";
+// Ancienne url décomissionnée : https://api-adresse.data.gouv.fr
+export const ADRESSE_DATA_GOUV_FR_URL = "https://data.geopf.fr/geocodage";
 
 interface Properties {
   label?: string;
