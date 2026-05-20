@@ -41,6 +41,7 @@ export type PackagingFormProps = {
   touched?: Partial<
     Record<keyof (PackagingInfoInput | BsffPackagingInput), boolean>
   >;
+  volumeEditable?: boolean;
 };
 
 /**
@@ -53,6 +54,8 @@ function BsffPackagingForm({
   packagingTypes,
   inputProps,
   disabled = false,
+  volumeEditable = false, // ← ajouter
+
   errors,
   touched
 }: PackagingFormProps) {
@@ -101,7 +104,7 @@ function BsffPackagingForm({
           <NonScrollableInput
             label={`Volume en litres`}
             className="fr-mb-2w"
-            disabled={disabled}
+            disabled={disabled && !volumeEditable}
             state={errors?.volume && touched?.volume ? "error" : "default"}
             stateRelatedMessage={errors?.volume}
             nativeInputProps={{
