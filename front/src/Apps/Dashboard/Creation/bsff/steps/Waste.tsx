@@ -216,7 +216,10 @@ const WasteBsff = () => {
                 sealedFields.includes("packagings") ||
                 bsffType === BsffType.Groupement ||
                 bsffType === BsffType.Reexpedition
-                // ← Reconditionnement : pas disabled, modifiable manuellement
+              }
+              volumeEditable={
+                bsffType === BsffType.Groupement ||
+                bsffType === BsffType.Reexpedition
               }
               fieldName="packagings"
               packagingTypes={bsffPackagingTypes}

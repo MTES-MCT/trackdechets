@@ -428,10 +428,6 @@ const BsffFormSteps = ({
     type: BsffType,
     packagings: any[] | null | undefined
   ) {
-    if ([BsffType.Groupement, BsffType.Reexpedition].includes(type)) {
-      return undefined;
-    }
-
     return packagings?.map(p => ({
       type: p.type,
       numero: p.numero,

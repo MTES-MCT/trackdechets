@@ -13,6 +13,7 @@ export interface RenderPackagingFormProps
   extends Omit<PackagingFormProps, "inputProps" | "errors" | "touched"> {
   fieldName: string;
   idx: number;
+  volumeEditable?: boolean;
 }
 
 export type PackagingListProps = {
@@ -20,6 +21,7 @@ export type PackagingListProps = {
   packagingTypes: (Packagings | BsffPackagingType)[];
   packagingInfos: PackagingInfoInput[];
   disabled?: boolean;
+  volumeEditable?: boolean;
   push: (packaging: PackagingInfoInput) => void;
   remove: (idx: number) => void;
   onRemoveFromTable?: (id: string) => void;
@@ -34,6 +36,8 @@ function BsffPackagingList({
   remove,
   onRemoveFromTable,
   disabled = false,
+  volumeEditable = false,
+
   children
 }: PackagingListProps) {
   const bsffType = useWatch({ name: "type" });
@@ -88,7 +92,8 @@ function BsffPackagingList({
               packagingsLength: packagingInfos.length,
               idx,
               packaging: p,
-              disabled
+              disabled,
+              volumeEditable
             })}
 
             {fromTable

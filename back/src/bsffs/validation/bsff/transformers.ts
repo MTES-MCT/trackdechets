@@ -44,18 +44,21 @@ export const checkAndSetPreviousPackagings: ZodBsffTransformer = async (
   ) {
     return {
       ...rest,
-      packagings: previousPackagings.map(p => ({
-        // Reprend les informations de base des contenants en cas de
-        // groupement ou de rééxpedition
-        type: p.type,
-        other: p.other,
-        numero: p.numero,
-        emissionNumero: p.numero,
-        volume: p.volume,
-        weight: p.acceptationWeight ?? 0,
-        operationNoTraceability: false,
-        previousPackagings: [p.id]
-      }))
+      packagings: previousPackagings.map(p => {
+        const userPackaging = bsff.packagings?.find(
+          up => up.numero === p.numero
+        );
+        return {
+          type: p.type,
+          other: p.other,
+          numero: p.numero,
+          emissionNumero: p.numero,
+          volume: userPackaging?.volume ?? p.volume,
+          weight: p.acceptationWeight ?? 0,
+          operationNoTraceability: false,
+          previousPackagings: [p.id]
+        };
+      })
     };
   } else if (bsff.type === BsffType.RECONDITIONNEMENT) {
     return {
