@@ -84,40 +84,24 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
     }
 
     const emitterIdentifier = emitterCompany.orgId || emitterCompany.siret;
-
     if (!emitterIdentifier) return;
 
     const current = getValues(companyField);
-
     const currentIdentifier = current?.orgId || current?.siret;
-
     const isEmpty = !currentIdentifier;
-
     const isSameCompany = currentIdentifier === emitterIdentifier;
 
     if (isEmpty || isSameCompany) {
       setValue(`${companyField}.orgId`, emitterCompany.orgId);
       setValue(`${companyField}.siret`, emitterCompany.siret);
-
-      if (!current?.name) {
-        setValue(`${companyField}.name`, emitterCompany.name);
-      }
-
-      if (!current?.address) {
+      if (!current?.name) setValue(`${companyField}.name`, emitterCompany.name);
+      if (!current?.address)
         setValue(`${companyField}.address`, emitterCompany.address);
-      }
-
-      if (!current?.contact) {
+      if (!current?.contact)
         setValue(`${companyField}.contact`, emitterCompany.contact);
-      }
-
-      if (!current?.phone) {
+      if (!current?.phone)
         setValue(`${companyField}.phone`, emitterCompany.phone);
-      }
-
-      if (!current?.mail) {
-        setValue(`${companyField}.mail`, emitterCompany.mail);
-      }
+      if (!current?.mail) setValue(`${companyField}.mail`, emitterCompany.mail);
     }
 
     hasInitializedInstallationDetenteur.current = true;
@@ -125,14 +109,36 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
   const syncCompanyWithoutOverriding = (company: any) => {
     const current = getValues(companyField);
+    const currentOrgId = current?.orgId || current?.siret;
+    const newOrgId = company.orgId || company.siret;
+    const isNewCompany = currentOrgId !== newOrgId;
 
     setValue(`${companyField}.orgId`, company.orgId);
     setValue(`${companyField}.siret`, company.siret);
-    setValue(`${companyField}.name`, current?.name ?? company.name);
-    setValue(`${companyField}.address`, current?.address ?? company.address);
-    setValue(`${companyField}.contact`, current?.contact ?? company.contact);
-    setValue(`${companyField}.phone`, current?.phone ?? company.contactPhone);
-    setValue(`${companyField}.mail`, current?.mail ?? company.contactEmail);
+    setValue(
+      `${companyField}.name`,
+      isNewCompany ? company.name : current?.name ?? company.name
+    );
+    setValue(
+      `${companyField}.address`,
+      isNewCompany ? company.address : current?.address ?? company.address
+    );
+    setValue(
+      `${companyField}.contact`,
+      isNewCompany ? company.contact : current?.contact ?? company.contact
+    );
+    setValue(
+      `${companyField}.phone`,
+      isNewCompany
+        ? company.contactPhone
+        : current?.phone ?? company.contactPhone
+    );
+    setValue(
+      `${companyField}.mail`,
+      isNewCompany
+        ? company.contactEmail
+        : current?.mail ?? company.contactEmail
+    );
   };
 
   return (
