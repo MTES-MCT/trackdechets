@@ -6,6 +6,9 @@ import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
+import { sendMail } from "../../../mailer/mailing";
+import { onTotpActivated, renderMail } from "@td/mail";
+import { logMfaEvent } from "../../../common/mfaLogger";
 
 const RECOVERY_CODE_COUNT = 10;
 const RECOVERY_CODE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -79,6 +82,12 @@ const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
   }
 
   if (!verifyTotpCode(dbUser.totpSeed, code)) {
+    logMfaEvent({
+      eventType: "MFA_ACTIVATION_ABANDONED",
+      userId: dbUser.id,
+      success: false,
+      ip: context.req.ip
+    });
     throw new UserInputError(
       "Le code est invalide. Vérifiez votre application d'authentification et réessayez."
     );
@@ -107,8 +116,23 @@ const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
     )
   ]);
 
-  // La MFA n'est pas encore activée : totpActivatedAt reste null.
-  // L'activation définitive est déléguée à finalizeMfaSetup.
+  // Mise à jour de issuedAt pour garder la session courante valide
+  context.req.session.issuedAt = new Date().toISOString();
+
+  logMfaEvent({
+    eventType: "MFA_ACTIVATED",
+    userId: dbUser.id,
+    success: true,
+    ip: context.req.ip
+  });
+
+  // E-mail de confirmation
+  await sendMail(
+    renderMail(onTotpActivated, {
+      to: [{ name: dbUser.name, email: dbUser.email }]
+    })
+  );
+
   return { codes: plainCodes };
 };
 

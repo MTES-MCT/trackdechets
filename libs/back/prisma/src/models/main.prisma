@@ -984,6 +984,19 @@ model TotpRecoveryCode {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model MfaAuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  eventType String
+  success   Boolean
+  ip        String?
+  loggedAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([userId], map: "MfaAuditLog_userId_idx")
+  @@index([loggedAt], map: "MfaAuditLog_loggedAt_idx")
+  @@index([eventType], map: "MfaAuditLog_eventType_idx")
+}
+
 model MfaResetRequest {
   id        String                @id @default(cuid()) @db.VarChar(30)
   userId    String                @db.VarChar(30)

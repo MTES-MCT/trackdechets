@@ -57,4 +57,16 @@ type Query {
   Liste les permissions que l'utilisateur a sur au moins un de ses établissements.
   """
   permissionsInfos: PermissionsInfos!
+
+  """
+  ADMIN UNIQUEMENT
+  Retourne les entrées du journal d'audit MFA, triées par date décroissante.
+  Paramètres optionnels : filtrer par userId, par type d'événement, limiter les résultats.
+  """
+  mfaAuditLogs(
+    userId: String
+    eventType: String
+    skip: Int
+    first: Int
+  ): [MfaAuditLog!]!
 }

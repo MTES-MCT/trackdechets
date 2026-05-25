@@ -3,6 +3,7 @@ import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";
+import { logMfaEvent } from "../../../common/mfaLogger";
 
 const BASE32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
@@ -62,6 +63,13 @@ const generateTotpSetupResolver: MutationResolvers["generateTotpSetup"] =
         data: { totpSeed: secret }
       })
     ]);
+
+    logMfaEvent({
+      eventType: "MFA_SETUP_INITIATED",
+      userId: user.id,
+      success: true,
+      ip: context.req.ip
+    });
 
     return { secret, qrCodeUrl };
   };
