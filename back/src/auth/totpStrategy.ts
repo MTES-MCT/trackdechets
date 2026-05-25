@@ -4,6 +4,7 @@ import { TOTP } from "totp-generator";
 import { prisma, User } from "@td/prisma";
 import { sanitizeEmail } from "../utils";
 import { addSeconds } from "date-fns";
+import { logMfaEvent } from "../common/mfaLogger";
 
 const TOTP_MAX_FAILS = 5;
 const TOTP_LOCK_SECONDS = 300; // 5 minutes after TOTP_MAX_FAILS consecutive failures
@@ -85,14 +86,41 @@ export class TotpStrategy extends PassportStrategy {
       if (!verifiedUser) {
         const { totpFails, totpLockedUntil } = await increaseLock(user!);
         if (totpFails >= TOTP_MAX_FAILS) {
+          logMfaEvent({
+            eventType: "MFA_LOCKOUT_TRIGGERED",
+            userId: user!.id,
+            success: false,
+            ip: req.ip
+          });
           return this.fail(
             { code: "TOTP_LOCKOUT", lockout: totpLockedUntil!.getTime() },
             401
           );
         }
+        logMfaEvent({
+          eventType: "MFA_LOGIN_FAILURE",
+          userId: user!.id,
+          success: false,
+          ip: req.ip
+        });
         return this.fail({ code: "INVALID_TOTP" }, 401);
       }
+      const wasLocked = !!user!.totpLockedUntil;
       await resetLock(user!);
+      if (wasLocked) {
+        logMfaEvent({
+          eventType: "MFA_LOCKOUT_LIFTED",
+          userId: user!.id,
+          success: true,
+          ip: req.ip
+        });
+      }
+      logMfaEvent({
+        eventType: "MFA_LOGIN_SUCCESS",
+        userId: user!.id,
+        success: true,
+        ip: req.ip
+      });
       this.success(verifiedUser);
     } catch (err) {
       this.error(err);

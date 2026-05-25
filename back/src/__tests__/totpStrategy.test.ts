@@ -6,6 +6,7 @@ import { User } from "@td/prisma";
 
 const findUniqueMock = jest.fn();
 const updateMock = jest.fn();
+const logMfaEventMock = jest.fn();
 
 jest.mock("@td/prisma", () => ({
   ...jest.requireActual("@td/prisma"),
@@ -15,6 +16,10 @@ jest.mock("@td/prisma", () => ({
       update: (...args: unknown[]) => updateMock(...args)
     }
   }
+}));
+
+jest.mock("../common/mfaLogger", () => ({
+  logMfaEvent: (...args: unknown[]) => logMfaEventMock(...args)
 }));
 
 jest.mock("../utils", () => ({
@@ -66,6 +71,7 @@ describe("TotpStrategy", () => {
   afterEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
+    logMfaEventMock.mockReset();
   });
 
   /**
@@ -155,5 +161,79 @@ describe("TotpStrategy", () => {
       (updateCall.data.totpLockedUntil.getTime() - timestamp) / 1000;
     expect(lockSeconds).toBeGreaterThanOrEqual(299);
     expect(lockSeconds).toBeLessThan(310); // sanity upper bound
+  });
+
+  it("should log MFA_LOGIN_SUCCESS on successful authentication", async () => {
+    const fixedNow = 1_700_000_015_000;
+    jest.spyOn(Date, "now").mockReturnValue(fixedNow);
+
+    const user = mockUser();
+    findUniqueMock.mockResolvedValue(user);
+    updateMock.mockResolvedValue(user);
+
+    const { otp } = TOTP.generate(SEED, { timestamp: fixedNow });
+    const { strategy } = makeStrategy();
+    await strategy.authenticate(mockRequest(otp));
+
+    expect(logMfaEventMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "MFA_LOGIN_SUCCESS",
+        success: true,
+        userId: user.id
+      })
+    );
+  });
+
+  it("should log MFA_LOGIN_FAILURE on wrong code (before lockout threshold)", async () => {
+    const user = mockUser({ totpFails: 0 });
+    findUniqueMock.mockResolvedValue(user);
+    updateMock.mockResolvedValue({});
+
+    const { strategy } = makeStrategy();
+    await strategy.authenticate(mockRequest("000000"));
+
+    expect(logMfaEventMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "MFA_LOGIN_FAILURE",
+        success: false,
+        userId: user.id
+      })
+    );
+  });
+
+  it("should log MFA_LOCKOUT_TRIGGERED on the 5th consecutive failure", async () => {
+    const user = mockUser({ totpFails: 4 });
+    findUniqueMock.mockResolvedValue(user);
+    updateMock.mockResolvedValue({});
+
+    const { strategy } = makeStrategy();
+    await strategy.authenticate(mockRequest("000000"));
+
+    expect(logMfaEventMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "MFA_LOCKOUT_TRIGGERED",
+        success: false,
+        userId: user.id
+      })
+    );
+  });
+
+  it("should log MFA_LOCKOUT_LIFTED then MFA_LOGIN_SUCCESS when succeeding after an expired lockout", async () => {
+    const fixedNow = 1_700_000_015_000;
+    jest.spyOn(Date, "now").mockReturnValue(fixedNow);
+
+    // User was locked but the lockout has already expired (in the past)
+    const expiredLockout = new Date(fixedNow - 1000);
+    const user = mockUser({ totpFails: 5, totpLockedUntil: expiredLockout });
+    findUniqueMock.mockResolvedValue(user);
+    updateMock.mockResolvedValue(user);
+
+    const { otp } = TOTP.generate(SEED, { timestamp: fixedNow });
+    const { strategy } = makeStrategy();
+    await strategy.authenticate(mockRequest(otp));
+
+    const calls = logMfaEventMock.mock.calls.map(c => c[0].eventType);
+    expect(calls).toContain("MFA_LOCKOUT_LIFTED");
+    expect(calls).toContain("MFA_LOGIN_SUCCESS");
   });
 });
