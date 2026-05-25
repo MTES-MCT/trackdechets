@@ -8,7 +8,6 @@ import {
   PreviewTextRow,
   PreviewCompanyContact
 } from "../BSDPreviewComponents";
-import Alert from "@codegouvfr/react-dsfr/Alert";
 
 interface BSFFPreviewEmitterProps {
   bsd: Bsff;
@@ -25,6 +24,10 @@ const BSFFPreviewEmitter = ({ bsd }: BSFFPreviewEmitterProps) => {
 
           <PreviewTextRow label="SIRET" value={bsd.emitter?.company?.siret} />
           <PreviewTextRow
+            label="Tva intracommunautaire"
+            value={bsd.emitter?.company?.vatNumber}
+          />
+          <PreviewTextRow
             label="Adresse"
             value={bsd.emitter?.company?.address}
           />
@@ -35,6 +38,8 @@ const BSFFPreviewEmitter = ({ bsd }: BSFFPreviewEmitterProps) => {
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={3} highlight>
+          <PreviewTextRow label="Poids total" value={bsd.weight?.value} />
+
           <PreviewTextRow
             label="Signé par"
             value={bsd.emitter?.emission?.signature?.author}

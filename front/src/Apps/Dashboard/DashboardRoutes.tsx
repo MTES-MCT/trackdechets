@@ -26,7 +26,6 @@ import { RouteBsddRequestRevision } from "./Components//RevisionRequestList/bsdd
 import {
   RouteBSDasrisView,
   RouteBSDDsView,
-  RouteBsffsView,
   RouteBspaohsView
 } from "../../dashboard/detail";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";

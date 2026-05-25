@@ -1,11 +1,5 @@
-import {
-  BsffPackaging,
-  BsffPackagingType,
-  PackagingInfo,
-  Packagings
-} from "@td/codegen-ui";
+import { BsffPackaging, BsffPackagingType } from "@td/codegen-ui";
 import { pluralize } from "@td/constants";
-import Decimal from "decimal.js";
 import { packagingTypeLabels } from "../../Forms/Components/PackagingList/helpers";
 
 export function getPackagingInfosSummary<P extends BsffPackaging>(
