@@ -9,8 +9,9 @@ import BSFFPreviewWaste from "./BSFFPreviewWaste";
 import BSFFPreviewEmitter from "./BSFFPreviewEmitter";
 import BSFFPreviewTransport from "./BSFFPreviewTransport";
 import BSFFPreviewDestination from "./BSFFPreviewDestination";
-import BSFFPreviewActors from "./BSFFPreviewActors";
 import BSFFPreviewAssociatedBsffs from "./BSFFPreviewAssociatedBsffs";
+import BSFFPreviewDetainer from "./BSFFPreviewDetainer";
+
 import { useBsffDownloadPdf } from "../../Components/Pdf/useDownloadPdf";
 import BSDPreviewHeader from "../BSDPreviewHeader";
 import {
@@ -21,7 +22,6 @@ import {
 import { getPackagingInfosSummary } from "../../../common/utils/packagingsBsffSummary";
 import QRCodeIcon from "react-qr-code";
 import { TBsdStatusCode } from "../../../common/types/bsdTypes";
-import BSFFPreviewNextBsff from "./BSFFPreviewNextBsff";
 
 interface BSFFPreviewContentProps {
   bsdId: string;
@@ -64,6 +64,16 @@ const BSFFPreviewContent = ({ bsdId }: BSFFPreviewContentProps) => {
       label: emitterLabel,
       iconId: "fr-icon-map-pin-2-fill" as FrIconClassName
     },
+    ...(bsd?.type === BsffType.CollectePetitesQuantites &&
+    bsd?.ficheInterventions?.length > 0
+      ? [
+          {
+            tabId: "detenteur",
+            label: "Détenteur",
+            iconId: "fr-icon-map-pin-2-fill" as FrIconClassName
+          }
+        ]
+      : []),
     ...(!(bsd?.type === BsffType.TracerFluide)
       ? [
           {
@@ -98,9 +108,10 @@ const BSFFPreviewContent = ({ bsdId }: BSFFPreviewContentProps) => {
       emetteur: <BSFFPreviewEmitter bsd={bsd} />,
       transport: <BSFFPreviewTransport bsd={bsd} />,
       destination: <BSFFPreviewDestination bsd={bsd} />,
-      bsffSuite: <BSFFPreviewNextBsff bsd={bsd} />,
-      acteurs: <BSFFPreviewActors bsd={bsd} />,
-      associes: <BSFFPreviewAssociatedBsffs bsd={bsd} />
+      // bsffSuite: <BSFFPreviewNextBsff bsd={bsd} />,
+      // acteurs: <BSFFPreviewActors bsd={bsd} />,
+      associes: <BSFFPreviewAssociatedBsffs bsd={bsd} />,
+      detenteur: <BSFFPreviewDetainer bsd={bsd} />
     }),
     [bsd]
   );
