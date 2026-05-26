@@ -54,7 +54,7 @@ describe("Query.mfaAuditLogs", () => {
     const { errors } = await query<Pick<Query, "mfaAuditLogs">>(MFA_AUDIT_LOGS);
 
     expect(errors).not.toBeUndefined();
-    expect(errors![0].extensions?.code).toEqual(ErrorCode.FORBIDDEN);
+    expect(errors![0].extensions?.code).toEqual(ErrorCode.UNAUTHENTICATED);
   });
 
   it("should return audit logs for an admin", async () => {

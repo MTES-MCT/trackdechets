@@ -39,6 +39,10 @@ describe("Mutation.generateTotpSetup — MFA audit log", () => {
   });
 
   it("should not write an audit log when unauthenticated", async () => {
+    const countBefore = await prisma.mfaAuditLog.count({
+      where: { eventType: "MFA_SETUP_INITIATED" }
+    });
+
     const { mutate } = makeClient(null);
     const { errors } = await mutate<Pick<Mutation, "generateTotpSetup">>(
       GENERATE_TOTP_SETUP
@@ -47,9 +51,9 @@ describe("Mutation.generateTotpSetup — MFA audit log", () => {
 
     await flushAuditLog();
 
-    const count = await prisma.mfaAuditLog.count({
+    const countAfter = await prisma.mfaAuditLog.count({
       where: { eventType: "MFA_SETUP_INITIATED" }
     });
-    expect(count).toBe(0);
+    expect(countAfter).toBe(countBefore);
   });
 });
