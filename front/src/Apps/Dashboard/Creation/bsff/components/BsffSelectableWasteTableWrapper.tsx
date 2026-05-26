@@ -169,24 +169,30 @@ function BsffSelectableWasteTableWrapper({
     const first = grouping?.[0];
 
     setValue("waste.code", first?.acceptation?.wasteCode ?? first?.waste?.code);
-
     setValue(
       "weight.value",
-      grouping.reduce(
-        (sum, g) => sum + (g.acceptation?.weight ?? g.acceptation?.weight ?? 0),
-        0
-      )
+      grouping.reduce((sum, g) => sum + (g.acceptation?.weight ?? 0), 0)
     );
 
+    const currentPackagings: any[] = getValues("packagings") ?? [];
+
     const allPackagings = grouping.flatMap(g => {
+      const existing = currentPackagings.find(
+        (c: any) => c.id === (g as any).id
+      );
+
       if (g.packagings?.length) {
-        return g.packagings;
+        return g.packagings.map(p => {
+          const ex = currentPackagings.find((c: any) => c.id === (p as any).id);
+          return { ...p, volume: ex?.volume ?? p.volume };
+        });
       }
 
       return [
         {
+          id: (g as any).id,
           type: g.type ?? null,
-          volume: g.volume ?? 0,
+          volume: existing?.volume ?? (g as any).volume ?? 0,
           numero: g.numero ?? "",
           weight: g.acceptation?.weight ?? 0,
           other: g.other ?? null
@@ -198,9 +204,9 @@ function BsffSelectableWasteTableWrapper({
 
     const nextCompany =
       first?.nextBsff?.emitter?.company ?? getInitialCompany();
-
     setValue("nextBsff.company", nextCompany);
   }
+
   function mapPackaging(p: ZodBsffGroupingOrForwarding) {
     if (p.packagings?.length) {
       return p.packagings;
@@ -219,21 +225,22 @@ function BsffSelectableWasteTableWrapper({
 
   function onForwardingChange(fwd: ZodBsffGroupingOrForwarding | null) {
     setValue("waste.code", fwd?.acceptation?.wasteCode ?? fwd?.waste?.code);
+    setValue("weight.value", fwd?.acceptation?.weight ?? 0);
 
-    setValue(
-      "weight.value",
-      fwd?.acceptation?.weight ?? fwd?.acceptation?.weight ?? 0
-    );
+    const currentPackagings: any[] = getValues("packagings") ?? [];
 
     const packagings = fwd?.packagings?.length
-      ? fwd.packagings
+      ? fwd.packagings.map(p => {
+          const ex = currentPackagings.find((c: any) => c.id === (p as any).id);
+          return { ...p, volume: ex?.volume ?? p.volume };
+        })
       : fwd
       ? [
           {
             type: fwd.type ?? null,
-            volume: fwd.volume ?? null,
+            volume: currentPackagings[0]?.volume ?? (fwd as any).volume ?? null,
             numero: fwd.numero ?? "",
-            weight: fwd.acceptation?.weight ?? fwd.acceptation?.weight ?? null,
+            weight: fwd.acceptation?.weight ?? null,
             other: fwd.other ?? null
           }
         ]
@@ -242,7 +249,6 @@ function BsffSelectableWasteTableWrapper({
     setValue("packagings", packagings);
 
     const nextCompany = fwd?.nextBsff?.emitter?.company ?? getInitialCompany();
-
     setValue("nextBsff.company", nextCompany);
   }
   if (error) {
