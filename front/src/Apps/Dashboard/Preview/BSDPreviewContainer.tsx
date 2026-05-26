@@ -4,6 +4,7 @@ import TdModal from "../../common/Components/Modal/Modal";
 import { BsdTypename } from "../../common/types/bsdTypes";
 import BSVHUPreviewContent from "./BSVHU/BSVHUPreviewContent";
 import BSDAPreviewContent from "./BSDA/BSDAPreviewContent";
+import BSFFPreviewContent from "./BSFF/BSFFPreviewContent";
 
 interface BSDPreviewContainerProps {
   bsdTypeName: BsdTypename;
@@ -13,7 +14,8 @@ const BSDPreviewContainer = ({ bsdTypeName }: BSDPreviewContainerProps) => {
   const navigate = useNavigate();
   const formContent = {
     [BsdTypename.Bsvhu]: <BSVHUPreviewContent bsdId={id!} />,
-    [BsdTypename.Bsda]: <BSDAPreviewContent bsdId={id!} />
+    [BsdTypename.Bsda]: <BSDAPreviewContent bsdId={id!} />,
+    [BsdTypename.Bsff]: <BSFFPreviewContent bsdId={id!} />
   };
 
   return (
