@@ -26,7 +26,6 @@ import { RouteBsddRequestRevision } from "./Components//RevisionRequestList/bsdd
 import {
   RouteBSDasrisView,
   RouteBSDDsView,
-  RouteBsffsView,
   RouteBspaohsView
 } from "../../dashboard/detail";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
@@ -189,7 +188,7 @@ function DashboardRoutes() {
           />
           <Route
             path={toRelative(routes.dashboard.bsffs.view)}
-            element={<RouteBsffsView />}
+            element={<BSDPreviewContainer bsdTypeName={BsdTypename.Bsff} />}
           />
 
           <Route
@@ -498,16 +497,7 @@ function DashboardRoutes() {
             />
             <Route
               path={toRelative(routes.dashboard.bsffs.view)}
-              element={
-                <Modal
-                  onClose={goBack}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  size={overviewModalSize}
-                >
-                  <RouteBsffsView />
-                </Modal>
-              }
+              element={<BSDPreviewContainer bsdTypeName={BsdTypename.Bsff} />}
             />
 
             {/** create / update Form modals */}

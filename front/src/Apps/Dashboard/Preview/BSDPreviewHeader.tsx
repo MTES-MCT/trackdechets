@@ -1,5 +1,5 @@
 import React from "react";
-import { BsdaType, BsdType } from "@td/codegen-ui";
+import { BsdaType, BsdType, BsffType } from "@td/codegen-ui";
 import { PreviewContainer, PreviewContainerRow } from "./BSDPreviewComponents";
 import Badge from "../Components/Badge/Badge";
 import { TBsdStatusCode } from "../../common/types/bsdTypes";
@@ -14,7 +14,7 @@ interface BSDPreviewHeaderProps {
   bsdStatus: TBsdStatusCode;
   title: string;
   wasteType: BsdType;
-  bsdType?: BsdaType;
+  bsdType?: BsdaType | BsffType;
   children: React.ReactNode;
 }
 const BSDPreviewHeader = ({

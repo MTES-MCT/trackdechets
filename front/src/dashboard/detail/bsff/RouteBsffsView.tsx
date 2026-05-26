@@ -8,7 +8,7 @@ import { GET_BSFF_FORM } from "../../../Apps/common/queries/bsff/queries";
 import { InlineError } from "../../../Apps/common/Components/Error/Error";
 import EmptyDetail from "../common/EmptyDetailView";
 
-import { BsffDetailContent } from "./BsffDetailContent";
+import BSFFPreviewContent from "../../../Apps/Dashboard/Preview/BSFF/BSFFPreviewContent";
 
 export function RouteBsffsView() {
   const { id: formId } = useParams<{ id: string }>();
@@ -33,6 +33,5 @@ export function RouteBsffsView() {
   if (data == null) {
     return <EmptyDetail />;
   }
-
-  return <BsffDetailContent form={data.bsff} />;
+  return <BSFFPreviewContent bsdId={data.bsff.id} />;
 }

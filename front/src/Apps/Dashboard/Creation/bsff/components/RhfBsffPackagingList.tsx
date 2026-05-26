@@ -7,8 +7,11 @@ import RhfBsffPackagingForm from "./RhfBsffPackagingForm";
 function RhfBsffPackagingList({
   fieldName,
   packagingTypes,
-  disabled = false
-}: Pick<PackagingListProps, "fieldName" | "packagingTypes" | "disabled">) {
+  disabled = false,
+  volumeEditable = false
+}: Pick<PackagingListProps, "fieldName" | "packagingTypes" | "disabled"> & {
+  volumeEditable?: boolean;
+}) {
   const { control, watch, setValue, getValues } = useFormContext(); // ← getValues
   const { append, remove } = useFieldArray({ control, name: fieldName });
 
@@ -52,6 +55,7 @@ function RhfBsffPackagingList({
       packagingInfos={packagings}
       packagingTypes={packagingTypes}
       fieldName={fieldName}
+      volumeEditable={volumeEditable} // ← à transmettre
       push={append}
       remove={remove}
       disabled={disabled}
