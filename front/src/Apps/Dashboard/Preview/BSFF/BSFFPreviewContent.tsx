@@ -47,6 +47,9 @@ const BSFFPreviewContent = ({ bsdId }: BSFFPreviewContentProps) => {
   const bsd = data?.bsff!;
   const isMultiModal = bsd?.transporters.length > 1;
   const initialBsffs = bsd?.forwarding ? [bsd?.forwarding] : bsd?.grouping;
+  const shouldHideAssociatedBsffsTab =
+    bsd?.type === BsffType.TracerFluide ||
+    bsd?.type === BsffType.CollectePetitesQuantites;
   const emitterLabel =
     bsd?.type === BsffType.CollectePetitesQuantites
       ? "Opérateur"
@@ -88,7 +91,7 @@ const BSFFPreviewContent = ({ bsdId }: BSFFPreviewContentProps) => {
       label: "Destinataire",
       iconId: "fr-icon-arrow-right-line" as FrIconClassName
     },
-    ...(!!initialBsffs?.length
+    ...(!!initialBsffs?.length && !shouldHideAssociatedBsffsTab
       ? [
           {
             tabId: "associes",
