@@ -124,6 +124,9 @@ const BSFFPreviewContent = ({ bsdId }: BSFFPreviewContentProps) => {
     [bsd]
   );
 
+  console.log("BSD", bsd);
+  console.log("updatedAt", bsd?.updatedAt);
+
   return (
     <>
       {!loading && bsd && (

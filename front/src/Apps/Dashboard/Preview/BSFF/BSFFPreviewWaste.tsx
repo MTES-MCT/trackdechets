@@ -51,7 +51,10 @@ const BSFFPreviewWaste = ({ bsd }: BSFFPreviewWasteProps) => {
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={4}>
-          <PreviewTextRow label="Opération réalisée" value="-" />
+          <PreviewTextRow
+            label="Opération réalisée"
+            value={bsd.destination?.plannedOperationCode}
+          />
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={4}>

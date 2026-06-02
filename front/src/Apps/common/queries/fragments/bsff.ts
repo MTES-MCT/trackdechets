@@ -114,6 +114,8 @@ export const FullBsffFragment = gql`
   fragment FullBsff on Bsff {
     id
     type
+    createdAt
+    updatedAt
     status
     isDraft
     emitter {
