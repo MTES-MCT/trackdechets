@@ -30,11 +30,10 @@ const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
 const BANNER_MESSAGES = [
   <>
-    Pour garantir la continuité de vos activités, veillez à ce que vos collègues
-    puissent accéder aux bordereaux de votre établissement lorsque vous êtes
-    absent. Nous vous recommandons d’ajouter dès maintenant un co-administrateur
-    sur Trackdéchets, afin d’éviter tout blocage lors de l’enlèvement des
-    déchets dangereux de votre entreprise.
+    Abonnez-vous à notre lettre d'information mensuelle pour suivre les
+    nouveautés de la plateforme, la programmation des formations, des conseils
+    pratiques, ainsi que les évolutions réglementaires liées à la traçabilité
+    des déchets.
   </>
 ];
 
@@ -72,8 +71,8 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "En savoir plus",
-                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement#comment-inviter-un-utilisateur-a-rejoindre-mon-entreprise"
+                    title: "Je m'abonne",
+                    href: "https://0806de2d.sibforms.com/serve/MUIEAG29k1cikyqt55ql5CSQp_3hunRICQ8Eu8IvTZMpZl1EuQSEYeErCYUb31W6nx1mUfBKGfamqI9xMrql4caFpN2IUJQ_NR-00sPbnSv5Kw21AYm8tMHap8_7ah9NCHlcPqpNKrp7CPjO2zYsiAaBFX8r3PHDY72zP55LieF3N9gc3sUfOG16ioQgATXDPF0GeDpTuU46gBWT"
                   }}
                   persistedSurveyName="td-20260210"
                 />

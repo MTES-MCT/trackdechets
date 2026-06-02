@@ -4,6 +4,26 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+# [2026.06.1] 02/06/2026
+
+#### :nail_care: Améliorations
+  
+- BSFF => Refonte & DSFR :
+  - Implémenter l'onglet Déchet du BSFF au DSFR
+  - Implémenter l'onglet Opérateur du BSFF au DSFR
+  - Implémenter l'onglet Détenteur du BSFF au DSFR
+  - Implémenter l'onglet Transporteur du BSFF au DSFR
+  - Implémenter l'onglet Destinataire du BSFF au DSFR
+  - Mettre la modale de signature de l'émetteur initial au DSFR
+  - Mettre la modale de signature transporteur au DSFR
+  - Mettre la modale de signature Mettre la modale de signature du destinataire au DSFR
+  - Implémentation la modale "Aperçu" au DSFR [PR 4771](https://github.com/MTES-MCT/trackdechets/pull/4771)
+  
+#### :bug: Corrections de bugs
+
+- BSFF: Pouvoir modifier le conditionnement sur le BSFF de reconditionnement, regroupement et réexpédition. [PR 4778](https://github.com/MTES-MCT/trackdechets/pull/4778)
+- BSFF: impossible de créer des fiche d'intervention en tant qu'opérateur FF, si je possède un autre profil établissement. [PR 4780](https://github.com/MTES-MCT/trackdechets/pull/4780)
+- Erreur code commune introuvable [PR 4777](https://github.com/MTES-MCT/trackdechets/pull/4777)
 
 # [2026.05.1] 05/05/2026
 
