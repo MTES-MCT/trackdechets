@@ -310,7 +310,7 @@ describe("Second factor", () => {
     });
   });
 
-  it("should deny user when otp is wrong", async () => {
+  it("should deny user when otp is wrong (fail 1 of 5, no lockout)", async () => {
     const totpSeed = "ABCD";
     const user = await userFactory({ totpSeed, totpActivatedAt: new Date() });
 
@@ -324,7 +324,6 @@ describe("Second factor", () => {
 
     const sessionCookie = login.header["set-cookie"][0];
     const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
-    const timestamp = new Date();
     const secondFactor = await request
       .post("/otp")
       .send(`totp=XYZ`) // wrong otp
@@ -335,10 +334,10 @@ describe("Second factor", () => {
       where: { id: user.id }
     });
 
-    // should redirect
+    // should redirect with INVALID_TOTP, no lockout param (only triggered at 5 fails)
     expect(secondFactor.status).toBe(302);
     expect(secondFactor.header.location).toBe(
-      `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP&lockout=${updatedUser?.totpLockedUntil?.getTime()}`
+      `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP`
     );
     // rolling session cookie should be kept
     expect(secondFactor.header["set-cookie"][0]).toContain(cookieValue);
@@ -354,20 +353,51 @@ describe("Second factor", () => {
     expect(errors[0].message).toEqual("Vous n'êtes pas connecté.");
 
     expect(updatedUser!.totpFails).toEqual(1);
-
-    // totpLockedUntil is incremented by 5s steps (5000ms)
-    expect(
-      updatedUser!.totpLockedUntil!.getTime() - timestamp.getTime() >= 5 * 1000
-    ).toBe(true);
+    // no lockout for first 4 failures
+    expect(updatedUser!.totpLockedUntil).toBeNull();
   });
 
-  it("should increase lockout when otp is wrong", async () => {
+  it("should not lockout before 5 consecutive fails (fail 2 of 5)", async () => {
     const totpSeed = "ABCD";
     const user = await userFactory({
       totpSeed,
       totpActivatedAt: new Date(),
       totpFails: 1,
-      totpLockedUntil: new Date()
+      totpLockedUntil: null
+    });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    const sessionCookie = login.header["set-cookie"][0];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
+    const secondFactor = await request
+      .post("/otp")
+      .send(`totp=XYZ`) // wrong otp
+      .send(`password=pass`)
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+
+    // still INVALID_TOTP, no lockout yet
+    expect(secondFactor.header.location).toBe(
+      `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP`
+    );
+    expect(updatedUser!.totpFails).toEqual(2);
+    expect(updatedUser!.totpLockedUntil).toBeNull();
+  });
+
+  it("should trigger 5-minute lockout on 5th consecutive fail", async () => {
+    const totpSeed = "ABCD";
+    const user = await userFactory({
+      totpSeed,
+      totpActivatedAt: new Date(),
+      totpFails: 4, // 4 prior fails
+      totpLockedUntil: null
     });
 
     const login = await request
@@ -380,7 +410,7 @@ describe("Second factor", () => {
     const timestamp = new Date();
     const secondFactor = await request
       .post("/otp")
-      .send(`totp=XYZ`) // wrong otp
+      .send(`totp=XYZ`) // wrong otp → 5th fail
       .send(`password=pass`)
       .set("Cookie", `${sess.name}=${cookieValue}`);
 
@@ -388,16 +418,16 @@ describe("Second factor", () => {
       where: { id: user.id }
     });
 
-    expect(secondFactor.header.location).toBe(
-      `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP&lockout=${updatedUser?.totpLockedUntil?.getTime()}`
-    );
+    // 5th fail → immediate TOTP_LOCKOUT (not INVALID_TOTP)
+    expect(secondFactor.status).toBe(302);
+    expect(secondFactor.header.location).toContain("errorCode=TOTP_LOCKOUT");
+    expect(secondFactor.header.location).toContain("lockout=");
 
-    expect(updatedUser!.totpFails).toEqual(2); // updated fails count
-
-    // updated totpLockedUntil is incremented (2 * 5s)
+    expect(updatedUser!.totpFails).toEqual(5);
+    // lockout must be ~5 minutes (300 seconds) from now
     expect(
       updatedUser!.totpLockedUntil!.getTime() - timestamp.getTime() >=
-        2 * 5 * 1000
+        300 * 1000
     ).toBe(true);
   });
 
@@ -480,6 +510,85 @@ describe("Second factor", () => {
 
     // totpLockedUntil is reset
     expect(updatedUser!.totpLockedUntil).toEqual(null);
+  });
+
+  /**
+   * Test A — Bypass impossible
+   *
+   * Submitting to POST /otp without having gone through POST /login first
+   * (no preloggedUser in session) must redirect to /login with
+   * TOTP_TIMEOUT_OR_MISSING_SESSION — not grant access to the application.
+   *
+   * Criterion: "Il n'est pas possible de contourner l'étape du second facteur"
+   */
+  it("should redirect to login when POST /otp is called without a prior login session", async () => {
+    const totpSeed = "ABCD";
+    const { otp } = TOTP.generate(totpSeed);
+
+    // Submit directly to /otp — no prior /login, no preloggedUser in session
+    const response = await request.post("/otp").send(`totp=${otp}`);
+
+    expect(response.status).toBe(302);
+    expect(response.header.location).toContain(`${UI_HOST}/login`);
+    expect(response.header.location).toContain(
+      "errorCode=TOTP_TIMEOUT_OR_MISSING_SESSION"
+    );
+  });
+
+  /**
+   * Test B — Correct code blocked during active lockout
+   *
+   * After 5 consecutive wrong codes trigger the 5-minute lockout,
+   * submitting a CORRECT code must still be rejected (TOTP_LOCKOUT).
+   * The lockout must not be bypassable with a valid code.
+   *
+   * Criterion: "Le blocage se lève automatiquement à l'issue du délai"
+   * (implicitly: it must NOT lift before the delay, even with a correct code)
+   */
+  it("should reject a correct TOTP code while the 5-minute lockout is active", async () => {
+    const totpSeed = "ABCD";
+    const user = await userFactory({
+      totpSeed,
+      totpActivatedAt: new Date(),
+      totpFails: 4, // 4 prior fails — next wrong code will trigger the lockout
+      totpLockedUntil: null
+    });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    const cookieValue = login.header["set-cookie"][0].match(cookieRegExp)?.[1];
+
+    // 5th wrong code → triggers 5-minute lockout
+    await request
+      .post("/otp")
+      .send(`totp=000000`)
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    // Now submit the CORRECT code — must still be blocked
+    const { otp } = TOTP.generate(totpSeed);
+    const correctDuringLock = await request
+      .post("/otp")
+      .send(`totp=${otp}`)
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    expect(correctDuringLock.status).toBe(302);
+    expect(correctDuringLock.header.location).toContain(
+      "errorCode=TOTP_LOCKOUT"
+    );
+
+    // User must not be authenticated
+    const protectedRes = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    expect(protectedRes.body.data).toBeNull();
+    expect(protectedRes.body.errors[0].message).toEqual(
+      "Vous n'êtes pas connecté."
+    );
   });
 });
 
