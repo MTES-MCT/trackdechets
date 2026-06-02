@@ -115,7 +115,7 @@ export function Waste() {
             }
             options={[
               {
-                label: "réelle",
+                label: "Réelle",
                 nativeInputProps: {
                   onChange: () =>
                     setValue(
@@ -127,7 +127,7 @@ export function Waste() {
                 }
               },
               {
-                label: "estimée",
+                label: "Estimée",
                 nativeInputProps: {
                   onChange: () =>
                     setValue("emitter.emission.detail.weight.isEstimate", true),

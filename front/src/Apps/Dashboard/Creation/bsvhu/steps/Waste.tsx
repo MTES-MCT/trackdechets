@@ -279,7 +279,7 @@ const WasteBsvhu = ({
             }
             options={[
               {
-                label: "réelle",
+                label: "Réelle",
                 nativeInputProps: {
                   onChange: () => setValue("weight.isEstimate", false),
 
@@ -287,7 +287,7 @@ const WasteBsvhu = ({
                 }
               },
               {
-                label: "estimée",
+                label: "Estimée",
                 nativeInputProps: {
                   onChange: () => setValue("weight.isEstimate", true),
                   checked: isEstimate === true
