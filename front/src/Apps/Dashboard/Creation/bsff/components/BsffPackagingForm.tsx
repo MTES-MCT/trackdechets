@@ -159,7 +159,7 @@ function BsffPackagingForm({
             state={errors?.numero && touched?.numero ? "error" : "default"}
             stateRelatedMessage={errors?.numero}
             nativeInputProps={{
-              type: "number",
+              type: "text",
               ...inputProps.numero
             }}
           />

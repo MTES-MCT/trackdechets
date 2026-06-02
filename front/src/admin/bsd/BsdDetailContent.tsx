@@ -2,7 +2,6 @@ import { Bsd } from "@td/codegen-ui";
 import React from "react";
 import BsdasriDetailContent from "../../dashboard/detail/bsdasri/BsdasriDetailContent";
 import BSDDetailContent from "../../dashboard/detail/bsdd/BSDDetailContent";
-import { BsffDetailContent } from "../../dashboard/detail/bsff/BsffDetailContent";
 import BspaohDetailContent from "../../dashboard/detail/bspaoh/BspaohDetailContent";
 import BSVHUPreviewContent from "../../Apps/Dashboard/Preview/BSVHU/BSVHUPreviewContent";
 import BSDAPreviewContent from "../../Apps/Dashboard/Preview/BSDA/BSDAPreviewContent";
@@ -25,6 +24,7 @@ import { NotificationError } from "../../Apps/common/Components/Error/Error";
 
 import { useQuery } from "@apollo/client";
 import { Loader } from "../../Apps/common/Components";
+import BSFFPreviewContent from "../../Apps/Dashboard/Preview/BSFF/BSFFPreviewContent";
 
 export function BsdDetailContent({ bsd }: { bsd: Bsd }) {
   const isBsda = bsd.__typename === "Bsda";
@@ -124,7 +124,7 @@ export function BsdDetailContent({ bsd }: { bsd: Bsd }) {
     return <BsdasriDetailContent form={bsdasriData.bsdasri} />;
   }
   if (isBsff && !!bsffData) {
-    return <BsffDetailContent form={bsffData.bsff} />;
+    return <BSFFPreviewContent bsdId={bsffData.bsff.id} />;
   }
   if (isBspaoh && !!bspaohData) {
     return <BspaohDetailContent form={bspaohData.bspaoh} />;

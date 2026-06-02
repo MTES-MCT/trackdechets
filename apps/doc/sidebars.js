@@ -138,6 +138,7 @@ module.exports = {
             "reference/validation/bsff",
             "reference/validation/bspaoh",
             "reference/validation/bsvhu",
+            "reference/validation/bsdasri", 
           ],
         },
         "reference/multi-bsd",
