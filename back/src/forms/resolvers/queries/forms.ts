@@ -55,8 +55,11 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     ...paginationArgs,
     orderBy: { rowNumber: "desc" },
     where: {
-      ...(rest.updatedAfter && {
-        updatedAt: { gte: new Date(rest.updatedAfter) }
+      ...((rest.updatedAfter || rest.updatedBefore) && {
+        updatedAt: {
+          ...(rest.updatedAfter && { gte: new Date(rest.updatedAfter) }),
+          ...(rest.updatedBefore && { lt: new Date(rest.updatedBefore) })
+        }
       }),
       ...(rest.sentAfter && { sentAt: { gte: new Date(rest.sentAfter) } }),
       ...(rest.wasteCode && { wasteDetailsCode: rest.wasteCode }),
