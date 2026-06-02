@@ -10,13 +10,15 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import styles from "./Login.module.scss";
 import { envConfig } from "../common/envConfig";
 
-function formatDuration(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  if (minutes > 0 && secs > 0) {
-    return `${minutes} ${minutes > 1 ? "minutes" : "minute"} ${secs} ${
-      secs > 1 ? "secondes" : "seconde"
-    }`;
+function getErrorMessage(
+  errorCode: string,
+  lockout?: string
+): string | React.JSX.Element {
+  if (errorCode === "INVALID_TOTP") {
+    return <Countdown timestamp={lockout} />;
+  }
+  if (errorCode === "MISSING_TOTP") {
+    return "Le code d'authentification est manquant";
   }
   if (minutes > 0) {
     return `${minutes} ${minutes > 1 ? "minutes" : "minute"}`;

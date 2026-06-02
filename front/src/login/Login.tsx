@@ -54,7 +54,8 @@ function getErrorMessage(errorCode: string): {
 
   if (errorCode === "TOTP_TIMEOUT_OR_MISSING_SESSION") {
     return {
-      description: "Votre session a expiré. Veuillez vous reconnecter."
+      description:
+        "Le délai d'attente pour remplir votre code d'authentification est dépassé, merci de recommencer la procédure"
     };
   }
 
