@@ -95,7 +95,7 @@ export default function StepsList(props: Props) {
   async function saveFormTransporter(
     transporterInput: CreateOrUpdateTransporterInput
   ): Promise<string> {
-    const { id, takenOverAt, ...input } = transporterInput;
+    const { id, takenOverAt, signatureDate, ...input } = transporterInput;
 
     // S'assure que les données de récépissé transport sont nulles dans les
     // cas suivants :
