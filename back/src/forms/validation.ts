@@ -268,7 +268,11 @@ export const hasPipelinePackaging = (
   ((value.wasteDetailsPackagingInfos ?? []) as PackagingInfo[]).some(
     i => i.type === "PIPELINE"
   );
+const NOTIFICATION_NUMBER_REGEX =
+  /^([A-Z]{2,3}\d{6,10}|[A-Z]{3}\.[A-Z]{2}\d{10}[A-Z]?)$/;
 
+const NOTIFICATION_NUMBER_ERROR =
+  "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu.";
 const getReceptionData = (context: any, isTempStorage = false) => {
   if (isTempStorage) {
     return {
@@ -1930,20 +1934,15 @@ const withNextDestination = (required: boolean) =>
                 isDangerous(wasteDetailsCode) ||
                 wasteDetailsPop ||
                 wasteDetailsIsDangerous;
-
               const isForeignCompany =
                 !!nextDestinationCompanyExtraEuropeanId ||
                 (!!nextDestinationCompanyVatNumber &&
                   isForeignVat(nextDestinationCompanyVatNumber));
-
               return isNotFinal && isForeignCompany && consideredAsDangerous;
             },
             then: schema =>
               schema
-                .max(
-                  15,
-                  "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
-                )
+                .matches(NOTIFICATION_NUMBER_REGEX, NOTIFICATION_NUMBER_ERROR)
                 .nullable()
                 .required(
                   "Destination ultérieure : le numéro de notification est obligatoire"
@@ -1954,6 +1953,7 @@ const withNextDestination = (required: boolean) =>
                   15,
                   "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
                 )
+                .matches(NOTIFICATION_NUMBER_REGEX, NOTIFICATION_NUMBER_ERROR)
                 .notRequired()
                 .nullable()
           }
