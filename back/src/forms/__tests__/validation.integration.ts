@@ -2182,7 +2182,7 @@ describe("processedInfoSchema", () => {
         wasteDetailsCode,
         wasteDetailsPop,
         wasteDetailsIsDangerous,
-        nextDestinationNotificationNumber: "xyz"
+        nextDestinationNotificationNumber: "FR20230010"
       };
       expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
     }

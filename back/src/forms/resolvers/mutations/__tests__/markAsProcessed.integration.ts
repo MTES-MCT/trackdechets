@@ -340,7 +340,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
             processingOperation: "D 1",
-            notificationNumber: "xyz",
+            notificationNumber: "FR20230010",
             company: {
               mail: "m@m.fr",
               siret: null,
@@ -700,7 +700,7 @@ describe("mutation.markAsProcessed", () => {
           noTraceability: true,
           nextDestination: {
             processingOperation: "D 1",
-            notificationNumber: "GB 2000 123456",
+            notificationNumber: "FR20230010",
             company: {
               extraEuropeanId: "ANYTHING"
             }
@@ -1088,7 +1088,7 @@ describe("mutation.markAsProcessed", () => {
 
             nextDestination: {
               processingOperation: "D 1",
-              notificationNumber: "GB 2000 123456",
+              notificationNumber: "FR20230010",
               company: {
                 mail: "m@m.fr",
                 siret: null,
@@ -1138,7 +1138,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
             processingOperation: "D 1",
-            notificationNumber: "xyz",
+            notificationNumber: "FR20230010",
             company: {
               mail: "m@m.fr",
               siret: null,
@@ -1186,7 +1186,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
             processingOperation: "D 1",
-            notificationNumber: "abc",
+            notificationNumber: "FR20230010",
             company: {
               mail: "m@m.fr",
               siret: null,
@@ -1231,7 +1231,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
             processingOperation: "D 1",
-            notificationNumber: "xyz",
+            notificationNumber: "FR20230010",
             company: {
               mail: "m@m.fr",
               siret: null,
@@ -1800,7 +1800,7 @@ describe("mutation.markAsProcessed", () => {
           noTraceability: true,
           nextDestination: {
             processingOperation: "D 1",
-            notificationNumber: "RU 2022 123456" // required if extra-EU
+            notificationNumber: "FR20230010" // required if extra-EU
           }
         }
       }
