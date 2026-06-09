@@ -24,8 +24,11 @@ export async function hasGovernmentPerm(
   const { permissions, authorizedIPs, authorizedOrgIds } = governmentAccount;
 
   if (permissions.includes(requiredPermission)) {
-    const authorizedIP = (authorizedIPs ?? []).find(ip => ip === user.ip);
-    if (!authorizedIP) {
+    // On autorise si la liste contient "ALL" OU si l'IP de l'utilisateur est dans la liste
+    const safeAuthorizedIPs = authorizedIPs ?? [];
+    const isIpAuthorized = safeAuthorizedIPs.includes("ALL") || safeAuthorizedIPs.includes(user.ip);
+    
+    if (!isIpAuthorized) {
       // la requête ne provient pas d'une IP autorisée
       return false;
     } else {

@@ -50,7 +50,7 @@ services:
     image: nginx:1.19.6
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     network_mode: $NGINX_NETWORK_MODE
-    volumes:
+    volumes:  
       - ./nginx/templates:/etc/nginx/templates
     environment:
       API_HOST: $API_HOST
@@ -63,6 +63,12 @@ services:
       STORYBOOK_HOST: $STORYBOOK_HOST
     ports:
       - "80:80"
+
+  gotenberg:
+    image: thecodingmachine/gotenberg:6
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "3001:3000"
 
 volumes:
   postgres:

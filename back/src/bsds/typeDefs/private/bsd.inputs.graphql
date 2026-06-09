@@ -192,3 +192,14 @@ input ControlBsdWhere {
   # identifiant lisible du bsd: 20 à 25 caractères
   readableId: String
 }
+
+input BordereauxSearchWhere {
+  clue: String
+  readableId: String
+  code_dechet: String
+  code_aiot: String
+  date_reception_debut: String
+  date_reception_fin: String
+  date_expedition_debut: String
+  date_expedition_fin: String
+}

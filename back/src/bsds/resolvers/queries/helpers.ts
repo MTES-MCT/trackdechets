@@ -24,6 +24,8 @@ import { expandBsffFromElastic } from "../../../bsffs/converter";
 import { expandBspaohFromElastic } from "../../../bspaoh/converter";
 
 import { ApiResponse } from "@elastic/elasticsearch";
+import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
+
 /**
  * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
  */
@@ -44,18 +46,9 @@ export async function toRawBsds(
     bspaohs: BSPAOH.map(bsdsElastic => bsdsElastic.rawBsd as BspaohForElastic)
   };
 }
-import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
 
 /**
  * Returns the keyword field matching the given fieldName.
- *
- * e.g passing "readableId" returns "readableId.keyword",
- *     because "redableId" is a "text" with a sub field "readableId.keyword" which is a keyword.
- *
- * e.g passing "id" returns "id", because it's already a keyword.
- *
- * This is useful for context where we are given a property but need to use its keyword counterpart.
- * For example when sorting, where it's not possible to sort on text fields.
  */
 export function getKeywordFieldNameFromName(
   fieldName: keyof BsdElastic
@@ -63,11 +56,9 @@ export function getKeywordFieldNameFromName(
   const property = index.mappings.properties[fieldName];
 
   if (property.type === "keyword") {
-    // this property is of type "keyword" itself, it can be used as such
     return fieldName;
   }
 
-  // look for a sub field with the type "keyword"
   const [subFieldName] =
     Object.entries(property.fields || {}).find(
       ([_, property]) => property.type === "keyword"
@@ -87,7 +78,6 @@ export function getKeywordFieldNameFromName(
  * requesting emittercompany to know wether direct takeover is allowed
  */
 export async function buildDasris(dasris: BsdasriForElastic[]) {
-  // build a list of emitter siret from dasris, non-INITIAL bsds are ignored
   const emitterSirets = dasris
     .filter(bsd => !!bsd.emitterCompanySiret && bsd.status === "INITIAL")
     .map(bsd => bsd.emitterCompanySiret)
@@ -95,7 +85,6 @@ export async function buildDasris(dasris: BsdasriForElastic[]) {
 
   const uniqueSirets = distinct(emitterSirets);
 
-  // build an array of sirets allowing direct takeover
   const allows = (
     await prisma.company.findMany({
       where: {
@@ -108,7 +97,6 @@ export async function buildDasris(dasris: BsdasriForElastic[]) {
     })
   ).map(comp => comp.siret);
 
-  // expand dasris and insert `allowDirectTakeOver`
   return dasris.map(bsd => ({
     ...expandBsdasriFromElastic(bsd),
     allowDirectTakeOver: allows.includes(bsd.emitterCompanySiret)
@@ -120,13 +108,8 @@ export const buildResponse = async ({ query, size, sort, search_after }) => {
     {
       index: index.alias,
       body: {
-        size:
-          size +
-          // Take one more result to know if there's a next page
-          // it's removed from the actual results though
-          1,
+        size: size + 1, // Take one more result to know if there's a next page
         query,
-
         sort,
         search_after
       }
@@ -144,6 +127,28 @@ export const buildResponse = async ({ query, size, sort, search_after }) => {
     bspaohs: concreteBspaohs
   } = await toRawBsds(hits.map(hit => hit._source));
 
+  // -------------------------------------------------------------------------
+  // Récupération des gerepId des émetteurs via Prisma
+  // -------------------------------------------------------------------------
+  const emitterSirets = distinct([
+    ...concreteBsdds.map(b => b.emitterCompanySiret),
+    ...concreteBsdasris.map(b => b.emitterCompanySiret),
+    ...concreteBsdas.map(b => b.emitterCompanySiret),
+    ...concreteBsffs.map(b => b.emitterCompanySiret),
+    ...concreteBsvhus.map(b => b.emitterCompanySiret),
+    ...concreteBspaohs.map(b => b.emitterCompanySiret),
+  ].filter(Boolean)) as string[];
+
+  const companies = await prisma.company.findMany({
+    where: { siret: { in: emitterSirets } },
+    select: { siret: true, gerepId: true }
+  });
+
+  const gerepIdBySiret = Object.fromEntries(
+    companies.map(c => [c.siret, c.gerepId])
+  );
+  // -------------------------------------------------------------------------
+
   const bsds: Record<BsdType, Bsd[]> = {
     BSDD: concreteBsdds.map(expandFormFromElastic),
     BSDASRI: await buildDasris(concreteBsdasris),
@@ -154,30 +159,37 @@ export const buildResponse = async ({ query, size, sort, search_after }) => {
   };
 
   const edges = hits
-    .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {
-      const bsd = bsds[type].find(bsd => bsd.id === id);
+    .reduce<Array<{ cursor: string; node: Bsd }>>((acc, hit: any) => { 
+      const { type, id } = hit._source;
+      const bsd = bsds[type].find((b) => b.id === id);
 
       if (bsd) {
-        // filter out null values in case Elastic Search
-        // is desynchronized with the actual database
-        return acc.concat(bsd);
+        const cursorValue = hit.sort && hit.sort.length > 0 ? String(hit.sort[0]) : hit._id;
+        
+        // Ton ajout ici 👇
+        const emitterSiret = hit._source.emitterCompanySiret;
+
+        return acc.concat({
+          cursor: cursorValue,
+          node: {
+            ...bsd,
+            emitter: {
+              ...bsd.emitter,
+              company: {
+                ...bsd.emitter?.company,
+                gerepId: gerepIdBySiret[emitterSiret] ?? null
+              }
+            }
+          }
+        });
       }
 
       return acc;
-    }, [])
-    .map(node => ({
-      cursor: node.id,
-      node
-    }));
+    }, []);
 
   const pageInfo = {
-    // startCursor and endCursor are null if the list is empty
-    // this is not 100% spec compliant but there are discussions to change that:
-    // https://github.com/facebook/relay/issues/1852
-    // https://github.com/facebook/relay/pull/2655
     startCursor: edges[0]?.cursor || null,
     endCursor: edges[edges.length - 1]?.cursor || null,
-
     hasNextPage: body.hits.hits.length > size,
     hasPreviousPage: false
   };

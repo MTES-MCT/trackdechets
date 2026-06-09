@@ -33,7 +33,7 @@ export default defineConfig({
   server: {
     port: 3000,
     host: "localhost",
-    allowedHosts: ["trackdechets.local"],
+    allowedHosts: ["trackdechets.local", "api.trackdechets.local"], // Ajouté ici
     fs: {
       // Allow serving files from one level up to the project root
       allow: [".."]

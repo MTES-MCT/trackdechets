@@ -69,3 +69,34 @@ export const controlBsdSearchSchema = z
       });
     }
   });
+
+export const bordereauxSearchSchema = z
+  .object({
+    clue: z.string().optional(),
+    readableId: z.string().min(20).max(25).optional(),
+    code_dechet: z.string().optional(),
+    code_aiot: z.string().optional(),
+    date_reception_debut: z.string().datetime().optional(),
+    date_reception_fin: z.string().datetime().optional(),
+    date_expedition_debut: z.string().datetime().optional(),
+    date_expedition_fin: z.string().datetime().optional()
+  })
+  .superRefine((val, ctx) => {
+    if (
+      ![
+        val.clue,
+        val.readableId,
+        val.code_dechet,
+        val.code_aiot,
+        val.date_reception_debut,
+        val.date_reception_fin,
+        val.date_expedition_debut,
+        val.date_expedition_fin
+      ].some(Boolean)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Vous devez passer au moins un paramètre de recherche`
+      });
+    }
+  });
