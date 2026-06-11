@@ -38,7 +38,11 @@ const BSFFPreviewEmitter = ({ bsd }: BSFFPreviewEmitterProps) => {
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={3} highlight>
-          <PreviewTextRow label="Poids total" value={bsd.weight?.value} />
+          <PreviewTextRow
+            label="Poids total"
+            value={bsd.weight?.value}
+            units={"kg"}
+          />
 
           <PreviewTextRow
             label="Signé par"
