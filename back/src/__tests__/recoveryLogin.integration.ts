@@ -180,6 +180,25 @@ describe("POST /recovery-login", () => {
     expect(updatedUser.mustReconfigureMfa).toBe(false);
   });
 
+  it("regenerates the session on successful recovery login (prevents session fixation)", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    const cookie = await doLogin(user.email);
+
+    const res = await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    expect(res.status).toBe(302);
+
+    // A new Set-Cookie header must be present with a different session ID
+    const newCookieHeader = res.header["set-cookie"]?.[0];
+    expect(newCookieHeader).toBeDefined();
+    const newCookieValue = newCookieHeader?.match(cookieRegExp)?.[1];
+    expect(newCookieValue).toBeDefined();
+    expect(newCookieValue).not.toBe(cookie);
+  });
+
   it("rejects a code that has already been deleted (already used)", async () => {
     const { user } = await createUserWithRecoveryCode("ABCDE-FGHIJ");
     const cookie = await doLogin(user.email);

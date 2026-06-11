@@ -136,13 +136,17 @@ export async function recoveryLoginHandler(
       })
     ).catch(() => undefined);
 
-    // Connexion de l'utilisateur — le frontend détectera mustReconfigureMfa via `me`
-    req.logIn(user, err => {
-      if (err) {
-        return next(err);
+    req.session.regenerate(regenerateErr => {
+      if (regenerateErr) {
+        return next(regenerateErr);
       }
-      req.session.issuedAt = new Date().toISOString();
-      res.redirect(`${UI_BASE_URL}${returnTo}`);
+      req.logIn(user, loginErr => {
+        if (loginErr) {
+          return next(loginErr);
+        }
+        req.session.issuedAt = new Date().toISOString();
+        res.redirect(`${UI_BASE_URL}${returnTo}`);
+      });
     });
   } catch (err) {
     next(err);
