@@ -927,6 +927,9 @@ model User {
   totpActivatedAt      DateTime?          @db.Timestamptz(6)
   totpFails            Int                @default(0)
   totpLockedUntil      DateTime?
+  recoveryFails        Int                @default(0)
+  recoveryLockedUntil  DateTime?
+  mustReconfigureMfa   Boolean            @default(false)
   trackingConsent      Boolean            @default(false)
   trackingConsentUntil DateTime?
 

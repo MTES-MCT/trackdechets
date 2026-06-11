@@ -160,4 +160,11 @@ type Mutation {
   Nécessite un code TOTP valide pour confirmer l'action.
   """
   disableTotp(code: String!): User!
+
+  """
+  USAGE INTERNE
+  Indique que l'utilisateur a terminé le parcours de reconfiguration MFA obligatoire.
+  Remet mustReconfigureMfa à false et accorde l'accès à la plateforme.
+  """
+  completeMfaReconfiguration: User!
 }

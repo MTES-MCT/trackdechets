@@ -9,6 +9,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import styles from "./Login.module.scss";
 import { envConfig } from "../common/envConfig";
+import RecoveryCodeModal from "./RecoveryCodeModal";
 
 function formatDuration(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -47,14 +48,40 @@ const isProdSandbox =
   import.meta.env.VITE_ENV_NAME === "production" ||
   import.meta.env.VITE_ENV_NAME === "sandbox";
 
+const RECOVERY_ERROR_CODES = new Set([
+  "INVALID_RECOVERY_CODE",
+  "MISSING_RECOVERY_CODE",
+  "RECOVERY_LOCKOUT"
+]);
+
 export default function SecondFactor() {
   const location = useLocation();
   const [totp, setTotp] = useState("");
-  const queries = queryString.parse(location.search);
   const formRef = createRef<HTMLFormElement>();
   const { VITE_API_ENDPOINT } = envConfig;
 
-  if (queries.errorCode || queries.returnTo) {
+  // Tous les hooks sont déclarés avant tout early return (Rules of Hooks)
+  // On détecte si une erreur de code de récupération est présente dans l'état
+  // pour ré-ouvrir automatiquement la modale après une tentative échouée
+  const queries = queryString.parse(location.search);
+  const hasQueryParams = !!(queries.errorCode || queries.returnTo);
+
+  const stateFromLocation = location.state || {};
+  const rawCode = hasQueryParams ? null : stateFromLocation.errorCode;
+  const code = Array.isArray(rawCode) ? rawCode[0] : rawCode;
+  const isRecoveryError = !!code && RECOVERY_ERROR_CODES.has(code);
+
+  const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(
+    () => isRecoveryError
+  );
+  useEffect(() => {
+    if (isRecoveryError) {
+      setIsRecoveryModalOpen(true);
+    }
+  }, [isRecoveryError, code]);
+
+  // Redirect: query params → location.state (évite l'exposition dans l'URL)
+  if (hasQueryParams) {
     const { errorCode, returnTo, username, lockout = 0 } = queries;
     const state = {
       ...(queries.errorCode ? { errorCode, username, lockout } : {}),
@@ -63,8 +90,7 @@ export default function SecondFactor() {
     return <Navigate to={{ pathname: routes.secondFactor }} state={state} />;
   }
 
-  const { returnTo, errorCode, lockout } = location.state || {};
-  const code = Array.isArray(errorCode) ? errorCode[0] : errorCode;
+  const { returnTo, lockout } = stateFromLocation;
   const lockoutTimestamp = lockout ? Number(lockout) : undefined;
 
   const isLockout = code === "TOTP_LOCKOUT";
@@ -116,6 +142,14 @@ export default function SecondFactor() {
 
   return (
     <div className={styles.onboardingWrapper}>
+      {isRecoveryModalOpen && (
+        <RecoveryCodeModal
+          onClose={() => setIsRecoveryModalOpen(false)}
+          errorCode={isRecoveryError ? code : null}
+          returnTo={returnTo}
+        />
+      )}
+
       <form
         ref={formRef}
         action={`${VITE_API_ENDPOINT}/otp`}
@@ -158,14 +192,11 @@ export default function SecondFactor() {
                 label="Code d'identification"
               />
 
-              {/* TRA-17923 : ce bouton ouvrira la modale de récupération */}
               {!isProdSandbox && (
                 <button
                   type="button"
                   className="fr-link fr-mb-2w"
-                  onClick={() => {
-                    /* TODO TRA-17923 */
-                  }}
+                  onClick={() => setIsRecoveryModalOpen(true)}
                 >
                   Je n'ai pas accès à l'application
                 </button>

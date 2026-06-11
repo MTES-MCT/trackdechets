@@ -1,4 +1,3 @@
-import { compare } from "bcrypt";
 import { TOTP } from "totp-generator";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
@@ -7,29 +6,13 @@ import type { MutationResolvers } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 import { sendMail } from "../../../mailer/mailing";
 import { onTotpDisabled, renderMail } from "@td/mail";
+import { findValidRecoveryCode } from "../../services/recoveryCode.service";
 
 function verifyTotpCode(seed: string, code: string): boolean {
   const { otp } = TOTP.generate(seed);
   const thirtySecondsAgo = Date.now() - 30 * 1000;
   const { otp: lastOtp } = TOTP.generate(seed, { timestamp: thirtySecondsAgo });
   return [otp, lastOtp].includes(code);
-}
-
-async function findValidRecoveryCode(
-  userId: string,
-  code: string
-): Promise<string | null> {
-  const normalized = code.replace(/-/g, "").toUpperCase();
-  const recoveryCodes = await prisma.totpRecoveryCode.findMany({
-    where: { userId, usedAt: null }
-  });
-
-  for (const rc of recoveryCodes) {
-    if (await compare(normalized, rc.codeHash)) {
-      return rc.id;
-    }
-  }
-  return null;
 }
 
 /**

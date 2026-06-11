@@ -7,6 +7,7 @@ import nocache from "../common/middlewares/nocache";
 import { rateLimiterMiddleware } from "../common/middlewares/rateLimiter";
 import { getUIBaseURL, sanitizeEmail } from "../utils";
 import { getSafeReturnTo } from "../common/helpers";
+import { recoveryLoginHandler } from "../auth/recoveryLoginHandler";
 
 const UI_BASE_URL = getUIBaseURL();
 
@@ -92,6 +93,19 @@ authRouter.post("/otp", (req, res, next) => {
     });
   })(req, res, next);
 });
+
+authRouter.post(
+  "/recovery-login",
+  rateLimiterMiddleware({
+    windowMs,
+    maxRequestsPerWindow,
+    keyGenerator: (ip, request) => {
+      const userEmail = request.session?.preloggedUser?.userEmail;
+      return `recovery_login_${ip}_${userEmail ?? "void"}`;
+    }
+  }),
+  recoveryLoginHandler
+);
 
 authRouter.get("/isAuthenticated", nocache, (req, res) => {
   return res.json({ isAuthenticated: req.isAuthenticated() });
