@@ -26,12 +26,16 @@ const BSFFPreviewWaste = ({ bsd }: BSFFPreviewWasteProps) => {
                 : undefined
             }
             value={bsd.weight?.value}
-            units={"t"}
+            units={"kg"}
           />
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={4}>
-          <PreviewTextRow label="Quantité réelle reçue" value="-" units={"t"} />
+          <PreviewTextRow
+            label="Quantité réelle reçue"
+            value="-"
+            units={"kg"}
+          />
         </PreviewContainerCol>
       </PreviewContainerRow>
 
