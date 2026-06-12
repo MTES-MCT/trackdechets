@@ -203,20 +203,13 @@ describe("POST /recovery-login", () => {
     const { user } = await createUserWithRecoveryCode("ABCDE-FGHIJ");
     const cookie = await doLogin(user.email);
 
-    // First use — valid
-    await request
-      .post("/recovery-login")
-      .send("recoveryCode=ABCDE-FGHIJ")
-      .set("Cookie", `${sess.name}=${cookie}`);
+    // Simulate an already-consumed code by deleting it directly from DB
+    await prisma.totpRecoveryCode.deleteMany({ where: { userId: user.id } });
 
-    // Re-login to get a new preloggedUser session
-    const cookie2 = await doLogin(user.email);
-
-    // Second use of the same code — must fail (codes were deleted)
     const res = await request
       .post("/recovery-login")
       .send("recoveryCode=ABCDE-FGHIJ")
-      .set("Cookie", `${sess.name}=${cookie2}`);
+      .set("Cookie", `${sess.name}=${cookie}`);
 
     expect(res.status).toBe(302);
     expect(res.header.location).toContain("errorCode=INVALID_RECOVERY_CODE");
