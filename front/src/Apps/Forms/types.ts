@@ -12,6 +12,7 @@ export type BsdTransporterInput = BsdaTransporterInput & {
   id?: string | null;
   // date de prise en charge par le transporteur
   takenOverAt?: string | null;
+  signatureDate?: string | null;
 };
 
 export type AnyTransporterInput =
