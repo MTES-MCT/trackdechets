@@ -127,7 +127,6 @@ export const initialFormTransporter: TransporterInput = {
 export type CreateOrUpdateTransporterInput = TransporterInput & {
   id?: string | null;
   takenOverAt?: string | null;
-  signatureDate?: string | null;
 };
 
 export type FormFormikValues = Omit<FormInput, "transporters"> & {
@@ -140,12 +139,7 @@ export type FormFormikValues = Omit<FormInput, "transporters"> & {
  * @param f current BSD
  */
 export function getInitialState(f?: Form | null): FormFormikValues {
-  const initialTransporters = f?.id
-    ? f.transporters.map(t => ({
-        ...t,
-        signatureDate: (t as any)?.transport?.signature?.date ?? null
-      }))
-    : [initialFormTransporter];
+  const initialTransporters = f?.id ? f.transporters : [initialFormTransporter];
 
   return {
     id: f?.id ?? null,
