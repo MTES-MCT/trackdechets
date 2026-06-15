@@ -5,7 +5,7 @@
   "projectType": "application",
   "targets": {
     "ci": {
-      "command": "cd e2e && xvfb-run npx playwright test"
+      "command": "cd e2e && npx playwright test"
     },
     "cli": {
       "command": "cd e2e && npx playwright test {args.file} && npx playwright show-report",
