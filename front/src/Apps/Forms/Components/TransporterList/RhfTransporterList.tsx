@@ -67,7 +67,6 @@ export function RhfTransporterList<
         if (!t) return null;
 
         const hasTakenOver = Boolean(t?.transport?.takenOverAt);
-        const hasSignedTransport = Boolean(t?.signatureDate);
         const previousHasTakenOver =
           idx > 0
             ? Boolean(transporters[idx - 1]?.transport?.takenOverAt)
@@ -136,7 +135,7 @@ export function RhfTransporterList<
             expanded={expandedIdx === idx}
             deleteLabel={deleteLabel}
           >
-            {hasSignedTransport ? (
+            {t?.transport?.takenOverAt ? (
               <TransporterDisplay transporter={t} />
             ) : (
               <RhfTransporterForm
