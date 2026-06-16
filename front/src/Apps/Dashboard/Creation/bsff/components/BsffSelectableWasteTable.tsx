@@ -5,7 +5,6 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import Decimal from "decimal.js";
 import { ZodBsffGroupingOrForwarding } from "../schema";
 
 export const MAX_BSFF_COUNT_TABLE_DISPLAY = 50;
