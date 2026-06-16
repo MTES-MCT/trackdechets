@@ -209,7 +209,7 @@
     "@nx/storybook": "22.3.1",
     "@nx/vite": "22.3.1",
     "@nx/web": "22.3.1",
-    "@playwright/test": "^1.54.2",
+    "@playwright/test": "1.54.2",
     "@storybook/addon-a11y": "10.1.9",
     "@storybook/addon-docs": "10.1.9",
     "@storybook/addon-links": "10.1.9",
