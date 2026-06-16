@@ -1,0 +1,13 @@
+enum MfaResetRequestStatus {
+  "Demande en attente — timer de 48h en cours"
+  PENDING
+
+  "Réinitialisation effectuée automatiquement à l'échéance"
+  DONE
+
+  "Demande annulée par un super-admin avant l'échéance"
+  CANCELLED
+
+  "Erreur technique ou compte introuvable/désactivé à l'échéance"
+  FAILED
+}

@@ -1,0 +1,73 @@
+"""
+Demande de réinitialisation MFA créée par un super-administrateur Trackdéchets.
+"""
+type MfaResetRequest {
+  "L'identifiant unique de la demande"
+  id: ID!
+
+  "L'utilisateur concerné par la réinitialisation"
+  user: MfaResetRequestUser!
+
+  "Statut de la demande"
+  status: MfaResetRequestStatus!
+
+  "Note interne optionnelle (numéro ticket support, motif…)"
+  note: String
+
+  "Date de création de la demande"
+  createdAt: DateTime!
+
+  "Échéance de la réinitialisation automatique (createdAt + 48h)"
+  dueAt: DateTime!
+
+  "Date de dernière mise à jour"
+  updatedAt: DateTime!
+}
+
+type MfaResetRequestUser {
+  "Email de l'utilisateur concerné"
+  email: String!
+
+  "Nom de l'utilisateur concerné"
+  name: String!
+}
+
+"""
+Récapitulatif pré-validation avant création d'une demande de réinitialisation MFA.
+"""
+type MfaResetRequestSummary {
+  "Compte trouvé pour l'email donné (null si introuvable)"
+  user: MfaResetRequestSummaryUser
+
+  "La MFA est-elle active sur ce compte ?"
+  hasMfa: Boolean!
+
+  "Existe-t-il déjà une demande PENDING pour ce compte ?"
+  hasPendingRequest: Boolean!
+
+  "Nombre d'établissements auxquels le compte est rattaché"
+  companiesCount: Int!
+
+  "Nombre d'administrateurs d'établissements qui seront notifiés"
+  adminNotifiedCount: Int!
+
+  "Aucun administrateur d'établissement ne sera notifié (warning)"
+  noAdminWarning: Boolean!
+}
+
+type MfaResetRequestSummaryUser {
+  id: ID!
+  email: String!
+  name: String!
+}
+
+type MfaResetRequestEdge {
+  cursor: String!
+  node: MfaResetRequest!
+}
+
+type MfaResetRequestConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [MfaResetRequestEdge!]!
+}
