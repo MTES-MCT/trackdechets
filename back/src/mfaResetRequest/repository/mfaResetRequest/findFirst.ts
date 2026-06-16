@@ -11,7 +11,9 @@ export type FindFirstMfaResetRequestFn = <
 export function buildFindFirstMfaResetRequest({
   prisma
 }: ReadRepositoryFnDeps): FindFirstMfaResetRequestFn {
-  return async <Args extends Omit<Prisma.MfaResetRequestFindFirstArgs, "where">>(
+  return async <
+    Args extends Omit<Prisma.MfaResetRequestFindFirstArgs, "where">
+  >(
     where: Prisma.MfaResetRequestWhereInput,
     options?: Args
   ) => {

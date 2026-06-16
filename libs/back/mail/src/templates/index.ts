@@ -32,12 +32,44 @@ export const onTotpRecovery: MailTemplate<{ name: string }> = {
   templateId: templateIds.LAYOUT
 };
 
+export const onMfaResetRequestCreatedForAdmins: MailTemplate<{
+  adminName: string;
+  companySiret: string;
+  companyName: string;
+  userEmail: string;
+}> = {
+  subject:
+    "Demande de récupération de compte sur votre établissement Trackdéchets",
+  body: mustacheRenderer("mfa-reset-request-created-for-admins.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const onMfaResetRequestCreatedForUser: MailTemplate<{
+  name: string;
+  email: string;
+}> = {
+  subject:
+    "Votre demande de récupération de compte Trackdéchets est en cours de traitement",
+  body: mustacheRenderer("mfa-reset-request-created-for-user.html"),
+  templateId: templateIds.LAYOUT
+};
+
 export const onMfaResetCancelled: MailTemplate<{
   name: string;
   email: string;
 }> = {
-  subject: "Annulation de la procédure de réinitialisation MFA — Trackdéchets",
+  subject: "Votre demande de récupération de compte Trackdéchets a été annulée",
   body: mustacheRenderer("mfa-reset-cancelled.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const onMfaResetDone: MailTemplate<{
+  name: string;
+  email: string;
+  reconfigurationUrl: string;
+}> = {
+  subject: "Votre double authentification Trackdéchets a été réinitialisée",
+  body: mustacheRenderer("mfa-reset-done.html"),
   templateId: templateIds.LAYOUT
 };
 
