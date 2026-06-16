@@ -105,9 +105,7 @@ export async function processDueMfaResetRequests(): Promise<void> {
             status: MfaResetRequestStatus.FAILED,
             note: buildFailedNote(
               request.note,
-              `Erreur technique lors de la réinitialisation : ${
-                err instanceof Error ? err.message : String(err)
-              }`
+              `Erreur technique lors de la réinitialisation : ${err instanceof Error ? err.message : String(err)}`
             )
           }
         });

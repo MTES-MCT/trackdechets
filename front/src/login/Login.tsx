@@ -17,6 +17,7 @@ function getErrorMessage(errorCode: string): {
   description: string | React.ReactElement;
   title?: string;
   severity?: "error" | "info" | "success" | "warning";
+  severity?: "error" | "info" | "success" | "warning";
 } {
   if (errorCode === "NOT_ACTIVATED") {
     return {
@@ -56,29 +57,6 @@ function getErrorMessage(errorCode: string): {
   if (errorCode === "TOTP_TIMEOUT_OR_MISSING_SESSION") {
     return {
       description: "Votre session a expiré. Veuillez vous reconnecter."
-    };
-  }
-
-  if (errorCode === "MFA_RESET_IN_PROGRESS") {
-    return {
-      title: "MFA en cours de réinitialisation",
-      severity: "info",
-      description: (
-        <>
-          La réinitialisation du MFA a été demandée pour ce compte. Merci de
-          vérifier vos mails afin de finaliser la procédure. Si vous n'êtes pas
-          à l'origine de cette demande, contactez notre support via l'Assistance
-          Trackdéchets.{" "}
-          <a
-            href="https://faq.trackdechets.fr/contact"
-            className="fr-link"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Contacter l'assistance
-          </a>
-        </>
-      )
     };
   }
 
