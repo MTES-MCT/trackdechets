@@ -965,6 +965,7 @@ model User {
   registryTexsAnalysisFiles  RegistryTexsAnalysisFile[]
   adminRequests              AdminRequest[]             @relation("AdminRequestUser")
   mfaResetRequests           MfaResetRequest[]
+  mfaReconfigTokens          MfaReconfigToken[]
 }
 
 model TotpRecoveryCode {
@@ -2446,6 +2447,23 @@ enum EmptyReturnADR {
   EMPTY_CITERNE
   EMPTY_CONTAINER
   EMPTY_CITERNE_CONTAINER
+}
+
+// ─── MFA Reconfig Token ──────────────────────────────────────────────────────
+
+/// Token à usage unique valable 24 h, généré après réinitialisation MFA réussie.
+/// Permet de fournir un lien sécurisé dans l'e-mail 5 (TRA-17932).
+/// Le frontend /mfa-reconfiguration?token=... le consomme (TRA-17933).
+model MfaReconfigToken {
+  id           String   @id @default(cuid()) @db.VarChar(30)
+  token        String   @unique @db.VarChar(64)
+  tokenExpires DateTime @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  used         Boolean  @default(false)
+  userId       String   @db.VarChar(30)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "_MfaReconfigTokenUserIdIdx")
 }
 
 // ─── MFA Reset Request ───────────────────────────────────────────────────────

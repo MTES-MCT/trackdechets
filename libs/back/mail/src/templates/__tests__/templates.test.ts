@@ -12,7 +12,11 @@ import {
   membershipRequestRefused,
   verificationProcessInfo,
   verificationDone,
-  yourCompanyIsIdentifiedOnABsd
+  yourCompanyIsIdentifiedOnABsd,
+  onMfaResetRequestCreatedForAdmins,
+  onMfaResetRequestCreatedForUser,
+  onMfaResetCancelled,
+  onMfaResetDone
 } from "..";
 import { toFrFormat } from "../../helpers";
 import { renderMail } from "../renderers";
@@ -360,5 +364,66 @@ describe("templates", () => {
     expect(rendered.body).toContain(
       "aux vérifications effectuées par nos équipes"
     );
+  });
+
+  // ── TRA-17932 : e-mails MFA reset ───────────────────────────────────────────
+
+  test("onMfaResetRequestCreatedForAdmins : sujet et variables correctes", () => {
+    const rendered = renderMail(onMfaResetRequestCreatedForAdmins, {
+      variables: {
+        adminName: "Alice Dupont",
+        companySiret: "12345678901234",
+        companyName: "ACME SAS",
+        userEmail: "bob@example.com"
+      },
+      to
+    });
+    expect(rendered.subject).toMatch(/récupération de compte/i);
+    expect(rendered.body).toContain("12345678901234");
+    expect(rendered.body).toContain("ACME SAS");
+    expect(rendered.body).toContain("bob@example.com");
+  });
+
+  test("onMfaResetRequestCreatedForUser : sujet et variables correctes", () => {
+    const rendered = renderMail(onMfaResetRequestCreatedForUser, {
+      variables: {
+        name: "Bob Martin",
+        email: "bob@example.com"
+      },
+      to
+    });
+    expect(rendered.subject).toMatch(/en cours de traitement/i);
+    expect(rendered.body).toContain("bob@example.com");
+    expect(rendered.body).toContain("48 heures");
+  });
+
+  test("onMfaResetCancelled : sujet et variables correctes", () => {
+    const rendered = renderMail(onMfaResetCancelled, {
+      variables: {
+        name: "Bob Martin",
+        email: "bob@example.com"
+      },
+      to
+    });
+    expect(rendered.subject).toMatch(/annulée/i);
+    expect(rendered.body).toContain("bob@example.com");
+  });
+
+  test("onMfaResetDone : sujet, lien reconfiguration et variables correctes", () => {
+    const reconfigurationUrl =
+      "https://app.td.fr/mfa-reconfiguration?token=abc123";
+    const rendered = renderMail(onMfaResetDone, {
+      variables: {
+        name: "Bob Martin",
+        email: "bob@example.com",
+        reconfigurationUrl
+      },
+      to
+    });
+    expect(rendered.subject).toMatch(/réinitialisée/i);
+    expect(rendered.body).toContain("bob@example.com");
+    expect(rendered.body).toContain(reconfigurationUrl);
+    expect(rendered.body).toContain("usage unique");
+    expect(rendered.body).toContain("24 heures");
   });
 });

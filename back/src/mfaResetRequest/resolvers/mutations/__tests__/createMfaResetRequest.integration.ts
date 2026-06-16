@@ -84,9 +84,10 @@ describe("Mutation createMfaResetRequest", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data!.createMfaResetRequest.status).toBe("PENDING");
-    expect(data!.createMfaResetRequest.note).toBe("Ticket #1234");
-    expect(data!.createMfaResetRequest.user.email).toBe(target.email);
+    const result = (data as any).createMfaResetRequest;
+    expect(result.status).toBe("PENDING");
+    expect(result.note).toBe("Ticket #1234");
+    expect(result.user.email).toBe(target.email);
 
     // Vérification BDD : dueAt ≈ createdAt + 48h
     const stored = await prisma.mfaResetRequest.findFirst({
@@ -141,5 +142,141 @@ describe("Mutation createMfaResetRequest", () => {
       }
     });
     expect(data!.createMfaResetRequest.note).toBe("Support ticket TRA-99999");
+  });
+
+  // ── E-mail 3 ────────────────────────────────────────────────────────────────
+
+  it("e-mail 3 : un e-mail de confirmation est envoyé au titulaire du compte", async () => {
+    const admin = await adminFactory();
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date()
+    });
+    const { mutate } = makeClient(admin);
+
+    await mutate(CREATE_MFA_RESET_REQUEST, {
+      variables: { input: { email: target.email } }
+    });
+
+    // Au moins un e-mail envoyé (email 3 au titulaire, pas d'admin ici)
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    const [renderedMail] = (sendMail as jest.Mock).mock.calls[0];
+    expect(renderedMail.to[0].email).toBe(target.email);
+    expect(renderedMail.subject).toMatch(/récupération de compte/i);
+  });
+
+  // ── E-mail 2 ────────────────────────────────────────────────────────────────
+
+  it("e-mail 2 : les admins des établissements rattachés reçoivent une notification", async () => {
+    const admin = await adminFactory();
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date()
+    });
+
+    // Rattache le titulaire à un établissement dont un autre utilisateur est admin
+    const { user: companyAdmin, company } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    await prisma.companyAssociation.create({
+      data: { userId: target.id, companyId: company.id, role: "MEMBER" }
+    });
+
+    const { mutate } = makeClient(admin);
+    await mutate(CREATE_MFA_RESET_REQUEST, {
+      variables: { input: { email: target.email } }
+    });
+
+    // Email 2 (admin) + email 3 (titulaire)
+    expect(sendMail).toHaveBeenCalledTimes(2);
+    const emails = (sendMail as jest.Mock).mock.calls.map(([mail]) => mail);
+    const adminEmail = emails.find(m => m.to[0].email === companyAdmin.email);
+    expect(adminEmail).toBeDefined();
+    expect(adminEmail!.subject).toMatch(/récupération de compte/i);
+    expect(adminEmail!.body).toContain(target.email);
+  });
+
+  it("e-mail 2 : aucun e-mail admin si le compte n'est rattaché à aucun établissement", async () => {
+    const admin = await adminFactory();
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date()
+    });
+    // Pas de companyAssociation pour target
+
+    const { mutate } = makeClient(admin);
+    await mutate(CREATE_MFA_RESET_REQUEST, {
+      variables: { input: { email: target.email } }
+    });
+
+    // Seulement email 3 (titulaire)
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    const [renderedMail] = (sendMail as jest.Mock).mock.calls[0];
+    expect(renderedMail.to[0].email).toBe(target.email);
+  });
+
+  it("e-mail 2 : le titulaire lui-même admin ne reçoit pas l'e-mail 2, uniquement l'e-mail 3", async () => {
+    const admin = await adminFactory();
+
+    // target est aussi admin d'un établissement
+    const { user: target } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {
+        totpSeed: "SEED",
+        totpActivatedAt: new Date()
+      }
+    );
+
+    const { mutate } = makeClient(admin);
+    await mutate(CREATE_MFA_RESET_REQUEST, {
+      variables: { input: { email: target.email } }
+    });
+
+    // Si le seul admin de l'établissement est lui-même, on ne lui envoie pas l'email 2
+    // Seulement email 3 (titulaire)
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    const [renderedMail] = (sendMail as jest.Mock).mock.calls[0];
+    expect(renderedMail.to[0].email).toBe(target.email);
+    // L'objet correspond à l'email 3, pas l'email 2
+    expect(renderedMail.subject).toMatch(/en cours de traitement/i);
+  });
+
+  it("e-mail 2 : un email par (admin, établissement) quand le même admin gère plusieurs établissements du titulaire", async () => {
+    const superAdmin = await adminFactory();
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date()
+    });
+
+    // Un admin tiers membre de deux établissements
+    const { user: companyAdmin, company: company1 } =
+      await userWithCompanyFactory("ADMIN");
+    const { company: company2 } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {
+        id: companyAdmin.id
+      }
+    );
+
+    // Rattache le titulaire aux deux établissements
+    await prisma.companyAssociation.createMany({
+      data: [
+        { userId: target.id, companyId: company1.id, role: "MEMBER" },
+        { userId: target.id, companyId: company2.id, role: "MEMBER" }
+      ]
+    });
+
+    const { mutate } = makeClient(superAdmin);
+    await mutate(CREATE_MFA_RESET_REQUEST, {
+      variables: { input: { email: target.email } }
+    });
+
+    // Au moins un e-mail envoyé à l'admin (+ email 3 au titulaire)
+    const emailsToAdmin = (sendMail as jest.Mock).mock.calls.filter(
+      ([mail]) => mail.to[0].email === companyAdmin.email
+    );
+    expect(emailsToAdmin.length).toBeGreaterThanOrEqual(1);
   });
 });

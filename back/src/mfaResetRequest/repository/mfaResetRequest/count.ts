@@ -8,5 +8,5 @@ export type CountMfaResetRequestsFn = (
 export function buildCountMfaResetRequests({
   prisma
 }: ReadRepositoryFnDeps): CountMfaResetRequestsFn {
-  return (where) => prisma.mfaResetRequest.count({ where });
+  return where => prisma.mfaResetRequest.count({ where });
 }
