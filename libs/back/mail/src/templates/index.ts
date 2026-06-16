@@ -32,6 +32,15 @@ export const onTotpRecovery: MailTemplate<{ name: string }> = {
   templateId: templateIds.LAYOUT
 };
 
+export const onMfaResetCancelled: MailTemplate<{
+  name: string;
+  email: string;
+}> = {
+  subject: "Annulation de la procédure de réinitialisation MFA — Trackdéchets",
+  body: mustacheRenderer("mfa-reset-cancelled.html"),
+  templateId: templateIds.LAYOUT
+};
+
 export const onSignup: MailTemplate<{ activationHash: string }> = {
   subject: "Activer votre compte sur Trackdéchets",
   body: mustacheRenderer("confirmation-de-compte.html"),

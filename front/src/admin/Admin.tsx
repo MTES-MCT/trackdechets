@@ -15,6 +15,7 @@ import { CompaniesDashboard } from "./companies/CompaniesDashboard";
 import { BsdAdmin } from "./bsd/BsdAdmin";
 import { BulkProfileUpdateAdmin } from "./bulkProfilesUpdate/BulkprofilesUpdateAdmin";
 import { AdminRequests } from "./adminRequests/AdminRequests";
+import { MfaResetAdmin } from "./mfaReset/MfaResetAdmin";
 
 const toRelative = route => {
   return getRelativeRoute(routes.admin.index, route);
@@ -161,6 +162,18 @@ export default function Admin() {
                 Demandes admin
               </NavLink>
             </li>
+            <li className="tw-mb-1">
+              <NavLink
+                to={routes.admin.mfaReset}
+                className={({ isActive }) =>
+                  isActive
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
+                }
+              >
+                Réinitialisation MFA
+              </NavLink>
+            </li>
           </ul>
         </Accordion>
       </SideBar>
@@ -220,6 +233,11 @@ export default function Admin() {
           <Route
             path={toRelative(routes.admin.adminRequests)}
             element={<AdminRequests />}
+          />
+
+          <Route
+            path={toRelative(routes.admin.mfaReset)}
+            element={<MfaResetAdmin />}
           />
 
           <Route

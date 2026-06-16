@@ -1,0 +1,25 @@
+input CreateMfaResetRequestInput {
+  "Email du compte concerné par la réinitialisation MFA"
+  email: String!
+
+  "Note interne optionnelle (numéro ticket support, motif, contexte)"
+  note: String
+}
+
+type Mutation {
+  """
+  Crée une demande de réinitialisation MFA pour un compte utilisateur.
+  Accessible uniquement aux super-administrateurs Trackdéchets.
+  Le compte est immédiatement suspendu (mfaResetSuspended = true).
+  L'échéance est calculée à createdAt + 48h.
+  """
+  createMfaResetRequest(input: CreateMfaResetRequestInput!): MfaResetRequest!
+
+  """
+  Annule une demande de réinitialisation MFA en statut PENDING.
+  Accessible uniquement aux super-administrateurs Trackdéchets.
+  Lève immédiatement la suspension du compte.
+  Ne modifie pas la MFA existante (TOTP seed et recovery codes conservés).
+  """
+  cancelMfaResetRequest(mfaResetRequestId: ID!): MfaResetRequest!
+}
