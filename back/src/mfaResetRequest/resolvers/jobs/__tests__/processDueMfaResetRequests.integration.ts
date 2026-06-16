@@ -277,6 +277,9 @@ describe("processDueMfaResetRequests", () => {
       where: { id: target.id }
     });
     expect(updatedUser!.totpSeed).toBe("SEED");
+<<<<<<< HEAD
     expect(sendMail).not.toHaveBeenCalled();
+=======
+>>>>>>> 5e3a3d78b (feat(TRA-17931): Panneau d'administration : gestion des réinitialisations MFA)
   });
 });
