@@ -1,12 +1,16 @@
 import gql from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
+<<<<<<< HEAD
 import {
   adminFactory,
   companyFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
+=======
+import { adminFactory, userFactory } from "../../../../__tests__/factories";
+>>>>>>> 5e3a3d78b (feat(TRA-17931): Panneau d'administration : gestion des réinitialisations MFA)
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
 import { addHours } from "date-fns";
@@ -14,6 +18,7 @@ import { addHours } from "date-fns";
 jest.mock("../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
+<<<<<<< HEAD
 // Let the Node.js event loop drain pending I/O callbacks (real DB queries inside
 // fire-and-forget email functions) before asserting on sendMail call counts.
 const flushAsync = async (times = 5) => {
@@ -22,6 +27,8 @@ const flushAsync = async (times = 5) => {
   }
 };
 
+=======
+>>>>>>> 5e3a3d78b (feat(TRA-17931): Panneau d'administration : gestion des réinitialisations MFA)
 const CREATE_MFA_RESET_REQUEST = gql`
   mutation createMfaResetRequest($input: CreateMfaResetRequestInput!) {
     createMfaResetRequest(input: $input) {
@@ -41,7 +48,11 @@ const CREATE_MFA_RESET_REQUEST = gql`
 describe("Mutation createMfaResetRequest", () => {
   afterEach(async () => {
     await resetDatabase();
+<<<<<<< HEAD
     jest.clearAllMocks();
+=======
+    jest.resetAllMocks();
+>>>>>>> 5e3a3d78b (feat(TRA-17931): Panneau d'administration : gestion des réinitialisations MFA)
   });
 
   it("un utilisateur non connecté ne peut pas accéder", async () => {
@@ -97,10 +108,16 @@ describe("Mutation createMfaResetRequest", () => {
     });
 
     expect(errors).toBeUndefined();
+<<<<<<< HEAD
     const result = (data as any).createMfaResetRequest;
     expect(result.status).toBe("PENDING");
     expect(result.note).toBe("Ticket #1234");
     expect(result.user.email).toBe(target.email);
+=======
+    expect(data!.createMfaResetRequest.status).toBe("PENDING");
+    expect(data!.createMfaResetRequest.note).toBe("Ticket #1234");
+    expect(data!.createMfaResetRequest.user.email).toBe(target.email);
+>>>>>>> 5e3a3d78b (feat(TRA-17931): Panneau d'administration : gestion des réinitialisations MFA)
 
     // Vérification BDD : dueAt ≈ createdAt + 48h
     const stored = await prisma.mfaResetRequest.findFirst({
