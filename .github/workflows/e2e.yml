@@ -89,14 +89,6 @@ jobs:
       #     curl notifier.trackdechets.local
 
       # Show logs
-      # - name: Show logs
-      #   run: |
-      #     cat /tmp/td-api.log
-      #     cat /tmp/td-queues-indexation.log
-      #     cat /tmp/td-queues-webhooks.log
-      #     cat /tmp/td-queues-runner.log
-      #     cat /tmp/td-notifier.log
-      #     cat /tmp/td-front.log
 
       # Playwright
       - name: Install Playwright Browsers
@@ -113,6 +105,27 @@ jobs:
 
       - name: Run Playwright tests
         run: npx nx run e2e:ci
+
+      # Show logs
+      - name: Show logs
+        if: always()
+        run: |
+          cat /tmp/td-api.log
+          cat /tmp/td-queues-indexation.log
+          cat /tmp/td-queues-webhooks.log
+          cat /tmp/td-queues-runner.log
+          cat /tmp/td-notifier.log
+          cat /tmp/td-front.log
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7
 
 
 env:
