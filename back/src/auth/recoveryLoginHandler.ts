@@ -6,6 +6,7 @@ import { getSafeReturnTo } from "../common/helpers";
 import { findValidRecoveryCode } from "../users/services/recoveryCode.service";
 import { sendMail } from "../mailer/mailing";
 import { onTotpRecovery, renderMail } from "@td/mail";
+import { AuthType } from "./auth";
 
 const UI_BASE_URL = getUIBaseURL();
 const RECOVERY_MAX_FAILS = 3;
@@ -140,7 +141,7 @@ export async function recoveryLoginHandler(
       if (regenerateErr) {
         return next(regenerateErr);
       }
-      req.logIn(user, loginErr => {
+      req.logIn({ ...user, auth: AuthType.Session }, loginErr => {
         if (loginErr) {
           return next(loginErr);
         }

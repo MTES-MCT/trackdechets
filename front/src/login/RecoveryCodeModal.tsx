@@ -83,6 +83,11 @@ export default function RecoveryCodeModal({
         ref={formRef}
         action={`${VITE_API_ENDPOINT}/recovery-login`}
         method="post"
+        onSubmit={e => {
+          if (isLockout) {
+            e.preventDefault();
+          }
+        }}
       >
         {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
 
