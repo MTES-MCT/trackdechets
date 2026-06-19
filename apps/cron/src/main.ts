@@ -4,6 +4,7 @@ import {
   cleanUpIsReturnForTab,
   cleanUpIsReviewedRevisionForTab,
   expireAdminRequests,
+  processDueMfaResetRequests,
   initSentry
 } from "back";
 import {
@@ -33,6 +34,13 @@ let jobs: cron.CronJob[] = [
     cronTime: "45 0 * * *", // Every day at 00:45
     onTick: async () => {
       await cleanPendingRegistry();
+    },
+    timeZone: TZ
+  }),
+  new cron.CronJob({
+    cronTime: "0 * * * *", // Every hour
+    onTick: async () => {
+      await processDueMfaResetRequests();
     },
     timeZone: TZ
   })

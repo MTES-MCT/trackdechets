@@ -53,7 +53,8 @@ const createMfaResetRequest = async (
         status: "PENDING",
         note: note ?? null,
         dueAt
-      }
+      },
+      include: { user: true }
     });
 
     await tx.user.update({
