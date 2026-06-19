@@ -3,6 +3,7 @@ import signup from "./mutations/signup";
 import changePassword from "./mutations/changePassword";
 import generateTotpSetup from "./mutations/generateTotpSetup";
 import confirmTotpSetup from "./mutations/confirmTotpSetup";
+import finalizeMfaSetup from "./mutations/finalizeMfaSetup";
 import disableTotp from "./mutations/disableTotp";
 import completeMfaReconfiguration from "./mutations/completeMfaReconfiguration";
 import createPasswordResetRequest from "./mutations/createPasswordResetRequest";
@@ -51,6 +52,7 @@ const Mutation: MutationResolvers = {
   subscribeToNotifications,
   generateTotpSetup,
   confirmTotpSetup,
+  finalizeMfaSetup,
   disableTotp,
   completeMfaReconfiguration
 };

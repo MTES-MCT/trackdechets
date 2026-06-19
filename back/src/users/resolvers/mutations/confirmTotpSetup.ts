@@ -6,8 +6,6 @@ import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
-import { sendMail } from "../../../mailer/mailing";
-import { onTotpActivated, renderMail } from "@td/mail";
 
 const RECOVERY_CODE_COUNT = 10;
 const RECOVERY_CODE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -50,9 +48,13 @@ function verifyTotpCode(seed: string, code: string): boolean {
 }
 
 /**
- * Confirme la configuration TOTP en validant le premier code.
- * Active le TOTP, génère les codes de récupération et envoie un e-mail de confirmation.
- * Révoque les sessions actives sur les autres appareils via passwordUpdatedAt.
+ * Valide le code TOTP et génère les codes de récupération.
+ * N'active PAS encore la MFA — l'activation définitive est faite par finalizeMfaSetup
+ * une fois que l'utilisateur a confirmé avoir sauvegardé ses codes.
+ *
+ * État après cet appel : totpSeed set, totpActivatedAt null, TotpRecoveryCodes créés.
+ * Cet état est considéré comme un setup incomplet : il sera nettoyé si l'utilisateur
+ * relance le parcours (generateTotpSetup) sans avoir finalisé.
  */
 const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
   _,
@@ -95,21 +97,9 @@ const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
     )
   );
 
-  const now = new Date();
-
+  // Stockage des codes — on remplace tout setup précédent incomplet
   await prisma.$transaction([
-    // Activation du TOTP
-    prisma.user.update({
-      where: { id: dbUser.id },
-      data: {
-        totpActivatedAt: now,
-        // Mise à jour de passwordUpdatedAt pour invalider les sessions des autres appareils
-        passwordUpdatedAt: now
-      }
-    }),
-    // Suppression de tout code de récupération existant
     prisma.totpRecoveryCode.deleteMany({ where: { userId: dbUser.id } }),
-    // Stockage des codes hachés
     ...hashedCodes.map(codeHash =>
       prisma.totpRecoveryCode.create({
         data: { userId: dbUser.id, codeHash }
@@ -117,16 +107,8 @@ const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
     )
   ]);
 
-  // Mise à jour de issuedAt pour garder la session courante valide
-  context.req.session.issuedAt = new Date().toISOString();
-
-  // E-mail de confirmation
-  await sendMail(
-    renderMail(onTotpActivated, {
-      to: [{ name: dbUser.name, email: dbUser.email }]
-    })
-  );
-
+  // La MFA n'est pas encore activée : totpActivatedAt reste null.
+  // L'activation définitive est déléguée à finalizeMfaSetup.
   return { codes: plainCodes };
 };
 

@@ -163,6 +163,14 @@ type Mutation {
 
   """
   USAGE INTERNE
+  Finalise l'activation MFA après confirmation de la sauvegarde des codes de récupération.
+  C'est ici que totpActivatedAt est posé et que la MFA devient réellement active.
+  Nécessite que confirmTotpSetup ait été appelé au préalable (codes de récupération générés).
+  """
+  finalizeMfaSetup: Boolean!
+
+  """
+  USAGE INTERNE
   Indique que l'utilisateur a terminé le parcours de reconfiguration MFA obligatoire.
   Remet mustReconfigureMfa à false et accorde l'accès à la plateforme.
   """
