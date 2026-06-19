@@ -28,7 +28,8 @@ const cancelMfaResetRequest = async (
   const cancelled = await prisma.$transaction(async tx => {
     const updated = await tx.mfaResetRequest.update({
       where: { id: mfaResetRequestId },
-      data: { status: MfaResetRequestStatus.CANCELLED }
+      data: { status: MfaResetRequestStatus.CANCELLED },
+      include: { user: true }
     });
 
     await tx.user.update({
