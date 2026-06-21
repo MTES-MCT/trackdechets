@@ -54,21 +54,96 @@ const RECOVERY_ERROR_CODES = new Set([
   "RECOVERY_LOCKOUT"
 ]);
 
+function buildQueryRedirectState(queries: queryString.ParsedQuery) {
+  const { errorCode, returnTo, username, lockout = 0 } = queries;
+  return {
+    ...(errorCode ? { errorCode, username, lockout } : {}),
+    ...(returnTo ? { returnTo } : {})
+  };
+}
+
+function resolveErrorCode(
+  raw: string | string[] | null | undefined
+): string | null {
+  if (!raw) return null;
+  return Array.isArray(raw) ? raw[0] : raw;
+}
+
+interface TopAlertProps {
+  isLockout: boolean;
+  isAccountSuspended: boolean;
+  lockoutTimestamp: number | undefined;
+}
+
+function TopAlert({
+  isLockout,
+  isAccountSuspended,
+  lockoutTimestamp
+}: TopAlertProps) {
+  if (isLockout) {
+    return (
+      <div className="fr-grid-row fr-mb-3w">
+        <Alert
+          title="Blocage temporaire"
+          description={
+            <>
+              Suite aux 5 tentatives successives en erreur, la connexion est
+              temporairement bloquée. Merci de bien vouloir réessayer{" "}
+              {lockoutTimestamp ? (
+                <Countdown timestamp={lockoutTimestamp} />
+              ) : (
+                "dans 5 minutes."
+              )}
+            </>
+          }
+          severity="warning"
+        />
+      </div>
+    );
+  }
+
+  if (isAccountSuspended) {
+    return (
+      <div className="fr-grid-row fr-mb-3w">
+        <Alert
+          title="Compte suspendu"
+          description={
+            <>
+              Votre compte est temporairement suspendu dans le cadre d'une
+              procédure de récupération en cours. Si vous n'êtes pas à l'origine
+              de cette demande, contactez notre support via l'Assistance
+              Trackdéchets.{" "}
+              <a
+                href="https://faq.trackdechets.fr/contact"
+                className="fr-link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Contacter l'assistance
+              </a>
+            </>
+          }
+          severity="warning"
+        />
+      </div>
+    );
+  }
+
+  return null;
+}
+
 export default function SecondFactor() {
   const location = useLocation();
   const [totp, setTotp] = useState("");
   const formRef = createRef<HTMLFormElement>();
   const { VITE_API_ENDPOINT } = envConfig;
 
-  // Tous les hooks sont déclarés avant tout early return (Rules of Hooks)
-  // On détecte si une erreur de code de récupération est présente dans l'état
-  // pour ré-ouvrir automatiquement la modale après une tentative échouée
   const queries = queryString.parse(location.search);
   const hasQueryParams = !!(queries.errorCode || queries.returnTo);
 
   const stateFromLocation = location.state || {};
   const rawCode = hasQueryParams ? null : stateFromLocation.errorCode;
-  const code = Array.isArray(rawCode) ? rawCode[0] : rawCode;
+  const code = resolveErrorCode(rawCode);
   const isRecoveryError = !!code && RECOVERY_ERROR_CODES.has(code);
 
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(
@@ -80,14 +155,13 @@ export default function SecondFactor() {
     }
   }, [isRecoveryError, code]);
 
-  // Redirect: query params → location.state (évite l'exposition dans l'URL)
   if (hasQueryParams) {
-    const { errorCode, returnTo, username, lockout = 0 } = queries;
-    const state = {
-      ...(queries.errorCode ? { errorCode, username, lockout } : {}),
-      ...(!!returnTo ? { returnTo } : {})
-    };
-    return <Navigate to={{ pathname: routes.secondFactor }} state={state} />;
+    return (
+      <Navigate
+        to={{ pathname: routes.secondFactor }}
+        state={buildQueryRedirectState(queries)}
+      />
+    );
   }
 
   const { returnTo, lockout } = stateFromLocation;
@@ -96,49 +170,6 @@ export default function SecondFactor() {
   const isLockout = code === "TOTP_LOCKOUT";
   const isAccountSuspended = code === "ACCOUNT_SUSPENDED";
   const isInvalidTotp = code === "INVALID_TOTP" || code === "MISSING_TOTP";
-
-  const topAlert = isLockout ? (
-    <div className="fr-grid-row fr-mb-3w">
-      <Alert
-        title="Blocage temporaire"
-        description={
-          <>
-            Suite aux 5 tentatives successives en erreur, la connexion est
-            temporairement bloquée. Merci de bien vouloir réessayer{" "}
-            {lockoutTimestamp ? (
-              <Countdown timestamp={lockoutTimestamp} />
-            ) : (
-              "dans 5 minutes."
-            )}
-          </>
-        }
-        severity="warning"
-      />
-    </div>
-  ) : isAccountSuspended ? (
-    <div className="fr-grid-row fr-mb-3w">
-      <Alert
-        title="Compte suspendu"
-        description={
-          <>
-            Votre compte est temporairement suspendu dans le cadre d'une
-            procédure de récupération en cours. Si vous n'êtes pas à l'origine
-            de cette demande, contactez notre support via l'Assistance
-            Trackdéchets.{" "}
-            <a
-              href="https://faq.trackdechets.fr/contact"
-              className="fr-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Contacter l'assistance
-            </a>
-          </>
-        }
-        severity="warning"
-      />
-    </div>
-  ) : null;
 
   return (
     <div className={styles.onboardingWrapper}>
@@ -157,7 +188,11 @@ export default function SecondFactor() {
         name="login"
       >
         <div className={`fr-container fr-pt-10w ${styles.totpContainer}`}>
-          {topAlert}
+          <TopAlert
+            isLockout={isLockout}
+            isAccountSuspended={isAccountSuspended}
+            lockoutTimestamp={lockoutTimestamp}
+          />
           <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
             <div className="fr-col fr-m-auto">
               <h1 className="fr-h3 fr-mb-3w">
