@@ -5,6 +5,10 @@ import { prisma } from "@td/prisma";
 import { app, sess } from "../server";
 import { userFactory } from "./factories";
 import { addSeconds } from "date-fns";
+import { sendMail } from "../mailer/mailing";
+
+jest.mock("../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const { UI_HOST } = process.env;
 const request = supertest(app);
@@ -45,7 +49,10 @@ async function doLogin(email: string) {
 }
 
 describe("POST /recovery-login", () => {
-  afterEach(() => resetDatabase());
+  afterEach(async () => {
+    await resetDatabase();
+    (sendMail as jest.Mock).mockClear();
+  });
 
   it("redirects to login when there is no preloggedUser session", async () => {
     const res = await request
@@ -89,6 +96,18 @@ describe("POST /recovery-login", () => {
       where: { userId: user.id }
     });
     expect(remainingCodes).toHaveLength(0);
+  });
+
+  it("n'envoie aucun email lors de la validation du code de récupération", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    const cookie = await doLogin(user.email);
+
+    await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    expect(sendMail as jest.Mock).not.toHaveBeenCalled();
   });
 
   it("is case-insensitive and ignores dashes", async () => {

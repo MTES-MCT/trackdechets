@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 import { sendMail } from "../../../mailer/mailing";
-import { onTotpActivated, renderMail } from "@td/mail";
+import { onTotpActivated, onTotpRecovery, renderMail } from "@td/mail";
 
 /**
  * Finalise l'activation MFA après que l'utilisateur a confirmé avoir sauvegardé
@@ -41,6 +41,10 @@ const finalizeMfaSetupResolver: MutationResolvers["finalizeMfaSetup"] = async (
     );
   }
 
+  // Capture avant toute mise à jour : garantit que la valeur n'est pas écrasée
+  // si l'update venait à inclure mustReconfigureMfa dans le futur.
+  const isRecoveryReconfiguration = dbUser.mustReconfigureMfa === true;
+
   const now = new Date();
 
   await prisma.user.update({
@@ -55,11 +59,20 @@ const finalizeMfaSetupResolver: MutationResolvers["finalizeMfaSetup"] = async (
   // Mise à jour de issuedAt pour garder la session courante valide
   context.req.session.issuedAt = new Date().toISOString();
 
-  await sendMail(
-    renderMail(onTotpActivated, {
-      to: [{ name: dbUser.name, email: dbUser.email }]
-    })
-  );
+  if (isRecoveryReconfiguration) {
+    await sendMail(
+      renderMail(onTotpRecovery, {
+        to: [{ name: dbUser.name, email: dbUser.email }],
+        variables: { name: dbUser.name }
+      })
+    );
+  } else {
+    await sendMail(
+      renderMail(onTotpActivated, {
+        to: [{ name: dbUser.name, email: dbUser.email }]
+      })
+    );
+  }
 
   return true;
 };

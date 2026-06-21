@@ -4,8 +4,6 @@ import { addSeconds } from "date-fns";
 import { sanitizeEmail, getUIBaseURL } from "../utils";
 import { getSafeReturnTo } from "../common/helpers";
 import { findValidRecoveryCode } from "../users/services/recoveryCode.service";
-import { sendMail } from "../mailer/mailing";
-import { onTotpRecovery, renderMail } from "@td/mail";
 import { AuthType } from "./auth";
 
 const UI_BASE_URL = getUIBaseURL();
@@ -38,7 +36,7 @@ async function increaseRecoveryLock(
  *  - le secret TOTP est révoqué
  *  - mustReconfigureMfa est mis à true
  *  - l'utilisateur est connecté
- *  - un email de notification de sécurité est envoyé
+ *  - l'email de récupération est envoyé en fin de reconfiguration (finalizeMfaSetup)
  *
  * Lockout : RECOVERY_MAX_FAILS (3) tentatives invalides → blocage RECOVERY_LOCK_SECONDS (300s)
  */
@@ -128,14 +126,6 @@ export async function recoveryLoginHandler(
         }
       })
     ]);
-
-    // Email de notification (non bloquant)
-    sendMail(
-      renderMail(onTotpRecovery, {
-        to: [{ name: user.name, email: user.email }],
-        variables: { name: user.name }
-      })
-    ).catch(() => undefined);
 
     req.session.regenerate(regenerateErr => {
       if (regenerateErr) {
