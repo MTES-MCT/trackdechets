@@ -1,5 +1,15 @@
 import { prisma, MfaResetRequestStatus } from "@td/prisma";
 import { logger } from "@td/logger";
+import { promisify } from "util";
+import crypto from "crypto";
+import { addHours } from "date-fns";
+import { onMfaResetDone, renderMail } from "@td/mail";
+import { sendMail } from "../../../mailer/mailing";
+import { initSentry } from "../../../common/sentry";
+
+const MFA_RECONFIG_TOKEN_EXPIRY_HOURS = 24;
+const { UI_HOST } = process.env;
+const Sentry = initSentry();
 
 /**
  * Traite les demandes de réinitialisation MFA dont l'échéance (dueAt) est passée.
@@ -91,6 +101,19 @@ export async function processDueMfaResetRequests(): Promise<void> {
       logger.info(
         `[processDueMfaResetRequests] Demande ${request.id} traitée → DONE (utilisateur ${user.email})`
       );
+
+      // E-mail 5 : lien sécurisé de reconfiguration MFA
+      await sendMfaResetDoneEmail({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isActive: user.isActive ?? false
+      }).catch(err =>
+        logger.error(
+          `[processDueMfaResetRequests] Erreur envoi email 5 pour demande ${request.id}`,
+          err
+        )
+      );
     } catch (err) {
       logger.error(
         `[processDueMfaResetRequests] Erreur lors du traitement de la demande ${request.id}`,
@@ -118,10 +141,43 @@ export async function processDueMfaResetRequests(): Promise<void> {
           updateErr
         );
       }
-      // TODO: Si un système d'alerte support existe (ex: Sentry alert, PagerDuty),
-      // l'intégrer ici pour notifier l'équipe ops d'une erreur non récupérée.
+      Sentry?.captureException(err);
     }
   }
+}
+
+async function sendMfaResetDoneEmail(user: {
+  id: string;
+  name: string;
+  email: string;
+  isActive: boolean;
+}): Promise<void> {
+  const randomBytes = promisify(crypto.randomBytes);
+  const token = (await randomBytes(32)).toString("hex");
+  const tokenExpires = addHours(new Date(), MFA_RECONFIG_TOKEN_EXPIRY_HOURS);
+
+  await prisma.mfaReconfigToken.create({
+    data: {
+      token,
+      tokenExpires,
+      user: { connect: { id: user.id } }
+    }
+  });
+
+  const reconfigurationUrl = `https://${UI_HOST}/mfa-reconfiguration?token=${encodeURIComponent(
+    token
+  )}`;
+
+  await sendMail(
+    renderMail(onMfaResetDone, {
+      to: [{ name: user.name, email: user.email }],
+      variables: {
+        name: user.name,
+        email: user.email,
+        reconfigurationUrl
+      }
+    })
+  );
 }
 
 function buildFailedNote(

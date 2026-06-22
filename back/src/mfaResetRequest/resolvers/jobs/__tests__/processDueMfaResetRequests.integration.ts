@@ -3,6 +3,18 @@ import { userFactory } from "../../../../__tests__/factories";
 import { prisma, MfaResetRequestStatus } from "@td/prisma";
 import { processDueMfaResetRequests } from "../processDueMfaResetRequests";
 import { addHours, subHours } from "date-fns";
+import { sendMail } from "../../../../mailer/mailing";
+
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+// Let the Node.js event loop drain pending I/O callbacks (crypto + DB inside
+// fire-and-forget sendMfaResetDoneEmail) before asserting on sendMail / token.
+const flushAsync = async (times = 5) => {
+  for (let i = 0; i < times; i++) {
+    await new Promise(resolve => setImmediate(resolve));
+  }
+};
 
 async function createRequest(
   userId: string,
@@ -18,7 +30,10 @@ async function createRequest(
 }
 
 describe("processDueMfaResetRequests", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    jest.resetAllMocks();
+  });
 
   it("ne traite pas les demandes dont dueAt est dans le futur", async () => {
     const target = await userFactory({
@@ -33,6 +48,7 @@ describe("processDueMfaResetRequests", () => {
       where: { userId: target.id }
     });
     expect(req!.status).toBe(MfaResetRequestStatus.PENDING);
+    expect(sendMail).not.toHaveBeenCalled();
   });
 
   it("traitement réussi : révoque TOTP, invalide recovery codes, passe en DONE", async () => {
@@ -66,6 +82,111 @@ describe("processDueMfaResetRequests", () => {
     });
     expect(codes.length).toBe(0);
   });
+
+  // ── E-mail 5 ────────────────────────────────────────────────────────────────
+
+  it("e-mail 5 : envoyé au titulaire après réinitialisation réussie", async () => {
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date(),
+      mfaResetSuspended: true
+    });
+    await createRequest(target.id);
+
+    await processDueMfaResetRequests();
+    await flushAsync();
+
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    const [renderedMail] = (sendMail as jest.Mock).mock.calls[0];
+    expect(renderedMail.to[0].email).toBe(target.email);
+    expect(renderedMail.subject).toMatch(
+      /double authentification.*réinitialisée/i
+    );
+  });
+
+  it("e-mail 5 : le corps contient le lien de reconfiguration", async () => {
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date(),
+      mfaResetSuspended: true
+    });
+    await createRequest(target.id);
+
+    await processDueMfaResetRequests();
+    await flushAsync();
+
+    const [renderedMail] = (sendMail as jest.Mock).mock.calls[0];
+    expect(renderedMail.body).toContain("mfa-reconfiguration");
+  });
+
+  it("e-mail 5 : un MfaReconfigToken valable 24h est créé en base", async () => {
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date(),
+      mfaResetSuspended: true
+    });
+    await createRequest(target.id);
+
+    const before = new Date();
+    await processDueMfaResetRequests();
+    await flushAsync();
+    const after = new Date();
+
+    const token = await prisma.mfaReconfigToken.findFirst({
+      where: { userId: target.id }
+    });
+    expect(token).not.toBeNull();
+    expect(token!.used).toBe(false);
+    const expiresMs = new Date(token!.tokenExpires).getTime();
+    const expectedMin = addHours(before, 23).getTime();
+    const expectedMax = addHours(after, 25).getTime();
+    expect(expiresMs).toBeGreaterThan(expectedMin);
+    expect(expiresMs).toBeLessThan(expectedMax);
+  });
+
+  it("e-mail 5 : non envoyé si le compte est désactivé → demande FAILED", async () => {
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date(),
+      isActive: false,
+      mfaResetSuspended: true
+    });
+    await createRequest(target.id);
+
+    await processDueMfaResetRequests();
+
+    expect(sendMail).not.toHaveBeenCalled();
+    const token = await prisma.mfaReconfigToken.findFirst({
+      where: { userId: target.id }
+    });
+    expect(token).toBeNull();
+  });
+
+  it("e-mail 5 : non envoyé si la réinitialisation échoue (erreur technique)", async () => {
+    // On simule une erreur en créant un état incohérent (userId inexistant dans la tx)
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date(),
+      mfaResetSuspended: true
+    });
+    const req = await createRequest(target.id);
+
+    // Supprime le user avant l'exécution pour provoquer un FAILED
+    await prisma.mfaResetRequest.update({
+      where: { id: req.id },
+      data: { status: MfaResetRequestStatus.PENDING }
+    });
+    await prisma.user.update({
+      where: { id: target.id },
+      data: { isActive: false }
+    });
+
+    await processDueMfaResetRequests();
+
+    expect(sendMail).not.toHaveBeenCalled();
+  });
+
+  // ── Autres cas existants ─────────────────────────────────────────────────────
 
   it("compte désactivé → demande FAILED, note automatique, suspension levée", async () => {
     const target = await userFactory({
@@ -156,5 +277,6 @@ describe("processDueMfaResetRequests", () => {
       where: { id: target.id }
     });
     expect(updatedUser!.totpSeed).toBe("SEED");
+    expect(sendMail).not.toHaveBeenCalled();
   });
 });

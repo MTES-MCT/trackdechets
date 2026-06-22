@@ -8,6 +8,7 @@ import {
   findTargetUserOrThrow,
   assertNoPendingRequest
 } from "./utils/mfaResetRequest.utils";
+import { sendMfaResetRequestCreatedEmails } from "../../emails/mfaResetRequestEmails";
 
 const MFA_RESET_DELAY_HOURS = 48;
 
@@ -64,6 +65,9 @@ const createMfaResetRequest = async (
 
     return request;
   });
+
+  // E-mails 2 + 3 : déclenchés après la transaction
+  await sendMfaResetRequestCreatedEmails(targetUser).catch(() => undefined);
 
   return mfaResetRequest;
 };
