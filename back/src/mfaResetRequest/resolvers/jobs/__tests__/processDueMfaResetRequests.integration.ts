@@ -268,6 +268,43 @@ describe("processDueMfaResetRequests", () => {
     expect(req!.note).toContain("ÉCHEC AUTOMATIQUE");
   });
 
+  it("log MFA_MANUAL_RESET_BY_SUPPORT écrit après traitement réussi", async () => {
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date(),
+      mfaResetSuspended: true
+    });
+    await createRequest(target.id);
+
+    await processDueMfaResetRequests();
+    await flushAsync();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: target.id, eventType: "MFA_MANUAL_RESET_BY_SUPPORT" }
+    });
+    expect(log).not.toBeNull();
+    expect(log!.success).toBe(true);
+    expect(log!.userId).toBe(target.id);
+  });
+
+  it("log MFA_MANUAL_RESET_BY_SUPPORT absent si le compte est désactivé (demande FAILED)", async () => {
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date(),
+      isActive: false,
+      mfaResetSuspended: true
+    });
+    await createRequest(target.id);
+
+    await processDueMfaResetRequests();
+    await flushAsync();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: target.id, eventType: "MFA_MANUAL_RESET_BY_SUPPORT" }
+    });
+    expect(log).toBeNull();
+  });
+
   it("ne traite que les demandes PENDING (ignore DONE, CANCELLED, FAILED)", async () => {
     const target = await userFactory({
       totpSeed: "SEED",
@@ -307,9 +344,6 @@ describe("processDueMfaResetRequests", () => {
       where: { id: target.id }
     });
     expect(updatedUser!.totpSeed).toBe("SEED");
-<<<<<<< HEAD
     expect(sendMail).not.toHaveBeenCalled();
-=======
->>>>>>> 5e3a3d78b (feat(TRA-17931): Panneau d'administration : gestion des réinitialisations MFA)
   });
 });
