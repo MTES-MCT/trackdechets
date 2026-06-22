@@ -9,6 +9,7 @@ import {
   assertNoPendingRequest
 } from "./utils/mfaResetRequest.utils";
 import { sendMfaResetRequestCreatedEmails } from "../../emails/mfaResetRequestEmails";
+import { logMfaEvent } from "../../../common/mfaLogger";
 
 const MFA_RESET_DELAY_HOURS = 48;
 
@@ -64,6 +65,13 @@ const createMfaResetRequest = async (
     });
 
     return request;
+  });
+
+  logMfaEvent({
+    eventType: "MFA_MANUAL_RESET_INITIATED",
+    userId: targetUser.id,
+    success: true,
+    ip: context.req.ip
   });
 
   // E-mails 2 + 3 : déclenchés après la transaction
