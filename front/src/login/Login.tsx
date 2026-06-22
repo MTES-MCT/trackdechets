@@ -17,7 +17,6 @@ function getErrorMessage(errorCode: string): {
   description: string | React.ReactElement;
   title?: string;
   severity?: "error" | "info" | "success" | "warning";
-  severity?: "error" | "info" | "success" | "warning";
 } {
   if (errorCode === "NOT_ACTIVATED") {
     return {

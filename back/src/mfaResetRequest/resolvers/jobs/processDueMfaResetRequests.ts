@@ -101,7 +101,12 @@ export async function processDueMfaResetRequests(): Promise<void> {
       );
 
       // E-mail 5 : lien sécurisé de reconfiguration MFA (non bloquant)
-      sendMfaResetDoneEmail(user).catch(err =>
+      sendMfaResetDoneEmail({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isActive: user.isActive ?? false
+      }).catch(err =>
         logger.error(
           `[processDueMfaResetRequests] Erreur envoi email 5 pour demande ${request.id}`,
           err
