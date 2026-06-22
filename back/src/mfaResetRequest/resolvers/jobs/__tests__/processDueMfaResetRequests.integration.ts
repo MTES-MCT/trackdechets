@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userFactory } from "../../../../../__tests__/factories";
+import { userFactory } from "../../../../__tests__/factories";
 import { prisma, MfaResetRequestStatus } from "@td/prisma";
 import { processDueMfaResetRequests } from "../processDueMfaResetRequests";
 import { addHours, subHours } from "date-fns";

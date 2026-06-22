@@ -32,7 +32,7 @@ async function createPendingRequest(userId: string, note?: string) {
 describe("Mutation cancelMfaResetRequest", () => {
   afterEach(async () => {
     await resetDatabase();
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it("un non super-admin ne peut pas annuler", async () => {
