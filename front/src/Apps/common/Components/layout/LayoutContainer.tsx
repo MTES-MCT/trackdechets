@@ -23,6 +23,7 @@ import Invite from "../../../../login/Invite";
 import UserActivation from "../../../../login/UserActivation";
 import PasswordResetRequest from "../../../../login/PasswordResetRequest";
 import PasswordReset from "../../../../login/PasswordReset";
+import MfaReconfiguration from "../../../../login/MfaReconfiguration";
 import Signup from "../../../../login/Signup";
 import WasteTree from "../search/WasteTree";
 
@@ -105,6 +106,11 @@ export default function LayoutContainer() {
           />
 
           <Route path={routes.passwordReset} element={<PasswordReset />} />
+
+          <Route
+            path={routes.mfaReconfiguration}
+            element={<MfaReconfiguration />}
+          />
 
           <Route path={routes.userActivation} element={<UserActivation />} />
 

@@ -20,6 +20,7 @@ const routes = {
   },
   login: "/login",
   secondFactor: "/second-factor",
+  mfaReconfiguration: "/mfa-reconfiguration",
   invite: "/invite",
   signup: {
     index: "/signup",

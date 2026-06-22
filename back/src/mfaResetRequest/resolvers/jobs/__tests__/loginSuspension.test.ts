@@ -76,8 +76,8 @@ describe("TotpStrategy — mfaResetSuspended", () => {
     jest.clearAllMocks();
   });
 
-  it("refuse l'authentification TOTP si le compte est suspendu (mfaResetSuspended = true)", async () => {
-    const user = mockUser({ mfaResetSuspended: true });
+  it("refuse avec MFA_RESET_IN_PROGRESS si suspendu ET mustReconfigureMfa=false (en attente 48h)", async () => {
+    const user = mockUser({ mfaResetSuspended: true, mustReconfigureMfa: false });
     findUniqueMock.mockResolvedValue(user);
 
     const { otp } = TOTP.generate(SEED);
@@ -88,6 +88,23 @@ describe("TotpStrategy — mfaResetSuspended", () => {
 
     expect(failSpy).toHaveBeenCalledWith(
       { code: "MFA_RESET_IN_PROGRESS" },
+      401
+    );
+    expect(successSpy).not.toHaveBeenCalled();
+  });
+
+  it("refuse avec MFA_RESET_DONE_RECONFIG_REQUIRED si suspendu ET mustReconfigureMfa=true (reset effectué)", async () => {
+    const user = mockUser({ mfaResetSuspended: true, mustReconfigureMfa: true });
+    findUniqueMock.mockResolvedValue(user);
+
+    const { otp } = TOTP.generate(SEED);
+    const req = mockRequest(otp);
+    const { strategy, failSpy, successSpy } = makeStrategy();
+
+    await strategy.authenticate(req);
+
+    expect(failSpy).toHaveBeenCalledWith(
+      { code: "MFA_RESET_DONE_RECONFIG_REQUIRED" },
       401
     );
     expect(successSpy).not.toHaveBeenCalled();
@@ -112,6 +129,7 @@ describe("TotpStrategy — mfaResetSuspended", () => {
     // Un compte suspendu ET locké → doit retourner MFA_RESET_IN_PROGRESS (pas TOTP_LOCKOUT)
     const user = mockUser({
       mfaResetSuspended: true,
+      mustReconfigureMfa: false,
       totpLockedUntil: addMinutes(new Date(), 5) // lockout actif
     });
     findUniqueMock.mockResolvedValue(user);

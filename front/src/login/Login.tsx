@@ -82,6 +82,30 @@ function getErrorMessage(errorCode: string): {
     };
   }
 
+  if (errorCode === "MFA_RESET_DONE_RECONFIG_REQUIRED") {
+    return {
+      title: "Double authentification réinitialisée",
+      severity: "warning",
+      description: (
+        <>
+          Votre double authentification a été réinitialisée. Pour vous
+          reconnecter, utilisez le lien de reconfiguration reçu par e-mail.
+          <br />
+          Si vous n'avez pas reçu cet e-mail, s'il est expiré ou déjà utilisé,
+          contactez notre support.{" "}
+          <a
+            href="https://faq.trackdechets.fr/contact"
+            className="fr-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Contacter l'Assistance Trackdéchets
+          </a>
+        </>
+      )
+    };
+  }
+
   return {
     description: "Courriel ou mot de passe incorrect"
   };

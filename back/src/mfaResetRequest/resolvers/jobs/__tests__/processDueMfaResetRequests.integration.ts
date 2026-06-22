@@ -75,7 +75,8 @@ describe("processDueMfaResetRequests", () => {
     expect(updatedUser!.totpSeed).toBeNull();
     expect(updatedUser!.totpActivatedAt).toBeNull();
     expect(updatedUser!.mustReconfigureMfa).toBe(true);
-    expect(updatedUser!.mfaResetSuspended).toBe(false);
+    // mfaResetSuspended reste true : levé uniquement par exchangeMfaReconfigToken
+    expect(updatedUser!.mfaResetSuspended).toBe(true);
 
     const codes = await prisma.totpRecoveryCode.findMany({
       where: { userId: target.id }
@@ -142,6 +143,35 @@ describe("processDueMfaResetRequests", () => {
     const expectedMax = addHours(after, 25).getTime();
     expect(expiresMs).toBeGreaterThan(expectedMin);
     expect(expiresMs).toBeLessThan(expectedMax);
+  });
+
+  it("e-mail 5 : le token stocké en base est le hash sha256 du token envoyé dans l'URL", async () => {
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date(),
+      mfaResetSuspended: true
+    });
+    await createRequest(target.id);
+
+    await processDueMfaResetRequests();
+
+    const [renderedMail] = (sendMail as jest.Mock).mock.calls[0];
+    // Extrait le token brut depuis l'URL dans le corps de l'e-mail
+    const match = renderedMail.body.match(/token=([a-f0-9]+)/i);
+    expect(match).not.toBeNull();
+    const rawToken = decodeURIComponent(match![1]);
+
+    const storedRecord = await prisma.mfaReconfigToken.findFirst({
+      where: { userId: target.id }
+    });
+    expect(storedRecord).not.toBeNull();
+
+    // Le hash sha256 du token brut doit correspondre à la valeur stockée
+    const { createHash } = await import("crypto");
+    const expectedHash = createHash("sha256").update(rawToken).digest("hex");
+    expect(storedRecord!.token).toBe(expectedHash);
+    // La valeur stockée ne doit pas être le token brut lui-même
+    expect(storedRecord!.token).not.toBe(rawToken);
   });
 
   it("e-mail 5 : non envoyé si le compte est désactivé → demande FAILED", async () => {
