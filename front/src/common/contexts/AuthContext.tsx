@@ -11,6 +11,7 @@ type AuthContextType = {
         isAdmin?: boolean | null;
         trackingConsent: boolean;
         trackingConsentUntil?: string | null;
+        mustReconfigureMfa: boolean;
       }
     | undefined;
   refreshUser: () => Promise<void>;
@@ -30,6 +31,7 @@ export const GET_ME = gql`
       isAdmin
       trackingConsent
       trackingConsentUntil
+      mustReconfigureMfa
     }
   }
 `;

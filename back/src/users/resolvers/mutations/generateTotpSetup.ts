@@ -35,6 +35,9 @@ function generateBase32Secret(byteLength = 20): string {
  * Initie la configuration TOTP pour l'utilisateur connecté.
  * Génère un nouveau secret, le stocke temporairement (non activé)
  * et retourne le secret en clair et l'URL otpauth pour affichage en QR code.
+ *
+ * Si un setup précédent est incomplet (codes générés mais MFA non finalisée),
+ * les codes orphelins sont supprimés pour repartir sur une base propre.
  */
 const generateTotpSetupResolver: MutationResolvers["generateTotpSetup"] =
   async (_, __, context) => {
@@ -49,11 +52,16 @@ const generateTotpSetupResolver: MutationResolvers["generateTotpSetup"] =
       issuer
     )}&algorithm=SHA1&digits=6&period=30`;
 
-    // Stocker le secret en attente de validation (totpActivatedAt reste null)
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { totpSeed: secret }
-    });
+    // Stocke le nouveau secret et purge les éventuels codes d'un setup incomplet.
+    // Un setup est incomplet quand totpActivatedAt est null mais que des TotpRecoveryCode
+    // existent (confirmTotpSetup appelé sans finalizeMfaSetup ensuite).
+    await prisma.$transaction([
+      prisma.totpRecoveryCode.deleteMany({ where: { userId: user.id } }),
+      prisma.user.update({
+        where: { id: user.id },
+        data: { totpSeed: secret }
+      })
+    ]);
 
     return { secret, qrCodeUrl };
   };

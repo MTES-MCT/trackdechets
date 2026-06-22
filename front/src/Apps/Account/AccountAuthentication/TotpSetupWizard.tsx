@@ -23,6 +23,12 @@ const CONFIRM_TOTP_SETUP = gql`
   }
 `;
 
+const FINALIZE_MFA_SETUP = gql`
+  mutation FinalizeMfaSetup {
+    finalizeMfaSetup
+  }
+`;
+
 // 4 étapes : QR code et validation sont fusionnés dans une même étape
 type Step = "explanation" | "qrcode" | "recovery" | "success";
 
@@ -78,6 +84,9 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
     confirmSetup,
     { loading: confirming, error: confirmError, reset: resetConfirmError }
   ] = useMutation(CONFIRM_TOTP_SETUP);
+
+  const [finalizeSetup, { loading: finalizing, error: finalizeError }] =
+    useMutation(FINALIZE_MFA_SETUP);
 
   const goToQrCode = async () => {
     if (!appInstalled) {
@@ -137,12 +146,15 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
     URL.revokeObjectURL(url);
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     if (!savedConfirmed) {
       setShowSavedError(true);
       return;
     }
-    setStep("success");
+    const { data } = await finalizeSetup();
+    if (data?.finalizeMfaSetup) {
+      setStep("success");
+    }
   };
 
   const title = "Activez l'authentification TOTP";
@@ -421,11 +433,17 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
             )}
           </div>
 
+          {finalizeError && (
+            <DsfrNotificationError apolloError={finalizeError} />
+          )}
+
           <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline fr-mt-3w">
             <Button priority="secondary" onClick={() => setStep("recovery")}>
               Précédent
             </Button>
-            <Button onClick={handleFinish}>Activer</Button>
+            <Button disabled={finalizing} onClick={handleFinish}>
+              Activer
+            </Button>
           </div>
         </div>
       )}
