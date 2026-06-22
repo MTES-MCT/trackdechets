@@ -100,8 +100,8 @@ export async function processDueMfaResetRequests(): Promise<void> {
         `[processDueMfaResetRequests] Demande ${request.id} traitée → DONE (utilisateur ${user.email})`
       );
 
-      // E-mail 5 : lien sécurisé de reconfiguration MFA (non bloquant)
-      sendMfaResetDoneEmail({
+      // E-mail 5 : lien sécurisé de reconfiguration MFA
+      await sendMfaResetDoneEmail({
         id: user.id,
         name: user.name,
         email: user.email,

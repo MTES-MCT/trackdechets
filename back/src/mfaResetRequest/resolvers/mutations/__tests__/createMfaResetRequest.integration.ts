@@ -1,13 +1,26 @@
 import gql from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import { adminFactory, userFactory } from "../../../../__tests__/factories";
+import {
+  adminFactory,
+  companyFactory,
+  userFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
 import { addHours } from "date-fns";
 
 jest.mock("../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+// Let the Node.js event loop drain pending I/O callbacks (real DB queries inside
+// fire-and-forget email functions) before asserting on sendMail call counts.
+const flushAsync = async (times = 5) => {
+  for (let i = 0; i < times; i++) {
+    await new Promise(resolve => setImmediate(resolve));
+  }
+};
 
 const CREATE_MFA_RESET_REQUEST = gql`
   mutation createMfaResetRequest($input: CreateMfaResetRequestInput!) {
@@ -28,7 +41,7 @@ const CREATE_MFA_RESET_REQUEST = gql`
 describe("Mutation createMfaResetRequest", () => {
   afterEach(async () => {
     await resetDatabase();
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it("un utilisateur non connecté ne peut pas accéder", async () => {
@@ -186,6 +199,7 @@ describe("Mutation createMfaResetRequest", () => {
     await mutate(CREATE_MFA_RESET_REQUEST, {
       variables: { input: { email: target.email } }
     });
+    await flushAsync();
 
     // Email 2 (admin) + email 3 (titulaire)
     expect(sendMail).toHaveBeenCalledTimes(2);
@@ -252,13 +266,10 @@ describe("Mutation createMfaResetRequest", () => {
     // Un admin tiers membre de deux établissements
     const { user: companyAdmin, company: company1 } =
       await userWithCompanyFactory("ADMIN");
-    const { company: company2 } = await userWithCompanyFactory(
-      "ADMIN",
-      {},
-      {
-        id: companyAdmin.id
-      }
-    );
+    const company2 = await companyFactory();
+    await prisma.companyAssociation.create({
+      data: { userId: companyAdmin.id, companyId: company2.id, role: "ADMIN" }
+    });
 
     // Rattache le titulaire aux deux établissements
     await prisma.companyAssociation.createMany({
@@ -272,6 +283,7 @@ describe("Mutation createMfaResetRequest", () => {
     await mutate(CREATE_MFA_RESET_REQUEST, {
       variables: { input: { email: target.email } }
     });
+    await flushAsync();
 
     // Au moins un e-mail envoyé à l'admin (+ email 3 au titulaire)
     const emailsToAdmin = (sendMail as jest.Mock).mock.calls.filter(

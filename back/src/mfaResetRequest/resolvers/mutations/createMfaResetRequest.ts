@@ -66,8 +66,8 @@ const createMfaResetRequest = async (
     return request;
   });
 
-  // E-mails 2 + 3 : non bloquants, déclenchés après la transaction
-  sendMfaResetRequestCreatedEmails(targetUser).catch(() => undefined);
+  // E-mails 2 + 3 : déclenchés après la transaction
+  await sendMfaResetRequestCreatedEmails(targetUser).catch(() => undefined);
 
   return mfaResetRequest;
 };
