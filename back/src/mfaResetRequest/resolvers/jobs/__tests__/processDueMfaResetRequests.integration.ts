@@ -3,10 +3,18 @@ import { userFactory } from "../../../../__tests__/factories";
 import { prisma, MfaResetRequestStatus } from "@td/prisma";
 import { processDueMfaResetRequests } from "../processDueMfaResetRequests";
 import { addHours, subHours } from "date-fns";
-import { sendMail } from "../../../../../mailer/mailing";
+import { sendMail } from "../../../../mailer/mailing";
 
-jest.mock("../../../../../mailer/mailing");
+jest.mock("../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+// Let the Node.js event loop drain pending I/O callbacks (crypto + DB inside
+// fire-and-forget sendMfaResetDoneEmail) before asserting on sendMail / token.
+const flushAsync = async (times = 5) => {
+  for (let i = 0; i < times; i++) {
+    await new Promise(resolve => setImmediate(resolve));
+  }
+};
 
 async function createRequest(
   userId: string,
@@ -86,6 +94,7 @@ describe("processDueMfaResetRequests", () => {
     await createRequest(target.id);
 
     await processDueMfaResetRequests();
+    await flushAsync();
 
     expect(sendMail).toHaveBeenCalledTimes(1);
     const [renderedMail] = (sendMail as jest.Mock).mock.calls[0];
@@ -104,6 +113,7 @@ describe("processDueMfaResetRequests", () => {
     await createRequest(target.id);
 
     await processDueMfaResetRequests();
+    await flushAsync();
 
     const [renderedMail] = (sendMail as jest.Mock).mock.calls[0];
     expect(renderedMail.body).toContain("mfa-reconfiguration");
@@ -119,6 +129,7 @@ describe("processDueMfaResetRequests", () => {
 
     const before = new Date();
     await processDueMfaResetRequests();
+    await flushAsync();
     const after = new Date();
 
     const token = await prisma.mfaReconfigToken.findFirst({
