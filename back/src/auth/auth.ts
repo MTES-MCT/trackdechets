@@ -56,7 +56,8 @@ enum LoginErrorCode {
   TOTP_TIMEOUT_OR_MISSING_SESSION = "TOTP_TIMEOUT_OR_MISSING_SESSION",
   MISSING_TOTP = "MISSING_TOTP",
   INVALID_TOTP = "INVALID_TOTP",
-  MFA_RESET_IN_PROGRESS = "MFA_RESET_IN_PROGRESS"
+  MFA_RESET_IN_PROGRESS = "MFA_RESET_IN_PROGRESS",
+  MFA_RESET_DONE_RECONFIG_REQUIRED = "MFA_RESET_DONE_RECONFIG_REQUIRED"
 }
 
 // verbose error message and related errored field
@@ -94,6 +95,11 @@ export const getLoginError = (username: string) => ({
     code: LoginErrorCode.MFA_RESET_IN_PROGRESS,
     message:
       "Votre compte est temporairement suspendu dans le cadre d'une procédure de récupération en cours. Si vous n'êtes pas à l'origine de cette demande, contactez notre support via l'Assistance Trackdéchets."
+  },
+  MFA_RESET_DONE_RECONFIG_REQUIRED: {
+    code: LoginErrorCode.MFA_RESET_DONE_RECONFIG_REQUIRED,
+    message:
+      "Votre double authentification a été réinitialisée. Veuillez utiliser le lien reçu par e-mail pour reconfigurer votre double authentification. Si vous n'avez pas reçu ce lien ou s'il est expiré, contactez notre support via l'Assistance Trackdéchets."
   }
 });
 
@@ -153,8 +159,13 @@ passport.use(
           });
         }
         if (user.mfaResetSuspended) {
+          // mustReconfigureMfa=true → reset terminé, l'utilisateur doit utiliser le lien e-mail
+          // mustReconfigureMfa=false → reset en cours (48h), accès suspendu en attente
+          const errorKey = user.mustReconfigureMfa
+            ? "MFA_RESET_DONE_RECONFIG_REQUIRED"
+            : "MFA_RESET_IN_PROGRESS";
           return done(null, false, {
-            ...getLoginError(username).MFA_RESET_IN_PROGRESS
+            ...getLoginError(username)[errorKey]
           });
         }
         if (needsTotp) {
