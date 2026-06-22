@@ -76,17 +76,17 @@ function BsffSelectableWasteTableWrapper({
           company: { siret: { _eq: destinationSiret } }
         }
       },
-      nextBsff: bsffId
-        ? {} // en édition, on accepte ceux liés au BSFF courant
-        : null // en création, on veut ceux sans nextBsff
+      nextBsff: null
     }),
-    [bsffId, codeFilter, destinationSiret]
+    [codeFilter, destinationSiret]
   );
 
-  const where = useMemo(
-    () => ({
+  const where = useMemo(() => {
+    const whereClause: BsffPackagingWhere = {
       ...baseWhere,
-      ...(idFilter.length > 0 ? { id: { _eq: idFilter } } : {}),
+      ...(idFilter.length > 0
+        ? { bsff: { ...baseWhere.bsff, id: { _eq: idFilter } } }
+        : {}),
       ...(wasteCodeFilter.length > 0
         ? { acceptation: { wasteCode: { _contains: wasteCodeFilter } } }
         : {}),
@@ -96,15 +96,33 @@ function BsffSelectableWasteTableWrapper({
       ...(emetteurSiretFilter.length > 0
         ? {
             bsff: {
+              ...baseWhere.bsff,
               emitter: {
                 company: { siret: { _eq: emetteurSiretFilter } }
               }
             }
           }
         : {})
-    }),
-    [baseWhere, idFilter, wasteCodeFilter, numeroFilter, emetteurSiretFilter]
-  );
+    };
+
+    if (bsffId) {
+      return {
+        _or: [
+          whereClause,
+          { ...whereClause, nextBsff: { id: { _eq: bsffId } } }
+        ]
+      };
+    }
+
+    return whereClause;
+  }, [
+    baseWhere,
+    bsffId,
+    idFilter,
+    wasteCodeFilter,
+    numeroFilter,
+    emetteurSiretFilter
+  ]);
 
   const { data, loading, error, refetch } = useQuery<
     Pick<Query, "bsffPackagings">,
