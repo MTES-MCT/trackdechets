@@ -55,7 +55,8 @@ enum LoginErrorCode {
   INVALID_CAPTCHA = "INVALID_CAPTCHA",
   TOTP_TIMEOUT_OR_MISSING_SESSION = "TOTP_TIMEOUT_OR_MISSING_SESSION",
   MISSING_TOTP = "MISSING_TOTP",
-  INVALID_TOTP = "INVALID_TOTP"
+  INVALID_TOTP = "INVALID_TOTP",
+  MFA_RESET_IN_PROGRESS = "MFA_RESET_IN_PROGRESS"
 }
 
 // verbose error message and related errored field
@@ -88,6 +89,11 @@ export const getLoginError = (username: string) => ({
   MISSING_TOTP: {
     code: LoginErrorCode.MISSING_TOTP,
     message: "Code d'authentification manquant"
+  },
+  MFA_RESET_IN_PROGRESS: {
+    code: LoginErrorCode.MFA_RESET_IN_PROGRESS,
+    message:
+      "Votre compte est temporairement suspendu dans le cadre d'une procédure de récupération en cours. Si vous n'êtes pas à l'origine de cette demande, contactez notre support via l'Assistance Trackdéchets."
   }
 });
 
@@ -144,6 +150,11 @@ passport.use(
         if (!user.isActive) {
           return done(null, false, {
             ...getLoginError(username).NOT_ACTIVATED
+          });
+        }
+        if (user.mfaResetSuspended) {
+          return done(null, false, {
+            ...getLoginError(username).MFA_RESET_IN_PROGRESS
           });
         }
         if (needsTotp) {

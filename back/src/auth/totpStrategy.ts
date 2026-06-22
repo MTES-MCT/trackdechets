@@ -68,6 +68,10 @@ export class TotpStrategy extends PassportStrategy {
       return this.fail({ code: "MISSING_TOTP" }, 401);
     }
 
+    if (user?.mfaResetSuspended) {
+      return this.fail({ code: "MFA_RESET_IN_PROGRESS" }, 401);
+    }
+
     if (user?.totpLockedUntil && user.totpLockedUntil > new Date()) {
       const lockout = user.totpLockedUntil.getTime();
       return this.fail({ code: "TOTP_LOCKOUT", lockout }, 401);

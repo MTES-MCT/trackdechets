@@ -15,7 +15,8 @@ const routes = {
     membersAdmin: "/admin/members",
     bsdAdmin: "/admin/bsd",
     massProfilesAdmin: "/admin/mass-profile",
-    adminRequests: "/admin/admin-requests"
+    adminRequests: "/admin/admin-requests",
+    mfaReset: "/admin/mfa-reset"
   },
   login: "/login",
   secondFactor: "/second-factor",

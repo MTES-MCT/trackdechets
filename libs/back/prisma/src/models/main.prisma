@@ -930,6 +930,7 @@ model User {
   recoveryFails        Int                @default(0)
   recoveryLockedUntil  DateTime?
   mustReconfigureMfa   Boolean            @default(false)
+  mfaResetSuspended    Boolean            @default(false)
   trackingConsent      Boolean            @default(false)
   trackingConsentUntil DateTime?
 
@@ -963,6 +964,7 @@ model User {
   registryChangeAggregates   RegistryChangeAggregate[]
   registryTexsAnalysisFiles  RegistryTexsAnalysisFile[]
   adminRequests              AdminRequest[]             @relation("AdminRequestUser")
+  mfaResetRequests           MfaResetRequest[]
 }
 
 model TotpRecoveryCode {
@@ -2444,4 +2446,34 @@ enum EmptyReturnADR {
   EMPTY_CITERNE
   EMPTY_CONTAINER
   EMPTY_CITERNE_CONTAINER
+}
+
+// ─── MFA Reset Request ───────────────────────────────────────────────────────
+
+enum MfaResetRequestStatus {
+  /// Demande en attente de réinitialisation automatique à l'échéance
+  PENDING
+  /// Réinitialisation effectuée automatiquement après 48h
+  DONE
+  /// Demande annulée par un super-admin avant l'échéance
+  CANCELLED
+  /// Erreur technique ou compte introuvable/désactivé à l'échéance
+  FAILED
+}
+
+model MfaResetRequest {
+  id        String                 @id @default(cuid()) @db.VarChar(30)
+  userId    String                 @db.VarChar(30)
+  status    MfaResetRequestStatus  @default(PENDING)
+  /// Note interne : numéro de ticket support, motif, contexte
+  note      String?
+  createdAt DateTime               @default(now()) @db.Timestamptz(6)
+  /// Échéance = createdAt + 48h, calculée à la création
+  dueAt     DateTime               @db.Timestamptz(6)
+  updatedAt DateTime               @updatedAt @db.Timestamptz(6)
+  user      User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId], map: "_MfaResetRequestUserIdIdx")
+  @@index([status], map: "_MfaResetRequestStatusIdx")
+  @@index([dueAt], map: "_MfaResetRequestDueAtIdx")
 }
