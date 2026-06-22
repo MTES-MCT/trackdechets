@@ -5,9 +5,11 @@ import crypto from "crypto";
 import { addHours } from "date-fns";
 import { onMfaResetDone, renderMail } from "@td/mail";
 import { sendMail } from "../../../mailer/mailing";
+import { initSentry } from "../../../common/sentry";
 
 const MFA_RECONFIG_TOKEN_EXPIRY_HOURS = 24;
 const { UI_HOST } = process.env;
+const Sentry = initSentry();
 
 /**
  * Traite les demandes de réinitialisation MFA dont l'échéance (dueAt) est passée.
@@ -139,8 +141,7 @@ export async function processDueMfaResetRequests(): Promise<void> {
           updateErr
         );
       }
-      // TODO: Si un système d'alerte support existe (ex: Sentry alert, PagerDuty),
-      // l'intégrer ici pour notifier l'équipe ops d'une erreur non récupérée.
+      Sentry?.captureException(err);
     }
   }
 }
