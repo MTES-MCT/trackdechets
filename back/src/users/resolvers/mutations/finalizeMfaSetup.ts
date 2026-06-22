@@ -5,6 +5,7 @@ import type { MutationResolvers } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 import { sendMail } from "../../../mailer/mailing";
 import { onTotpActivated, onTotpRecovery, renderMail } from "@td/mail";
+import { logMfaEvent } from "../../../common/mfaLogger";
 
 /**
  * Finalise l'activation MFA après que l'utilisateur a confirmé avoir sauvegardé
@@ -60,6 +61,12 @@ const finalizeMfaSetupResolver: MutationResolvers["finalizeMfaSetup"] = async (
   context.req.session.issuedAt = new Date().toISOString();
 
   if (isRecoveryReconfiguration) {
+    logMfaEvent({
+      eventType: "MFA_RECONFIG_COMPLETED",
+      userId: dbUser.id,
+      success: true,
+      ip: context.req.ip
+    });
     await sendMail(
       renderMail(onTotpRecovery, {
         to: [{ name: dbUser.name, email: dbUser.email }],
