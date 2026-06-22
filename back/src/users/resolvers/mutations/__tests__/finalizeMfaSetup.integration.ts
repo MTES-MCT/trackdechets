@@ -119,4 +119,41 @@ describe("Mutation.finalizeMfaSetup", () => {
     // mustReconfigureMfa n'est pas touché par finalizeMfaSetup : il reste false
     expect(dbUser.mustReconfigureMfa).toBe(false);
   });
+
+  // ── MFA Audit Log ────────────────────────────────────────────────────────────
+
+  const flushAuditLog = () => new Promise(resolve => setTimeout(resolve, 100));
+
+  it("log MFA_RECONFIG_COMPLETED écrit quand mustReconfigureMfa=true (reconfiguration post-récupération)", async () => {
+    const user = await createUserReadyToFinalize({ mustReconfigureMfa: true });
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const { errors } = await mutate<Pick<Mutation, "finalizeMfaSetup">>(
+      FINALIZE_MFA_SETUP
+    );
+    expect(errors).toBeUndefined();
+
+    await flushAuditLog();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECONFIG_COMPLETED" }
+    });
+    expect(log).not.toBeNull();
+    expect(log!.success).toBe(true);
+    expect(log!.userId).toBe(user.id);
+  });
+
+  it("log MFA_RECONFIG_COMPLETED absent quand mustReconfigureMfa=false (activation classique)", async () => {
+    const user = await createUserReadyToFinalize({ mustReconfigureMfa: false });
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    await mutate<Pick<Mutation, "finalizeMfaSetup">>(FINALIZE_MFA_SETUP);
+
+    await flushAuditLog();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECONFIG_COMPLETED" }
+    });
+    expect(log).toBeNull();
+  });
 });
