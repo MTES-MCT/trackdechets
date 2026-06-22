@@ -25,13 +25,13 @@ export function getMfaResetRequestRepository(
   user: Express.User,
   transaction?: RepositoryTransaction
 ): MfaResetRequestRepository {
-  function useTransaction<FnResult>(builder: RepositoryFnBuilder<FnResult>) {
+  function withTransaction<FnResult>(builder: RepositoryFnBuilder<FnResult>) {
     return transactionWrapper(builder, { user, transaction });
   }
 
   return {
     ...getReadonlyMfaResetRequestRepository(),
-    create: useTransaction(buildCreateMfaResetRequest),
-    update: useTransaction(buildUpdateMfaResetRequest)
+    create: withTransaction(buildCreateMfaResetRequest),
+    update: withTransaction(buildUpdateMfaResetRequest)
   };
 }

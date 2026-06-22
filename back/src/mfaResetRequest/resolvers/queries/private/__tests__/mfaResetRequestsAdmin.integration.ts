@@ -82,8 +82,12 @@ describe("Query mfaResetRequestsAdmin", () => {
   it("la pagination fonctionne correctement", async () => {
     const admin = await adminFactory();
     const targets = await Promise.all(
-      Array.from({ length: 5 }, () =>
-        userFactory({ totpSeed: "S", totpActivatedAt: new Date() })
+      Array.from({ length: 5 }, (_, index) =>
+        userFactory({
+          email: `mfa-reset-pagination-${index}@td.io`,
+          totpSeed: `S${index}`,
+          totpActivatedAt: new Date()
+        })
       )
     );
     await Promise.all(
