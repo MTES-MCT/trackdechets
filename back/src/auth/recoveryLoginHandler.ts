@@ -5,6 +5,7 @@ import { sanitizeEmail, getUIBaseURL } from "../utils";
 import { getSafeReturnTo } from "../common/helpers";
 import { findValidRecoveryCode } from "../users/services/recoveryCode.service";
 import { AuthType } from "./auth";
+import { logMfaEvent } from "../common/mfaLogger";
 
 const UI_BASE_URL = getUIBaseURL();
 const RECOVERY_MAX_FAILS = 3;
@@ -97,16 +98,31 @@ export async function recoveryLoginHandler(
       );
 
       if (recoveryFails >= RECOVERY_MAX_FAILS) {
+        logMfaEvent({
+          eventType: "MFA_RECOVERY_LOCKOUT_TRIGGERED",
+          userId: user.id,
+          success: false,
+          ip: req.ip
+        });
         res.redirect(
           `${UI_BASE_URL}/second-factor?errorCode=RECOVERY_LOCKOUT&lockout=${recoveryLockedUntil!.getTime()}`
         );
       } else {
+        logMfaEvent({
+          eventType: "MFA_RECOVERY_FAILURE",
+          userId: user.id,
+          success: false,
+          ip: req.ip
+        });
         res.redirect(
           `${UI_BASE_URL}/second-factor?errorCode=INVALID_RECOVERY_CODE`
         );
       }
       return;
     }
+
+    // Capture avant la transaction (qui remet recoveryLockedUntil à null)
+    const wasLocked = !!user.recoveryLockedUntil;
 
     // Code valide : révocation complète TOTP + activation flag reconfiguration
     await prisma.$transaction([
@@ -126,6 +142,21 @@ export async function recoveryLoginHandler(
         }
       })
     ]);
+
+    if (wasLocked) {
+      logMfaEvent({
+        eventType: "MFA_RECOVERY_LOCKOUT_LIFTED",
+        userId: user.id,
+        success: true,
+        ip: req.ip
+      });
+    }
+    logMfaEvent({
+      eventType: "MFA_RECOVERY_SUCCESS",
+      userId: user.id,
+      success: true,
+      ip: req.ip
+    });
 
     req.session.regenerate(regenerateErr => {
       if (regenerateErr) {

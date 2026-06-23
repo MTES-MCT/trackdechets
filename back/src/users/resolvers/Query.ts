@@ -13,6 +13,7 @@ import myCompaniesCsv from "./queries/myCompaniesCsv";
 import myCompaniesXls from "./queries/myCompaniesXls";
 import isAuthenticated from "./queries/isAuthenticated";
 import permissionsInfos from "./queries/permissionsInfos";
+import mfaAuditLogs from "./queries/mfaAuditLogs";
 
 const Query: QueryResolvers = {
   me,
@@ -28,7 +29,8 @@ const Query: QueryResolvers = {
   warningMessage,
   myCompaniesCsv,
   myCompaniesXls,
-  permissionsInfos
+  permissionsInfos,
+  mfaAuditLogs
 };
 
 export default Query;

@@ -233,4 +233,146 @@ describe("POST /recovery-login", () => {
     expect(res.status).toBe(302);
     expect(res.header.location).toContain("errorCode=INVALID_RECOVERY_CODE");
   });
+
+  // ── MFA Audit Logs ───────────────────────────────────────────────────────────
+
+  const flushAuditLog = () => new Promise(resolve => setTimeout(resolve, 100));
+
+  it("log MFA_RECOVERY_SUCCESS écrit quand le code de récupération est valide", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    const cookie = await doLogin(user.email);
+
+    await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    await flushAuditLog();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECOVERY_SUCCESS" }
+    });
+    expect(log).not.toBeNull();
+    expect(log!.success).toBe(true);
+    expect(log!.userId).toBe(user.id);
+  });
+
+  it("log MFA_RECOVERY_FAILURE écrit quand le code est invalide (avant verrouillage)", async () => {
+    const { user } = await createUserWithRecoveryCode();
+    const cookie = await doLogin(user.email);
+
+    await request
+      .post("/recovery-login")
+      .send("recoveryCode=WRONG-CODE")
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    await flushAuditLog();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECOVERY_FAILURE" }
+    });
+    expect(log).not.toBeNull();
+    expect(log!.success).toBe(false);
+    expect(log!.userId).toBe(user.id);
+  });
+
+  it("log MFA_RECOVERY_LOCKOUT_TRIGGERED écrit à la 3e tentative invalide", async () => {
+    const { user } = await createUserWithRecoveryCode("ABCDE-FGHIJ", {
+      recoveryFails: 2
+    });
+    const cookie = await doLogin(user.email);
+
+    await request
+      .post("/recovery-login")
+      .send("recoveryCode=WRONG-CODE")
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    await flushAuditLog();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECOVERY_LOCKOUT_TRIGGERED" }
+    });
+    expect(log).not.toBeNull();
+    expect(log!.success).toBe(false);
+    expect(log!.userId).toBe(user.id);
+
+    // MFA_RECOVERY_FAILURE ne doit PAS être écrit à la tentative qui déclenche le blocage
+    const failureLog = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECOVERY_FAILURE" }
+    });
+    expect(failureLog).toBeNull();
+  });
+
+  it("log MFA_RECOVERY_LOCKOUT_LIFTED écrit quand le code est valide après expiration du blocage", async () => {
+    // Blocage expiré : recoveryLockedUntil dans le passé
+    const expiredLockout = new Date(Date.now() - 1000);
+    const { user, plainCode } = await createUserWithRecoveryCode(
+      "ABCDE-FGHIJ",
+      {
+        recoveryFails: 3,
+        recoveryLockedUntil: expiredLockout
+      }
+    );
+    const cookie = await doLogin(user.email);
+
+    await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    await flushAuditLog();
+
+    const liftedLog = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECOVERY_LOCKOUT_LIFTED" }
+    });
+    expect(liftedLog).not.toBeNull();
+    expect(liftedLog!.success).toBe(true);
+
+    // MFA_RECOVERY_SUCCESS doit aussi être écrit
+    const successLog = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECOVERY_SUCCESS" }
+    });
+    expect(successLog).not.toBeNull();
+  });
+
+  it("log MFA_RECOVERY_LOCKOUT_LIFTED absent si l'utilisateur n'avait pas de blocage précédent", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    const cookie = await doLogin(user.email);
+
+    await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    await flushAuditLog();
+
+    const liftedLog = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECOVERY_LOCKOUT_LIFTED" }
+    });
+    expect(liftedLog).toBeNull();
+  });
+
+  it("logs MFA recovery : aucun code TOTP, code de récupération ou mot de passe stocké", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    const cookie = await doLogin(user.email);
+
+    await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    await flushAuditLog();
+
+    const logs = await prisma.mfaAuditLog.findMany({
+      where: { userId: user.id }
+    });
+    // Le modèle MfaAuditLog n'a pas de champ libre — seul eventType est une string
+    // et ne doit pas contenir de valeur sensible
+    const sensitivePatterns = ["ABCDE", "FGHIJ", "pass", "TOTP"];
+    logs.forEach(l => {
+      sensitivePatterns.forEach(p => {
+        expect(l.eventType).not.toContain(p);
+      });
+    });
+  });
 });

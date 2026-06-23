@@ -27,6 +27,10 @@ jest.mock("../../../../utils", () => ({
   sanitizeEmail: (email: string) => email.toLowerCase().trim()
 }));
 
+jest.mock("../../../../common/mfaLogger", () => ({
+  logMfaEvent: jest.fn()
+}));
+
 const SEED = "JBSWY3DPEHPK3PXP";
 
 const mockUser = (overrides: Partial<User> = {}): User =>

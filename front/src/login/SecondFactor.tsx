@@ -44,10 +44,6 @@ function Countdown({ timestamp }: { timestamp: number }) {
   return <span>dans {formatDuration(seconds)}.</span>;
 }
 
-const isProdSandbox =
-  import.meta.env.VITE_ENV_NAME === "production" ||
-  import.meta.env.VITE_ENV_NAME === "sandbox";
-
 const RECOVERY_ERROR_CODES = new Set([
   "INVALID_RECOVERY_CODE",
   "MISSING_RECOVERY_CODE",
@@ -227,15 +223,13 @@ export default function SecondFactor() {
                 label="Code d'identification"
               />
 
-              {!isProdSandbox && (
-                <button
-                  type="button"
-                  className="fr-link fr-mb-2w"
-                  onClick={() => setIsRecoveryModalOpen(true)}
-                >
-                  Je n'ai pas accès à l'application
-                </button>
-              )}
+              <button
+                type="button"
+                className="fr-link fr-mb-2w"
+                onClick={() => setIsRecoveryModalOpen(true)}
+              >
+                Je n'ai pas accès à l'application
+              </button>
             </div>
           </div>
 

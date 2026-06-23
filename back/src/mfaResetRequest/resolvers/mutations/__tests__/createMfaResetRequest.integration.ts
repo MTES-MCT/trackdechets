@@ -291,4 +291,58 @@ describe("Mutation createMfaResetRequest", () => {
     );
     expect(emailsToAdmin.length).toBeGreaterThanOrEqual(1);
   });
+
+  // ── MFA Audit Log ────────────────────────────────────────────────────────────
+
+  it("log MFA_MANUAL_RESET_INITIATED écrit pour le compte cible lors d'une création valide", async () => {
+    const admin = await adminFactory();
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date()
+    });
+    const { mutate } = makeClient(admin);
+
+    await mutate(CREATE_MFA_RESET_REQUEST, {
+      variables: { input: { email: target.email } }
+    });
+
+    // fire-and-forget : laisser l'event loop drainer
+    await flushAsync();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: target.id, eventType: "MFA_MANUAL_RESET_INITIATED" }
+    });
+    expect(log).not.toBeNull();
+    expect(log!.success).toBe(true);
+    expect(log!.userId).toBe(target.id);
+  });
+
+  it("log MFA_MANUAL_RESET_INITIATED : aucun code TOTP ni mot de passe stocké", async () => {
+    const admin = await adminFactory();
+    const target = await userFactory({
+      totpSeed: "SEED",
+      totpActivatedAt: new Date()
+    });
+    const { mutate } = makeClient(admin);
+
+    await mutate(CREATE_MFA_RESET_REQUEST, {
+      variables: { input: { email: target.email } }
+    });
+
+    await flushAsync();
+
+    const logs = await prisma.mfaAuditLog.findMany({
+      where: { userId: target.id }
+    });
+    // La table MfaAuditLog ne contient que les champs définis dans le modèle Prisma
+    // — aucun champ libre ne peut stocker un code TOTP ou un mot de passe.
+    expect(logs.every(l => l.eventType !== undefined)).toBe(true);
+    // Aucune entrée ne doit mentionner un code sensible dans eventType
+    const sensitiveValues = ["TOTP", "PASSWORD", "SEED"];
+    logs.forEach(l => {
+      sensitiveValues.forEach(v => {
+        expect(l.eventType).not.toContain(v);
+      });
+    });
+  });
 });

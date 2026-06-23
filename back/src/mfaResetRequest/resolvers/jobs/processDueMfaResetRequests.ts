@@ -6,6 +6,7 @@ import { addHours } from "date-fns";
 import { onMfaResetDone, renderMail } from "@td/mail";
 import { sendMail } from "../../../mailer/mailing";
 import { initSentry } from "../../../common/sentry";
+import { logMfaEvent } from "../../../common/mfaLogger";
 import { getUIBaseURL } from "../../../utils";
 
 const MFA_RECONFIG_TOKEN_EXPIRY_HOURS = 24;
@@ -102,6 +103,13 @@ export async function processDueMfaResetRequests(): Promise<void> {
       logger.info(
         `[processDueMfaResetRequests] Demande ${request.id} traitée → DONE (utilisateur ${user.email})`
       );
+
+      logMfaEvent({
+        eventType: "MFA_MANUAL_RESET_BY_SUPPORT",
+        userId: user.id,
+        success: true
+        // Pas d'IP disponible dans un job cron
+      });
 
       // E-mail 5 : lien sécurisé de reconfiguration MFA
       await sendMfaResetDoneEmail({
