@@ -399,6 +399,8 @@ function BsffPackagingAcceptation({
       {isAccepted && (
         <div>
           Quantité réelle présentée : {packaging?.acceptation?.weight} kg
+          {packaging?.acceptation?.weight != null &&
+            ` (${(packaging.acceptation.weight / 1000).toFixed(3)} tonnes)`}
         </div>
       )}
 
