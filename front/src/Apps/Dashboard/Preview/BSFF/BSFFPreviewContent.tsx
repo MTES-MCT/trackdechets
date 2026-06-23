@@ -158,7 +158,7 @@ const BSFFPreviewContent = ({ bsdId }: BSFFPreviewContentProps) => {
                       : undefined
                   }
                   value={bsd.weight?.value}
-                  units={"t"}
+                  units={"kg"}
                 />
               </PreviewContainerCol>
 

@@ -5,7 +5,6 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import Decimal from "decimal.js";
 import { ZodBsffGroupingOrForwarding } from "../schema";
 
 export const MAX_BSFF_COUNT_TABLE_DISPLAY = 50;
@@ -239,9 +238,7 @@ export default function BsffSelectableWasteTable({
                     {selectedBsff.acceptation?.wasteCode ??
                       selectedBsff.waste?.code}
                     {selectedBsff.acceptation?.weight
-                      ? ` - ${new Decimal(
-                          selectedBsff.acceptation?.weight
-                        ).toFixed(6)} T`
+                      ? ` - ${selectedBsff.acceptation.weight} KG`
                       : ""}
                   </div>
                 ))}
