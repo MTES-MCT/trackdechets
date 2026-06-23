@@ -94,7 +94,7 @@ function getErrorMessage(errorCode: string): {
           Si vous n'avez pas reçu cet e-mail, s'il est expiré ou déjà utilisé,
           contactez notre support.{" "}
           <a
-            href="https://faq.trackdechets.fr/contact"
+            href="https://assistance.trackdechets.beta.gouv.fr"
             className="fr-link"
             target="_blank"
             rel="noopener noreferrer"

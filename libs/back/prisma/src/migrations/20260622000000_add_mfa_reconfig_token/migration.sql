@@ -1,8 +1,8 @@
 -- CreateTable: MfaReconfigToken
 CREATE TABLE "MfaReconfigToken" (
-  "id"           VARCHAR(30)    NOT NULL,
-  "userId"       VARCHAR(30)    NOT NULL,
-  "token"        VARCHAR(64)    NOT NULL,
+  "id"           VARCHAR2(30)    NOT NULL,
+  "userId"       VARCHAR2(30)    NOT NULL,
+  "token"        VARCHAR2(64)    NOT NULL,
   "tokenExpires" TIMESTAMPTZ(6) NOT NULL,
   "used"         BOOLEAN        NOT NULL DEFAULT false,
   "createdAt"    TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
