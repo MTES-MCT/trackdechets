@@ -114,7 +114,7 @@ function TopAlert({
               de cette demande, contactez notre support via l'Assistance
               Trackdéchets.{" "}
               <a
-                href="https://faq.trackdechets.fr/contact"
+                href="https://assistance.trackdechets.beta.gouv.fr/"
                 className="fr-link"
                 target="_blank"
                 rel="noopener noreferrer"

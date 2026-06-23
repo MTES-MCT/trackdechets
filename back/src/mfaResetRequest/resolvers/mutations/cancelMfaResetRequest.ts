@@ -5,6 +5,7 @@ import { prisma, MfaResetRequest, MfaResetRequestStatus } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { sendMail } from "../../../mailer/mailing";
 import { onMfaResetCancelled, renderMail } from "@td/mail";
+import { logger } from "@td/logger";
 import { getMfaResetRequestOrThrow } from "./utils/mfaResetRequest.utils";
 
 const cancelMfaResetRequest = async (
@@ -46,7 +47,12 @@ const cancelMfaResetRequest = async (
       to: [{ name: existing.user.name, email: existing.user.email }],
       variables: { name: existing.user.name, email: existing.user.email }
     })
-  ).catch(() => undefined);
+  ).catch(err =>
+    logger.error(
+      `[MFA reset] Erreur envoi email 4 annulation demande ${mfaResetRequestId} pour utilisateur ${existing.user.email}`,
+      err
+    )
+  );
 
   return cancelled;
 };

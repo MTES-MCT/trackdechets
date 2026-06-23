@@ -178,6 +178,13 @@ enum AuthType {
   JWT
 }
 
+enum MfaResetRequestStatus {
+  PENDING
+  DONE
+  CANCELLED
+  FAILED
+}
+
 enum ApplicationGoal {
   // Application pour un usage personnel ou au sein de sa propre entreprise
   PERSONNAL
@@ -936,6 +943,8 @@ model User {
 
   AccessToken           AccessToken[]
   totpRecoveryCodes     TotpRecoveryCode[]
+  mfaResetRequests      MfaResetRequest[]
+  mfaReconfigTokens     MfaReconfigToken[]
   applications          Application[]
   companyAssociations   CompanyAssociation[]
   featureFlags          FeatureFlag[]
@@ -964,8 +973,6 @@ model User {
   registryChangeAggregates   RegistryChangeAggregate[]
   registryTexsAnalysisFiles  RegistryTexsAnalysisFile[]
   adminRequests              AdminRequest[]             @relation("AdminRequestUser")
-  mfaResetRequests           MfaResetRequest[]
-  mfaReconfigTokens          MfaReconfigToken[]
 }
 
 model TotpRecoveryCode {
@@ -975,6 +982,36 @@ model TotpRecoveryCode {
   usedAt    DateTime?
   createdAt DateTime  @default(now()) @db.Timestamptz(6)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MfaResetRequest {
+  id        String                @id @default(cuid()) @db.VarChar(30)
+  userId    String                @db.VarChar(30)
+  status    MfaResetRequestStatus @default(PENDING)
+  note      String?
+  createdAt DateTime              @default(now()) @db.Timestamptz(6)
+  dueAt     DateTime              @db.Timestamptz(6)
+  updatedAt DateTime              @updatedAt @db.Timestamptz(6)
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId], map: "_MfaResetRequestUserIdIdx")
+  @@index([status], map: "_MfaResetRequestStatusIdx")
+  @@index([dueAt], map: "_MfaResetRequestDueAtIdx")
+}
+
+model MfaReconfigToken {
+  id           String   @id @default(cuid()) @db.VarChar(30)
+  userId       String   @db.VarChar(30)
+  token        String   @unique(map: "MfaReconfigToken.token._UNIQUE") @db.VarChar(64)
+  tokenExpires DateTime @db.Timestamptz(6)
+  used         Boolean  @default(false)
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "_MfaReconfigTokenUserIdIdx")
+  @@index([tokenExpires], map: "_MfaReconfigTokenTokenExpiresIdx")
+  @@index([used], map: "_MfaReconfigTokenUsedIdx")
 }
 
 enum GovernmentPermission {
@@ -2447,51 +2484,4 @@ enum EmptyReturnADR {
   EMPTY_CITERNE
   EMPTY_CONTAINER
   EMPTY_CITERNE_CONTAINER
-}
-
-// ─── MFA Reconfig Token ──────────────────────────────────────────────────────
-
-/// Token à usage unique valable 24 h, généré après réinitialisation MFA réussie.
-/// Permet de fournir un lien sécurisé dans l'e-mail 5 (TRA-17932).
-/// Le frontend /mfa-reconfiguration?token=... le consomme (TRA-17933).
-model MfaReconfigToken {
-  id           String   @id @default(cuid()) @db.VarChar(30)
-  token        String   @unique @db.VarChar(64)
-  tokenExpires DateTime @db.Timestamptz(6)
-  createdAt    DateTime @default(now()) @db.Timestamptz(6)
-  used         Boolean  @default(false)
-  userId       String   @db.VarChar(30)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId], map: "_MfaReconfigTokenUserIdIdx")
-}
-
-// ─── MFA Reset Request ───────────────────────────────────────────────────────
-
-enum MfaResetRequestStatus {
-  /// Demande en attente de réinitialisation automatique à l'échéance
-  PENDING
-  /// Réinitialisation effectuée automatiquement après 48h
-  DONE
-  /// Demande annulée par un super-admin avant l'échéance
-  CANCELLED
-  /// Erreur technique ou compte introuvable/désactivé à l'échéance
-  FAILED
-}
-
-model MfaResetRequest {
-  id        String                 @id @default(cuid()) @db.VarChar(30)
-  userId    String                 @db.VarChar(30)
-  status    MfaResetRequestStatus  @default(PENDING)
-  /// Note interne : numéro de ticket support, motif, contexte
-  note      String?
-  createdAt DateTime               @default(now()) @db.Timestamptz(6)
-  /// Échéance = createdAt + 48h, calculée à la création
-  dueAt     DateTime               @db.Timestamptz(6)
-  updatedAt DateTime               @updatedAt @db.Timestamptz(6)
-  user      User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
-
-  @@index([userId], map: "_MfaResetRequestUserIdIdx")
-  @@index([status], map: "_MfaResetRequestStatusIdx")
-  @@index([dueAt], map: "_MfaResetRequestDueAtIdx")
 }

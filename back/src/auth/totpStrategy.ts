@@ -69,7 +69,10 @@ export class TotpStrategy extends PassportStrategy {
     }
 
     if (user?.mfaResetSuspended) {
-      return this.fail({ code: "MFA_RESET_IN_PROGRESS" }, 401);
+      const code = user.mustReconfigureMfa
+        ? "MFA_RESET_DONE_RECONFIG_REQUIRED"
+        : "MFA_RESET_IN_PROGRESS";
+      return this.fail({ code }, 401);
     }
 
     if (user?.totpLockedUntil && user.totpLockedUntil > new Date()) {
