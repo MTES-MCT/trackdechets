@@ -130,14 +130,16 @@ export const buildResponse = async ({ query, size, sort, search_after }) => {
   // -------------------------------------------------------------------------
   // Récupération des gerepId des émetteurs via Prisma
   // -------------------------------------------------------------------------
-  const emitterSirets = distinct([
-    ...concreteBsdds.map(b => b.emitterCompanySiret),
-    ...concreteBsdasris.map(b => b.emitterCompanySiret),
-    ...concreteBsdas.map(b => b.emitterCompanySiret),
-    ...concreteBsffs.map(b => b.emitterCompanySiret),
-    ...concreteBsvhus.map(b => b.emitterCompanySiret),
-    ...concreteBspaohs.map(b => b.emitterCompanySiret),
-  ].filter(Boolean)) as string[];
+  const emitterSirets = distinct(
+    [
+      ...concreteBsdds.map(b => b.emitterCompanySiret),
+      ...concreteBsdasris.map(b => b.emitterCompanySiret),
+      ...concreteBsdas.map(b => b.emitterCompanySiret),
+      ...concreteBsffs.map(b => b.emitterCompanySiret),
+      ...concreteBsvhus.map(b => b.emitterCompanySiret),
+      ...concreteBspaohs.map(b => b.emitterCompanySiret)
+    ].filter(Boolean)
+  ) as string[];
 
   const companies = await prisma.company.findMany({
     where: { siret: { in: emitterSirets } },
@@ -158,14 +160,15 @@ export const buildResponse = async ({ query, size, sort, search_after }) => {
     BSPAOH: concreteBspaohs.map(expandBspaohFromElastic)
   };
 
-  const edges = hits
-    .reduce<Array<{ cursor: string; node: Bsd }>>((acc, hit: any) => { 
+  const edges = hits.reduce<Array<{ cursor: string; node: Bsd }>>(
+    (acc, hit: any) => {
       const { type, id } = hit._source;
-      const bsd = bsds[type].find((b) => b.id === id);
+      const bsd = bsds[type].find(b => b.id === id);
 
       if (bsd) {
-        const cursorValue = hit.sort && hit.sort.length > 0 ? String(hit.sort[0]) : hit._id;
-        
+        const cursorValue =
+          hit.sort && hit.sort.length > 0 ? String(hit.sort[0]) : hit._id;
+
         // Ton ajout ici 👇
         const emitterSiret = hit._source.emitterCompanySiret;
 
@@ -185,7 +188,9 @@ export const buildResponse = async ({ query, size, sort, search_after }) => {
       }
 
       return acc;
-    }, []);
+    },
+    []
+  );
 
   const pageInfo = {
     startCursor: edges[0]?.cursor || null,

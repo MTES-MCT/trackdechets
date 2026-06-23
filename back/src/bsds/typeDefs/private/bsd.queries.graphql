@@ -38,5 +38,9 @@ type Query {
   Recherche multicritères de bordereaux. N'impacte pas la recherche de la fiche établissement.
   Accessible uniquement aux comptes gouvernementaux disposant de la permission BSDS_CAN_READ_ALL.
   """
-  bordereauxSearch(where: BordereauxSearchWhere, after: String, first: Int): BsdConnection!
+  bordereauxSearch(
+    where: BordereauxSearchWhere
+    after: String
+    first: Int
+  ): BsdConnection!
 }
