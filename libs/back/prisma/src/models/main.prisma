@@ -992,7 +992,7 @@ model MfaResetRequest {
   createdAt DateTime              @default(now()) @db.Timestamptz(6)
   dueAt     DateTime              @db.Timestamptz(6)
   updatedAt DateTime              @updatedAt @db.Timestamptz(6)
-  user      User                  @relation(fields: [userId], references: [id])
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
 
   @@index([userId], map: "_MfaResetRequestUserIdIdx")
   @@index([status], map: "_MfaResetRequestStatusIdx")
