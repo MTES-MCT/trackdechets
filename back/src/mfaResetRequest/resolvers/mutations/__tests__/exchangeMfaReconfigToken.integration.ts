@@ -8,13 +8,15 @@ import { print } from "graphql";
 import { subHours, addHours } from "date-fns";
 
 const EXCHANGE_MFA_RECONFIG_TOKEN = gql`
-  mutation ExchangeMfaReconfigToken($token: String!) {
-    exchangeMfaReconfigToken(token: $token) {
+  mutation ExchangeMfaReconfigToken($token: String!, $password: String!) {
+    exchangeMfaReconfigToken(token: $token, password: $password) {
       id
       mustReconfigureMfa
     }
   }
 `;
+
+const VALID_PASSWORD = "pass";
 
 function hashToken(rawToken: string): string {
   return crypto.createHash("sha256").update(rawToken).digest("hex");
@@ -89,7 +91,7 @@ describe("Mutation exchangeMfaReconfigToken", () => {
 
     const { mutate } = makeUnauthenticatedClient();
     const { result, logInMock } = await mutate(EXCHANGE_MFA_RECONFIG_TOKEN, {
-      variables: { token: rawToken }
+      variables: { token: rawToken, password: VALID_PASSWORD }
     });
 
     expect(result.errors).toBeUndefined();
@@ -112,10 +114,12 @@ describe("Mutation exchangeMfaReconfigToken", () => {
 
     const { mutate } = makeUnauthenticatedClient();
     await mutate(EXCHANGE_MFA_RECONFIG_TOKEN, {
-      variables: { token: rawToken }
+      variables: { token: rawToken, password: VALID_PASSWORD }
     });
 
-    const updatedUser = await prisma.user.findUnique({ where: { id: user.id } });
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
     expect(updatedUser!.mfaResetSuspended).toBe(false);
 
     const storedToken = await prisma.mfaReconfigToken.findFirst({
@@ -127,7 +131,7 @@ describe("Mutation exchangeMfaReconfigToken", () => {
   it("token invalide (hash inconnu) → erreur explicite, pas de session", async () => {
     const { mutate } = makeUnauthenticatedClient();
     const { result, logInMock } = await mutate(EXCHANGE_MFA_RECONFIG_TOKEN, {
-      variables: { token: "a".repeat(64) }
+      variables: { token: "a".repeat(64), password: VALID_PASSWORD }
     });
 
     expect(result.errors).toBeDefined();
@@ -146,7 +150,7 @@ describe("Mutation exchangeMfaReconfigToken", () => {
 
     const { mutate } = makeUnauthenticatedClient();
     const { result, logInMock } = await mutate(EXCHANGE_MFA_RECONFIG_TOKEN, {
-      variables: { token: rawToken }
+      variables: { token: rawToken, password: VALID_PASSWORD }
     });
 
     expect(result.errors).toBeDefined();
@@ -163,7 +167,7 @@ describe("Mutation exchangeMfaReconfigToken", () => {
 
     const { mutate } = makeUnauthenticatedClient();
     const { result, logInMock } = await mutate(EXCHANGE_MFA_RECONFIG_TOKEN, {
-      variables: { token: rawToken }
+      variables: { token: rawToken, password: VALID_PASSWORD }
     });
 
     expect(result.errors).toBeDefined();
@@ -181,7 +185,7 @@ describe("Mutation exchangeMfaReconfigToken", () => {
 
     const { mutate } = makeUnauthenticatedClient();
     const { result, logInMock } = await mutate(EXCHANGE_MFA_RECONFIG_TOKEN, {
-      variables: { token: rawToken }
+      variables: { token: rawToken, password: VALID_PASSWORD }
     });
 
     expect(result.errors).toBeDefined();
@@ -205,15 +209,38 @@ describe("Mutation exchangeMfaReconfigToken", () => {
 
     // Premier échange : succès
     const { result: first } = await mutate(EXCHANGE_MFA_RECONFIG_TOKEN, {
-      variables: { token: rawToken }
+      variables: { token: rawToken, password: VALID_PASSWORD }
     });
     expect(first.errors).toBeUndefined();
 
     // Second échange avec le même token : refusé
     const { result: second } = await mutate(EXCHANGE_MFA_RECONFIG_TOKEN, {
-      variables: { token: rawToken }
+      variables: { token: rawToken, password: VALID_PASSWORD }
     });
     expect(second.errors).toBeDefined();
     expect(second.errors![0].message).toMatch(/déjà été utilisé/i);
+  });
+
+  it("mot de passe incorrect : refuse la session sans consommer le token", async () => {
+    const user = await userFactory({
+      mustReconfigureMfa: true,
+      mfaResetSuspended: true,
+      totpSeed: null
+    });
+    const rawToken = await createValidToken(user.id);
+
+    const { mutate } = makeUnauthenticatedClient();
+    const { result, logInMock } = await mutate(EXCHANGE_MFA_RECONFIG_TOKEN, {
+      variables: { token: rawToken, password: "wrong-password" }
+    });
+
+    expect(result.errors).toBeDefined();
+    expect(result.errors![0].message).toMatch(/mot de passe incorrect/i);
+    expect(logInMock).not.toHaveBeenCalled();
+
+    const storedToken = await prisma.mfaReconfigToken.findFirst({
+      where: { userId: user.id }
+    });
+    expect(storedToken!.used).toBe(false);
   });
 });

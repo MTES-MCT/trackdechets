@@ -77,7 +77,10 @@ describe("TotpStrategy — mfaResetSuspended", () => {
   });
 
   it("refuse avec MFA_RESET_IN_PROGRESS si suspendu ET mustReconfigureMfa=false (en attente 48h)", async () => {
-    const user = mockUser({ mfaResetSuspended: true, mustReconfigureMfa: false });
+    const user = mockUser({
+      mfaResetSuspended: true,
+      mustReconfigureMfa: false
+    });
     findUniqueMock.mockResolvedValue(user);
 
     const { otp } = TOTP.generate(SEED);
@@ -94,7 +97,10 @@ describe("TotpStrategy — mfaResetSuspended", () => {
   });
 
   it("refuse avec MFA_RESET_DONE_RECONFIG_REQUIRED si suspendu ET mustReconfigureMfa=true (reset effectué)", async () => {
-    const user = mockUser({ mfaResetSuspended: true, mustReconfigureMfa: true });
+    const user = mockUser({
+      mfaResetSuspended: true,
+      mustReconfigureMfa: true
+    });
     findUniqueMock.mockResolvedValue(user);
 
     const { otp } = TOTP.generate(SEED);

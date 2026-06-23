@@ -6,9 +6,9 @@ import { addHours } from "date-fns";
 import { onMfaResetDone, renderMail } from "@td/mail";
 import { sendMail } from "../../../mailer/mailing";
 import { initSentry } from "../../../common/sentry";
+import { getUIBaseURL } from "../../../utils";
 
 const MFA_RECONFIG_TOKEN_EXPIRY_HOURS = 24;
-const { UI_HOST } = process.env;
 const Sentry = initSentry();
 
 /**
@@ -156,10 +156,7 @@ async function sendMfaResetDoneEmail(user: {
   const randomBytes = promisify(crypto.randomBytes);
   const rawToken = (await randomBytes(32)).toString("hex");
   // Seul le hash est stocké en base — le token brut ne quitte jamais le process
-  const tokenHash = crypto
-    .createHash("sha256")
-    .update(rawToken)
-    .digest("hex");
+  const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
   const tokenExpires = addHours(new Date(), MFA_RECONFIG_TOKEN_EXPIRY_HOURS);
 
   await prisma.mfaReconfigToken.create({
@@ -170,7 +167,7 @@ async function sendMfaResetDoneEmail(user: {
     }
   });
 
-  const reconfigurationUrl = `https://${UI_HOST}/mfa-reconfiguration?token=${encodeURIComponent(
+  const reconfigurationUrl = `${getUIBaseURL()}/mfa-reconfiguration?token=${encodeURIComponent(
     rawToken
   )}`;
 

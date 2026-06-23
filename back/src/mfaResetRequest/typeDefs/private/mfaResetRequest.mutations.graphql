@@ -24,14 +24,19 @@ type Mutation {
   cancelMfaResetRequest(mfaResetRequestId: ID!): MfaResetRequest!
 
   """
-  Échange le token sécurisé reçu par e-mail (TRA-17933) contre une session authentifiée.
-  Accessible sans authentification préalable : le token constitue le facteur d'identité.
+  Échange le token sécurisé reçu par e-mail (TRA-17933) et le mot de passe du
+  compte contre une session authentifiée.
+  Accessible sans authentification préalable : le token identifie le compte et
+  le mot de passe confirme l'identité de l'utilisateur.
   Le token est à usage unique et valable 24h.
   En cas de succès, établit une session avec mustReconfigureMfa=true :
   l'utilisateur est authentifié mais doit compléter le wizard de reconfiguration MFA
   avant d'accéder à la plateforme.
   """
-  exchangeMfaReconfigToken(token: String!): ExchangeMfaReconfigTokenPayload!
+  exchangeMfaReconfigToken(
+    token: String!
+    password: String!
+  ): ExchangeMfaReconfigTokenPayload!
 }
 
 type ExchangeMfaReconfigTokenPayload {

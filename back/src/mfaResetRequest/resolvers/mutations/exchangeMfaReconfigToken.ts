@@ -1,19 +1,23 @@
 import crypto from "crypto";
+import { compare } from "bcrypt";
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { AuthType } from "../../../auth/auth";
 import type { GraphQLContext } from "../../../types";
 
 /**
- * Échange le token sécurisé reçu par e-mail contre une session authentifiée.
+ * Échange le token sécurisé reçu par e-mail et le mot de passe du compte contre
+ * une session authentifiée.
  *
  * Appelée depuis la page /mfa-reconfiguration?token=... (TRA-17933).
- * Pas d'authentification préalable requise : le token constitue le facteur d'identité.
+ * Pas de second facteur requis : le token identifie le compte, puis le mot de
+ * passe confirme l'identité de l'utilisateur.
  *
  * Préconditions vérifiées :
  *  - token non vide, hash sha256 trouvé en base
  *  - token non expiré
  *  - token non encore utilisé
+ *  - mot de passe correct
  *  - compte en état mustReconfigureMfa=true ET mfaResetSuspended=true
  *
  * En cas de succès (transaction atomique) :
@@ -23,11 +27,14 @@ import type { GraphQLContext } from "../../../types";
  */
 const exchangeMfaReconfigToken = async (
   _: unknown,
-  { token }: { token: string },
+  { token, password }: { token: string; password: string },
   context: GraphQLContext
 ): Promise<{ id: string; mustReconfigureMfa: boolean }> => {
   if (!token) {
     throw new UserInputError("Lien de reconfiguration invalide.");
+  }
+  if (!password) {
+    throw new UserInputError("Mot de passe requis.");
   }
 
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
@@ -54,6 +61,11 @@ const exchangeMfaReconfigToken = async (
   }
 
   const user = record.user;
+
+  const passwordValid = await compare(password, user.password);
+  if (!passwordValid) {
+    throw new UserInputError("Mot de passe incorrect.");
+  }
 
   if (!user.mustReconfigureMfa || !user.mfaResetSuspended) {
     // L'utilisateur n'est plus en attente de reconfiguration (reconfiguration déjà
