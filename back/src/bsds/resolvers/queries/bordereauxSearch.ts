@@ -1,4 +1,7 @@
-import type { QueryResolvers, QueryBordereauxSearchArgs } from "@td/codegen-back";
+import type {
+  QueryResolvers,
+  QueryBordereauxSearchArgs
+} from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { hasGovernmentReadAllBsdsPermOrThrow } from "../../../permissions";
 import { buildResponse } from "./helpers";
@@ -20,25 +23,25 @@ function buildQuery({ where }: QueryBordereauxSearchArgs) {
   }
 
   if (where?.code_dechet) {
-  // Nettoie et split : "['10 13 09*', '15 01 11*']" → ["10 13 09*", "15 01 11*"]
-  const codes = where.code_dechet
-    .replace(/[\]['"]/g, "")
-    .split(",")
-    .map(c => c.trim())
-    .filter(Boolean);
+    // Nettoie et split : "['10 13 09*', '15 01 11*']" → ["10 13 09*", "15 01 11*"]
+    const codes = where.code_dechet
+      .replace(/[\]['"]/g, "")
+      .split(",")
+      .map(c => c.trim())
+      .filter(Boolean);
 
-  if (codes.length === 1) {
-    must.push({
-      term: { wasteCode: codes[0] }
-    });
-  } else {
-    must.push({
-      terms: { wasteCode: codes }
-    });
+    if (codes.length === 1) {
+      must.push({
+        term: { wasteCode: codes[0] }
+      });
+    } else {
+      must.push({
+        terms: { wasteCode: codes }
+      });
+    }
   }
-}
 
-if (where?.code_aiot) {
+  if (where?.code_aiot) {
     must.push({
       bool: {
         should: [
@@ -69,9 +72,11 @@ if (where?.code_aiot) {
 
   if (where?.date_reception_debut || where?.date_reception_fin) {
     const range: any = {};
-    if (where.date_reception_debut) range.gte = new Date(where.date_reception_debut).getTime();
-    if (where.date_reception_fin) range.lte = new Date(where.date_reception_fin).getTime();
-    
+    if (where.date_reception_debut)
+      range.gte = new Date(where.date_reception_debut).getTime();
+    if (where.date_reception_fin)
+      range.lte = new Date(where.date_reception_fin).getTime();
+
     filter.push({
       range: {
         destinationReceptionDate: range
@@ -81,8 +86,10 @@ if (where?.code_aiot) {
 
   if (where?.date_expedition_debut || where?.date_expedition_fin) {
     const range: any = {};
-    if (where.date_expedition_debut) range.gte = new Date(where.date_expedition_debut).getTime();
-    if (where.date_expedition_fin) range.lte = new Date(where.date_expedition_fin).getTime();
+    if (where.date_expedition_debut)
+      range.gte = new Date(where.date_expedition_debut).getTime();
+    if (where.date_expedition_fin)
+      range.lte = new Date(where.date_expedition_fin).getTime();
 
     filter.push({
       range: {
@@ -106,7 +113,9 @@ const bordereauxSearchResolver: QueryResolvers["bordereauxSearch"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  await hasGovernmentReadAllBsdsPermOrThrow(user);
+  if (!user.isAdmin) {
+    await hasGovernmentReadAllBsdsPermOrThrow(user);
+  }
 
   const MIN_SIZE = 0;
   const MAX_SIZE = 300;
