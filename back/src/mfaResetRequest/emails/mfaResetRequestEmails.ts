@@ -5,6 +5,7 @@ import {
   onMfaResetRequestCreatedForUser,
   renderMail
 } from "@td/mail";
+import { logger } from "@td/logger";
 import { sendMail } from "../../mailer/mailing";
 
 /**
@@ -77,7 +78,12 @@ async function sendAdminNotificationEmails(targetUser: User): Promise<void> {
           userEmail: targetUser.email
         }
       })
-    ).catch(() => undefined)
+    ).catch(err =>
+      logger.error(
+        `[MFA reset] Erreur envoi email 2 admin ${admin.email} pour utilisateur ${targetUser.email}`,
+        err
+      )
+    )
   );
 
   await Promise.all(sends);
@@ -92,5 +98,10 @@ async function sendUserConfirmationEmail(targetUser: User): Promise<void> {
         email: targetUser.email
       }
     })
-  ).catch(() => undefined);
+  ).catch(err =>
+    logger.error(
+      `[MFA reset] Erreur envoi email 3 titulaire ${targetUser.email}`,
+      err
+    )
+  );
 }

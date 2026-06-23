@@ -38,7 +38,7 @@ let jobs: cron.CronJob[] = [
     timeZone: TZ
   }),
   new cron.CronJob({
-    cronTime: "0 * * * *", // Every hour
+    cronTime: "0/5 * * * *", // Every hour
     onTick: async () => {
       await processDueMfaResetRequests();
     },
