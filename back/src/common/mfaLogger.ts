@@ -32,9 +32,9 @@ export function logMfaEvent({
   logger.info("mfa_event", {
     timestamp: new Date().toISOString(), // ISO 8601 : "2026-05-14T10:30:00.000Z"
     mfa_event_type: eventType,
-    user_id: userId,
+    user_id_suffix: userId.slice(-4),
     success,
-    ip: ip ?? null
+    ip_present: Boolean(ip)
   });
 
   // Persistence en base pour Metabase (fire-and-forget, non bloquant)
