@@ -306,10 +306,13 @@ describe("POST /recovery-login", () => {
   it("log MFA_RECOVERY_LOCKOUT_LIFTED écrit quand le code est valide après expiration du blocage", async () => {
     // Blocage expiré : recoveryLockedUntil dans le passé
     const expiredLockout = new Date(Date.now() - 1000);
-    const { user, plainCode } = await createUserWithRecoveryCode("ABCDE-FGHIJ", {
-      recoveryFails: 3,
-      recoveryLockedUntil: expiredLockout
-    });
+    const { user, plainCode } = await createUserWithRecoveryCode(
+      "ABCDE-FGHIJ",
+      {
+        recoveryFails: 3,
+        recoveryLockedUntil: expiredLockout
+      }
+    );
     const cookie = await doLogin(user.email);
 
     await request
