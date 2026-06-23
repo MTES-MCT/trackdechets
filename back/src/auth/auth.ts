@@ -103,6 +103,16 @@ export const getLoginError = (username: string) => ({
   }
 });
 
+function getMfaResetLoginError(user: User, username: string) {
+  if (!user.mfaResetSuspended) {
+    return null;
+  }
+  if (user.mustReconfigureMfa) {
+    return { ...getLoginError(username).MFA_RESET_DONE_RECONFIG_REQUIRED };
+  }
+  return { ...getLoginError(username).MFA_RESET_IN_PROGRESS };
+}
+
 // apart from logging the user in, we perform captcha verifications:
 // - if user has performed less than FAILED_ATTEMPTS_BEFORE_CAPTCHA in the last FAILED_LOGIN_EXPIRATION seconds, perform as usual
 // - if user has performed more failed attempts, check if captcha is correct
@@ -158,15 +168,9 @@ passport.use(
             ...getLoginError(username).NOT_ACTIVATED
           });
         }
-        if (user.mfaResetSuspended) {
-          // mustReconfigureMfa=true → reset terminé, l'utilisateur doit utiliser le lien e-mail
-          // mustReconfigureMfa=false → reset en cours (48h), accès suspendu en attente
-          const errorKey = user.mustReconfigureMfa
-            ? "MFA_RESET_DONE_RECONFIG_REQUIRED"
-            : "MFA_RESET_IN_PROGRESS";
-          return done(null, false, {
-            ...getLoginError(username)[errorKey]
-          });
+        const mfaResetError = getMfaResetLoginError(user, username);
+        if (mfaResetError) {
+          return done(null, false, mfaResetError);
         }
         if (needsTotp) {
           // we redirect to the totp page without logging the user in.
@@ -205,8 +209,13 @@ passport.serializeUser((user: User, done) => {
 passport.deserializeUser((id: string, done) => {
   // Fetch the complete user from database using their ID
   prisma.user
-    .findUniqueOrThrow({ where: { id } })
-    .then(user => done(null, { ...user, auth: AuthType.Session }))
+    .findUnique({ where: { id } })
+    .then(user => {
+      if (!user) {
+        return done(null, false);
+      }
+      return done(null, { ...user, auth: AuthType.Session });
+    })
     .catch(err => done(err));
 });
 

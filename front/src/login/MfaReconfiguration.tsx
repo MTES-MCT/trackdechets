@@ -18,7 +18,7 @@ const EXCHANGE_MFA_RECONFIG_TOKEN = gql`
   }
 `;
 
-const SUPPORT_LINK = "https://faq.trackdechets.fr/contact";
+const SUPPORT_LINK = "https://assistance.trackdechets.beta.gouv.fr/";
 
 /**
  * Page /mfa-reconfiguration?token=...
