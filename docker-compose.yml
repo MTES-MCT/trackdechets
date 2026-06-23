@@ -50,7 +50,7 @@ services:
     image: nginx:1.19.6
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     network_mode: $NGINX_NETWORK_MODE
-    volumes:  
+    volumes:
       - ./nginx/templates:/etc/nginx/templates
     environment:
       API_HOST: $API_HOST
