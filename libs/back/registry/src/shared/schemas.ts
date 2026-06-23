@@ -346,7 +346,13 @@ export const ttdNumberSchema = z
   .string()
   .transform(v => v.replace(/\s+/g, ""))
   .refine(
-    v => /^(?:[A-Z]{2,3}|A7[EI])[0-9]{0,4}[0-9]{6}$/.test(v),
+    v =>
+      // Ancien format : [2–3 lettres maj. ou A7E/A7I] + [6–10 chiffres]
+      // Ex: FR00123456, GLW0012345678
+      /^(?:[A-Z]{2,3}|A7[EI])[0-9]{0,4}[0-9]{6}$/.test(v) ||
+      // Nouveau format GISTRID (depuis le 11/12/2025) : [3 lettres].[2 lettres pays][2 chiffres année][8 chiffres][i optionnel]
+      // Ex: GLW.FR2500000001, GLW.FR2500000001i
+      /^[A-Z]{3}\.[A-Z]{2}\d{10}i?$/.test(v),
     "Le numéro de notification ou de déclaration de transfert transfrontalier de déchet ne respecte pas le format attendu"
   )
   .nullish();
