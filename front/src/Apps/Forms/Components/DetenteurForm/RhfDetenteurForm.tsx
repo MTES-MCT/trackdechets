@@ -313,7 +313,13 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       render={({ field }) => (
                         <Input
                           label="Nom et prénom"
-                          nativeInputProps={field}
+                          nativeInputProps={{
+                            ...field,
+                            onBlur: e => {
+                              field.onChange(e.target.value.trim());
+                              field.onBlur();
+                            }
+                          }}
                           disabled={sealedFields.includes("ficheInterventions")}
                         />
                       )}
