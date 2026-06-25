@@ -103,4 +103,5 @@ export default {
 export type CreateOrUpdateBsvhuTransporterInput = BsvhuTransporterInput & {
   id?: string | null;
   takenOverAt?: string | null;
+  signatureDate?: string | null;
 };

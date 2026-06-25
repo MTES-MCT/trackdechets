@@ -122,10 +122,18 @@ const BsvhuFormSteps = ({
     [formQuery.data]
   );
 
-  const formState = useMemo(
-    () => getComputedState(initialState, formQuery.data?.bsvhu),
-    [formQuery.data]
-  );
+  const formState = useMemo(() => {
+    const computed = getComputedState(initialState, formQuery.data?.bsvhu);
+    return {
+      ...computed,
+      transporters: computed.transporters.map((t, idx) => ({
+        ...t,
+        signatureDate:
+          formQuery.data?.bsvhu?.transporters?.[idx]?.transport?.signature
+            ?.date ?? null
+      }))
+    };
+  }, [formQuery.data]);
 
   const methods = useForm<ZodBsvhu>({
     values: formState,
@@ -174,7 +182,7 @@ const BsvhuFormSteps = ({
   async function saveBsvhuTransporter(
     transporterInput: CreateOrUpdateBsvhuTransporterInput
   ): Promise<string> {
-    const { id, transport, ...input } = transporterInput;
+    const { id, transport, signatureDate, ...input } = transporterInput;
 
     // S'assure que les données de récépissé transport sont nulles dans les
     // cas suivants :
@@ -208,7 +216,7 @@ const BsvhuFormSteps = ({
       // Le transporteur existe déjà en base de données, on met
       // à jour les infos (uniquement si le transporteur n'a pas encore
       // pris en charge le déchet) et on renvoie l'identifiant
-      if (!transport?.takenOverAt) {
+      if (!signatureDate) {
         const { errors } = await updateBsvhuTransporter({
           variables: { id, input: cleanInput },
           onError: err => {
