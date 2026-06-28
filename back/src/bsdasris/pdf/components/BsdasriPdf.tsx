@@ -158,6 +158,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
             )}
             <p>
               <strong>Date de remise au collecteur :</strong>{" "}
+              {formatDate(bsdasri?.transporter?.transport?.takenOverAt)}
             </p>
             <hr />
             <p>
