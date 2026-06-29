@@ -18,6 +18,18 @@ import { getWasteDescription } from "./utils";
 import { splitAddress } from "../common/addresses";
 import { kgToTonRegistryV2 } from "../common/converter";
 import { getFirstTransporterSync } from "./converter";
+
+type BspaohPackagingItem = { quantity?: number | null };
+
+const getPackagingsQuantity = (packagings: Prisma.JsonValue): number | null => {
+  if (!Array.isArray(packagings) || packagings.length === 0) {
+    return null;
+  }
+  return (packagings as BspaohPackagingItem[]).reduce(
+    (total, p) => total + (p.quantity ?? 0),
+    0
+  );
+};
 import {
   emptyIncomingWasteV2,
   emptyOutgoingWasteV2,
@@ -86,7 +98,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getPackagingsQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     initialEmitterCompanyName: null,
@@ -230,7 +242,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getPackagingsQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
@@ -407,7 +419,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
-    quantity: null,
+    quantity: getPackagingsQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
     volume: null,
@@ -548,7 +560,7 @@ export const toAllWasteV2 = (
     wasteCode: bspaoh.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getPackagingsQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
