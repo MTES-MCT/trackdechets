@@ -1961,7 +1961,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+          "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR), le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) ou le numéro de déclaration GISTRID (ancien format ex. FR00123456, nouveau format ex. GLW.FR2500000001[i]) renseigné ne correspond pas au format attendu."
       })
     ]);
   });
