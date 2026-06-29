@@ -51,6 +51,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
   detenteurCompanyName: yup
     .string()
     .ensure()
+    .trim()
     .when("detenteurIsPrivateIndividual", {
       is: true,
       then: schema =>
