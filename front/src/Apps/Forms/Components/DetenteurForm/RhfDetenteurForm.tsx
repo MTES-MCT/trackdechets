@@ -62,9 +62,10 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
       setValue(`${companyField}.siret`, undefined);
       setValue(`${companyField}.orgId`, undefined);
 
+      const contactValue = watch(`${companyField}.contact`);
       setValue(
         `${companyField}.name`,
-        watch(`${companyField}.contact`) ?? "Détenteur particulier"
+        contactValue?.trim() || "Détenteur particulier"
       );
     }
   }, [isPrivate, setValue, companyField, watch]);
