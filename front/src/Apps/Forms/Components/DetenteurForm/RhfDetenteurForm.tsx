@@ -62,9 +62,10 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
       setValue(`${companyField}.siret`, undefined);
       setValue(`${companyField}.orgId`, undefined);
 
+      const contactValue = watch(`${companyField}.contact`);
       setValue(
         `${companyField}.name`,
-        watch(`${companyField}.contact`) ?? "Détenteur particulier"
+        contactValue?.trim() || "Détenteur particulier"
       );
     }
   }, [isPrivate, setValue, companyField, watch]);
@@ -313,7 +314,13 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       render={({ field }) => (
                         <Input
                           label="Nom et prénom"
-                          nativeInputProps={field}
+                          nativeInputProps={{
+                            ...field,
+                            onBlur: e => {
+                              field.onChange(e.target.value.trim());
+                              field.onBlur();
+                            }
+                          }}
                           disabled={sealedFields.includes("ficheInterventions")}
                         />
                       )}

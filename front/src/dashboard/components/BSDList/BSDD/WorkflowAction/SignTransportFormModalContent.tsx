@@ -67,6 +67,13 @@ const SIGN_TRANSPORT_FORM = gql`
   }
   ${fullFormFragment}
 `;
+const UPDATE_FORM_TRANSPORTER = gql`
+  mutation UpdateFormTransporter($id: ID!, $input: TransporterInput!) {
+    updateFormTransporter(id: $id, input: $input) {
+      id
+    }
+  }
+`;
 
 interface SignTransportFormModalProps {
   siret: string;
@@ -114,6 +121,25 @@ export default function SignTransportFormModalContent({
     MutationUpdateFormArgs
   >(UPDATE_FORM);
 
+  const [updateFormTransporter, { error: updateTransporterError }] =
+    useMutation<
+      { updateFormTransporter: { id: string } },
+      {
+        id: string;
+        input: {
+          company?: {
+            siret?: string;
+            vatNumber?: string;
+            contact?: string;
+            phone?: string;
+            mail?: string;
+          };
+          numberPlate?: string;
+          mode?: TransportMode;
+        };
+      }
+    >(UPDATE_FORM_TRANSPORTER);
+
   if (formLoading) return <Loader />;
   if (formError) return <InlineError apolloError={formError} />;
   if (!data?.form) {
@@ -159,6 +185,25 @@ export default function SignTransportFormModalContent({
       validationSchema={validationSchema}
       onSubmit={async values => {
         try {
+          await updateFormTransporter({
+            variables: {
+              id: signingTransporter!.id,
+              input: {
+                company: {
+                  siret: signingTransporter!.company?.siret ?? undefined,
+                  vatNumber:
+                    signingTransporter!.company?.vatNumber ?? undefined,
+                  contact: values.transporterCompanyContact,
+                  phone: values.transporterCompanyPhone,
+                  mail: values.transporterCompanyMail
+                },
+                numberPlate: values.transporterNumberPlate ?? undefined,
+                mode:
+                  (values.transporterTransportMode as TransportMode) ??
+                  undefined
+              }
+            }
+          });
           const { update } = values;
           const packagingsInfoUpdate = cleanPackagings(update.packagingInfos);
           if (
@@ -272,6 +317,9 @@ export default function SignTransportFormModalContent({
 
           {error && <NotificationError apolloError={error} />}
           {updateError && <NotificationError apolloError={updateError} />}
+          {updateTransporterError && (
+            <NotificationError apolloError={updateTransporterError} />
+          )}
 
           <div className="td-modal-actions">
             <button

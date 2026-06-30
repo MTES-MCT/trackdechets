@@ -325,17 +325,18 @@ function SignOperationModal({
   const notificationNumberIsOptional = !notificationNumberIsMandatory;
   // nextDestination + hasVatNumber + isDangerousOrPop
   const notificationNumberPlaceHolder = isDangerousOrPop
-    ? "PPAAAADDDRRR"
+    ? "PPAAAADDDRRR ou GLW.PPAAAAAAAAAA[i]"
     : "A7E AAAA DDDRRR";
+
   const notificationNumberLabel = isDangerousOrPop
     ? `Numéro de notification ${
         notificationNumberIsOptional ? "(Optionnel)" : ""
       }`
     : "Numéro de déclaration Annexe 7 (optionnel)";
-  const notificationNumberTooltip = isDangerousOrPop
-    ? "En cas d'export, indiquer ici le N° de notification prévu à l'annexe 1-B du règlement N°1013/2006, au format PPAAAADDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre."
-    : "En cas d'export, indiquer ici le N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre. ";
 
+  const notificationNumberTooltip = isDangerousOrPop
+    ? "En cas d'export, indiquer ici le N° de notification prévu à l'annexe 1-B du règlement N°1013/2006. Ancien format : PPAAAADDDRRR (PP = code pays, AAAA = année, DDD = département de départ, RRR = numéro d'ordre). Nouveau format GLW : GLW.PPAAAAAAAAAA, où PP est le code pays, AAAA l'année et AAAAAAAA le numéro chronologique sur 8 chiffres. Un suffixe « i » peut être ajouté pour les dossiers d'import (DIWASS)."
+    : "En cas d'export, indiquer ici le N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.";
   const isOperationCodeNeedComment = ["D 3", "D 4", "D 12", "D 9 F"].includes(
     processingOperationDone as string
   );

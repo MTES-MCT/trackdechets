@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Bsff } from "@td/codegen-ui";
-import { getPackagingInfosSummary } from "../../../common/utils/packagingsBsffSummary";
+
 import {
   PreviewContainer,
   PreviewContainerRow,
@@ -8,31 +8,12 @@ import {
   PreviewDateRow,
   PreviewTextRow
 } from "../BSDPreviewComponents";
-import { TableBody } from "react-stately";
-// import { Table, TableCell, TableHead, TableRow } from "front/src/common/components";
-import {
-  Table,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow
-} from "../../../../../../front/src/common/components";
-
-// import { PACKAGINGS_NAMES } from "front/src/form/bsff/components/packagings/Packagings";
-import { PACKAGINGS_NAMES } from "../../../../form/bsff/components/packagings/Packagings";
 
 interface BSFFPreviewWasteProps {
   bsd: Bsff;
 }
-const BSFFPreviewWaste = ({ bsd }: BSFFPreviewWasteProps) => {
-  const contenant = useMemo(
-    () =>
-      bsd?.packagings
-        ? getPackagingInfosSummary(bsd.packagings, { expanded: true })
-        : "",
-    [bsd]
-  );
 
+const BSFFPreviewWaste = ({ bsd }: BSFFPreviewWasteProps) => {
   return (
     <PreviewContainer>
       <PreviewContainerRow title={"Quantité"}>
@@ -45,12 +26,16 @@ const BSFFPreviewWaste = ({ bsd }: BSFFPreviewWasteProps) => {
                 : undefined
             }
             value={bsd.weight?.value}
-            units={"t"}
+            units={"kg"}
           />
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={4}>
-          <PreviewTextRow label="Quantité réelle reçue" value="-" units={"t"} />
+          <PreviewTextRow
+            label="Quantité réelle reçue"
+            value="-"
+            units={"kg"}
+          />
         </PreviewContainerCol>
       </PreviewContainerRow>
 
