@@ -4,10 +4,26 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+
+# [2026.06.2] 30/06/2026
+
+#### :nail_care: Améliorations
+
+- GISTRID : Nvl format numérotation :
+  - Assouplir le contrôle de format sur gistridNumber (BSDD). [PR 4796](https://github.com/MTES-MCT/trackdechets/pull/4796)
+  - Assouplir le contrôle de format sur gistridNumber (déclarations au registre national). [PR 4797](https://github.com/MTES-MCT/trackdechets/pull/4797)
+- Quantité affichée en kg au lieu de tonnes dans l’aperçu & formulaire du BSFF. [PR 4800](https://github.com/MTES-MCT/trackdechets/pull/4800)
+
+#### :bug: Corrections de bugs
+
+- BSDD : Blocage signature transporteur si informations de contact absents malgré saisie dans la modale. [PR 4795](https://github.com/MTES-MCT/trackdechets/pull/4795)
+- VHU, BSFF et BSDA : Blocage modification transporteur si date de prise en charge enregistrée mais signature échouée (API). [PR 4794](https://github.com/MTES-MCT/trackdechets/pull/4794)
+- BSDD - API : absence de contrôle des informations de contact du transporteur vers l’exutoire final. [PR 4795](https://github.com/MTES-MCT/trackdechets/pull/4795)
+
 # [2026.06.1] 02/06/2026
 
 #### :nail_care: Améliorations
-  
+
 - BSFF => Refonte & DSFR :
   - Implémenter l'onglet Déchet du BSFF au DSFR
   - Implémenter l'onglet Opérateur du BSFF au DSFR
@@ -18,7 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Mettre la modale de signature transporteur au DSFR
   - Mettre la modale de signature Mettre la modale de signature du destinataire au DSFR
   - Implémentation la modale "Aperçu" au DSFR [PR 4771](https://github.com/MTES-MCT/trackdechets/pull/4771)
-  
+
 #### :bug: Corrections de bugs
 
 - BSFF: Pouvoir modifier le conditionnement sur le BSFF de reconditionnement, regroupement et réexpédition. [PR 4778](https://github.com/MTES-MCT/trackdechets/pull/4778)
