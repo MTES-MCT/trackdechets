@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Modal from "../Modal/Modal";
 import { useCrisp } from "../../hooks/useCrisp";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import styles from "./Footer.module.scss";
+import routes from "../../../routes";
 /**
  * ========================
  * TYPES
@@ -188,25 +190,21 @@ export default function AppFooter() {
               </li>
 
               <li className="fr-footer__bottom-item">
-                <a
+                <Link
                   className="fr-footer__bottom-link"
-                  href="/Mentions-legales.pdf"
-                  target="_blank"
-                  rel="noopener"
+                  to={routes.mentionsLegales}
                 >
                   Mentions légales
-                </a>
+                </Link>
               </li>
 
               <li className="fr-footer__bottom-item">
-                <a
+                <Link
                   className="fr-footer__bottom-link"
-                  href="/Politique-de-confidentialite.pdf"
-                  target="_blank"
-                  rel="noopener"
+                  to={routes.politiqueDeConfidentialite}
                 >
                   Politique de confidentialité
-                </a>
+                </Link>
               </li>
 
               <li className="fr-footer__bottom-item">
@@ -273,13 +271,9 @@ export default function AppFooter() {
             <p className="fr-text--md fr-mb-0">
               Ici, vous pouvez voir et personnaliser les informations que nous
               collectons sur vous.{" "}
-              <a
-                href="/politique-de-confidentialite.pdf"
-                target="_blank"
-                rel="noopener"
-              >
+              <Link to={routes.politiqueDeConfidentialite}>
                 Politique de confidentialité
-              </a>
+              </Link>
             </p>
           </div>
 

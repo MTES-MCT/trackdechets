@@ -143,6 +143,8 @@ const routes = {
       index: "/companies/manage"
     }
   },
+  mentionsLegales: "/mentions-legales",
+  politiqueDeConfidentialite: "/politique-de-confidentialite",
   registry_new: {
     index: "/registry",
     myImports: "/registry/own",
@@ -275,6 +277,9 @@ export const titles = {
   "/companies/join": "",
   "/companies/create": "Ajouter un établissement — Trackdéchets",
   "/companies/manage": "Gestion avancée — Trackdéchets",
+  "/mentions-legales": "Mentions légales — Trackdéchets",
+  "/politique-de-confidentialite":
+    "Politique de confidentialité — Trackdéchets",
   "/registry/own": "Mes imports au registre national — Trackdéchets",
   "/registry/list":
     "Imports au registre national par établissement — Trackdéchets",

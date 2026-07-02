@@ -26,6 +26,8 @@ import PasswordReset from "../../../../login/PasswordReset";
 import MfaReconfiguration from "../../../../login/MfaReconfiguration";
 import Signup from "../../../../login/Signup";
 import WasteTree from "../search/WasteTree";
+import MentionsLegales from "../../../../Pages/Legal/MentionsLegales";
+import PolitiqueDeConfidentialite from "../../../../Pages/Legal/PolitiqueDeConfidentialite";
 
 const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
@@ -88,6 +90,13 @@ export default function LayoutContainer() {
                 <Admin />
               </RequireAuth>
             }
+          />
+
+          <Route path={routes.mentionsLegales} element={<MentionsLegales />} />
+
+          <Route
+            path={routes.politiqueDeConfidentialite}
+            element={<PolitiqueDeConfidentialite />}
           />
 
           <Route path={routes.login} element={<Login />} />
