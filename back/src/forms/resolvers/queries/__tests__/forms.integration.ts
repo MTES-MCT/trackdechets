@@ -705,6 +705,91 @@ describe("Query.forms", () => {
     expect(updatedAfterTomorrow.forms.length).toBe(0);
   });
 
+  it("should filter by updatedBefore", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret!]
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret!]
+      }
+    ]);
+
+    const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
+    const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
+
+    const { query } = makeClient(user);
+    const { data: updatedBeforeTomorrow } = await query<Pick<Query, "forms">>(
+      `query {
+          forms(updatedBefore: "${tomorrow}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(updatedBeforeTomorrow.forms.length).toBe(2);
+
+    const { data: updatedBeforeYesterday } = await query<Pick<Query, "forms">>(
+      `query {
+          forms(updatedBefore: "${yesterday}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(updatedBeforeYesterday.forms.length).toBe(0);
+  });
+
+  it("should filter by updatedAfter and updatedBefore", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret!]
+      }
+    ]);
+
+    const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
+    const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
+
+    const { query } = makeClient(user);
+    const { data: inRange } = await query<Pick<Query, "forms">>(
+      `query {
+          forms(updatedAfter: "${yesterday}", updatedBefore: "${tomorrow}") {
+            id
+          }
+        }
+      `
+    );
+
+    expect(inRange.forms.length).toBe(1);
+
+    const { data: outOfRange } = await query<Pick<Query, "forms">>(
+      `query {
+          forms(updatedAfter: "${tomorrow}", updatedBefore: "${tomorrow}") {
+            id
+          }
+        }
+      `
+    );
+
+    expect(outOfRange.forms.length).toBe(0);
+  });
+
   it("should filter by waste code", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     await createForms(user.id, [

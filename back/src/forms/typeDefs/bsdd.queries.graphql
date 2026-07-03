@@ -98,6 +98,14 @@ type Query {
     updatedAfter: String
 
     """
+    (Optionnel) Retourne les BSD modifiés avant la date
+    Filtre sur la date de dernière modification
+    Au format ISO 8601
+    Par défaut vide, aucun filtre n'est appliqué
+    """
+    updatedBefore: String
+
+    """
     (Optionnel) Filtre sur les statuts des bordereaux
     Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
     Défaut à vide.

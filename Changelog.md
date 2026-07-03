@@ -25,6 +25,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - BSFF: impossible de créer des fiche d'intervention en tant qu'opérateur FF, si je possède un autre profil établissement. [PR 4780](https://github.com/MTES-MCT/trackdechets/pull/4780)
 - Erreur code commune introuvable [PR 4777](https://github.com/MTES-MCT/trackdechets/pull/4777)
 
+# Next release
+
+#### :nail_care: Améliorations
+
+- BSDD : Ajouter le paramètre `updatedBefore` sur la requête `forms` pour permettre le filtrage par fenêtre temporelle
+
 # [2026.05.1] 05/05/2026
 
 #### :nail_care: Améliorations
