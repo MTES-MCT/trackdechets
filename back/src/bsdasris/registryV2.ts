@@ -1,4 +1,5 @@
 import {
+  BsdasriPackaging,
   IncomingWasteV2,
   OutgoingWasteV2,
   TransportedWasteV2,
@@ -73,6 +74,38 @@ const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
   };
 };
 
+const packagingLabels: Record<string, string> = {
+  BOITE_CARTON: "Caisse(s) en carton avec sac en plastique",
+  FUT: "Fût(s)",
+  BOITE_PERFORANTS: "Boîte(s) et Mini-collecteurs pour déchets perforants",
+  GRAND_EMBALLAGE: "Grand(s) emballage(s)",
+  GRV: "Grand(s) récipient(s) pour vrac",
+  AUTRE: "Autre(s)"
+};
+
+const getQuantity = (packagings: BsdasriPackaging[]) => {
+  if (!packagings?.length) {
+    return null;
+  }
+
+  const grouped = new Map<string, number>();
+
+  for (const packaging of packagings) {
+    const type =
+      packaging.type === "AUTRE"
+        ? `${packagingLabels.AUTRE}${
+            packaging.other ? ` (${packaging.other})` : ""
+          }`
+        : packagingLabels[packaging.type];
+
+    grouped.set(type, (grouped.get(type) ?? 0) + (packaging.quantity ?? 0));
+  }
+
+  return [...grouped.entries()]
+    .map(([type, quantity]) => `${quantity}: ${type}`)
+    .join(" | ");
+};
+
 export const toIncomingWasteV2 = (
   bsdasri: RegistryV2Bsdasri
 ): Omit<Required<IncomingWasteV2>, "__typename"> => {
@@ -123,7 +156,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     initialEmitterCompanyName: null,
@@ -286,7 +319,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdasri.emitterWasteWeightValue
       ? kgToTonRegistryV2(bsdasri.emitterWasteWeightValue)
@@ -472,7 +505,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
     volume: null,
@@ -619,7 +652,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
 
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
@@ -789,7 +822,7 @@ export const toAllWasteV2 = (
     wasteCode: bsdasri.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,

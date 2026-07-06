@@ -41,15 +41,38 @@ import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
 import { bsdaWasteQuantities } from "./utils";
 
+const packagingLabels: Record<string, string> = {
+  BIG_BAG: "Big-bag / GRV",
+  DEPOT_BAG: "Dépôt-bag",
+  PALETTE_FILME: "Palette filmée",
+  SAC_RENFORCE: "Sac renforcé",
+  CONTENEUR_BAG: "Conteneur-bag",
+  OTHER: "Autre"
+};
+
 const getQuantity = (packagings: Prisma.JsonValue) => {
-  if (!packagings || !(packagings as PackagingInfo[])?.length) {
+  const values = packagings as PackagingInfo[] | null;
+
+  if (!values?.length) {
     return null;
   }
 
-  return (packagings as PackagingInfo[])?.reduce(
-    (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
-    0
-  );
+  const grouped = new Map<string, number>();
+
+  for (const packaging of values) {
+    const type =
+      packaging.type === "OTHER"
+        ? `${packagingLabels.OTHER}${
+            packaging.other ? ` (${packaging.other})` : ""
+          }`
+        : packagingLabels[packaging.type] ?? packaging.type;
+
+    grouped.set(type, (grouped.get(type) ?? 0) + (packaging.quantity ?? 0));
+  }
+
+  return [...grouped.entries()]
+    .map(([type, quantity]) => `${quantity}: ${type}`)
+    .join(" | ");
 };
 
 const getInitialEmitterData = (bsda: RegistryV2Bsda) => {

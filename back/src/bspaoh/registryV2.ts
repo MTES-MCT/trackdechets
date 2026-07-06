@@ -35,6 +35,32 @@ import {
 import { logger } from "@td/logger";
 import { BspaohForElastic } from "./elastic";
 
+const packagingLabels: Record<string, string> = {
+  RELIQUAIRE: "Reliquaire",
+  LITTLE_BOX: "Petite boîte",
+  BIG_BOX: "Grande boîte"
+};
+
+const getQuantity = (packagings: Prisma.JsonValue) => {
+  const values = packagings as { type: string }[] | null;
+
+  if (!values?.length) {
+    return null;
+  }
+
+  const grouped = new Map<string, number>();
+
+  for (const packaging of values) {
+    const type = packagingLabels[packaging.type] ?? packaging.type;
+
+    grouped.set(type, (grouped.get(type) ?? 0) + 1);
+  }
+
+  return [...grouped.entries()]
+    .map(([type, quantity]) => `${quantity}: ${type}`)
+    .join(" | ");
+};
+
 export const toIncomingWasteV2 = (
   bspaoh: RegistryV2Bspaoh
 ): Omit<Required<IncomingWasteV2>, "__typename"> => {
@@ -86,7 +112,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     initialEmitterCompanyName: null,
@@ -230,7 +256,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
@@ -407,7 +433,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
-    quantity: null,
+    quantity: getQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
     volume: null,
@@ -548,7 +574,7 @@ export const toAllWasteV2 = (
     wasteCode: bspaoh.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,

@@ -40,6 +40,7 @@ import {
 } from "@td/constants";
 import { logger } from "@td/logger";
 import { FormForElastic } from "./elastic";
+import { packagingLabels } from "../registryV2/utils";
 
 const getInitialEmitterData = (bsdd: BsddV2) => {
   const initialEmitter: Record<string, string | null> = {
@@ -130,14 +131,29 @@ const getFinalOperationsData = (bsdd: BsddV2) => {
   };
 };
 
-const getQuantity = (packagings: PackagingInfo[]) => {
-  if (!packagings) {
+const getQuantity = (packagings: PackagingInfo[], isDirectSupply: boolean) => {
+  if (isDirectSupply) {
+    return `N/A: ${packagingLabels.PIPELINE}`;
+  }
+
+  if (!packagings?.length) {
     return null;
   }
-  return packagings.reduce(
-    (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
-    0
-  );
+
+  const grouped = new Map<string, number>();
+
+  for (const packaging of packagings) {
+    const type =
+      packaging.type === "AUTRE"
+        ? `Autre${packaging.other ? ` (${packaging.other})` : ""}`
+        : packagingLabels[packaging.type];
+
+    grouped.set(type, (grouped.get(type) ?? 0) + (packaging.quantity ?? 0));
+  }
+
+  return [...grouped.entries()]
+    .map(([type, quantity]) => `${quantity}: ${type}`)
+    .join(" | ");
 };
 
 const getWasteType = (bsdd: MinimalBsddForLookup): RegistryExportWasteType => {
@@ -252,7 +268,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     initialEmitterCompanyName,
@@ -521,7 +537,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     weightIsEstimate: bsdd.weightIsEstimate,
@@ -804,7 +820,7 @@ export const toTransportedWasteV2 = (
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
     weight: bsdd.weightValue,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsdd.weightIsEstimate,
     volume: null,
@@ -1064,7 +1080,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     weightIsEstimate: bsdd.weightIsEstimate,
@@ -1351,7 +1367,7 @@ export const toAllWasteV2 = (
     wasteCode: bsdd.wasteCode,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     weightIsEstimate: bsdd.weightIsEstimate,

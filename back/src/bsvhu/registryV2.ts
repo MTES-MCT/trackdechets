@@ -36,6 +36,24 @@ import { BsvhuForElastic } from "./elastic";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { getTransporterCompanyOrgId } from "@td/constants";
 
+const packagingLabels: Record<string, string> = {
+  UNITE: "unités",
+  LOT: "lots"
+};
+
+const getQuantity = (
+  quantity: number | null | undefined,
+  packaging: string | null | undefined
+) => {
+  if (quantity == null) {
+    return null;
+  }
+
+  const label = packaging ? packagingLabels[packaging] ?? packaging : "";
+
+  return label ? `${quantity}: ${label}` : `${quantity}`;
+};
+
 export const toIncomingWasteV2 = (
   bsvhu: RegistryV2Bsvhu
 ): Omit<Required<IncomingWasteV2>, "__typename"> => {
@@ -136,7 +154,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: bsvhu.quantity,
+    quantity: getQuantity(bsvhu.quantity, bsvhu.packaging),
     wasteContainsElectricOrHybridVehicles:
       bsvhu.containsElectricOrHybridVehicles,
     weight: kgToTonRegistryV2(bsvhu.weightValue),
@@ -363,7 +381,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: bsvhu.quantity,
+    quantity: getQuantity(bsvhu.quantity, bsvhu.packaging),
     wasteContainsElectricOrHybridVehicles:
       bsvhu.containsElectricOrHybridVehicles,
     weight: kgToTonRegistryV2(bsvhu.weightValue),
@@ -647,7 +665,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bsvhu.weightValue),
-    quantity: bsvhu.quantity,
+    quantity: getQuantity(bsvhu.quantity, bsvhu.packaging),
     wasteContainsElectricOrHybridVehicles:
       bsvhu.containsElectricOrHybridVehicles,
     weightIsEstimate: bsvhu.weightIsEstimate,
@@ -905,7 +923,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: bsvhu.quantity,
+    quantity: getQuantity(bsvhu.quantity, bsvhu.packaging),
     wasteContainsElectricOrHybridVehicles:
       bsvhu.containsElectricOrHybridVehicles,
     weight: kgToTonRegistryV2(bsvhu.weightValue),
@@ -1179,7 +1197,7 @@ export const toAllWasteV2 = (
     wasteCode: bsvhu.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: bsvhu.quantity,
+    quantity: getQuantity(bsvhu.quantity, bsvhu.packaging),
     wasteContainsElectricOrHybridVehicles:
       bsvhu.containsElectricOrHybridVehicles,
     weight: kgToTonRegistryV2(bsvhu.weightValue),

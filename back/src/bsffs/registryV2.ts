@@ -38,6 +38,35 @@ import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
 import { logger } from "@td/logger";
 import { BsffWithTransporters } from "./types";
+const packagingLabels: Record<string, string> = {
+  BOUTEILLE: "Bouteille",
+  CITERNE: "Citerne",
+  CONTENEUR: "Conteneur",
+  AUTRE: "Autre"
+};
+
+const getQuantity = (packagings: BsffPackaging[]) => {
+  if (!packagings?.length) {
+    return null;
+  }
+
+  const grouped = new Map<string, number>();
+
+  for (const packaging of packagings) {
+    const type =
+      packaging.type === "AUTRE"
+        ? `${packagingLabels.AUTRE}${
+            packaging.other ? ` (${packaging.other})` : ""
+          }`
+        : packagingLabels[packaging.type] ?? packaging.type;
+
+    grouped.set(type, (grouped.get(type) ?? 0) + 1);
+  }
+
+  return [...grouped.entries()]
+    .map(([type, quantity]) => `${quantity}: ${type}`)
+    .join(" | ");
+};
 
 const getInitialEmitterData = (bsff: RegistryV2Bsff) => {
   const initialEmitter: Record<string, string | null> = {
@@ -333,7 +362,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsff.weightValue),
     initialEmitterCompanyName,
@@ -565,7 +594,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsff.weightValue),
     volume: null,
@@ -844,7 +873,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bsff.weightValue),
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: false,
     volume: null,
@@ -1101,7 +1130,7 @@ export const toAllWasteV2 = (
     wasteCode: bsff.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsff.weightValue),
     initialEmitterCompanyName,

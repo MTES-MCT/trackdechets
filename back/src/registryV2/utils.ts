@@ -1,7 +1,12 @@
 import { Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { GenericWasteV2 } from "./types";
-import { IncomingWasteV2, OutgoingWasteV2, SsdWasteV2 } from "@td/codegen-back";
+import {
+  IncomingWasteV2,
+  OutgoingWasteV2,
+  SsdWasteV2,
+  PackagingInfo
+} from "@td/codegen-back";
 
 type CompanyCache = {
   [siret: string]: Prisma.CompanyGetPayload<{
@@ -95,3 +100,12 @@ export class CompanyCachedFetcher {
     return registryWaste;
   }
 }
+
+export const packagingLabels: Record<PackagingInfo["type"], string> = {
+  FUT: "Fût",
+  GRV: "Grand Récipient Vrac (GRV)",
+  CITERNE: "Citerne",
+  BENNE: "Benne",
+  PIPELINE: "Conditionné pour pipeline",
+  AUTRE: "Autre"
+};
