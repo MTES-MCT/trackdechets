@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useMutation } from "@apollo/client";
 import Modal from "../Modal/Modal";
 import { useCrisp } from "../../hooks/useCrisp";
+import { useAuth } from "../../../../common/contexts/AuthContext"; // ⚠️ à vérifier selon l'emplacement réel du fichier
+import { UPDATE_TRACKING_CONSENT } from "../../../common/queries/user/userQueries";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import styles from "./Footer.module.scss";
+
 /**
  * ========================
  * TYPES
@@ -28,6 +32,9 @@ export default function AppFooter() {
 
   const [bannerVisible, setBannerVisible] = useState(false);
 
+  const { isAuthenticated, user, refreshUser } = useAuth();
+  const [updateTrackingConsent] = useMutation(UPDATE_TRACKING_CONSENT);
+
   const allAccepted = draft.crisp && draft.matomo;
   const allRefused = !draft.crisp && !draft.matomo;
 
@@ -45,33 +52,49 @@ export default function AppFooter() {
     setDraft(consent);
     setIsOpen(true);
   };
+
   /**
    * ========================
    * LOAD CONSENT
    * ========================
+   *
+   * Si l'utilisateur est connecté, la base de données fait foi pour Matomo
+   * (via user.trackingConsent), afin de rester cohérent avec un éventuel
+   * choix fait depuis un autre appareil ou l'ancien formulaire "Mon compte".
+   * Le localStorage reste la source de vérité pour Crisp et pour les
+   * visiteurs non connectés.
    */
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
+    let localConsent: Consent = DEFAULT_CONSENT;
+    let hasSavedValue = false;
 
-    if (!saved) {
-      setConsent(DEFAULT_CONSENT);
-      setHydrated(true);
-      setBannerVisible(true); // afficher banner
-      return;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as Partial<Consent>;
+        localConsent = {
+          crisp: parsed.crisp === true,
+          matomo: parsed.matomo === true
+        };
+        hasSavedValue = true;
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
     }
 
-    try {
-      const parsed: Consent = JSON.parse(saved);
-      setConsent(parsed);
-    } catch {
-      localStorage.removeItem(STORAGE_KEY);
-      setConsent(DEFAULT_CONSENT);
-      setBannerVisible(true);
+    if (isAuthenticated && user) {
+      const merged: Consent = {
+        ...localConsent,
+        matomo: user.trackingConsent
+      };
+      setConsent(merged);
+    } else {
+      setConsent(localConsent);
     }
 
+    setBannerVisible(!hasSavedValue);
     setHydrated(true);
-  }, []);
-
+  }, [isAuthenticated, user]);
   /**
    * ========================
    * SAVE CONSENT
@@ -83,6 +106,20 @@ export default function AppFooter() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newConsent));
     setIsOpen(false);
     setBannerVisible(false); // important
+
+    // Si l'utilisateur est connecté, on synchronise aussi en base
+    // pour que MatomoTracker (qui lit user.trackingConsent) soit à jour.
+    if (isAuthenticated) {
+      updateTrackingConsent({
+        variables: { trackingConsent: newConsent.matomo }
+      })
+        .then(() => refreshUser())
+        .catch(() => {
+          // Échec silencieux : le localStorage reste la source de vérité
+          // locale, l'expérience utilisateur n'est pas bloquée.
+        });
+    }
+
     if (crispChanged) {
       // reload
       window.location.reload();

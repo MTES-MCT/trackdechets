@@ -19,7 +19,7 @@ window.matomoHeatmapSessionRecordingAsyncInit = function (_: any) {
 
 export function MatomoTracker() {
   const { VITE_MATOMO_TRACKER_SITE_ID, VITE_MATOMO_TRACKER_URL } = envConfig;
-  const { user } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const trackingConsentUntil = user?.trackingConsentUntil;
   const trackingConsent = user?.trackingConsent;
@@ -29,11 +29,27 @@ export function MatomoTracker() {
       return;
     }
 
-    const hasConsent =
-      trackingConsent &&
-      (trackingConsentUntil
-        ? new Date(trackingConsentUntil) > new Date()
-        : false);
+    // Pour les visiteurs non connectés, on se base sur le consentement
+    // stocké localement par le bandeau cookies (AppFooter).
+    const localConsent = (() => {
+      try {
+        const parsed = JSON.parse(
+          localStorage.getItem("cookie-consent") || "{}"
+        ) as { matomo?: boolean };
+        return parsed.matomo === true;
+      } catch {
+        return false;
+      }
+    })();
+
+    // Pour les utilisateurs connectés, la base de données fait foi
+    // (trackingConsent + expiration à 180 jours gérée côté back).
+    const hasConsent = isAuthenticated
+      ? trackingConsent &&
+        (trackingConsentUntil
+          ? new Date(trackingConsentUntil) > new Date()
+          : false)
+      : localConsent;
 
     if (hasConsent) {
       if (window._matomoLoaded) return;
@@ -64,6 +80,7 @@ export function MatomoTracker() {
   }, [
     trackingConsentUntil,
     trackingConsent,
+    isAuthenticated,
     VITE_MATOMO_TRACKER_SITE_ID,
     VITE_MATOMO_TRACKER_URL
   ]);
