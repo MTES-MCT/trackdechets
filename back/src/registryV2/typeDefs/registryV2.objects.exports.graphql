@@ -56,9 +56,9 @@ type IncomingWasteV2 {
   wasteIsDangerous: Boolean
 
   """
-  Quantité de déchet en unités
+  Quantité de déchet en string
   """
-  quantity: Int
+  quantity: String
 
   """
   Est-ce que le déchet contient des véhicules électriques ou hybrides ?
@@ -435,9 +435,9 @@ type OutgoingWasteV2 {
   weight: Float
 
   """
-  Quantité de déchet en unités
+  Quantité de déchet en string
   """
-  quantity: Int
+  quantity: String
 
   """
   Est-ce que le déchet contient des véhicules électriques ou hybrides ?
@@ -843,9 +843,9 @@ type TransportedWasteV2 {
   weight: Float
 
   """
-  Quantité de déchet en unités
+  Quantité de déchet en String
   """
-  quantity: Int
+  quantity: String
 
   """
   Est-ce que le déchet contient des véhicules électriques ou hybrides ?
@@ -1179,9 +1179,9 @@ type ManagedWasteV2 {
   weight: Float
 
   """
-  Quantité de déchet en unités
+  Quantité de déchet en String
   """
-  quantity: Int
+  quantity: String
 
   """
   Est-ce que le déchet contient des véhicules électriques ou hybrides ?
@@ -1580,9 +1580,9 @@ type AllWasteV2 {
   wasteIsDangerous: Boolean
 
   """
-  Quantité de déchet en unités
+  Quantité de déchet en String
   """
-  quantity: Int
+  quantity: String
 
   """
   Est-ce que le déchet contient des véhicules électriques ou hybrides ?

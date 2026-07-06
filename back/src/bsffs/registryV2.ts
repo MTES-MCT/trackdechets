@@ -38,35 +38,13 @@ import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
 import { logger } from "@td/logger";
 import { BsffWithTransporters } from "./types";
-const packagingLabels: Record<string, string> = {
-  BOUTEILLE: "Bouteille",
-  CITERNE: "Citerne",
-  CONTENEUR: "Conteneur",
-  AUTRE: "Autre"
-};
+import {
+  BSFF_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
 
-const getQuantity = (packagings: BsffPackaging[]) => {
-  if (!packagings?.length) {
-    return null;
-  }
-
-  const grouped = new Map<string, number>();
-
-  for (const packaging of packagings) {
-    const type =
-      packaging.type === "AUTRE"
-        ? `${packagingLabels.AUTRE}${
-            packaging.other ? ` (${packaging.other})` : ""
-          }`
-        : packagingLabels[packaging.type] ?? packaging.type;
-
-    grouped.set(type, (grouped.get(type) ?? 0) + 1);
-  }
-
-  return [...grouped.entries()]
-    .map(([type, quantity]) => `${quantity}: ${type}`)
-    .join(" | ");
-};
+const getQuantity = (packagings: BsffPackaging[]) =>
+  formatGroupedPackagingQuantity(packagings, BSFF_PACKAGING_LABELS);
 
 const getInitialEmitterData = (bsff: RegistryV2Bsff) => {
   const initialEmitter: Record<string, string | null> = {

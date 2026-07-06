@@ -35,24 +35,15 @@ import { logger } from "@td/logger";
 import { BsvhuForElastic } from "./elastic";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { getTransporterCompanyOrgId } from "@td/constants";
-
-const packagingLabels: Record<string, string> = {
-  UNITE: "unités",
-  LOT: "lots"
-};
+import {
+  BSVHU_PACKAGING_LABELS,
+  formatSinglePackagingQuantity
+} from "../registryV2/packagings";
 
 const getQuantity = (
   quantity: number | null | undefined,
   packaging: string | null | undefined
-) => {
-  if (quantity == null) {
-    return null;
-  }
-
-  const label = packaging ? packagingLabels[packaging] ?? packaging : "";
-
-  return label ? `${quantity}: ${label}` : `${quantity}`;
-};
+) => formatSinglePackagingQuantity(quantity, packaging, BSVHU_PACKAGING_LABELS);
 
 export const toIncomingWasteV2 = (
   bsvhu: RegistryV2Bsvhu

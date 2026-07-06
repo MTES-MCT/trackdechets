@@ -34,32 +34,16 @@ import {
 } from "@td/registry";
 import { logger } from "@td/logger";
 import { BspaohForElastic } from "./elastic";
+import {
+  BSPAOH_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
 
-const packagingLabels: Record<string, string> = {
-  RELIQUAIRE: "Reliquaire",
-  LITTLE_BOX: "Petite boîte",
-  BIG_BOX: "Grande boîte"
-};
-
-const getQuantity = (packagings: Prisma.JsonValue) => {
-  const values = packagings as { type: string }[] | null;
-
-  if (!values?.length) {
-    return null;
-  }
-
-  const grouped = new Map<string, number>();
-
-  for (const packaging of values) {
-    const type = packagingLabels[packaging.type] ?? packaging.type;
-
-    grouped.set(type, (grouped.get(type) ?? 0) + 1);
-  }
-
-  return [...grouped.entries()]
-    .map(([type, quantity]) => `${quantity}: ${type}`)
-    .join(" | ");
-};
+const getQuantity = (packagings: Prisma.JsonValue) =>
+  formatGroupedPackagingQuantity(
+    packagings as { type: string }[] | null,
+    BSPAOH_PACKAGING_LABELS
+  );
 
 export const toIncomingWasteV2 = (
   bspaoh: RegistryV2Bspaoh

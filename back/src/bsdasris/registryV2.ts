@@ -36,6 +36,10 @@ import {
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
+import {
+  BSDASRI_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
 
 const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
   const destinationFinalOperationCodes: string[] = [];
@@ -74,37 +78,10 @@ const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
   };
 };
 
-const packagingLabels: Record<string, string> = {
-  BOITE_CARTON: "Caisse(s) en carton avec sac en plastique",
-  FUT: "Fût(s)",
-  BOITE_PERFORANTS: "Boîte(s) et Mini-collecteurs pour déchets perforants",
-  GRAND_EMBALLAGE: "Grand(s) emballage(s)",
-  GRV: "Grand(s) récipient(s) pour vrac",
-  AUTRE: "Autre(s)"
-};
-
-const getQuantity = (packagings: BsdasriPackaging[]) => {
-  if (!packagings?.length) {
-    return null;
-  }
-
-  const grouped = new Map<string, number>();
-
-  for (const packaging of packagings) {
-    const type =
-      packaging.type === "AUTRE"
-        ? `${packagingLabels.AUTRE}${
-            packaging.other ? ` (${packaging.other})` : ""
-          }`
-        : packagingLabels[packaging.type];
-
-    grouped.set(type, (grouped.get(type) ?? 0) + (packaging.quantity ?? 0));
-  }
-
-  return [...grouped.entries()]
-    .map(([type, quantity]) => `${quantity}: ${type}`)
-    .join(" | ");
-};
+const getQuantity = (packagings: BsdasriPackaging[]) =>
+  formatGroupedPackagingQuantity(packagings, BSDASRI_PACKAGING_LABELS, {
+    useQuantityField: true
+  });
 
 export const toIncomingWasteV2 = (
   bsdasri: RegistryV2Bsdasri

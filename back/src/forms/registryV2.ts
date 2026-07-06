@@ -40,7 +40,10 @@ import {
 } from "@td/constants";
 import { logger } from "@td/logger";
 import { FormForElastic } from "./elastic";
-import { packagingLabels } from "../registryV2/utils";
+import {
+  BSDD_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
 
 const getInitialEmitterData = (bsdd: BsddV2) => {
   const initialEmitter: Record<string, string | null> = {
@@ -133,27 +136,12 @@ const getFinalOperationsData = (bsdd: BsddV2) => {
 
 const getQuantity = (packagings: PackagingInfo[], isDirectSupply: boolean) => {
   if (isDirectSupply) {
-    return `N/A: ${packagingLabels.PIPELINE}`;
+    return `N/A: ${BSDD_PACKAGING_LABELS.PIPELINE}`;
   }
 
-  if (!packagings?.length) {
-    return null;
-  }
-
-  const grouped = new Map<string, number>();
-
-  for (const packaging of packagings) {
-    const type =
-      packaging.type === "AUTRE"
-        ? `Autre${packaging.other ? ` (${packaging.other})` : ""}`
-        : packagingLabels[packaging.type];
-
-    grouped.set(type, (grouped.get(type) ?? 0) + (packaging.quantity ?? 0));
-  }
-
-  return [...grouped.entries()]
-    .map(([type, quantity]) => `${quantity}: ${type}`)
-    .join(" | ");
+  return formatGroupedPackagingQuantity(packagings, BSDD_PACKAGING_LABELS, {
+    useQuantityField: true
+  });
 };
 
 const getWasteType = (bsdd: MinimalBsddForLookup): RegistryExportWasteType => {
