@@ -63,6 +63,7 @@ interface CompanySelectorProps {
   registeredOnlyCompanies?: boolean;
   heading?: string;
   disabled?: boolean;
+  contactInfoDisabled?: boolean;
   optionalMail?: boolean;
   skipFavorite?: boolean;
   isBsdaTransporter?: boolean;
@@ -79,6 +80,7 @@ export default function CompanySelector({
   registeredOnlyCompanies = false,
   heading,
   disabled,
+  contactInfoDisabled,
   optionalMail = false,
   skipFavorite = false,
   isBsdaTransporter = false,
@@ -91,6 +93,7 @@ export default function CompanySelector({
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
+  const isContactDisabled = contactInfoDisabled ?? disabled;
 
   const [hasAutoselected, setHasAutoselected] = useState(false);
   const [selectedCompanyDetails, setSelectedCompanyDetails] = useState({
@@ -585,7 +588,7 @@ export default function CompanySelector({
               name={`${field.name}.contact`}
               placeholder="NOM Prénom"
               className="td-input"
-              disabled={disabled}
+              disabled={isContactDisabled}
             />
           </label>
           <RedErrorMessage name={`${field.name}.contact`} />
@@ -598,7 +601,7 @@ export default function CompanySelector({
               name={`${field.name}.phone`}
               placeholder="Numéro"
               className={`td-input ${styles.companySelectorSearchPhone}`}
-              disabled={disabled}
+              disabled={isContactDisabled}
             />
           </label>
 
@@ -611,7 +614,7 @@ export default function CompanySelector({
               type="email"
               name={`${field.name}.mail`}
               className={`td-input ${styles.companySelectorSearchEmail}`}
-              disabled={disabled}
+              disabled={isContactDisabled}
             />
           </label>
 
