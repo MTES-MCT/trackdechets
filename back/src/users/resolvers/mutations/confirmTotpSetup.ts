@@ -10,34 +10,40 @@ import { sendMail } from "../../../mailer/mailing";
 import { onTotpActivated, renderMail } from "@td/mail";
 import { logMfaEvent } from "../../../common/mfaLogger";
 
-const RECOVERY_CODE_COUNT = 10;
+const RECOVERY_CODE_COUNT = 5;
+const RECOVERY_CODE_LENGTH = 20;
+const RECOVERY_CODE_GROUP_SIZE = 5;
 const RECOVERY_CODE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 const BCRYPT_SALT_ROUNDS = 10;
 
 /**
- * Génère un code de récupération aléatoire au format XXXXX-XXXXX.
- * La saisie est insensible à la casse et le tiret est ignoré à la validation.
+ * Génère un code de récupération aléatoire au format XXXXX-XXXXX-XXXXX-XXXXX.
+ * La saisie est insensible à la casse et les tirets sont ignorés à la validation.
  */
 function generateRecoveryCode(): string {
   const charsetLength = RECOVERY_CODE_CHARS.length;
   const maxUnbiased = Math.floor(256 / charsetLength) * charsetLength;
   const chars: string[] = [];
 
-  while (chars.length < 10) {
-    const bytes = randomBytes(10 - chars.length);
+  while (chars.length < RECOVERY_CODE_LENGTH) {
+    const bytes = randomBytes(RECOVERY_CODE_LENGTH - chars.length);
     for (const b of bytes) {
       if (b >= maxUnbiased) {
         continue;
       }
       chars.push(RECOVERY_CODE_CHARS[b % charsetLength]);
-      if (chars.length === 10) {
+      if (chars.length === RECOVERY_CODE_LENGTH) {
         break;
       }
     }
   }
 
   const raw = chars.join("");
-  return `${raw.slice(0, 5)}-${raw.slice(5, 10)}`;
+  const groups: string[] = [];
+  for (let i = 0; i < raw.length; i += RECOVERY_CODE_GROUP_SIZE) {
+    groups.push(raw.slice(i, i + RECOVERY_CODE_GROUP_SIZE));
+  }
+  return groups.join("-");
 }
 
 /**
