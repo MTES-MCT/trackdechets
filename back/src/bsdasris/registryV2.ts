@@ -3,7 +3,8 @@ import {
   OutgoingWasteV2,
   TransportedWasteV2,
   AllWasteV2,
-  type ManagedWasteV2
+  type ManagedWasteV2,
+  BsdasriPackaging
 } from "@td/codegen-back";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
@@ -36,6 +37,12 @@ import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
 
+const getQuantity = (packagings?: BsdasriPackaging[] | null): number | null => {
+  if (!packagings || packagings.length === 0) {
+    return null;
+  }
+  return packagings.reduce((total, p) => total + (p.quantity ?? 0), 0);
+};
 const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
@@ -123,7 +130,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     initialEmitterCompanyName: null,
@@ -286,7 +293,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdasri.emitterWasteWeightValue
       ? kgToTonRegistryV2(bsdasri.emitterWasteWeightValue)
@@ -472,7 +479,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
     volume: null,
@@ -619,7 +626,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
 
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
@@ -789,7 +796,7 @@ export const toAllWasteV2 = (
     wasteCode: bsdasri.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
