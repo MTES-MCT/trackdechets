@@ -47,7 +47,6 @@ const formatEmitterType = (emitterType: EmitterType | null) => {
 };
 const formatNumber = (n: number) =>
   isDefined(n) ? parseFloat(n.toFixed(3)) : null; // return as a number to allow xls cells formulas
-const formatInteger = (n: number) => (isDefined(n) ? Math.round(n) : null);
 const formatArray = (arr: any[], opts = { separator: "," }) =>
   Array.isArray(arr) ? arr.join(opts.separator) : "";
 const formatArrayWithMissingElements = (arr: any[]) => {
@@ -143,6 +142,9 @@ const formatStatusLabel = (status: string | null, opts: formatOptions) => {
   return _formatStatusLabel(status, opts.waste);
 };
 
+const QUANTITY_WITH_PACKAGING_LABEL =
+  "Nombre d'unité(s) - Conditionnement associé";
+
 export const EXPORT_COLUMNS: {
   SSD: Omit<Record<keyof SsdWasteV2, columnInfos>, "id" | "__typename">;
   INCOMING: Omit<
@@ -230,7 +232,7 @@ export const EXPORT_COLUMNS: {
     wasteCodeBale: { label: "Code déchet Bâle" },
     wastePop: { label: "POP", format: formatBoolean },
     wasteIsDangerous: { label: "Dangereux", format: formatBoolean },
-    quantity: { label: "Nombre d'unité(s)", format: formatInteger },
+    quantity: { label: QUANTITY_WITH_PACKAGING_LABEL },
     wasteContainsElectricOrHybridVehicles: {
       label: "VHU électrique ou hybride",
       format: formatBoolean
@@ -528,7 +530,7 @@ export const EXPORT_COLUMNS: {
     wasteCodeBale: { label: "Code déchet Bâle" },
     wastePop: { label: "POP", format: formatBoolean },
     wasteIsDangerous: { label: "Dangereux", format: formatBoolean },
-    quantity: { label: "Nombre d'unité(s)", format: formatInteger },
+    quantity: { label: QUANTITY_WITH_PACKAGING_LABEL },
     wasteContainsElectricOrHybridVehicles: {
       label: "VHU électrique ou hybride",
       format: formatBoolean
@@ -895,7 +897,7 @@ export const EXPORT_COLUMNS: {
     wasteCodeBale: { label: "Code déchet Bâle" },
     wastePop: { label: "POP", format: formatBoolean },
     wasteIsDangerous: { label: "Dangereux", format: formatBoolean },
-    quantity: { label: "Nombre d'unité(s)", format: formatInteger },
+    quantity: { label: QUANTITY_WITH_PACKAGING_LABEL },
     wasteContainsElectricOrHybridVehicles: {
       label: "VHU électrique ou hybride",
       format: formatBoolean
@@ -1147,7 +1149,7 @@ export const EXPORT_COLUMNS: {
     wasteCodeBale: { label: "Code déchet Bâle" },
     wastePop: { label: "POP", format: formatBoolean },
     wasteIsDangerous: { label: "Dangereux", format: formatBoolean },
-    quantity: { label: "Nombre d'unité(s)", format: formatInteger },
+    quantity: { label: QUANTITY_WITH_PACKAGING_LABEL },
     wasteContainsElectricOrHybridVehicles: {
       label: "VHU électrique ou hybride",
       format: formatBoolean
@@ -1507,7 +1509,7 @@ export const EXHAUSTIVE_EXPORT_COLUMNS = {
   wasteCode: { label: "Code déchet" },
   wastePop: { label: "POP", format: formatBoolean },
   wasteIsDangerous: { label: "Dangereux", format: formatBoolean },
-  quantity: { label: "Nombre d'unité(s)", format: formatInteger },
+  quantity: { label: QUANTITY_WITH_PACKAGING_LABEL },
   wasteContainsElectricOrHybridVehicles: {
     label: "VHU électrique ou hybride",
     format: formatBoolean

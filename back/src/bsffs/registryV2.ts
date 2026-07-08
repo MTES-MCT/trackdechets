@@ -38,6 +38,13 @@ import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
 import { logger } from "@td/logger";
 import { BsffWithTransporters } from "./types";
+import {
+  BSFF_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
+
+const getQuantity = (packagings: BsffPackaging[]) =>
+  formatGroupedPackagingQuantity(packagings, BSFF_PACKAGING_LABELS);
 
 const getInitialEmitterData = (bsff: RegistryV2Bsff) => {
   const initialEmitter: Record<string, string | null> = {
@@ -333,7 +340,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsff.weightValue),
     initialEmitterCompanyName,
@@ -565,7 +572,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsff.weightValue),
     volume: null,
@@ -844,7 +851,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bsff.weightValue),
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: false,
     volume: null,
@@ -1101,7 +1108,7 @@ export const toAllWasteV2 = (
     wasteCode: bsff.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsff.weightValue),
     initialEmitterCompanyName,

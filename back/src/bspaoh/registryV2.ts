@@ -34,6 +34,16 @@ import {
 } from "@td/registry";
 import { logger } from "@td/logger";
 import { BspaohForElastic } from "./elastic";
+import {
+  BSPAOH_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
+
+const getQuantity = (packagings: Prisma.JsonValue) =>
+  formatGroupedPackagingQuantity(
+    packagings as { type: string }[] | null,
+    BSPAOH_PACKAGING_LABELS
+  );
 
 export const toIncomingWasteV2 = (
   bspaoh: RegistryV2Bspaoh
@@ -86,7 +96,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     initialEmitterCompanyName: null,
@@ -230,7 +240,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
@@ -407,7 +417,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
-    quantity: null,
+    quantity: getQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
     volume: null,
@@ -548,7 +558,7 @@ export const toAllWasteV2 = (
     wasteCode: bspaoh.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bspaoh.wastePackagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,

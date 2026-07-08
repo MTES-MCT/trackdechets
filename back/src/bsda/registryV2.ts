@@ -40,17 +40,20 @@ import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
 import { bsdaWasteQuantities } from "./utils";
+import {
+  BSDA_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
 
-const getQuantity = (packagings: Prisma.JsonValue) => {
-  if (!packagings || !(packagings as PackagingInfo[])?.length) {
-    return null;
-  }
-
-  return (packagings as PackagingInfo[])?.reduce(
-    (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
-    0
+const getQuantity = (packagings: Prisma.JsonValue) =>
+  formatGroupedPackagingQuantity(
+    packagings as PackagingInfo[] | null,
+    BSDA_PACKAGING_LABELS,
+    {
+      otherType: "OTHER",
+      useQuantityField: true
+    }
   );
-};
 
 const getInitialEmitterData = (bsda: RegistryV2Bsda) => {
   const initialEmitter: Record<string, string | null> = {
