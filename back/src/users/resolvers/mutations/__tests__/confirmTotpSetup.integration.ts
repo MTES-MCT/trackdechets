@@ -88,3 +88,43 @@ describe("Mutation.confirmTotpSetup — MFA audit log", () => {
     expect(count).toBe(0);
   });
 });
+
+describe("Mutation.confirmTotpSetup — recovery codes format", () => {
+  afterAll(resetDatabase);
+
+  it("generates exactly 5 recovery codes of 20 alphanumeric characters formatted as 4 groups of 5", async () => {
+    const user = await userFactory({ totpSeed: SEED });
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const { otp } = TOTP.generate(SEED);
+    const { data, errors } = await mutate<Pick<Mutation, "confirmTotpSetup">>(
+      CONFIRM_TOTP_SETUP,
+      {
+        variables: { code: otp }
+      }
+    );
+    expect(errors).toBeUndefined();
+
+    const codes = data!.confirmTotpSetup.codes;
+    expect(codes).toHaveLength(5);
+
+    const codePattern = /^[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}$/;
+    codes.forEach(code => {
+      expect(code).toMatch(codePattern);
+      expect(code.replace(/-/g, "")).toHaveLength(20);
+    });
+
+    // all codes must be unique
+    expect(new Set(codes).size).toBe(5);
+
+    // codes must only be stored as bcrypt hashes, never in clear
+    const storedCodes = await prisma.totpRecoveryCode.findMany({
+      where: { userId: user.id }
+    });
+    expect(storedCodes).toHaveLength(5);
+    storedCodes.forEach(stored => {
+      expect(codes).not.toContain(stored.codeHash);
+      expect(stored.codeHash.startsWith("$2b$")).toBe(true);
+    });
+  });
+});
