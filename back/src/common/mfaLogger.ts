@@ -16,7 +16,9 @@ export type MfaEventType =
   | "MFA_RECOVERY_LOCKOUT_LIFTED"
   | "MFA_MANUAL_RESET_INITIATED"
   | "MFA_MANUAL_RESET_BY_SUPPORT"
-  | "MFA_RECONFIG_COMPLETED";
+  | "MFA_RECONFIG_COMPLETED"
+  | "MFA_RECOVERY_TEMP_LOGIN_SUCCESS"
+  | "MFA_RECOVERY_LAST_CODE_USED";
 
 // Switch over string literals so CodeQL sees no taint flow from eventType to the return value.
 function toSafeMfaEventLabel(eventType: MfaEventType): string {
@@ -51,6 +53,10 @@ function toSafeMfaEventLabel(eventType: MfaEventType): string {
       return "MFA_MANUAL_RESET_BY_SUPPORT";
     case "MFA_RECONFIG_COMPLETED":
       return "MFA_RECONFIG_COMPLETED";
+    case "MFA_RECOVERY_TEMP_LOGIN_SUCCESS":
+      return "MFA_RECOVERY_TEMP_LOGIN_SUCCESS";
+    case "MFA_RECOVERY_LAST_CODE_USED":
+      return "MFA_RECOVERY_LAST_CODE_USED";
     default:
       return "UNKNOWN_MFA_EVENT";
   }

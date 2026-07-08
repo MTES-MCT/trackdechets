@@ -22,9 +22,9 @@ describe("findValidRecoveryCode", () => {
       recoveryCode.id
     );
     // without dashes, lowercase
-    expect(
-      await findValidRecoveryCode(user.id, normalized.toLowerCase())
-    ).toBe(recoveryCode.id);
+    expect(await findValidRecoveryCode(user.id, normalized.toLowerCase())).toBe(
+      recoveryCode.id
+    );
   });
 
   it("returns null when the code does not match any stored hash", async () => {

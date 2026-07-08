@@ -22,3 +22,12 @@ export async function findValidRecoveryCode(
   }
   return null;
 }
+
+/**
+ * Compte les codes de récupération encore valides (non utilisés) d'un utilisateur.
+ */
+export async function countValidRecoveryCodes(userId: string): Promise<number> {
+  return prisma.totpRecoveryCode.count({
+    where: { userId, usedAt: null }
+  });
+}
