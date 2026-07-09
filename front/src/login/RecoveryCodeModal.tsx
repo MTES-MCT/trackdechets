@@ -99,7 +99,7 @@ export default function RecoveryCodeModal({
             name: "recoveryCode",
             value: code,
             autoComplete: "off",
-            placeholder: "Ex : ABCDE-FGHIJ",
+            placeholder: "Ex : ABCDE-FGHIJ-KLMNO-PQRST",
             onChange: e => setCode(e.target.value),
             disabled: isLockout
           }}
