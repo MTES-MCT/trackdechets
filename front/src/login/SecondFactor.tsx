@@ -51,9 +51,15 @@ const RECOVERY_ERROR_CODES = new Set([
 ]);
 
 function buildQueryRedirectState(queries: queryString.ParsedQuery) {
-  const { errorCode, returnTo, username, lockout = 0 } = queries;
+  const {
+    errorCode,
+    returnTo,
+    username,
+    lockout = 0,
+    attemptsRemaining
+  } = queries;
   return {
-    ...(errorCode ? { errorCode, username, lockout } : {}),
+    ...(errorCode ? { errorCode, username, lockout, attemptsRemaining } : {}),
     ...(returnTo ? { returnTo } : {})
   };
 }
@@ -160,7 +166,7 @@ export default function SecondFactor() {
     );
   }
 
-  const { returnTo, lockout } = stateFromLocation;
+  const { returnTo, lockout, attemptsRemaining } = stateFromLocation;
   const lockoutTimestamp = lockout ? Number(lockout) : undefined;
 
   const isLockout = code === "TOTP_LOCKOUT";
@@ -174,6 +180,7 @@ export default function SecondFactor() {
           onClose={() => setIsRecoveryModalOpen(false)}
           errorCode={isRecoveryError ? code : null}
           returnTo={returnTo}
+          attemptsRemaining={isRecoveryError ? attemptsRemaining : null}
         />
       )}
 

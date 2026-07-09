@@ -165,10 +165,36 @@ describe("POST /recovery-login", () => {
     });
     expect(updatedUser.recoveryFails).toBe(3);
     expect(updatedUser.recoveryLockedUntil).not.toBeNull();
-    // lockout must be ~5 minutes from now
+    // lockout must be ~1h from now
     expect(
-      updatedUser.recoveryLockedUntil!.getTime() - before.getTime() >= 300_000
+      updatedUser.recoveryLockedUntil!.getTime() - before.getTime() >= 3_600_000
     ).toBe(true);
+  });
+
+  it("returns attemptsRemaining=2 on the 1st invalid attempt", async () => {
+    const { user } = await createUserWithRecoveryCode();
+    const cookie = await doLogin(user.email);
+
+    const res = await request
+      .post("/recovery-login")
+      .send("recoveryCode=WRONG-CODE")
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    expect(res.header.location).toContain("attemptsRemaining=2");
+  });
+
+  it("returns attemptsRemaining=1 on the 2nd invalid attempt", async () => {
+    const { user } = await createUserWithRecoveryCode("ABCDE-FGHIJ", {
+      recoveryFails: 1
+    });
+    const cookie = await doLogin(user.email);
+
+    const res = await request
+      .post("/recovery-login")
+      .send("recoveryCode=WRONG-CODE")
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    expect(res.header.location).toContain("attemptsRemaining=1");
   });
 
   it("blocks any attempt during an active lockout", async () => {
@@ -216,6 +242,96 @@ describe("POST /recovery-login", () => {
     const newCookieValue = newCookieHeader?.match(cookieRegExp)?.[1];
     expect(newCookieValue).toBeDefined();
     expect(newCookieValue).not.toBe(cookie);
+  });
+
+  it("recoveryAction=TEMPORARY with remaining codes: connects normally without resetting TOTP", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    // Second valid recovery code so at least one remains after consumption
+    await prisma.totpRecoveryCode.create({
+      data: { userId: user.id, codeHash: await hash("OTHERCODE", 10) }
+    });
+    const cookie = await doLogin(user.email);
+
+    const res = await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .send("recoveryAction=TEMPORARY")
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    expect(res.status).toBe(302);
+    expect(res.header.location).toBe(`http://${UI_HOST}/`);
+
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+    // TOTP must remain intact
+    expect(updatedUser.totpSeed).not.toBeNull();
+    expect(updatedUser.mustReconfigureMfa).toBe(false);
+    expect(updatedUser.recoveryFails).toBe(0);
+    expect(updatedUser.recoveryLockedUntil).toBeNull();
+
+    // The used code is marked as used, the other one remains valid
+    const codes = await prisma.totpRecoveryCode.findMany({
+      where: { userId: user.id }
+    });
+    expect(codes).toHaveLength(2);
+    const usedCodes = codes.filter(c => c.usedAt !== null);
+    const validCodes = codes.filter(c => c.usedAt === null);
+    expect(usedCodes).toHaveLength(1);
+    expect(validCodes).toHaveLength(1);
+  });
+
+  it("recoveryAction=TEMPORARY on the last valid code falls back to a full MFA reset", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    const cookie = await doLogin(user.email);
+
+    const res = await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .send("recoveryAction=TEMPORARY")
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    expect(res.status).toBe(302);
+    expect(res.header.location).toBe(`http://${UI_HOST}/`);
+
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+    expect(updatedUser.totpSeed).toBeNull();
+    expect(updatedUser.totpActivatedAt).toBeNull();
+    expect(updatedUser.mustReconfigureMfa).toBe(true);
+
+    const remainingCodes = await prisma.totpRecoveryCode.findMany({
+      where: { userId: user.id }
+    });
+    expect(remainingCodes).toHaveLength(0);
+  });
+
+  it("recoveryAction=RESET revokes TOTP even if other codes remain valid", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    await prisma.totpRecoveryCode.create({
+      data: { userId: user.id, codeHash: await hash("OTHERCODE", 10) }
+    });
+    const cookie = await doLogin(user.email);
+
+    const res = await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .send("recoveryAction=RESET")
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    expect(res.status).toBe(302);
+
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+    expect(updatedUser.totpSeed).toBeNull();
+    expect(updatedUser.mustReconfigureMfa).toBe(true);
+
+    const remainingCodes = await prisma.totpRecoveryCode.findMany({
+      where: { userId: user.id }
+    });
+    expect(remainingCodes).toHaveLength(0);
   });
 
   it("rejects a code that has already been deleted (already used)", async () => {
@@ -350,6 +466,47 @@ describe("POST /recovery-login", () => {
       where: { userId: user.id, eventType: "MFA_RECOVERY_LOCKOUT_LIFTED" }
     });
     expect(liftedLog).toBeNull();
+  });
+
+  it("log MFA_RECOVERY_TEMP_LOGIN_SUCCESS écrit lors d'une connexion temporaire avec codes restants", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    await prisma.totpRecoveryCode.create({
+      data: { userId: user.id, codeHash: await hash("OTHERCODE", 10) }
+    });
+    const cookie = await doLogin(user.email);
+
+    await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .send("recoveryAction=TEMPORARY")
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    await flushAuditLog();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECOVERY_TEMP_LOGIN_SUCCESS" }
+    });
+    expect(log).not.toBeNull();
+    expect(log!.success).toBe(true);
+  });
+
+  it("log MFA_RECOVERY_LAST_CODE_USED écrit quand le dernier code déclenche un reset en mode TEMPORARY", async () => {
+    const { user, plainCode } = await createUserWithRecoveryCode();
+    const cookie = await doLogin(user.email);
+
+    await request
+      .post("/recovery-login")
+      .send(`recoveryCode=${plainCode}`)
+      .send("recoveryAction=TEMPORARY")
+      .set("Cookie", `${sess.name}=${cookie}`);
+
+    await flushAuditLog();
+
+    const log = await prisma.mfaAuditLog.findFirst({
+      where: { userId: user.id, eventType: "MFA_RECOVERY_LAST_CODE_USED" }
+    });
+    expect(log).not.toBeNull();
+    expect(log!.success).toBe(true);
   });
 
   it("logs MFA recovery : aucun code TOTP, code de récupération ou mot de passe stocké", async () => {
