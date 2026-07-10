@@ -156,9 +156,7 @@ export default function AppFooter() {
               <li className="fr-footer__bottom-item">
                 <a
                   className="fr-footer__bottom-link"
-                  href="/Mentions-legales.pdf"
-                  target="_blank"
-                  rel="noopener"
+                  href="//trackdechets.beta.gouv.fr/mentions-legales/"
                 >
                   Mentions légales
                 </a>
@@ -167,9 +165,7 @@ export default function AppFooter() {
               <li className="fr-footer__bottom-item">
                 <a
                   className="fr-footer__bottom-link"
-                  href="/Politique-de-confidentialite.pdf"
-                  target="_blank"
-                  rel="noopener"
+                  href="//trackdechets.beta.gouv.fr/politiques-confidentialites/"
                 >
                   Politique de confidentialité
                 </a>
