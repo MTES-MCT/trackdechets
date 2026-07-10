@@ -16,7 +16,11 @@ import FormikBroker from "../../Apps/Forms/Components/Broker/FormikBroker";
 import FormikTrader from "../../Apps/Forms/Components/Trader/FormikTrader";
 import FormikIntermediaryList from "../../Apps/Forms/Components/IntermediaryList/FormikIntermediaryList";
 
-export default function Recipient({ disabled, intermediariesDisabled }) {
+export default function Recipient({
+  disabled,
+  intermediariesDisabled,
+  contactInfoDisabled
+}) {
   const { siret } = useParams<{ siret: string }>();
 
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -94,6 +98,7 @@ export default function Recipient({ disabled, intermediariesDisabled }) {
         name="recipient.company"
         registeredOnlyCompanies={true}
         disabled={disabled}
+        contactInfoDisabled={contactInfoDisabled}
       />
       <h4 className="form__section-heading">Informations complémentaires</h4>
       {!isTempStorage && (
