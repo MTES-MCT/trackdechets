@@ -1299,6 +1299,7 @@ const minimalBsffForLookupSelect = {
   destinationReceptionDate: true,
   destinationCompanySiret: true,
   wasteCode: true,
+  emitterEmissionSignatureDate: true,
   emitterCompanySiret: true,
   detenteurCompanySirets: true,
   transporters: {
@@ -1338,7 +1339,13 @@ const bsffToLookupCreateInputs = (
       bsffId: bsff.id
     });
   }
-  if (transporter?.transporterTransportSignatureDate) {
+  // le registre sortant est alimenté dès la signature émetteur,
+  // la date bascule sur la date d'enlèvement à la signature transporteur
+  const outgoingDate =
+    transporter?.transporterTransportTakenOverAt ??
+    transporter?.transporterTransportSignatureDate ??
+    bsff.emitterEmissionSignatureDate;
+  if (outgoingDate) {
     const sirets = new Set([
       bsff.emitterCompanySiret,
       ...bsff.detenteurCompanySirets
@@ -1355,11 +1362,7 @@ const bsffToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsff.wasteCode,
-        ...generateDateInfos(
-          transporter.transporterTransportTakenOverAt ??
-            transporter.transporterTransportSignatureDate!,
-          bsff.createdAt
-        ),
+        ...generateDateInfos(outgoingDate, bsff.createdAt),
         bsffId: bsff.id
       });
     });
