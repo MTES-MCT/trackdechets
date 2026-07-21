@@ -1397,6 +1397,7 @@ const minimalBsvhuForLookupSelect = {
   id: true,
   createdAt: true,
   destinationOperationSignatureDate: true,
+  emitterEmissionSignatureDate: true,
   destinationReceptionDate: true,
   destinationCompanySiret: true,
   emitterCompanySiret: true,
@@ -1452,7 +1453,13 @@ const bsvhuToLookupCreateInputs = (
       bsvhuId: bsvhu.id
     });
   }
-  if (transporter?.transporterTransportSignatureDate) {
+  // le registre sortant est alimenté dès la signature émetteur,
+  // la date bascule sur la date d'enlèvement à la signature transporteur
+  const outgoingDate =
+    transporter?.transporterTransportTakenOverAt ??
+    transporter?.transporterTransportSignatureDate ??
+    bsvhu.emitterEmissionSignatureDate;
+  if (outgoingDate) {
     const outgoingSirets = new Set([
       bsvhu.emitterCompanySiret,
       bsvhu.ecoOrganismeSiret
@@ -1469,14 +1476,12 @@ const bsvhuToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsvhu.wasteCode,
-        ...generateDateInfos(
-          transporter.transporterTransportTakenOverAt ??
-            transporter.transporterTransportSignatureDate!,
-          bsvhu.createdAt
-        ),
+        ...generateDateInfos(outgoingDate, bsvhu.createdAt),
         bsvhuId: bsvhu.id
       });
     });
+  }
+  if (transporter?.transporterTransportSignatureDate) {
     const managedSirets = new Set([
       bsvhu.brokerCompanySiret,
       bsvhu.traderCompanySiret
