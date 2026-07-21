@@ -7,7 +7,13 @@ import type {
   AllWasteV2
 } from "@td/codegen-back";
 import { Prisma } from "@td/prisma";
-export type GenericWasteV2 = SsdWasteV2 | IncomingWasteV2 | OutgoingWasteV2;
+export type GenericWasteV2 =
+  | SsdWasteV2
+  | IncomingWasteV2
+  | OutgoingWasteV2
+  | TransportedWasteV2
+  | ManagedWasteV2
+  | AllWasteV2;
 
 type Nullable<T> = { [K in keyof T]: T[K] | null };
 
@@ -147,6 +153,7 @@ export const emptyIncomingWasteV2: Omit<
   wasteContainsElectricOrHybridVehicles: null,
   initialEmitterCompanyName: null,
   initialEmitterCompanySiret: null,
+  initialEmitterCompanyGivenName: null,
   initialEmitterCompanyAddress: null,
   initialEmitterCompanyPostalCode: null,
   initialEmitterCompanyCity: null,
@@ -304,6 +311,7 @@ export const emptyOutgoingWasteV2: Omit<
   weightIsEstimate: null,
   volume: null,
   initialEmitterCompanySiret: null,
+  initialEmitterCompanyGivenName: null,
   initialEmitterCompanyName: null,
   initialEmitterCompanyAddress: null,
   initialEmitterCompanyPostalCode: null,
@@ -622,6 +630,7 @@ export const emptyManagedWasteV2: Omit<
   managingStartDate: null,
   managingEndDate: null,
   initialEmitterCompanySiret: null,
+  initialEmitterCompanyGivenName: null,
   initialEmitterCompanyName: null,
   initialEmitterCompanyAddress: null,
   initialEmitterCompanyPostalCode: null,
@@ -772,6 +781,7 @@ export const emptyAllWasteV2: Omit<
 > = {
   id: null,
   bsdId: null,
+  source: null,
   createdAt: null,
   updatedAt: null,
   transporterTakenOverAt: null,
@@ -790,6 +800,7 @@ export const emptyAllWasteV2: Omit<
   wasteContainsElectricOrHybridVehicles: null,
   weightIsEstimate: null,
   initialEmitterCompanySiret: null,
+  initialEmitterCompanyGivenName: null,
   initialEmitterCompanyName: null,
   initialEmitterCompanyAddress: null,
   initialEmitterCompanyPostalCode: null,
