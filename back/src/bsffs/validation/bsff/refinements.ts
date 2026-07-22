@@ -67,7 +67,8 @@ export const checkCompanies = async (
     BsdType.BSFF,
     zodContext,
     false,
-    !sealedFields.includes("emitterCompanySiret")
+    !sealedFields.includes("emitterCompanySiret"),
+    ["emitter", "company", "siret"] // ← Le chemin correct pour BSFF
   );
   await isDestinationRefinement(
     bsff.destinationCompanySiret,
@@ -75,7 +76,8 @@ export const checkCompanies = async (
     "DESTINATION",
     CompanyRole.Destination,
     undefined,
-    !sealedFields.includes("destinationCompanySiret")
+    !sealedFields.includes("destinationCompanySiret"),
+    ["destination", "company", "siret"]
   );
 
   for (const transporter of bsff.transporters ?? []) {

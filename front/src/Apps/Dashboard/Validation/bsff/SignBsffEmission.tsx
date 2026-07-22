@@ -17,7 +17,7 @@ import {
 
 import { GET_BSFF_FORM, SIGN_BSFF } from "../../../common/queries/bsff/queries";
 import { Loader } from "../../../common/Components";
-import { NotificationError } from "../../../common/Components/Error/Error";
+import { DsfrNotificationError } from "../../../common/Components/Error/Error";
 import TdModal from "../../../common/Components/Modal/Modal";
 
 import { BsffJourneySummary } from "./BsffJourneySummary";
@@ -151,8 +151,8 @@ export default function SignBsffEmission({ bsffId, onClose }: Props) {
 
           {/* ERROR */}
           {error && (
-            <div className="fr-mb-4w">
-              <NotificationError apolloError={error} />
+            <div className="fr-mb-8w">
+              {error && <DsfrNotificationError apolloError={error} />}
             </div>
           )}
 
