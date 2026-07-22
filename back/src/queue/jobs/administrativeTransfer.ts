@@ -4,6 +4,7 @@ import { Job } from "bull";
 import { getFormRepository } from "../../forms/repository";
 import { AuthType } from "../../auth/auth";
 import { getBsdaRepository } from "../../bsda/repository";
+import { getBsffRepository } from "../../bsffs/repository";
 
 export type AdministrativeTransferArgs = { fromOrgId: string; toOrgId: string };
 
@@ -70,6 +71,25 @@ export async function processAdministrativeTransferJob(
       destinationCompanyPhone: toCompany.contactPhone
     }
   );
+  const bsffRepository = getBsffRepository({
+    auth: AuthType.Bearer,
+    id: "JOB_ADMINISTRATIVE_TRANSFER",
+    name: "JOB_ADMINISTRATIVE_TRANSFER"
+  } as Express.User);
 
+  await bsffRepository.updateMany({
+    where: {
+      destinationCompanySiret: fromOrgId,
+      status: "INTERMEDIATELY_PROCESSED"
+    },
+    data: {
+      destinationCompanySiret: toCompany.orgId,
+      destinationCompanyName: toCompany.name,
+      destinationCompanyAddress: toCompany.address,
+      destinationCompanyContact: toCompany.contact,
+      destinationCompanyMail: toCompany.contactEmail,
+      destinationCompanyPhone: toCompany.contactPhone
+    }
+  });
   // Later on, other types of BSDs...
 }
