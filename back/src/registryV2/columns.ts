@@ -242,6 +242,9 @@ export const EXPORT_COLUMNS: {
       label: "Producteur initial - N° d'identification"
     },
     initialEmitterCompanyName: { label: "Producteur initial - Raison sociale" },
+    initialEmitterCompanyGivenName: {
+      label: "Producteur initial - Nom usuel"
+    },
     initialEmitterCompanyAddress: {
       label: "Producteur initial - Libellé adresse"
     },
@@ -549,6 +552,9 @@ export const EXPORT_COLUMNS: {
       label: "Producteur initial - N° d'identification"
     },
     initialEmitterCompanyName: { label: "Producteur initial - Raison sociale" },
+    initialEmitterCompanyGivenName: {
+      label: "Producteur initial - Nom usuel"
+    },
     initialEmitterCompanyAddress: {
       label: "Producteur initial - Libellé adresse"
     },
@@ -1176,6 +1182,9 @@ export const EXPORT_COLUMNS: {
       label: "Producteur initial - N° d'identification"
     },
     initialEmitterCompanyName: { label: "Producteur initial - Raison sociale" },
+    initialEmitterCompanyGivenName: {
+      label: "Producteur initial - Nom usuel"
+    },
     initialEmitterCompanyAddress: {
       label: "Producteur initial - Libellé adresse"
     },
@@ -1523,6 +1532,9 @@ export const EXHAUSTIVE_EXPORT_COLUMNS = {
     label: "Producteur initial - N° d'identification"
   },
   initialEmitterCompanyName: { label: "Producteur initial - Raison sociale" },
+  initialEmitterCompanyGivenName: {
+    label: "Producteur initial - Nom usuel"
+  },
   initialEmitterCompanyAddress: {
     label: "Producteur initial - Libellé adresse"
   },

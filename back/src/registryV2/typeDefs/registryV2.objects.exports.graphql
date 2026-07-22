@@ -80,6 +80,8 @@ type IncomingWasteV2 {
   initialEmitterCompanyName: String
   "Le SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanySiret: String
+  "Le nom usuel du producteur initial du déchet"
+  initialEmitterCompanyGivenName: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
   "Le code postal du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
@@ -451,6 +453,8 @@ type OutgoingWasteV2 {
   initialEmitterCompanySiret: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyName: String
+  "Le nom usuel du producteur initial du déchet"
+  initialEmitterCompanyGivenName: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
   "Le code postal du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
@@ -1198,6 +1202,8 @@ type ManagedWasteV2 {
   initialEmitterCompanySiret: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyName: String
+  "Le nom usuel du producteur initial du déchet"
+  initialEmitterCompanyGivenName: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
   "Le code postal du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
@@ -1538,6 +1544,8 @@ type AllWasteV2 {
   """
   bsdId: ID
 
+  source: RegistryV2ExportSource!
+
   "Date de création du bordereau"
   createdAt: DateTime
 
@@ -1599,6 +1607,8 @@ type AllWasteV2 {
   initialEmitterCompanySiret: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyName: String
+  "Le nom usuel du producteur initial du déchet"
+  initialEmitterCompanyGivenName: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
   "Le code postal du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
