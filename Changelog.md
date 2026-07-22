@@ -5,6 +5,47 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2026.07.1] 28/07/2026
+
+#### :rocket: Nouvelles fonctionnalités
+
+MFA
+
+- Activer la double authentification [PR-4736](https://github.com/MTES-MCT/trackdechets/pull/4736)
+- Se connecter avec la double authentification activée [PR-4739] (https://github.com/MTES-MCT/trackdechets/pull/4739)
+- Récupérer son compte via un code de récupération [PR-4799] (https://github.com/MTES-MCT/trackdechets/pull/4799)
+- Désactiver la double authentification [PR-4740] (https://github.com/MTES-MCT/trackdechets/pull/4740)
+- Journaliser les actions liées à la MFA [PR-4782] (https://github.com/MTES-MCT/trackdechets/pull/4782)
+- Mise à jour de l'Assistance Trackdéchets : récupération manuelle [PR-65] (https://github.com/MTES-MCT/trackdechets-assistance/pull/65)
+- Panneau d'administration : gestion des réinitialisations MFA [PR-4804] (https://github.com/MTES-MCT/trackdechets/pull/4804)
+- Notifications de sécurité liées à la récupération manuelle [PR-4805] (https://github.com/MTES-MCT/trackdechets/pull/4805)
+- Reconfiguration obligatoire et notification post-réinitialisation manuelle
+- MFA - Activer la double authentification - Révisions des codes [PR-4827] (https://github.com/MTES-MCT/trackdechets/pull/4827)
+- MFA - Récupérer son compte via un code de récupération - Evolutions [PR-4830] (https://github.com/MTES-MCT/trackdechets/pull/4830)
+- MFA - Double authentification - Wording [PR-4826] (https://github.com/MTES-MCT/trackdechets/pull/4826)
+
+CRISP
+
+- Crips : Logo Chatbot IA
+- Crisp : Implémenter chatbot IA en recette
+- Crisp - Footer en prod, recette & sandbox trackdéchets [PR-4743] (https://github.com/MTES-MCT/trackdechets/pull/4743)
+- Crisp : Cookies & pop up [PR-4743] (https://github.com/MTES-MCT/trackdechets/pull/4743)
+- Crisp : Retrait de crisp des cookies [PR-4822] (https://github.com/MTES-MCT/trackdechets/pull/4822)
+
+- Mentions Légales - Politique de confidentialité a intégrer en page WEB et non PDF [PR-4833] (https://github.com/MTES-MCT/trackdechets/pull/4833)
+
+#### :nail_care: Améliorations
+
+- Trackdéchets & Registre exhaustif : Ajouter Conditionnement : (Nombre, Type et Volume) [PR-4825] (https://github.com/MTES-MCT/trackdechets/pull/4825)
+
+#### :bug: Corrections de bugs
+
+- Blocage de modification des informations de contact du destinataire après signature émetteur (BSDD / BSDA) [PR-4829] (https://github.com/MTES-MCT/trackdechets/pull/4829)
+- Registre exhaustif – Colonnes "Nom usuel" vides pour tous les acteurs [PR-4836] (https://github.com/MTES-MCT/trackdechets/pull/4836)
+- BSVHU & BSFF — Absence d'apparition dans le registre établissement dès la signature producteur [PR-4840] (https://github.com/MTES-MCT/trackdechets/pull/4840)
+- Impossible d'enregister un bordereau de regroupement BSFF [PR-4837] (https://github.com/MTES-MCT/trackdechets/pull/4837)
+- BSFF - Afficher un message d'erreur si le transporteur n'est pas inscrit ou mis en sommeil [PR-4837] (https://github.com/MTES-MCT/trackdechets/pull/4837)
+
 # [2026.06.2] 30/06/2026
 
 #### :nail_care: Améliorations
