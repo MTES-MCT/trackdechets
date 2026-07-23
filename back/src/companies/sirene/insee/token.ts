@@ -1,90 +1,155 @@
-import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse, isAxiosError } from "axios";
 import { redisClient, setInCache } from "../../../common/redis";
 
 const SIRENE_API_TOKEN_URL =
   "https://auth.insee.net/auth/realms/apim-gravitee/protocol/openid-connect/token";
+
 export const INSEE_TOKEN_KEY = "insee_token";
-const { INSEE_CLIENT_SECRET, INSEE_CLIENT_ID, INSEE_USERNAME, INSEE_PASSWORD } =
-  process.env;
-
-/**
- * Generates INSEE Sirene API token
- */
-async function generateToken(): Promise<string> {
-  const headers = {
-    "Content-Type": "application/x-www-form-urlencoded"
-  };
-
-  // Création des paramètres de la requête avec URLSearchParams
-  const params = new URLSearchParams();
-  params.append("grant_type", "password");
-  params.append("client_id", INSEE_CLIENT_ID);
-  params.append("client_secret", INSEE_CLIENT_SECRET);
-  params.append("username", INSEE_USERNAME);
-  params.append("password", INSEE_PASSWORD);
-
-  const response = await axios.post<{ access_token: string }>(
-    SIRENE_API_TOKEN_URL,
-    params,
-    { headers }
-  );
-
-  return response.data.access_token;
-}
 
 // Le token expire au bout de 300 secondes
 const INSEE_TOKEN_EX = 300;
 
-/**
- * Generates a token and save it to redis cache
- */
-async function renewToken(): Promise<void> {
-  const token = await generateToken();
-  await setInCache(INSEE_TOKEN_KEY, token, { EX: INSEE_TOKEN_EX });
+type GenerateTokenOptions = {
+  password?: string;
+  cache?: boolean;
+};
+
+type InseeTokenResponse = {
+  access_token: string;
+  expires_in?: number;
+  token_type?: string;
+};
+
+function getRequiredEnvironmentVariable(name: string): string {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`La variable d'environnement ${name} est manquante`);
+  }
+
+  return value;
 }
 
 /**
- * Retrives token from redis cache
+ * Génère un token INSEE.
+ *
+ * Le mot de passe peut être passé explicitement pendant une rotation.
+ * Sinon, la valeur INSEE_PASSWORD de l'environnement est utilisée.
+ */
+export async function generateToken(
+  options: GenerateTokenOptions = {}
+): Promise<string> {
+  const clientId = getRequiredEnvironmentVariable("INSEE_CLIENT_ID");
+  const clientSecret = getRequiredEnvironmentVariable("INSEE_CLIENT_SECRET");
+  const username = getRequiredEnvironmentVariable("INSEE_USERNAME");
+  const password =
+    options.password ?? getRequiredEnvironmentVariable("INSEE_PASSWORD");
+
+  const params = new URLSearchParams();
+
+  params.append("grant_type", "password");
+  params.append("client_id", clientId);
+  params.append("client_secret", clientSecret);
+  params.append("username", username);
+  params.append("password", password);
+
+  try {
+    const response = await axios.post<InseeTokenResponse>(
+      SIRENE_API_TOKEN_URL,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        timeout: 15_000
+      }
+    );
+
+    const token = response.data.access_token;
+
+    if (!token) {
+      throw new Error("L'INSEE n'a pas renvoyé de jeton d'accès");
+    }
+
+    if (options.cache !== false) {
+      await setInCache(INSEE_TOKEN_KEY, token, {
+        EX: INSEE_TOKEN_EX
+      });
+    }
+
+    return token;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(
+        `Échec de génération du token INSEE : HTTP ${
+          error.response?.status ?? "inconnu"
+        }`
+      );
+    }
+
+    throw error;
+  }
+}
+
+/**
+ * Génère un token puis le place dans Redis.
+ */
+export async function renewToken(): Promise<void> {
+  await generateToken();
+}
+
+/**
+ * Supprime le token INSEE actuellement en cache.
+ */
+export async function clearToken(): Promise<void> {
+  await redisClient.del(INSEE_TOKEN_KEY);
+}
+
+/**
+ * Récupère le token depuis Redis.
  */
 export async function getToken(): Promise<string | null> {
   return redisClient.get(INSEE_TOKEN_KEY);
 }
 
 /**
- * Patched version of axios.get that handles
- * authorization to INSEE API and token renewal
+ * Version d'axios.get gérant automatiquement l'authentification INSEE.
  */
 export async function authorizedAxiosGet<T>(
   url: string,
   config?: AxiosRequestConfig
 ): Promise<AxiosResponse<T>> {
-  // inner function that add authorization header
-  async function get() {
+  async function get(): Promise<AxiosResponse<T>> {
     let token = await getToken();
+
     if (token === null) {
-      // token has never been set, renew it
       await renewToken();
       token = await getToken();
     }
-    const authHeader = {
-      Authorization: `Bearer ${token}`
-    };
+
+    if (!token) {
+      throw new Error("Impossible de récupérer un token INSEE");
+    }
+
     return axios.get<T>(url, {
       ...config,
-      headers: { ...(config?.headers ? config.headers : {}), ...authHeader }
+      headers: {
+        ...(config?.headers ?? {}),
+        Authorization: `Bearer ${token}`
+      }
     });
   }
+
   try {
-    const response = await get();
-    return response;
-  } catch (err) {
-    if (err.response?.status === 401) {
-      // Token has expired, renew it
+    return await get();
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 401) {
+      await clearToken();
       await renewToken();
-      // Retry request after renewal
+
       return get();
-    } else {
-      throw err;
     }
+
+    throw error;
   }
 }

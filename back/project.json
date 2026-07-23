@@ -8,6 +8,16 @@
     "types": {
       "command": "tsc -p back/tsconfig.lib.json --noEmit"
     },
+    "rotate-insee-password": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/rotateInseePassword.ts"
+      },
+      "configurations": {
+        "integration": {}
+      }
+    },
+
     "reindex-all-bsds-bulk": {
       "executor": "nx:run-commands",
       "options": {

@@ -1,0 +1,8 @@
+{
+  "jobs": [
+    {
+      "command": "15 3 * * * npx nx run back:rotate-insee-password",
+      "size": "M"
+    }
+  ]
+}
