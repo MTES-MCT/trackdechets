@@ -71,25 +71,80 @@ export async function processAdministrativeTransferJob(
       destinationCompanyPhone: toCompany.contactPhone
     }
   );
-  const bsffRepository = getBsffRepository({
-    auth: AuthType.Bearer,
-    id: "JOB_ADMINISTRATIVE_TRANSFER",
-    name: "JOB_ADMINISTRATIVE_TRANSFER"
-  } as Express.User);
 
-  await bsffRepository.updateMany({
+  // ============================================
+  // BSFFs
+  // ============================================
+  logger.info(`[BSFF] Starting BSFF transfer...`);
+
+  // Vérifier d'abord combien de BSFF il y a
+  const bsffToTransfer = await prisma.bsff.findMany({
     where: {
       destinationCompanySiret: fromOrgId,
       status: "INTERMEDIATELY_PROCESSED"
     },
-    data: {
-      destinationCompanySiret: toCompany.orgId,
-      destinationCompanyName: toCompany.name,
-      destinationCompanyAddress: toCompany.address,
-      destinationCompanyContact: toCompany.contact,
-      destinationCompanyMail: toCompany.contactEmail,
-      destinationCompanyPhone: toCompany.contactPhone
-    }
+    select: { id: true, destinationCompanySiret: true, status: true }
   });
-  // Later on, other types of BSDs...
+
+  logger.info(
+    `[BSFF] Found ${bsffToTransfer.length} BSFF with status INTERMEDIATELY_PROCESSED`
+  );
+
+  if (bsffToTransfer.length > 0) {
+    logger.info(`[BSFF] BSFF IDs: ${bsffToTransfer.map(b => b.id).join(", ")}`);
+
+    const bsffRepository = getBsffRepository({
+      auth: AuthType.Bearer,
+      id: "JOB_ADMINISTRATIVE_TRANSFER",
+      name: "JOB_ADMINISTRATIVE_TRANSFER"
+    } as Express.User);
+
+    try {
+      logger.info(
+        `[BSFF] Calling updateMany with where: destinationCompanySiret=${fromOrgId}, status=INTERMEDIATELY_PROCESSED`
+      );
+
+      await bsffRepository.updateMany({
+        where: {
+          destinationCompanySiret: fromOrgId,
+          status: "INTERMEDIATELY_PROCESSED"
+        },
+        data: {
+          destinationCompanySiret: toCompany.orgId,
+          destinationCompanyName: toCompany.name,
+          destinationCompanyAddress: toCompany.address,
+          destinationCompanyContact: toCompany.contact,
+          destinationCompanyMail: toCompany.contactEmail,
+          destinationCompanyPhone: toCompany.contactPhone
+        }
+      });
+
+      logger.info(
+        `[BSFF] Successfully transferred ${bsffToTransfer.length} BSFF`
+      );
+
+      // Vérifier après le transfert
+      const bsffAfterTransfer = await prisma.bsff.findMany({
+        where: {
+          destinationCompanySiret: toCompany.orgId,
+          id: { in: bsffToTransfer.map(b => b.id) }
+        },
+        select: { id: true, destinationCompanySiret: true }
+      });
+
+      logger.info(
+        `[BSFF] Verification: ${bsffAfterTransfer.length} BSFF now point to ${toCompany.orgId}`
+      );
+    } catch (error) {
+      logger.error(`[BSFF] Error transferring BSFF: ${error.message}`);
+      logger.error(`[BSFF] Stack trace: ${error.stack}`);
+      throw error;
+    }
+  } else {
+    logger.info(`[BSFF] No BSFF to transfer`);
+  }
+
+  logger.info(
+    `Administrative transfer completed successfully from ${fromOrgId} to ${toOrgId}`
+  );
 }
