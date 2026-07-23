@@ -1,72 +1,113 @@
 import { useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
+
 import { envConfig } from "../envConfig";
 
 declare global {
   interface Window {
-    _mtm?: Array<Record<string, any>>;
+    _paq?: Array<unknown[]>;
     _matomoLoaded?: boolean;
-    matomoHeatmapSessionRecordingAsyncInit?: (args: any) => void;
-    Matomo: any;
+    _matomoNavigationTrackingInitialized?: boolean;
   }
 }
 
-window.matomoHeatmapSessionRecordingAsyncInit = function (_: any) {
-  if (window?.Matomo) {
-    window.Matomo.HeatmapSessionRecording.enable();
+function normalizeMatomoUrl(url: string): string {
+  const urlWithScheme =
+    url.startsWith("http://") || url.startsWith("https://")
+      ? url
+      : `https://${url}`;
+
+  return `${urlWithScheme.replace(/\/+$/, "")}/`;
+}
+
+function trackPageView(): void {
+  if (!window._paq) {
+    return;
   }
-};
+
+  window._paq.push(["setCustomUrl", window.location.href]);
+  window._paq.push(["setDocumentTitle", document.title]);
+  window._paq.push(["trackPageView"]);
+}
+
+function initializeNavigationTracking(): void {
+  if (window._matomoNavigationTrackingInitialized) {
+    return;
+  }
+
+  window._matomoNavigationTrackingInitialized = true;
+
+  const originalPushState = window.history.pushState;
+  const originalReplaceState = window.history.replaceState;
+
+  window.history.pushState = function (...args) {
+    originalPushState.apply(this, args);
+
+    window.setTimeout(() => {
+      trackPageView();
+    }, 0);
+  };
+
+  window.history.replaceState = function (...args) {
+    originalReplaceState.apply(this, args);
+
+    window.setTimeout(() => {
+      trackPageView();
+    }, 0);
+  };
+
+  window.addEventListener("popstate", () => {
+    window.setTimeout(() => {
+      trackPageView();
+    }, 0);
+  });
+}
 
 export function MatomoTracker() {
   const { VITE_MATOMO_TRACKER_SITE_ID, VITE_MATOMO_TRACKER_URL } = envConfig;
-  const { user } = useAuth();
-
-  const trackingConsentUntil = user?.trackingConsentUntil;
-  const trackingConsent = user?.trackingConsent;
 
   useEffect(() => {
     if (!VITE_MATOMO_TRACKER_SITE_ID || !VITE_MATOMO_TRACKER_URL) {
       return;
     }
 
-    const hasConsent =
-      trackingConsent &&
-      (trackingConsentUntil
-        ? new Date(trackingConsentUntil) > new Date()
-        : false);
-
-    if (hasConsent) {
-      if (window._matomoLoaded) return;
-
-      const _mtm = (window._mtm = window._mtm || []);
-      _mtm.push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });
-
-      const d = document;
-      const g = d.createElement("script");
-      const s = d.getElementsByTagName("script")[0];
-      g.async = true;
-      g.src = `https://${VITE_MATOMO_TRACKER_URL}/js/${VITE_MATOMO_TRACKER_SITE_ID}.js`;
-
-      if (s.parentNode) {
-        s.parentNode.insertBefore(g, s);
-      }
-
-      window._matomoLoaded = true;
+    if (window._matomoLoaded) {
+      return;
     }
 
-    if (!hasConsent) {
-      // Remove Matomo script when consent is withdrawn
-      if (window._matomoLoaded) {
-        // the process of removing in-memory matomo code is a pita, let's just refesh the page
-        window.location.reload();
-      }
-    }
-  }, [
-    trackingConsentUntil,
-    trackingConsent,
-    VITE_MATOMO_TRACKER_SITE_ID,
-    VITE_MATOMO_TRACKER_URL
-  ]);
+    const matomoUrl = normalizeMatomoUrl(VITE_MATOMO_TRACKER_URL);
+    const _paq = (window._paq = window._paq || []);
+
+    /*
+     * Trackdéchets utilise Matomo sans cookies.
+     * Cette commande doit être exécutée avant la première page vue.
+     */
+    _paq.push(["disableCookies"]);
+
+    _paq.push(["setTrackerUrl", `${matomoUrl}matomo.php`]);
+    _paq.push(["setSiteId", VITE_MATOMO_TRACKER_SITE_ID]);
+    _paq.push(["enableLinkTracking"]);
+
+    trackPageView();
+    initializeNavigationTracking();
+
+    const script = document.createElement("script");
+
+    script.async = true;
+    script.src = `${matomoUrl}matomo.js`;
+    script.dataset.matomo = "true";
+
+    script.onerror = () => {
+      window._matomoLoaded = false;
+
+      console.error(
+        `Impossible de charger Matomo depuis ${script.src}. Vérifiez l'URL BRGM et la CSP.`
+      );
+    };
+
+    document.head.appendChild(script);
+
+    window._matomoLoaded = true;
+  }, [VITE_MATOMO_TRACKER_SITE_ID, VITE_MATOMO_TRACKER_URL]);
 
   return null;
 }

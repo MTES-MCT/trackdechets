@@ -37,6 +37,7 @@ CRISP
 #### :nail_care: Améliorations
 
 - Trackdéchets & Registre exhaustif : Ajouter Conditionnement : (Nombre, Type et Volume) [PR-4825] (https://github.com/MTES-MCT/trackdechets/pull/4825)
+- Matomo : Identifier les applications concernées par Matomo Beta.Gouv [PR-4843] (https://github.com/MTES-MCT/trackdechets/pull/4843)
 
 #### :bug: Corrections de bugs
 
