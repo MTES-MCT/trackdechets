@@ -46,6 +46,7 @@ CRISP
 - BSVHU & BSFF — Absence d'apparition dans le registre établissement dès la signature producteur [PR-4840] (https://github.com/MTES-MCT/trackdechets/pull/4840)
 - Impossible d'enregister un bordereau de regroupement BSFF [PR-4837] (https://github.com/MTES-MCT/trackdechets/pull/4837)
 - BSFF - Afficher un message d'erreur si le transporteur n'est pas inscrit ou mis en sommeil [PR-4837] (https://github.com/MTES-MCT/trackdechets/pull/4837)
+- BSFF : Permettre de transférer les bordereaux d'un SIRET fermé en attente de groupement vers un SIRET ouvert [PR-4844] (https://github.com/MTES-MCT/trackdechets/pull/4844)
 
 # [2026.06.2] 30/06/2026
 
