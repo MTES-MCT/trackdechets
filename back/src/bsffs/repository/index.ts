@@ -35,6 +35,7 @@ import {
 import { buildCountBsffPackaging } from "./bsffPackaging/count";
 import { buildFindManyBsffPackagings } from "./bsffPackaging/findMany";
 import { buildCountBsff } from "./bsff/count";
+import { buildUpdateManyBsff } from "./bsff/updateMany";
 
 export type BsffRepository = BsffActions;
 export type BsffPackagingRepository = BsffPackagingActions;
@@ -89,6 +90,7 @@ export function getBsffRepository(
     ...getReadonlyBsffRepository(transaction),
     create: useTransaction(buildCreateBsff) as CreateBsffFn,
     updateBsff: useTransaction(buildUpdateBsff) as UpdateBsffFn,
+    updateMany: useTransaction(buildUpdateManyBsff),
     delete: useTransaction(buildDeleteBsff) as DeleteBsffFn
   };
 }

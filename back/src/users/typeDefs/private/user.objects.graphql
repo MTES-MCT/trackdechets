@@ -132,3 +132,21 @@ type OrgPermissionsInfos {
   "Rôle de l'utilisateur"
   role: UserRole!
 }
+
+"""
+Entrée du journal d'audit MFA. Accessible uniquement aux administrateurs Trackdéchets.
+"""
+type MfaAuditLog {
+  "Identifiant unique de l'entrée"
+  id: ID!
+  "Identifiant interne de l'utilisateur concerné (pas l'email)"
+  userId: String!
+  "Type d'événement MFA"
+  eventType: String!
+  "Résultat de l'action"
+  success: Boolean!
+  "Adresse IP de la requête"
+  ip: String
+  "Horodatage ISO 8601"
+  loggedAt: DateTime!
+}

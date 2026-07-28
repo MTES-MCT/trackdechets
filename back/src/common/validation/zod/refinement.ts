@@ -64,7 +64,8 @@ export async function refineSiretAndGetCompany(
   siret: string | null | undefined,
   ctx: RefinementCtx,
   companyRole?: CompanyRole,
-  checkIsNotDormant = true
+  checkIsNotDormant = true,
+  customPath?: (string | number)[]
 ): Promise<Company | null> {
   if (!siret) return null;
   const company = await prisma.company.findUnique({
@@ -74,7 +75,7 @@ export async function refineSiretAndGetCompany(
   if (company === null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole({ companyRole }),
+      path: customPath || pathFromCompanyRole({ companyRole }),
       message: `${
         companyRole ? `${companyRole} : ` : ""
       }L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
@@ -84,7 +85,7 @@ export async function refineSiretAndGetCompany(
   if (checkIsNotDormant && company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole({ companyRole }),
+      path: customPath || pathFromCompanyRole({ companyRole }),
       message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
     });
   }
@@ -164,13 +165,15 @@ export async function isDestinationRefinement(
     | "DEMOLISSEUR" = "DESTINATION",
   bsdCompanyRole: CompanyRole = CompanyRole.Destination,
   isExemptedFromVerification?: (destination: Company | null) => boolean,
-  checkIsNotDormant = true
+  checkIsNotDormant = true,
+  customPath?: (string | number)[]
 ) {
   const company = await refineSiretAndGetCompany(
     siret,
     ctx,
     bsdCompanyRole,
-    checkIsNotDormant
+    checkIsNotDormant,
+    customPath
   );
   if (company) {
     if (
@@ -181,24 +184,25 @@ export async function isDestinationRefinement(
       if (!isWasteVehicles(company)) {
         return ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
+          path:
+            customPath || pathFromCompanyRole({ companyRole: bsdCompanyRole }), // ← UTILISER customPath
           message: `Cet établissement n'a pas le profil Installation de traitement de VHU.`
         });
       }
-      if (role === "BROYEUR" && !isBroyeur(company)) {
-        return ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
-          message: `Cet établissement n'a pas le sous-profil Broyeur.`
-        });
-      }
-      if (role === "DEMOLISSEUR" && !isDemolisseur(company)) {
-        return ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
-          message: `Cet établissement n'a pas le sous-profil Casse automobile / démolisseur.`
-        });
-      }
+    }
+    if (role === "BROYEUR" && !isBroyeur(company)) {
+      return ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
+        message: `Cet établissement n'a pas le sous-profil Broyeur.`
+      });
+    }
+    if (role === "DEMOLISSEUR" && !isDemolisseur(company)) {
+      return ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
+        message: `Cet établissement n'a pas le sous-profil Casse automobile / démolisseur.`
+      });
     } else if (
       !isCollector(company) &&
       !isWasteProcessor(company) &&
@@ -207,7 +211,8 @@ export async function isDestinationRefinement(
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
+        path:
+          customPath || pathFromCompanyRole({ companyRole: bsdCompanyRole }),
         message:
           `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
           ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
@@ -226,7 +231,8 @@ export async function isDestinationRefinement(
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
+        path:
+          customPath || pathFromCompanyRole({ companyRole: bsdCompanyRole }), // ← ET ICI
         message:
           `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
           ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
@@ -240,16 +246,18 @@ export async function isEmitterRefinement(
   bsdType: BsdType,
   ctx: RefinementCtx,
   isExemptedFromVerification = false,
-  checkIsNotDormant = true
+  checkIsNotDormant = true,
+  customPath?: (string | number)[]
 ) {
   let company: Company | null = null;
-  // if the emitter of the BSD has to be registered on TD, add the BSD type here
+
   if (bsdType === BsdType.BSVHU && !isExemptedFromVerification) {
     company = await refineSiretAndGetCompany(
       siret,
       ctx,
       CompanyRole.Emitter,
-      checkIsNotDormant
+      checkIsNotDormant,
+      customPath
     );
   } else {
     if (!siret) return null;
@@ -261,12 +269,12 @@ export async function isEmitterRefinement(
   if (checkIsNotDormant && company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole({ companyRole: CompanyRole.Emitter }),
+      path:
+        customPath || pathFromCompanyRole({ companyRole: CompanyRole.Emitter }),
       message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
     });
   }
 }
-
 export function destinationOperationModeRefinement(
   destinationOperationCode: string | null | undefined,
   destinationOperationMode: string | null | undefined,

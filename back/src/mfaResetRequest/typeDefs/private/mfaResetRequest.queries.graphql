@@ -1,0 +1,14 @@
+type Query {
+  """
+  Liste paginée des demandes de réinitialisation MFA.
+  Accessible uniquement aux super-administrateurs Trackdéchets.
+  """
+  mfaResetRequestsAdmin(skip: Int, first: Int): MfaResetRequestConnection!
+
+  """
+  Récapitulatif pré-validation avant création d'une demande pour l'email donné.
+  Retourne les informations nécessaires à l'affichage du récapitulatif de confirmation.
+  Accessible uniquement aux super-administrateurs Trackdéchets.
+  """
+  mfaResetRequestSummary(email: String!): MfaResetRequestSummary!
+}

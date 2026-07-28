@@ -1,4 +1,3 @@
-import { compare } from "bcrypt";
 import { TOTP } from "totp-generator";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
@@ -7,29 +6,14 @@ import type { MutationResolvers } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 import { sendMail } from "../../../mailer/mailing";
 import { onTotpDisabled, renderMail } from "@td/mail";
+import { findValidRecoveryCode } from "../../services/recoveryCode.service";
+import { logMfaEvent } from "../../../common/mfaLogger";
 
 function verifyTotpCode(seed: string, code: string): boolean {
   const { otp } = TOTP.generate(seed);
   const thirtySecondsAgo = Date.now() - 30 * 1000;
   const { otp: lastOtp } = TOTP.generate(seed, { timestamp: thirtySecondsAgo });
   return [otp, lastOtp].includes(code);
-}
-
-async function findValidRecoveryCode(
-  userId: string,
-  code: string
-): Promise<string | null> {
-  const normalized = code.replace(/-/g, "").toUpperCase();
-  const recoveryCodes = await prisma.totpRecoveryCode.findMany({
-    where: { userId, usedAt: null }
-  });
-
-  for (const rc of recoveryCodes) {
-    if (await compare(normalized, rc.codeHash)) {
-      return rc.id;
-    }
-  }
-  return null;
 }
 
 /**
@@ -61,9 +45,24 @@ const disableTotpResolver: MutationResolvers["disableTotp"] = async (
     : await findValidRecoveryCode(dbUser.id, code);
 
   if (!isTotpValid && recoveryCodeId === null) {
+    logMfaEvent({
+      eventType: "MFA_RECOVERY_FAILURE",
+      userId: dbUser.id,
+      success: false,
+      ip: context.req.ip
+    });
     throw new UserInputError(
       "Le code est invalide. Vérifiez votre application d'authentification et réessayez."
     );
+  }
+
+  if (recoveryCodeId !== null) {
+    logMfaEvent({
+      eventType: "MFA_RECOVERY_SUCCESS",
+      userId: dbUser.id,
+      success: true,
+      ip: context.req.ip
+    });
   }
 
   await prisma.$transaction([
@@ -78,6 +77,13 @@ const disableTotpResolver: MutationResolvers["disableTotp"] = async (
     }),
     prisma.totpRecoveryCode.deleteMany({ where: { userId: dbUser.id } })
   ]);
+
+  logMfaEvent({
+    eventType: "MFA_DISABLED",
+    userId: dbUser.id,
+    success: true,
+    ip: context.req.ip
+  });
 
   await sendMail(
     renderMail(onTotpDisabled, {

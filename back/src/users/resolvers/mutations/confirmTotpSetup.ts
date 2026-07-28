@@ -8,35 +8,42 @@ import type { MutationResolvers } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 import { sendMail } from "../../../mailer/mailing";
 import { onTotpActivated, renderMail } from "@td/mail";
+import { logMfaEvent } from "../../../common/mfaLogger";
 
-const RECOVERY_CODE_COUNT = 10;
+const RECOVERY_CODE_COUNT = 5;
+const RECOVERY_CODE_LENGTH = 20;
+const RECOVERY_CODE_GROUP_SIZE = 5;
 const RECOVERY_CODE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 const BCRYPT_SALT_ROUNDS = 10;
 
 /**
- * Génère un code de récupération aléatoire au format XXXXX-XXXXX.
- * La saisie est insensible à la casse et le tiret est ignoré à la validation.
+ * Génère un code de récupération aléatoire au format XXXXX-XXXXX-XXXXX-XXXXX.
+ * La saisie est insensible à la casse et les tirets sont ignorés à la validation.
  */
 function generateRecoveryCode(): string {
   const charsetLength = RECOVERY_CODE_CHARS.length;
   const maxUnbiased = Math.floor(256 / charsetLength) * charsetLength;
   const chars: string[] = [];
 
-  while (chars.length < 10) {
-    const bytes = randomBytes(10 - chars.length);
+  while (chars.length < RECOVERY_CODE_LENGTH) {
+    const bytes = randomBytes(RECOVERY_CODE_LENGTH - chars.length);
     for (const b of bytes) {
       if (b >= maxUnbiased) {
         continue;
       }
       chars.push(RECOVERY_CODE_CHARS[b % charsetLength]);
-      if (chars.length === 10) {
+      if (chars.length === RECOVERY_CODE_LENGTH) {
         break;
       }
     }
   }
 
   const raw = chars.join("");
-  return `${raw.slice(0, 5)}-${raw.slice(5, 10)}`;
+  const groups: string[] = [];
+  for (let i = 0; i < raw.length; i += RECOVERY_CODE_GROUP_SIZE) {
+    groups.push(raw.slice(i, i + RECOVERY_CODE_GROUP_SIZE));
+  }
+  return groups.join("-");
 }
 
 /**
@@ -50,9 +57,13 @@ function verifyTotpCode(seed: string, code: string): boolean {
 }
 
 /**
- * Confirme la configuration TOTP en validant le premier code.
- * Active le TOTP, génère les codes de récupération et envoie un e-mail de confirmation.
- * Révoque les sessions actives sur les autres appareils via passwordUpdatedAt.
+ * Valide le code TOTP et génère les codes de récupération.
+ * N'active PAS encore la MFA — l'activation définitive est faite par finalizeMfaSetup
+ * une fois que l'utilisateur a confirmé avoir sauvegardé ses codes.
+ *
+ * État après cet appel : totpSeed set, totpActivatedAt null, TotpRecoveryCodes créés.
+ * Cet état est considéré comme un setup incomplet : il sera nettoyé si l'utilisateur
+ * relance le parcours (generateTotpSetup) sans avoir finalisé.
  */
 const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
   _,
@@ -77,6 +88,12 @@ const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
   }
 
   if (!verifyTotpCode(dbUser.totpSeed, code)) {
+    logMfaEvent({
+      eventType: "MFA_ACTIVATION_ABANDONED",
+      userId: dbUser.id,
+      success: false,
+      ip: context.req.ip
+    });
     throw new UserInputError(
       "Le code est invalide. Vérifiez votre application d'authentification et réessayez."
     );
@@ -95,21 +112,9 @@ const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
     )
   );
 
-  const now = new Date();
-
+  // Stockage des codes — on remplace tout setup précédent incomplet
   await prisma.$transaction([
-    // Activation du TOTP
-    prisma.user.update({
-      where: { id: dbUser.id },
-      data: {
-        totpActivatedAt: now,
-        // Mise à jour de passwordUpdatedAt pour invalider les sessions des autres appareils
-        passwordUpdatedAt: now
-      }
-    }),
-    // Suppression de tout code de récupération existant
     prisma.totpRecoveryCode.deleteMany({ where: { userId: dbUser.id } }),
-    // Stockage des codes hachés
     ...hashedCodes.map(codeHash =>
       prisma.totpRecoveryCode.create({
         data: { userId: dbUser.id, codeHash }
@@ -119,6 +124,13 @@ const confirmTotpSetupResolver: MutationResolvers["confirmTotpSetup"] = async (
 
   // Mise à jour de issuedAt pour garder la session courante valide
   context.req.session.issuedAt = new Date().toISOString();
+
+  logMfaEvent({
+    eventType: "MFA_ACTIVATED",
+    userId: dbUser.id,
+    success: true,
+    ip: context.req.ip
+  });
 
   // E-mail de confirmation
   await sendMail(

@@ -175,6 +175,26 @@ const WasteBsda = () => {
               small
               className="fr-mt-2w"
             />
+            <h4 className="fr-h4 fr-mt-4w">Mention ADR</h4>
+
+            <Input
+              className="fr-col-md-8"
+              label="Mention au titre de la réglementation ADR (optionnel)"
+              disabled={sealedFields.includes(`waste.adr`)}
+              nativeInputProps={{
+                ...register("waste.adr"),
+                placeholder: waste?.adr || "Exemple: Transport sous 1.1.3.6"
+              }}
+              state={formState.errors.waste?.["adr"] ? "error" : "default"}
+              stateRelatedMessage={formState.errors.waste?.["adr"]?.message}
+            />
+
+            <Alert
+              description="Vous pouvez modifier la mention ADR..."
+              severity="info"
+              small
+              className="fr-mt-2w"
+            />
           </>
         )}
 

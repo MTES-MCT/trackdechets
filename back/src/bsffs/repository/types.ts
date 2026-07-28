@@ -24,6 +24,7 @@ import {
 import { CountBsffPackagingFn } from "./bsffPackaging/count";
 import { FindManyBsffPackagingsFn } from "./bsffPackaging/findMany";
 import { CountBsffFn } from "./bsff/count";
+import { UpdateManyBsffFn } from "./bsff/updateMany";
 
 export const bsffEventTypes: eventTypes = {
   created: "BsffCreated",
@@ -48,6 +49,7 @@ export type BsffActions = {
   findMany: FindManyBsffFn;
   create: CreateBsffFn;
   updateBsff: UpdateBsffFn;
+  updateMany: UpdateManyBsffFn;
   delete: DeleteBsffFn;
 };
 

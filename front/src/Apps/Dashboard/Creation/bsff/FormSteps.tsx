@@ -56,6 +56,7 @@ import {
   handleGraphQlError,
   TabId
 } from "../utils";
+import { DsfrNotificationError } from "../../../common/Components/Error/Error";
 
 interface Props {
   bsdId?: string;
@@ -126,12 +127,13 @@ const BsffFormSteps = ({
       MutationUpdateBsffTransporterArgs
     >(UPDATE_BSFF_TRANSPORTER);
 
-  const [createBsff, { loading: creatingBsff }] = useMutation<
-    Pick<Mutation, "createBsff">,
-    MutationCreateBsffArgs // ← vérifier que ce type existe dans @td/codegen-ui
-  >(CREATE_BSFF);
+  const [createBsff, { loading: creatingBsff, error: createBsffError }] =
+    useMutation<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs // ← vérifier que ce type existe dans @td/codegen-ui
+    >(CREATE_BSFF);
 
-  const [createFicheIntervention] = useMutation<
+  const [createFicheIntervention, { error: ficheError }] = useMutation<
     Pick<Mutation, "createFicheInterventionBsff">,
     MutationCreateFicheInterventionBsffArgs
   >(CREATE_BSFF_FICHE_INTERVENTION);
@@ -355,6 +357,7 @@ const BsffFormSteps = ({
           const { data } = await createFicheIntervention({
             variables: { input: ficheInput }
           });
+
           return data?.createFicheInterventionBsff?.id ?? null;
         })
     );
@@ -466,13 +469,25 @@ const BsffFormSteps = ({
     }
 
     try {
-      return await createBsff({ variables: { input } });
+      const result = await createBsff({ variables: { input } });
+
+      return result;
     } catch (err: any) {
       setPublishErrors(handleGraphQlError(err));
       throw err;
     }
   }
+  useEffect(() => {
+    if (createBsffError) {
+      setPublishErrors(handleGraphQlError(createBsffError));
+    }
+  }, [createBsffError]);
 
+  useEffect(() => {
+    if (ficheError) {
+      setPublishErrors(handleGraphQlError(ficheError));
+    }
+  }, [ficheError]);
   async function saveBsffTransporter(t: any): Promise<string> {
     const { id, transport, ...input } = t;
 
@@ -537,6 +552,14 @@ const BsffFormSteps = ({
           error => error.tabId === TabId.none
         )}
       />
+      {(createBsffError || ficheError) && (
+        <div className="fr-mb-8w">
+          {createBsffError && (
+            <DsfrNotificationError apolloError={createBsffError} />
+          )}
+          {ficheError && <DsfrNotificationError apolloError={ficheError} />}
+        </div>
+      )}
       {loading && <Loader />}
     </BsffContext.Provider>
   );

@@ -1,4 +1,5 @@
 import {
+  BsdasriPackaging,
   IncomingWasteV2,
   OutgoingWasteV2,
   TransportedWasteV2,
@@ -35,6 +36,10 @@ import {
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
+import {
+  BSDASRI_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
 
 const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
   const destinationFinalOperationCodes: string[] = [];
@@ -72,6 +77,11 @@ const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
     destinationFinalOperationCompanySirets
   };
 };
+
+const getQuantity = (packagings: BsdasriPackaging[]) =>
+  formatGroupedPackagingQuantity(packagings, BSDASRI_PACKAGING_LABELS, {
+    useQuantityField: true
+  });
 
 export const toIncomingWasteV2 = (
   bsdasri: RegistryV2Bsdasri
@@ -123,11 +133,12 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyPostalCode: null,
     initialEmitterCompanyCity: null,
@@ -286,7 +297,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdasri.emitterWasteWeightValue
       ? kgToTonRegistryV2(bsdasri.emitterWasteWeightValue)
@@ -295,6 +306,7 @@ export const toOutgoingWasteV2 = (
     volume: null,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyPostalCode: null,
     initialEmitterCompanyCity: null,
@@ -472,7 +484,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
     volume: null,
@@ -619,7 +631,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
 
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
@@ -629,6 +641,7 @@ export const toManagedWasteV2 = (
     managingEndDate: null,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyPostalCode: null,
     initialEmitterCompanyCity: null,
@@ -774,6 +787,7 @@ export const toAllWasteV2 = (
     ...emptyAllWasteV2,
     id: bsdasri.id,
     bsdId: bsdasri.id,
+    source: "BSD",
     createdAt: bsdasri.createdAt,
     updatedAt: bsdasri.updatedAt,
     transporterTakenOverAt: bsdasri.transporterTakenOverAt,
@@ -789,12 +803,13 @@ export const toAllWasteV2 = (
     wasteCode: bsdasri.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsdasri.emitterWastePackagings as BsdasriPackaging[]),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyPostalCode: null,
     initialEmitterCompanyCity: null,

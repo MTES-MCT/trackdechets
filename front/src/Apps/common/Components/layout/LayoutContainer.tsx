@@ -23,6 +23,7 @@ import Invite from "../../../../login/Invite";
 import UserActivation from "../../../../login/UserActivation";
 import PasswordResetRequest from "../../../../login/PasswordResetRequest";
 import PasswordReset from "../../../../login/PasswordReset";
+import MfaReconfiguration from "../../../../login/MfaReconfiguration";
 import Signup from "../../../../login/Signup";
 import WasteTree from "../search/WasteTree";
 
@@ -30,10 +31,8 @@ const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
 const BANNER_MESSAGES = [
   <>
-    Abonnez-vous à notre lettre d'information mensuelle pour suivre les
-    nouveautés de la plateforme, la programmation des formations, des conseils
-    pratiques, ainsi que les évolutions réglementaires liées à la traçabilité
-    des déchets.
+    Renforcez la sécurité de votre compte Trackdéchets en activant dès
+    maintenant la double authentification depuis l'onglet Mon compte.
   </>
 ];
 
@@ -71,8 +70,8 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "Je m'abonne",
-                    href: "https://0806de2d.sibforms.com/serve/MUIEAG29k1cikyqt55ql5CSQp_3hunRICQ8Eu8IvTZMpZl1EuQSEYeErCYUb31W6nx1mUfBKGfamqI9xMrql4caFpN2IUJQ_NR-00sPbnSv5Kw21AYm8tMHap8_7ah9NCHlcPqpNKrp7CPjO2zYsiAaBFX8r3PHDY72zP55LieF3N9gc3sUfOG16ioQgATXDPF0GeDpTuU46gBWT"
+                    title: "En savoir plus",
+                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/renouveler-son-mot-de-passe-1"
                   }}
                   persistedSurveyName="td-20260210"
                 />
@@ -105,6 +104,11 @@ export default function LayoutContainer() {
           />
 
           <Route path={routes.passwordReset} element={<PasswordReset />} />
+
+          <Route
+            path={routes.mfaReconfiguration}
+            element={<MfaReconfiguration />}
+          />
 
           <Route path={routes.userActivation} element={<UserActivation />} />
 
