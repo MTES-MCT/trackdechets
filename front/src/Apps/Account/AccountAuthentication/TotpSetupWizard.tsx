@@ -23,6 +23,12 @@ const CONFIRM_TOTP_SETUP = gql`
   }
 `;
 
+const FINALIZE_MFA_SETUP = gql`
+  mutation FinalizeMfaSetup {
+    finalizeMfaSetup
+  }
+`;
+
 // 4 étapes : QR code et validation sont fusionnés dans une même étape
 type Step = "explanation" | "qrcode" | "recovery" | "success";
 
@@ -78,6 +84,9 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
     confirmSetup,
     { loading: confirming, error: confirmError, reset: resetConfirmError }
   ] = useMutation(CONFIRM_TOTP_SETUP);
+
+  const [finalizeSetup, { loading: finalizing, error: finalizeError }] =
+    useMutation(FINALIZE_MFA_SETUP);
 
   const goToQrCode = async () => {
     if (!appInstalled) {
@@ -137,12 +146,15 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
     URL.revokeObjectURL(url);
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     if (!savedConfirmed) {
       setShowSavedError(true);
       return;
     }
-    setStep("success");
+    const { data } = await finalizeSetup();
+    if (data?.finalizeMfaSetup) {
+      setStep("success");
+    }
   };
 
   const title = "Activez l'authentification TOTP";
@@ -189,21 +201,52 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
       {step === "explanation" && (
         <div>
           <p className="fr-mb-3w">
-            Un code unique vous sera demandé à chaque nouvelle session. Pour
-            l'obtenir, vous devez utiliser une application mobile.
+            Pour renforcer la sécurité de votre compte, un code à usage unique
+            vous sera demandé à chaque connexion. Pour générer ce code, vous
+            devrez utiliser une application d'authentification compatible TOTP,
+            installée sur votre téléphone.
           </p>
           <p className="fr-mb-3w">
-            Si vous n'avez pas encore d'application, nous vous conseillons
-            d'utiliser l'outil opensource{" "}
+            Si vous n'en utilisez pas déjà une, vous pouvez installer l'une des
+            applications suivantes :{" "}
             <a
               href="https://freeotp.github.io/"
               target="_blank"
               rel="noopener noreferrer"
               className="fr-link"
             >
-              FreeOTP Authenticator
+              FreeOTP
             </a>
-            .
+            <p>
+              <a
+                href="https://2fas.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fr-link"
+              >
+                2FAS
+              </a>
+            </p>
+            <p>
+              <a
+                href="https://support.google.com/accounts/answer/1066447"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fr-link"
+              >
+                Google Authenticator
+              </a>
+            </p>
+            <p>
+              <a
+                href="https://support.microsoft.com/en-us/authenticator/download-microsoft-authenticator"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fr-link"
+              >
+                Microsoft Authenticator
+              </a>
+            </p>
           </p>
 
           {generateError && (
@@ -231,8 +274,9 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
             </label>
             {showAppError && (
               <p className="fr-error-text">
-                Merci de bien vouloir prendre connaissance et cocher la case
-                pour continuer.
+                Il est nécessaire d'installer une application d'authentification
+                TOTP pour passer à l'étape suivante de mise en place de
+                l'authentification multifactorielle.
               </p>
             )}
           </div>
@@ -257,7 +301,7 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
         <div>
           <h3 className="fr-h1">
             <p className="fr-text--lead">
-              Scannez ce QRcode avec votre application
+              Scannez ce QRCode avec votre application d'authentification.
             </p>
           </h3>
 
@@ -299,9 +343,9 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
             </div>
           )}
 
-          <div className="fr-col-md-8">
+          <div className="fr-col-md-9">
             <label className="fr-label fr-text--bold fr-²">
-              Insérez le code généré par votre application
+              Insérez le code généré par votre application d'authentification
             </label>
             <Input
               label="Entrez le code à usage unique"
@@ -359,7 +403,7 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
                 borderRadius: 4,
                 fontFamily: "monospace",
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
+                gridTemplateColumns: "1fr",
                 gap: "0.5rem"
               }}
             >
@@ -415,17 +459,24 @@ export default function TotpSetupWizard({ onSuccess, onClose }: Props) {
             </label>
             {showSavedError && (
               <p className="fr-error-text">
-                Merci de bien vouloir prendre connaissance et cocher la case
-                pour continuer.
+                Il est indispensable de sauvegarder vos clés de récupération
+                sans cela, en cas de perte de votre téléphone, vous ne pourrez
+                plus accéder à votre compte.
               </p>
             )}
           </div>
+
+          {finalizeError && (
+            <DsfrNotificationError apolloError={finalizeError} />
+          )}
 
           <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline fr-mt-3w">
             <Button priority="secondary" onClick={() => setStep("recovery")}>
               Précédent
             </Button>
-            <Button onClick={handleFinish}>Activer</Button>
+            <Button disabled={finalizing} onClick={handleFinish}>
+              Activer
+            </Button>
           </div>
         </div>
       )}

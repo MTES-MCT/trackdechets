@@ -28,6 +28,9 @@ export default function FormContainer() {
             const disabledAfterTransport = !!form && !!form.takenOverAt;
             const intermediariesDisabled = !!form?.receivedAt;
 
+            const contactInfoDisabledAfterReception =
+              !!form && !!form.receivedAt;
+
             return (
               <>
                 <StepContainer
@@ -46,6 +49,7 @@ export default function FormContainer() {
                     <Recipient
                       {...props}
                       intermediariesDisabled={intermediariesDisabled}
+                      contactInfoDisabled={contactInfoDisabledAfterReception}
                     />
                   )}
                   title="Destination du déchet"

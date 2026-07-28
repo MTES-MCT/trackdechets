@@ -1,7 +1,11 @@
-import { Prisma } from "@td/prisma";
-import { prisma } from "@td/prisma";
+import { Prisma, prisma } from "@td/prisma";
 import { GenericWasteV2 } from "./types";
-import { IncomingWasteV2, OutgoingWasteV2, SsdWasteV2 } from "@td/codegen-back";
+import {
+  IncomingWasteV2,
+  OutgoingWasteV2,
+  SsdWasteV2,
+  AllWasteV2
+} from "@td/codegen-back";
 
 type CompanyCache = {
   [siret: string]: Prisma.CompanyGetPayload<{
@@ -12,9 +16,14 @@ type CompanyCache = {
   }>;
 };
 
-type WasteField = keyof (SsdWasteV2 & IncomingWasteV2 & OutgoingWasteV2);
+type WasteField =
+  | keyof SsdWasteV2
+  | keyof IncomingWasteV2
+  | keyof OutgoingWasteV2
+  | keyof AllWasteV2;
 
 const GIVEN_NAMES_AND_SIRET_FIELDS: [WasteField, WasteField][] = [
+  ["initialEmitterCompanyGivenName", "initialEmitterCompanySiret"],
   ["emitterCompanyGivenName", "emitterCompanySiret"],
   ["destinationCompanyGivenName", "destinationCompanySiret"],
   ["transporter1CompanyGivenName", "transporter1CompanySiret"],
@@ -30,7 +39,9 @@ export class CompanyCachedFetcher {
   async getCompanies(sirets: string[]): Promise<CompanyCache> {
     // Filter out sirets that are not in cache
     const dedupedSirets = [...new Set(sirets)].filter(Boolean) as string[];
-    const uncachedSirets = dedupedSirets.filter(siret => !this.cache[siret]);
+    const uncachedSirets = dedupedSirets.filter(
+      siret => !Object.prototype.hasOwnProperty.call(this.cache, siret)
+    );
 
     // If there are uncached sirets, fetch them from the database
     if (uncachedSirets.length > 0) {
@@ -49,8 +60,9 @@ export class CompanyCachedFetcher {
       newCompanies.forEach(company => {
         this.cache[company.orgId] = company;
       });
+
       uncachedSirets.forEach(siret => {
-        if (!this.cache[siret]) {
+        if (!Object.prototype.hasOwnProperty.call(this.cache, siret)) {
           this.cache[siret] = {
             orgId: siret,
             givenName: null
@@ -62,7 +74,7 @@ export class CompanyCachedFetcher {
     // Create result object with only the requested sirets
     const result: CompanyCache = {};
     dedupedSirets.forEach(siret => {
-      if (this.cache[siret]) {
+      if (Object.prototype.hasOwnProperty.call(this.cache, siret)) {
         result[siret] = this.cache[siret];
       }
     });
@@ -77,21 +89,25 @@ export class CompanyCachedFetcher {
     if (registryWaste.source !== "BSD") {
       return registryWaste;
     }
-    const sirets: string[] = [];
-    GIVEN_NAMES_AND_SIRET_FIELDS.forEach(([_, siretField]) => {
-      if (registryWaste[siretField]) {
-        sirets.push(registryWaste[siretField]);
-      }
+
+    const sirets = GIVEN_NAMES_AND_SIRET_FIELDS.flatMap(([, siretField]) => {
+      const orgId = registryWaste[siretField];
+      return typeof orgId === "string" && orgId ? [orgId] : [];
     });
 
     const companies = await this.getCompanies(sirets);
 
     GIVEN_NAMES_AND_SIRET_FIELDS.forEach(([givenNameField, siretField]) => {
-      if (registryWaste[siretField] && companies[registryWaste[siretField]]) {
-        registryWaste[givenNameField] =
-          companies[registryWaste[siretField]].givenName ?? null;
+      const orgId = registryWaste[siretField];
+
+      if (
+        typeof orgId === "string" &&
+        Object.prototype.hasOwnProperty.call(companies, orgId)
+      ) {
+        registryWaste[givenNameField] = companies[orgId].givenName ?? null;
       }
     });
+
     return registryWaste;
   }
 }

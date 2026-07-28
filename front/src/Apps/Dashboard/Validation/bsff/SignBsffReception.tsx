@@ -18,7 +18,7 @@ import {
 } from "@td/codegen-ui";
 
 import TdModal from "../../../common/Components/Modal/Modal";
-import { NotificationError } from "../../../common/Components/Error/Error";
+import { DsfrNotificationError } from "../../../common/Components/Error/Error";
 
 import {
   GET_BSFF_FORM,
@@ -60,7 +60,7 @@ export function SignBsffReception({ bsffId, onClose }: Props) {
     fetchPolicy: "network-only"
   });
 
-  const [updateBsff] = useMutation<
+  const [updateBsff, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsff">,
     MutationUpdateBsffArgs
   >(UPDATE_BSFF_FORM);
@@ -91,32 +91,36 @@ export function SignBsffReception({ bsffId, onClose }: Props) {
   };
 
   const onSubmit = async (form: FormData) => {
-    await updateBsff({
-      variables: {
-        id: bsff.id,
-        input: {
-          destination: {
-            reception: {
-              date: form.receptionDate
+    try {
+      await updateBsff({
+        variables: {
+          id: bsff.id,
+          input: {
+            destination: {
+              reception: {
+                date: form.receptionDate
+              }
             }
           }
         }
-      }
-    });
+      });
 
-    await signBsff({
-      variables: {
-        id: bsff.id,
-        input: {
-          type: BsffSignatureType.Reception,
-          author: form.signatureAuthor,
-          date: form.receptionDate
+      await signBsff({
+        variables: {
+          id: bsff.id,
+          input: {
+            type: BsffSignatureType.Reception,
+            author: form.signatureAuthor,
+            date: form.receptionDate
+          }
         }
-      }
-    });
+      });
 
-    reset();
-    onClose();
+      reset();
+      onClose();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -161,9 +165,14 @@ export function SignBsffReception({ bsffId, onClose }: Props) {
           </div>
 
           {/* ERROR */}
-          {error && (
+          {updateError && (
             <div className="fr-mb-4w">
-              <NotificationError apolloError={error} />
+              <DsfrNotificationError apolloError={updateError} />
+            </div>
+          )}
+          {error && (
+            <div className="fr-mb-8w">
+              {error && <DsfrNotificationError apolloError={error} />}
             </div>
           )}
 

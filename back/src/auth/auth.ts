@@ -55,7 +55,9 @@ enum LoginErrorCode {
   INVALID_CAPTCHA = "INVALID_CAPTCHA",
   TOTP_TIMEOUT_OR_MISSING_SESSION = "TOTP_TIMEOUT_OR_MISSING_SESSION",
   MISSING_TOTP = "MISSING_TOTP",
-  INVALID_TOTP = "INVALID_TOTP"
+  INVALID_TOTP = "INVALID_TOTP",
+  MFA_RESET_IN_PROGRESS = "MFA_RESET_IN_PROGRESS",
+  MFA_RESET_DONE_RECONFIG_REQUIRED = "MFA_RESET_DONE_RECONFIG_REQUIRED"
 }
 
 // verbose error message and related errored field
@@ -88,8 +90,28 @@ export const getLoginError = (username: string) => ({
   MISSING_TOTP: {
     code: LoginErrorCode.MISSING_TOTP,
     message: "Code d'authentification manquant"
+  },
+  MFA_RESET_IN_PROGRESS: {
+    code: LoginErrorCode.MFA_RESET_IN_PROGRESS,
+    message:
+      "Votre compte est temporairement suspendu dans le cadre d'une procédure de récupération en cours. Si vous n'êtes pas à l'origine de cette demande, contactez notre support via l'Assistance Trackdéchets."
+  },
+  MFA_RESET_DONE_RECONFIG_REQUIRED: {
+    code: LoginErrorCode.MFA_RESET_DONE_RECONFIG_REQUIRED,
+    message:
+      "Votre double authentification a été réinitialisée. Veuillez utiliser le lien reçu par e-mail pour reconfigurer votre double authentification. Si vous n'avez pas reçu ce lien ou s'il est expiré, contactez notre support via l'Assistance Trackdéchets."
   }
 });
+
+function getMfaResetLoginError(user: User, username: string) {
+  if (!user.mfaResetSuspended) {
+    return null;
+  }
+  if (user.mustReconfigureMfa) {
+    return { ...getLoginError(username).MFA_RESET_DONE_RECONFIG_REQUIRED };
+  }
+  return { ...getLoginError(username).MFA_RESET_IN_PROGRESS };
+}
 
 // apart from logging the user in, we perform captcha verifications:
 // - if user has performed less than FAILED_ATTEMPTS_BEFORE_CAPTCHA in the last FAILED_LOGIN_EXPIRATION seconds, perform as usual
@@ -146,6 +168,10 @@ passport.use(
             ...getLoginError(username).NOT_ACTIVATED
           });
         }
+        const mfaResetError = getMfaResetLoginError(user, username);
+        if (mfaResetError) {
+          return done(null, false, mfaResetError);
+        }
         if (needsTotp) {
           // we redirect to the totp page without logging the user in.
           // We store their email in a short-lived session to be retrieved on the 2nd factor page
@@ -183,8 +209,13 @@ passport.serializeUser((user: User, done) => {
 passport.deserializeUser((id: string, done) => {
   // Fetch the complete user from database using their ID
   prisma.user
-    .findUniqueOrThrow({ where: { id } })
-    .then(user => done(null, { ...user, auth: AuthType.Session }))
+    .findUnique({ where: { id } })
+    .then(user => {
+      if (!user) {
+        return done(null, false);
+      }
+      return done(null, { ...user, auth: AuthType.Session });
+    })
     .catch(err => done(err));
 });
 

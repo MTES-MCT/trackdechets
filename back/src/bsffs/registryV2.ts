@@ -38,6 +38,13 @@ import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
 import { logger } from "@td/logger";
 import { BsffWithTransporters } from "./types";
+import {
+  BSFF_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
+
+const getQuantity = (packagings: BsffPackaging[]) =>
+  formatGroupedPackagingQuantity(packagings, BSFF_PACKAGING_LABELS);
 
 const getInitialEmitterData = (bsff: RegistryV2Bsff) => {
   const initialEmitter: Record<string, string | null> = {
@@ -333,11 +340,12 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsff.weightValue),
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity,
@@ -565,12 +573,13 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsff.weightValue),
     volume: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity,
@@ -844,7 +853,7 @@ export const toTransportedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     weight: kgToTonRegistryV2(bsff.weightValue),
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: false,
     volume: null,
@@ -1088,6 +1097,7 @@ export const toAllWasteV2 = (
     ...emptyAllWasteV2,
     id: bsff.id,
     bsdId: bsff.id,
+    source: "BSD",
     createdAt: bsff.createdAt,
     updatedAt: bsff.updatedAt,
     transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
@@ -1101,11 +1111,12 @@ export const toAllWasteV2 = (
     wasteCode: bsff.wasteCode,
     wastePop: false,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsff.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: kgToTonRegistryV2(bsff.weightValue),
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity,
@@ -1296,6 +1307,7 @@ const minimalBsffForLookupSelect = {
   id: true,
   createdAt: true,
   destinationReceptionSignatureDate: true,
+  emitterEmissionSignatureDate: true,
   destinationReceptionDate: true,
   destinationCompanySiret: true,
   wasteCode: true,
@@ -1338,15 +1350,25 @@ const bsffToLookupCreateInputs = (
       bsffId: bsff.id
     });
   }
-  if (transporter?.transporterTransportSignatureDate) {
+
+  // le registre sortant est alimenté dès la signature émetteur,
+  // la date bascule sur la date d'enlèvement à la signature transporteur
+  const outgoingDate =
+    transporter?.transporterTransportTakenOverAt ??
+    transporter?.transporterTransportSignatureDate ??
+    bsff.emitterEmissionSignatureDate;
+
+  if (outgoingDate) {
     const sirets = new Set([
       bsff.emitterCompanySiret,
       ...bsff.detenteurCompanySirets
     ]);
+
     sirets.forEach(siret => {
       if (!siret) {
         return;
       }
+
       res.push({
         id: bsff.id,
         readableId: bsff.id,
@@ -1355,11 +1377,7 @@ const bsffToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsff.wasteCode,
-        ...generateDateInfos(
-          transporter.transporterTransportTakenOverAt ??
-            transporter.transporterTransportSignatureDate!,
-          bsff.createdAt
-        ),
+        ...generateDateInfos(outgoingDate, bsff.createdAt),
         bsffId: bsff.id
       });
     });

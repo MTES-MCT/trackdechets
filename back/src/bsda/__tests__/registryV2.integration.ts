@@ -26,7 +26,7 @@ describe("registryV2", () => {
     const incomingWaste = toIncomingWasteV2(dbBsda as RegistryV2Bsda);
 
     // Then
-    expect(incomingWaste.quantity).toBe(10);
+    expect(incomingWaste.quantity).toBe("3: Palette filmée | 7: Dépôt-bag");
   });
 
   it("quantity should be null if no packaging", async () => {

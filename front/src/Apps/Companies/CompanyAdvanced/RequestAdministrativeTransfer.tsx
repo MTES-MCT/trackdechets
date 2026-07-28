@@ -152,14 +152,14 @@ export function RequestAdministrativeTranfer({ company }: Props) {
               d'arrivée peut avoir plus de sous-profil TTR cochés, mais pas
               moins.
             </li>
-            <li>L'ensemble des bordereaux en attente est transféré.</li>
             <li>
               L'établissement d'arrivée devra valider le transfert depuis
               l'onglet "avancé de son établissement
             </li>
             <li>
-              L'ensemble des bordereaux (BSDD au statut "awaiting-group" et BSDA
-              au statut "awaiting-child" soit En attente de regroupement) sera
+              L'ensemble des bordereaux (BSDD au statut "awaiting-group", BSDA
+              au statut "awaiting-child" et les contenants des BSFF au statut
+              "intermediately_processed" (En attente de regroupement)) sera
               transféré (pas de sélection possible).
             </li>
             <li>L'opération est irréversible.</li>

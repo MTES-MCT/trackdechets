@@ -40,17 +40,20 @@ import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
 import { bsdaWasteQuantities } from "./utils";
+import {
+  BSDA_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
 
-const getQuantity = (packagings: Prisma.JsonValue) => {
-  if (!packagings || !(packagings as PackagingInfo[])?.length) {
-    return null;
-  }
-
-  return (packagings as PackagingInfo[])?.reduce(
-    (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
-    0
+const getQuantity = (packagings: Prisma.JsonValue) =>
+  formatGroupedPackagingQuantity(
+    packagings as PackagingInfo[] | null,
+    BSDA_PACKAGING_LABELS,
+    {
+      otherType: "OTHER",
+      useQuantityField: true
+    }
   );
-};
 
 const getInitialEmitterData = (bsda: RegistryV2Bsda) => {
   const initialEmitter: Record<string, string | null> = {
@@ -261,6 +264,7 @@ export const toIncomingWasteV2 = (
     wasteContainsElectricOrHybridVehicles: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity,
@@ -534,6 +538,7 @@ export const toOutgoingWasteV2 = (
     volume: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity,
@@ -1082,6 +1087,7 @@ export const toManagedWasteV2 = (
     managingEndDate: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity,
@@ -1353,6 +1359,7 @@ export const toAllWasteV2 = (
     ...emptyAllWasteV2,
     id: bsda.id,
     bsdId: bsda.id,
+    source: "BSD",
     createdAt: bsda.createdAt,
     updatedAt: bsda.updatedAt,
     transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
@@ -1372,6 +1379,7 @@ export const toAllWasteV2 = (
     weightIsEstimate: bsda.weightIsEstimate,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity,

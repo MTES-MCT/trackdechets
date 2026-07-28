@@ -3,18 +3,12 @@ import Modal from "../Modal/Modal";
 import { useCrisp } from "../../hooks/useCrisp";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import styles from "./Footer.module.scss";
-/**
- * ========================
- * TYPES
- * ========================
- */
+
 type Consent = {
-  crisp: boolean;
   matomo: boolean;
 };
 
 const DEFAULT_CONSENT: Consent = {
-  crisp: false,
   matomo: false
 };
 
@@ -23,87 +17,61 @@ const STORAGE_KEY = "cookie-consent";
 export default function AppFooter() {
   const [isOpen, setIsOpen] = useState(false);
   const [consent, setConsent] = useState<Consent>(DEFAULT_CONSENT);
-  const [hydrated, setHydrated] = useState(false);
   const [draft, setDraft] = useState<Consent>(DEFAULT_CONSENT);
-
   const [bannerVisible, setBannerVisible] = useState(false);
 
-  const allAccepted = draft.crisp && draft.matomo;
-  const allRefused = !draft.crisp && !draft.matomo;
+  useCrisp();
 
-  const acceptAll = () => {
-    saveConsent({ crisp: true, matomo: true });
+  const allAccepted = draft.matomo;
+  const allRefused = !draft.matomo;
+
+  const saveConsent = (newConsent: Consent) => {
+    setConsent(newConsent);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newConsent));
+    setIsOpen(false);
     setBannerVisible(false);
   };
 
+  const acceptAll = () => {
+    saveConsent({ matomo: true });
+  };
+
   const refuseAll = () => {
-    saveConsent({ crisp: false, matomo: false });
-    setBannerVisible(false);
+    saveConsent({ matomo: false });
   };
 
   const openModal = () => {
     setDraft(consent);
     setIsOpen(true);
   };
-  /**
-   * ========================
-   * LOAD CONSENT
-   * ========================
-   */
+
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
 
     if (!saved) {
       setConsent(DEFAULT_CONSENT);
-      setHydrated(true);
-      setBannerVisible(true); // afficher banner
+      setBannerVisible(true);
       return;
     }
 
     try {
-      const parsed: Consent = JSON.parse(saved);
-      setConsent(parsed);
+      const parsed: Partial<Consent> = JSON.parse(saved);
+
+      setConsent({
+        matomo: Boolean(parsed.matomo)
+      });
     } catch {
       localStorage.removeItem(STORAGE_KEY);
       setConsent(DEFAULT_CONSENT);
       setBannerVisible(true);
     }
-
-    setHydrated(true);
   }, []);
-
-  /**
-   * ========================
-   * SAVE CONSENT
-   * ========================
-   */
-  const saveConsent = (newConsent: Consent) => {
-    const crispChanged = newConsent.crisp !== consent.crisp;
-    setConsent(newConsent);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newConsent));
-    setIsOpen(false);
-    setBannerVisible(false); // important
-    if (crispChanged) {
-      // reload
-      window.location.reload();
-    }
-  };
-
-  /**
-   * ========================
-   * CRISP ACTIVATION
-   * ========================
-   */
-  useCrisp(hydrated && consent.crisp);
 
   return (
     <>
-      {/* ================= FOOTER ================= */}
       <footer className="fr-footer" role="contentinfo">
         <div className="fr-container">
-          {/* ===== BODY ===== */}
           <div className="fr-footer__body">
-            {/* BRAND */}
             <div className="fr-footer__brand">
               <p className="fr-logo">
                 République
@@ -121,7 +89,6 @@ export default function AppFooter() {
               </p>
             </div>
 
-            {/* CONTENT */}
             <div className="fr-footer__content">
               <p className="fr-footer__content-desc">
                 Trackdéchets est un service numérique du Ministère en charge de
@@ -164,7 +131,6 @@ export default function AppFooter() {
             </div>
           </div>
 
-          {/* ===== BOTTOM ===== */}
           <div className="fr-footer__bottom">
             <ul className="fr-footer__bottom-list">
               <li className="fr-footer__bottom-item">
@@ -190,9 +156,7 @@ export default function AppFooter() {
               <li className="fr-footer__bottom-item">
                 <a
                   className="fr-footer__bottom-link"
-                  href="/Mentions-legales.pdf"
-                  target="_blank"
-                  rel="noopener"
+                  href="//trackdechets.beta.gouv.fr/mentions-legales/"
                 >
                   Mentions légales
                 </a>
@@ -201,9 +165,7 @@ export default function AppFooter() {
               <li className="fr-footer__bottom-item">
                 <a
                   className="fr-footer__bottom-link"
-                  href="/Politique-de-confidentialite.pdf"
-                  target="_blank"
-                  rel="noopener"
+                  href="//trackdechets.beta.gouv.fr/politiques-confidentialites/"
                 >
                   Politique de confidentialité
                 </a>
@@ -218,7 +180,6 @@ export default function AppFooter() {
                 </a>
               </li>
 
-              {/* COOKIE MANAGEMENT */}
               <li className="fr-footer__bottom-item">
                 <button
                   type="button"
@@ -255,7 +216,7 @@ export default function AppFooter() {
           </div>
         </div>
       </footer>
-      {/* ================= MODALE COOKIES ================= */}
+
       <Modal
         ariaLabel="Gestion des cookies"
         isOpen={isOpen}
@@ -264,7 +225,6 @@ export default function AppFooter() {
         hasFooter
       >
         <div className="fr-mb-3w">
-          {/* ================= HEADER ================= */}
           <div className="fr-mb-2w">
             <h1 className="fr-h3 fr-mb-1w">
               Les informations que nous collectons
@@ -283,20 +243,12 @@ export default function AppFooter() {
             </p>
           </div>
 
-          {/* ================= BODY ================= */}
-
-          {/* ACTIONS GLOBAL */}
           <div className="fr-btns-group fr-btns-group--inline fr-btns-group--right fr-mb-4w">
             <button
               type="button"
               className="fr-btn"
               disabled={allAccepted}
-              onClick={() =>
-                setDraft({
-                  crisp: true,
-                  matomo: true
-                })
-              }
+              onClick={() => setDraft({ matomo: true })}
             >
               Tout accepter
             </button>
@@ -305,56 +257,19 @@ export default function AppFooter() {
               type="button"
               className="fr-btn fr-btn--secondary"
               disabled={allRefused}
-              onClick={() =>
-                setDraft({
-                  crisp: false,
-                  matomo: false
-                })
-              }
+              onClick={() => setDraft({ matomo: false })}
             >
               Tout refuser
             </button>
           </div>
 
           <hr className="fr-mb-3w" />
-          {/* ================= LIST ================= */}
-
-          {/* CRISP */}
-
-          <section className="fr-mb-4w">
-            <ToggleSwitch
-              label="Chatbox Crisp"
-              checked={draft.crisp}
-              onChange={() => setDraft({ ...draft, crisp: !draft.crisp })}
-              classes={{
-                label: styles.label
-              }}
-            />
-
-            <p className="fr-text--sm fr-mt-2w fr-ml-9w">
-              Le Crisp chatbox, qui opère sur le site web Trackdéchets, utilise
-              des cookies. Ce dépôt est soumis à votre consentement pour
-              l’utilisation du service. Les cookies sont uniquement utilisés
-              conformément à ses éléments : Ces cookies sont nécessaires aux
-              fonctionnalités du chatbox et ont une durée d’expiration de 6
-              mois. Ces cookies lient un utilisateur à une seule session,
-              détruite après 30 minutes après leur dernier accès au site. Les
-              cookies ne sont pas utilisés à des fins de traçage. L'adresse IP
-              de l'utilisateur est stockée dans un serveur mémorisant les
-              données de la session de navigation lié au cookie. La durée de
-              conservation est à minima d’un an. Vous pouvez consulter le détail
-              des informations sur la page
-            </p>
-          </section>
-
-          <hr className="fr-mb-4w" />
-          {/* MATOMO */}
 
           <section className="fr-mb-4w">
             <ToggleSwitch
               label="Matomo"
               checked={draft.matomo}
-              onChange={() => setDraft({ ...draft, matomo: !draft.matomo })}
+              onChange={() => setDraft({ matomo: !draft.matomo })}
               classes={{
                 label: styles.label
               }}
@@ -368,9 +283,12 @@ export default function AppFooter() {
 
           <hr className="fr-mb-4w" />
 
-          {/* ================= FOOTER ================= */}
           <div className="fr-btns-group fr-btns-group--inline fr-btns-group--right fr-mb-4w">
-            <button className="fr-btn" onClick={() => saveConsent(draft)}>
+            <button
+              type="button"
+              className="fr-btn"
+              onClick={() => saveConsent(draft)}
+            >
               Sauvegarder
             </button>
           </div>
@@ -425,15 +343,19 @@ export default function AppFooter() {
               gap: "8px"
             }}
           >
-            <button className="fr-btn" onClick={acceptAll}>
+            <button type="button" className="fr-btn" onClick={acceptAll}>
               Accepter
             </button>
 
-            <button className="fr-btn" onClick={refuseAll}>
+            <button type="button" className="fr-btn" onClick={refuseAll}>
               Refuser
             </button>
 
-            <button className="fr-btn fr-btn--tertiary" onClick={openModal}>
+            <button
+              type="button"
+              className="fr-btn fr-btn--tertiary"
+              onClick={openModal}
+            >
               En savoir plus
             </button>
           </div>

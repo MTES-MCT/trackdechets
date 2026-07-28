@@ -16,6 +16,7 @@ import { envConfig } from "../common/envConfig";
 function getErrorMessage(errorCode: string): {
   description: string | React.ReactElement;
   title?: string;
+  severity?: "error" | "info" | "success" | "warning";
 } {
   if (errorCode === "NOT_ACTIVATED") {
     return {
@@ -54,8 +55,54 @@ function getErrorMessage(errorCode: string): {
 
   if (errorCode === "TOTP_TIMEOUT_OR_MISSING_SESSION") {
     return {
-      description:
-        "Le délai d'attente pour remplir votre code d'authentification est dépassé, merci de recommencer la procédure"
+      description: "Votre session a expiré. Veuillez vous reconnecter."
+    };
+  }
+
+  if (errorCode === "MFA_RESET_IN_PROGRESS") {
+    return {
+      title: "MFA en cours de réinitialisation",
+      severity: "info",
+      description: (
+        <>
+          La réinitialisation du MFA a été demandée pour ce compte. Merci de
+          vérifier vos mails afin de finaliser la procédure. Si vous n'êtes pas
+          à l'origine de cette demande, contactez notre support via l'Assistance
+          Trackdéchets.{" "}
+          <a
+            href="https://assistance.trackdechets.beta.gouv.fr/"
+            className="fr-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Contacter l'assistance
+          </a>
+        </>
+      )
+    };
+  }
+
+  if (errorCode === "MFA_RESET_DONE_RECONFIG_REQUIRED") {
+    return {
+      title: "Double authentification réinitialisée",
+      severity: "warning",
+      description: (
+        <>
+          Votre double authentification a été réinitialisée. Pour vous
+          reconnecter, utilisez le lien de reconfiguration reçu par e-mail.
+          <br />
+          Si vous n'avez pas reçu cet e-mail, s'il est expiré ou déjà utilisé,
+          contactez notre support.{" "}
+          <a
+            href="https://assistance.trackdechets.beta.gouv.fr"
+            className="fr-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Contacter l'Assistance Trackdéchets
+          </a>
+        </>
+      )
     };
   }
 
@@ -126,7 +173,7 @@ export default function Login() {
       <Alert
         title={errorObject.title ?? "Erreur"}
         description={errorObject.description}
-        severity="error"
+        severity={errorObject.severity ?? "error"}
       />
     </div>
   ) : null;

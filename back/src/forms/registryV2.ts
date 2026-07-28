@@ -40,6 +40,10 @@ import {
 } from "@td/constants";
 import { logger } from "@td/logger";
 import { FormForElastic } from "./elastic";
+import {
+  BSDD_PACKAGING_LABELS,
+  formatGroupedPackagingQuantity
+} from "../registryV2/packagings";
 
 const getInitialEmitterData = (bsdd: BsddV2) => {
   const initialEmitter: Record<string, string | null> = {
@@ -130,14 +134,14 @@ const getFinalOperationsData = (bsdd: BsddV2) => {
   };
 };
 
-const getQuantity = (packagings: PackagingInfo[]) => {
-  if (!packagings) {
-    return null;
+const getQuantity = (packagings: PackagingInfo[], isDirectSupply: boolean) => {
+  if (isDirectSupply) {
+    return `N/A: ${BSDD_PACKAGING_LABELS.PIPELINE}`;
   }
-  return packagings.reduce(
-    (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
-    0
-  );
+
+  return formatGroupedPackagingQuantity(packagings, BSDD_PACKAGING_LABELS, {
+    useQuantityField: true
+  });
 };
 
 const getWasteType = (bsdd: MinimalBsddForLookup): RegistryExportWasteType => {
@@ -252,11 +256,12 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity,
@@ -521,12 +526,13 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     weightIsEstimate: bsdd.weightIsEstimate,
     volume: null,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyName,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
@@ -804,7 +810,7 @@ export const toTransportedWasteV2 = (
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
     weight: bsdd.weightValue,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsdd.weightIsEstimate,
     volume: null,
@@ -1064,7 +1070,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     weightIsEstimate: bsdd.weightIsEstimate,
@@ -1072,6 +1078,7 @@ export const toManagedWasteV2 = (
     managingStartDate: null,
     managingEndDate: null,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyName,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
@@ -1338,6 +1345,7 @@ export const toAllWasteV2 = (
     ...emptyAllWasteV2,
     id: bsdd.id,
     bsdId: bsdd.id,
+    source: "BSD",
     createdAt: bsdd.createdAt,
     updatedAt: bsdd.updatedAt,
     transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
@@ -1351,11 +1359,12 @@ export const toAllWasteV2 = (
     wasteCode: bsdd.wasteCode,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: getQuantity(bsdd.packagings),
+    quantity: getQuantity(bsdd.packagings, bsdd.isDirectSupply),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     weightIsEstimate: bsdd.weightIsEstimate,
     initialEmitterCompanySiret,
+    initialEmitterCompanyGivenName: null,
     initialEmitterCompanyName,
     initialEmitterCompanyAddress,
     initialEmitterCompanyPostalCode,
