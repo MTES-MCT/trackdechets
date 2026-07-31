@@ -93,6 +93,7 @@ export const ZodOperationEnum = z
 
 const bsffPackagingSchema = z
   .object({
+    id: z.string().nullish(),
     type: z.nativeEnum(BsffPackagingType),
     other: z.string().max(250).nullish(),
     quantity: z.coerce.number().nonnegative().nullish(),

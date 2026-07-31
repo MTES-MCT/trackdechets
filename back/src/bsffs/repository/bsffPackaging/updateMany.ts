@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { bsffEventTypes } from "../types";
+import { checkPackagingGroupIntegrity } from "./checkPackagingGroupIntegrity";
 
 export type UpdateManyBsffPackagingsFn = (
   args: Prisma.BsffPackagingUpdateManyArgs,
@@ -17,7 +18,20 @@ export function buildUpdateManyBsffPackagings(
     const { prisma, user } = deps;
 
     const update = await prisma.bsffPackaging.updateMany(args);
+    if (args.data.bsffId) {
+  const packagings = await prisma.bsffPackaging.findMany({
+    where: args.where,
+    select: { id: true }
+  });
 
+  for (const packaging of packagings) {
+    await checkPackagingGroupIntegrity(
+      packaging.id,
+      args.data.bsffId as string,
+      prisma
+    );
+  }
+}
     const updatedBsffPackagings = await prisma.bsffPackaging.findMany({
       where: args.where,
       select: { bsffId: true }

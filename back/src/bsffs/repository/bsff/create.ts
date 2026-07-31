@@ -22,6 +22,14 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
     logMetadata?: LogMetadata
   ) => {
     const { prisma, user } = deps;
+    
+        if (!args.data.rowNumber) {
+      const maxBsff = await prisma.bsff.findFirst({
+        orderBy: { rowNumber: 'desc' },
+        select: { rowNumber: true }
+      });
+      args.data.rowNumber = (maxBsff?.rowNumber ?? 0) + 1;
+    }
 
     const bsff = await prisma.bsff.create(args);
 
@@ -38,6 +46,16 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
+    // Si le BSFF a des fiches d'intervention et des packagings,
+    // on fait le lien entre eux
+    // if (fullBsff.ficheInterventions?.length && fullBsff.packagings?.length) {
+    //   await addBsffPackagingsFichesIntervention(
+    //     fullBsff.packagings,
+    //     fullBsff.ficheInterventions,
+    //     prisma
+    //   );
+    // }
+    
     // update transporters ordering when connecting transporters records
     if (
       args.data.transporters?.connect &&
