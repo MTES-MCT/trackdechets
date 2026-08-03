@@ -34,7 +34,9 @@ describe("getOrgIdsByTab", () => {
   let transporter2: UserWithCompany;
   let destination: UserWithCompany;
   let detenteur: UserWithCompany;
+  let detenteur2: UserWithCompany;
   let ficheIntervention: BsffFicheIntervention;
+  let ficheIntervention2: BsffFicheIntervention;
 
   beforeEach(async () => {
     emitter = await userWithCompanyFactory();
@@ -42,6 +44,7 @@ describe("getOrgIdsByTab", () => {
     transporter2 = await userWithCompanyFactory();
     destination = await userWithCompanyFactory();
     detenteur = await userWithCompanyFactory();
+    detenteur2 = await userWithCompanyFactory();
     ficheIntervention = await prisma.bsffFicheIntervention.create({
       data: {
         numero: "FI",
@@ -50,6 +53,22 @@ describe("getOrgIdsByTab", () => {
         detenteurCompanyAddress: detenteur.company.address!,
         weight: 1,
         postalCode: "13001",
+        operateurCompanySiret: emitter.company.siret!,
+        operateurCompanyName: emitter.company.name,
+        operateurCompanyAddress: emitter.company.address!,
+        operateurCompanyContact: emitter.company.contact!,
+        operateurCompanyMail: emitter.company.contactEmail!,
+        operateurCompanyPhone: emitter.company.contactPhone!
+      }
+    });
+    ficheIntervention2 = await prisma.bsffFicheIntervention.create({
+      data: {
+        numero: "FI2",
+        detenteurCompanySiret: detenteur2.company.siret,
+        detenteurCompanyName: detenteur2.company.name,
+        detenteurCompanyAddress: detenteur2.company.address!,
+        weight: 7,
+        postalCode: "31100",
         operateurCompanySiret: emitter.company.siret!,
         operateurCompanyName: emitter.company.name,
         operateurCompanyAddress: emitter.company.address!,
@@ -92,6 +111,9 @@ describe("getOrgIdsByTab", () => {
               ]
             }
           },
+          packagingData: {
+            ficheInterventions: { connect: { id: ficheIntervention2.id } }
+          },
           userId: roles[role].user.id
         }
       );
@@ -113,6 +135,9 @@ describe("getOrgIdsByTab", () => {
               { transporterCompanySiret: transporter2.company.siret, number: 2 }
             ]
           }
+        },
+        packagingData: {
+          ficheInterventions: { connect: { id: ficheIntervention2.id } }
         }
       }
     );
@@ -123,6 +148,7 @@ describe("getOrgIdsByTab", () => {
     expect(isFollowFor).toContain(transporter2.company.siret);
     expect(isFollowFor).toContain(destination.company.siret);
     expect(isFollowFor).toContain(detenteur.company.siret);
+    expect(isFollowFor).toContain(detenteur2.company.siret);
   });
 
   test("status SIGNED_BY_EMITTER", async () => {
@@ -137,6 +163,9 @@ describe("getOrgIdsByTab", () => {
               { transporterCompanySiret: transporter2.company.siret, number: 2 }
             ]
           }
+        },
+        packagingData: {
+          ficheInterventions: { connect: { id: ficheIntervention2.id } }
         }
       }
     );
@@ -147,6 +176,7 @@ describe("getOrgIdsByTab", () => {
     expect(isFollowFor).toContain(transporter2.company.siret);
     expect(isFollowFor).toContain(destination.company.siret);
     expect(isFollowFor).toContain(detenteur.company.siret);
+    expect(isFollowFor).toContain(detenteur2.company.siret);
   });
 
   test("status SENT (first transporter has signed)", async () => {
@@ -155,6 +185,9 @@ describe("getOrgIdsByTab", () => {
       {
         data: {
           ficheInterventions: { connect: { id: ficheIntervention.id } }
+        },
+        packagingData: {
+          ficheInterventions: { connect: { id: ficheIntervention2.id } }
         }
       }
     );
@@ -177,6 +210,7 @@ describe("getOrgIdsByTab", () => {
     // permet une réception anticipé même si le transporteur n°2 n'a pas signé
     expect(isForActionFor).toContain(destination.company.siret);
     expect(isFollowFor).toContain(detenteur.company.siret);
+    expect(isFollowFor).toContain(detenteur2.company.siret);
   });
 
   test("status SENT (second transporter has signed)", async () => {
@@ -185,6 +219,9 @@ describe("getOrgIdsByTab", () => {
       {
         data: {
           ficheInterventions: { connect: { id: ficheIntervention.id } }
+        },
+        packagingData: {
+          ficheInterventions: { connect: { id: ficheIntervention2.id } }
         }
       }
     );
@@ -217,6 +254,7 @@ describe("getOrgIdsByTab", () => {
     expect(isCollectedFor).toContain(transporter2.company.siret);
     expect(isForActionFor).toContain(destination.company.siret);
     expect(isFollowFor).toContain(detenteur.company.siret);
+    expect(isFollowFor).toContain(detenteur2.company.siret);
   });
 
   test("status RECEIVED", async () => {
@@ -225,6 +263,9 @@ describe("getOrgIdsByTab", () => {
       {
         data: {
           ficheInterventions: { connect: { id: ficheIntervention.id } }
+        },
+        packagingData: {
+          ficheInterventions: { connect: { id: ficheIntervention2.id } }
         }
       }
     );
@@ -244,6 +285,7 @@ describe("getOrgIdsByTab", () => {
     expect(isFollowFor).toContain(transporter2.company.siret);
     expect(isForActionFor).toContain(destination.company.siret);
     expect(isFollowFor).toContain(detenteur.company.siret);
+    expect(isFollowFor).toContain(detenteur2.company.siret);
   });
 
   test("status ACCEPTED", async () => {
@@ -252,6 +294,9 @@ describe("getOrgIdsByTab", () => {
       {
         data: {
           ficheInterventions: { connect: { id: ficheIntervention.id } }
+        },
+        packagingData: {
+          ficheInterventions: { connect: { id: ficheIntervention2.id } }
         }
       }
     );
@@ -260,6 +305,7 @@ describe("getOrgIdsByTab", () => {
     expect(isFollowFor).toContain(transporter.company.siret);
     expect(isForActionFor).toContain(destination.company.siret);
     expect(isFollowFor).toContain(detenteur.company.siret);
+    expect(isFollowFor).toContain(detenteur2.company.siret);
   });
 
   test("status PROCESSED", async () => {
@@ -268,6 +314,9 @@ describe("getOrgIdsByTab", () => {
       {
         data: {
           ficheInterventions: { connect: { id: ficheIntervention.id } }
+        },
+        packagingData: {
+          ficheInterventions: { connect: { id: ficheIntervention2.id } }
         }
       }
     );
@@ -276,6 +325,7 @@ describe("getOrgIdsByTab", () => {
     expect(isArchivedFor).toContain(transporter.company.siret);
     expect(isArchivedFor).toContain(destination.company.siret);
     expect(isArchivedFor).toContain(detenteur.company.siret);
+    expect(isArchivedFor).toContain(detenteur2.company.siret);
   });
 
   test("status INTERMEDIATELY_PROCESSED", async () => {
@@ -286,7 +336,10 @@ describe("getOrgIdsByTab", () => {
           status: "INTERMEDIATELY_PROCESSED",
           ficheInterventions: { connect: { id: ficheIntervention.id } }
         },
-        packagingData: { operationCode: "R13" }
+        packagingData: {
+          operationCode: "R13",
+          ficheInterventions: { connect: { id: ficheIntervention2.id } }
+        }
       }
     );
     const { isFollowFor } = getOrgIdsByTab(bsff);
@@ -294,6 +347,7 @@ describe("getOrgIdsByTab", () => {
     expect(isFollowFor).toContain(transporter.company.siret);
     expect(isFollowFor).toContain(destination.company.siret);
     expect(isFollowFor).toContain(detenteur.company.siret);
+    expect(isFollowFor).toContain(detenteur2.company.siret);
   });
 
   describe("isReturnFor", () => {
@@ -395,6 +449,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
   let destination: UserWithCompany;
   let detenteur1: UserWithCompany;
   let detenteur2: UserWithCompany;
+  let detenteur3: UserWithCompany;
   let bsff: any;
   let elasticBsff: BsdElastic;
 
@@ -415,6 +470,9 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     detenteur2 = await userWithCompanyFactory("MEMBER", {
       name: "Détenteur 2"
     });
+    detenteur3 = await userWithCompanyFactory("MEMBER", {
+      name: "Détenteur 3"
+    });
     const ficheIntervention1 = await createFicheIntervention({
       operateur: emitter,
       detenteur: detenteur1
@@ -423,12 +481,23 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
       operateur: emitter,
       detenteur: detenteur2
     });
-
-    bsff = await createBsff({
-      emitter,
-      transporter,
-      destination
+    const ficheIntervention3 = await createFicheIntervention({
+      operateur: emitter,
+      detenteur: detenteur3
     });
+
+    bsff = await createBsff(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        packagingData: {
+          ficheInterventions: { connect: { id: ficheIntervention3.id } }
+        }
+      }
+    );
     await prisma.bsff.update({
       where: { id: bsff.id },
       data: {
@@ -455,6 +524,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsff.companyNames).toContain(destination.company.name);
     expect(elasticBsff.companyNames).toContain(detenteur1.company.name);
     expect(elasticBsff.companyNames).toContain(detenteur2.company.name);
+    expect(elasticBsff.companyNames).toContain(detenteur3.company.name);
   });
 
   test("companyOrgIds > should contain the orgIds of ALL BSFF companies", async () => {
@@ -464,5 +534,6 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsff.companyOrgIds).toContain(destination.company.siret);
     expect(elasticBsff.companyOrgIds).toContain(detenteur1.company.siret);
     expect(elasticBsff.companyOrgIds).toContain(detenteur2.company.siret);
+    expect(elasticBsff.companyOrgIds).toContain(detenteur3.company.siret);
   });
 });

@@ -12,7 +12,6 @@ import { getBsffFicheInterventionRepository } from "../../repository";
 const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsff"] =
   async (_, { id, input }, context) => {
     const user = checkIsAuthenticated(context);
-    const ficheInterventionData = flattenFicheInterventionBsffInput(input);
 
     const existingFicheIntervention = await getFicheInterventionBsffOrNotFound({
       id
@@ -21,6 +20,13 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
       user,
       existingFicheIntervention,
       input
+    );
+
+    // 👇 On extrait packagings avant de flatten
+    const { packagings, ...ficheInterventionInput } = input;
+
+    const ficheInterventionData = flattenFicheInterventionBsffInput(
+      ficheInterventionInput
     );
 
     const futureFicheIntervention = {
@@ -34,8 +40,20 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
       getBsffFicheInterventionRepository(user);
 
     const updatedFicheIntervention = await updateBsffFicheIntervention({
-      data: ficheInterventionData,
-      where: { id: existingFicheIntervention.id }
+      where: { id: existingFicheIntervention.id },
+      data: {
+        ...ficheInterventionData,
+        // 👇 Si packagings fourni : on reset et reconnecte
+        // Si non fourni : on ne touche pas aux relations existantes
+        ...(packagings !== undefined
+          ? {
+              packagings: {
+                set: [],
+                connect: packagings.map(id => ({ id }))
+              }
+            }
+          : {})
+      }
     });
 
     return expandFicheInterventionBsffFromDB(updatedFicheIntervention);

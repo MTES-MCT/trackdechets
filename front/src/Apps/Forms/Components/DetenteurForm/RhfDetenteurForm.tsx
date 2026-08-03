@@ -48,7 +48,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   const selectedOrgId = watch(`${companyField}.orgId`);
 
   const sealedFields = useContext(SealedFieldsContext);
-
   const hasInitializedTracerFluide = useRef(false);
   useEffect(() => {
     if (!isTracerFluide || hasInitializedTracerFluide.current) return;
@@ -93,108 +92,108 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
     const isEmpty = !currentIdentifier;
     const isSameCompany = currentIdentifier === emitterIdentifier;
 
-if (isEmpty || isSameCompany) {
-  setValue(`${companyField}.orgId`, emitterCompany.orgId);
-  setValue(`${companyField}.siret`, emitterCompany.siret);
+    if (isEmpty || isSameCompany) {
+      setValue(`${companyField}.orgId`, emitterCompany.orgId);
+      setValue(`${companyField}.siret`, emitterCompany.siret);
 
-  if (!current?.name) {
-    setValue(`${companyField}.name`, emitterCompany.name);
-  }
+      if (!current?.name) {
+        setValue(`${companyField}.name`, emitterCompany.name);
+      }
 
-  if (!current?.address) {
-    setValue(`${companyField}.address`, emitterCompany.address);
-  }
+      if (!current?.address) {
+        setValue(`${companyField}.address`, emitterCompany.address);
+      }
 
-  if (!current?.contact) {
-    setValue(`${companyField}.contact`, emitterCompany.contact);
-  }
+      if (!current?.contact) {
+        setValue(`${companyField}.contact`, emitterCompany.contact);
+      }
 
-  if (!current?.phone) {
-    setValue(`${companyField}.phone`, emitterCompany.phone);
-  }
+      if (!current?.phone) {
+        setValue(`${companyField}.phone`, emitterCompany.phone);
+      }
 
-  if (!current?.mail) {
-    setValue(`${companyField}.mail`, emitterCompany.mail);
-  }
-}
+      if (!current?.mail) {
+        setValue(`${companyField}.mail`, emitterCompany.mail);
+      }
+    }
 
-hasInitializedInstallationDetenteur.current = true;
-}, [isInstallationType, emitterCompany, companyField, getValues, setValue]);
+    hasInitializedInstallationDetenteur.current = true;
+  }, [isInstallationType, emitterCompany, companyField, getValues, setValue]);
 
-const syncCompanyWithoutOverriding = (company: any) => {
-  const current = getValues(companyField);
-  const currentOrgId = current?.orgId || current?.siret;
-  const newOrgId = company.orgId || company.siret;
-  const isNewCompany = currentOrgId !== newOrgId;
+  const syncCompanyWithoutOverriding = (company: any) => {
+    const current = getValues(companyField);
+    const currentOrgId = current?.orgId || current?.siret;
+    const newOrgId = company.orgId || company.siret;
+    const isNewCompany = currentOrgId !== newOrgId;
 
-  setValue(`${companyField}.orgId`, company.orgId);
-  setValue(`${companyField}.siret`, company.siret);
+    setValue(`${companyField}.orgId`, company.orgId);
+    setValue(`${companyField}.siret`, company.siret);
 
-  setValue(
-    `${companyField}.name`,
-    isNewCompany ? company.name : current?.name ?? company.name
+    setValue(
+      `${companyField}.name`,
+      isNewCompany ? company.name : current?.name ?? company.name
+    );
+
+    setValue(
+      `${companyField}.address`,
+      isNewCompany ? company.address : current?.address ?? company.address
+    );
+
+    setValue(
+      `${companyField}.contact`,
+      isNewCompany ? company.contact : current?.contact ?? company.contact
+    );
+
+    setValue(
+      `${companyField}.phone`,
+      isNewCompany
+        ? company.contactPhone
+        : current?.phone ?? company.contactPhone
+    );
+
+    setValue(
+      `${companyField}.mail`,
+      isNewCompany
+        ? company.contactEmail
+        : current?.mail ?? company.contactEmail
+    );
+  };
+
+  // ======================================================
+  // NOUVELLE FONCTIONNALITÉ : synchronisation fiche ↔ contenants
+  // ======================================================
+
+  const ficheInterventions = watch("ficheInterventions");
+
+  // le numéro saisi dans CETTE fiche
+  const currentNumero = watch(`${fieldName}.numero`);
+
+  // la fiche correspondant au numéro
+  const currentFicheIntervention = ficheInterventions?.find(
+    fi => fi.numero === currentNumero
   );
 
-  setValue(
-    `${companyField}.address`,
-    isNewCompany ? company.address : current?.address ?? company.address
-  );
+  React.useEffect(() => {
+    if (!currentFicheIntervention) return;
 
-  setValue(
-    `${companyField}.contact`,
-    isNewCompany ? company.contact : current?.contact ?? company.contact
-  );
+    const alreadyLinked = (currentFicheIntervention.packagings ?? [])
+      .map((p: any) => p.numero)
+      .filter(Boolean);
 
-  setValue(
-    `${companyField}.phone`,
-    isNewCompany
-      ? company.contactPhone
-      : current?.phone ?? company.contactPhone
-  );
+    if (!alreadyLinked.length) return;
 
-  setValue(
-    `${companyField}.mail`,
-    isNewCompany
-      ? company.contactEmail
-      : current?.mail ?? company.contactEmail
-  );
-};
+    const current = watch(`${fieldName}.contenantsRattaches`) ?? [];
 
-// ======================================================
-// NOUVELLE FONCTIONNALITÉ : synchronisation fiche ↔ contenants
-// ======================================================
-
-const ficheInterventions = watch("ficheInterventions");
-
-// le numéro saisi dans CETTE fiche
-const currentNumero = watch(`${fieldName}.numero`);
-
-// la fiche correspondant au numéro
-const currentFicheIntervention = ficheInterventions?.find(
-  fi => fi.numero === currentNumero
-);
-
-React.useEffect(() => {
-  if (!currentFicheIntervention) return;
-
-  const alreadyLinked = (currentFicheIntervention.packagings ?? [])
-    .map((p: any) => p.numero)
-    .filter(Boolean);
-
-  if (!alreadyLinked.length) return;
-
-  const current = watch(`${fieldName}.contenantsRattaches`) ?? [];
-
-  if (current.length === 0) {
-    setValue(`${fieldName}.contenantsRattaches`, alreadyLinked);
-  }
-}, [
-  currentFicheIntervention?.numero,
-  currentFicheIntervention?.packagings,
-  fieldName,
-  setValue,
-  watch
-]);
+    if (current.length === 0) {
+      setValue(`${fieldName}.contenantsRattaches`, alreadyLinked);
+    }
+  }, [
+    currentFicheIntervention?.numero,
+    currentFicheIntervention?.packagings,
+    fieldName,
+    setValue,
+    watch
+  ]);
 
   return (
     <div className="fr-col-12">
@@ -342,9 +341,7 @@ React.useEffect(() => {
             </div>
           </div>
 
-
-
-         {/* CONTENANTS RATTACHÉS */}
+          {/* CONTENANTS RATTACHÉS */}
           {packagingInfos.length > 0 && (
             <>
               <h4 className="fr-mt-4w">Contenants rattachés</h4>

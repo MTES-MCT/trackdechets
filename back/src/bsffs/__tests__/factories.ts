@@ -128,10 +128,21 @@ export async function createBsff(
     };
   }
   const include = {
-    packagings: { include: { previousPackagings: true } },
+    packagings: {
+      include: { previousPackagings: true, ficheInterventions: true }
+    },
     transporters: true,
     ficheInterventions: true
   };
+
+  // Génère un rowNumber unique si pas fourni
+  if (!input.rowNumber) {
+    const maxBsff = await prisma.bsff.findFirst({
+      orderBy: { rowNumber: "desc" },
+      select: { rowNumber: true }
+    });
+    input.rowNumber = (maxBsff?.rowNumber ?? 0) + 1;
+  }
 
   const created = await prisma.bsff.create({
     data: input,
