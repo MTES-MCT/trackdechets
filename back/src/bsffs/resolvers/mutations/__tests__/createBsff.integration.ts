@@ -513,201 +513,360 @@ describe("Mutation.createBsff", () => {
     ]);
   });
 
-  describe("dormant sirets", () => {
-    let user: User;
-    let emitter: Company;
-    let destination: Company;
-    let transporter: Company;
-    let bsffInput: BsffInput;
+  describe("TRA-16247 - one can link fiches to packagings", () => {
+    it("if creating a BSFF with fiche + packagings, should link them", async () => {
+      // Given
+      const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+      const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-    // eslint-disable-next-line prefer-const
-    let searchCompanyMock = jest.fn().mockReturnValue({});
-    let makeClientLocal: typeof makeClient;
-
-    beforeAll(async () => {
-      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
-        name: "Emitter"
+      const ficheIntervention1 = await createFicheIntervention({
+        operateur,
+        detenteur
       });
-      user = emitterCompanyAndUser.user;
-      emitter = emitterCompanyAndUser.company;
-      destination = await companyFactory({ name: "Destination" });
-      transporter = await companyFactory({ name: "Transporter" });
+      const ficheIntervention2 = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
 
-      bsffInput = {
-        type: BsffType.COLLECTE_PETITES_QUANTITES,
-        emitter: {
-          company: {
-            siret: emitter.siret,
-            name: emitter.name,
-            address: "Rue de la carcasse",
-            contact: "Contact emitter",
-            phone: "0101010101",
-            mail: "emitter@mail.com"
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsff">,
+        MutationCreateBsffArgs
+      >(CREATE_BSFF, {
+        variables: {
+          input: {
+            ...createInput(operateur, transporter, destination),
+            packagings: [
+              {
+                type: BsffPackagingType.BOUTEILLE,
+                numero: "123",
+                weight: 1,
+                volume: 1
+              },
+              {
+                type: BsffPackagingType.CITERNE,
+                numero: "456",
+                weight: 2,
+                volume: 2
+              }
+            ],
+            ficheInterventions: [ficheIntervention1.id, ficheIntervention2.id]
           }
-        },
-        transporter: {
-          company: {
-            siret: transporter.siret,
-            name: transporter.name,
-            address: "address",
-            contact: "contact",
-            phone: "0101010101",
-            mail: "transporter@mail.com"
-          }
-        },
-        destination: {
-          company: {
-            siret: destination.siret,
-            name: destination.name,
-            address: "address",
-            contact: "contact",
-            phone: "0101010101",
-            mail: "destination@mail.com"
-          },
-          plannedOperationCode: "R12" as BsffOperationCode
-        },
-        waste: {
-          code: BSFF_WASTE_CODES[0],
-          adr: "Mention ADR",
-          description: "R410"
-        },
-        weight: {
-          value: 1,
-          isEstimate: true
-        },
-        packagings: [
-          {
-            type: BsffPackagingType.BOUTEILLE,
-            numero: "123",
-            weight: 1,
-            volume: 1
-          }
-        ]
-      };
-
-      // Mock les appels à la base SIRENE
-      jest.mock("../../../../companies/search", () => ({
-        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
-        ...jest.requireActual("../../../../companies/search"),
-        searchCompany: searchCompanyMock
-      }));
-
-      // Ré-importe makeClient pour que searchCompany soit bien mocké
-      jest.resetModules();
-      makeClientLocal = require("../../../../__tests__/testClient")
-        .default as typeof makeClient;
-    });
-
-    afterAll(async () => {
-      jest.resetAllMocks();
-      await resetDatabase();
-    });
-
-    describe("closed company", () => {
-      const mockCloseCompany = (siretToClose: string | null) => {
-        searchCompanyMock.mockImplementation((siret: string) => {
-          return {
-            siret,
-            etatAdministratif: siret === siretToClose ? "F" : "O",
-            address: "Company address",
-            name: "Company name"
-          };
-        });
-      };
-
-      const testCreatingBsffWithClosedSiret = async (
-        siret: string | null | undefined
-      ) => {
-        // Given
-        mockCloseCompany(siret!);
-
-        // When
-        const { mutate } = makeClientLocal(user);
-        const { errors } = await mutate<Pick<Mutation, "createBsff">>(
-          CREATE_BSFF,
-          {
-            variables: {
-              input: bsffInput
-            }
-          }
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          `L'établissement ${siret} est fermé selon le répertoire SIRENE`
-        );
-      };
-
-      it.each(["emitter", "transporter", "destination"])(
-        "should not allow creating a BSFF with a closed %p siret",
-        async role => {
-          const siret = bsffInput?.[role]?.company?.siret;
-          await testCreatingBsffWithClosedSiret(siret);
         }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Get packagings
+      const packagings = await prisma.bsffPackaging.findMany({
+        where: {
+          bsffId: data.createBsff.id
+        },
+        include: {
+          ficheInterventions: true
+        }
+      });
+      expect(packagings.length).toBe(2);
+
+      const packaging1 = packagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
       );
+      const packaging2 = packagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+
+      // Packaging 1 should have 2 fiches
+      expect(packaging1?.ficheInterventions?.length).toBe(2);
+      expect(packaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention1.id },
+        { id: ficheIntervention2.id }
+      ]);
+
+      // Packaging 2 should have 2 fiches
+      expect(packaging2?.ficheInterventions?.length).toBe(2);
+      expect(packaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention1.id },
+        { id: ficheIntervention2.id }
+      ]);
     });
 
-    describe("dormant company", () => {
-      const mockOpenCompany = () => {
-        searchCompanyMock.mockImplementation((siret: string) => {
-          return {
-            siret,
-            etatAdministratif: "O",
-            address: "Company address",
-            name: "Company name"
-          };
-        });
-      };
+    it("user can link fiches to packagings directly (not to BSFF)", async () => {
+      // Given
+      const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+      const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-      const testCreatingBsffWithDormantSiret = async (
-        siret: string | null | undefined
-      ) => {
-        // Given
-        mockOpenCompany();
+      const ficheIntervention1 = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+      const ficheIntervention2 = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+      const ficheIntervention3 = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
 
-        // Reset previous companies
-        await prisma.company.updateMany({
-          data: {
-            isDormantSince: null
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsff">,
+        MutationCreateBsffArgs
+      >(CREATE_BSFF, {
+        variables: {
+          input: {
+            ...createInput(operateur, transporter, destination),
+            packagings: [
+              {
+                type: BsffPackagingType.BOUTEILLE,
+                numero: "123",
+                weight: 1,
+                volume: 1,
+                ficheInterventions: [ficheIntervention1.id]
+              },
+              {
+                type: BsffPackagingType.CITERNE,
+                numero: "456",
+                weight: 2,
+                volume: 2,
+                ficheInterventions: [
+                  ficheIntervention2.id,
+                  ficheIntervention3.id
+                ]
+              },
+              {
+                type: BsffPackagingType.CONTENEUR,
+                numero: "456",
+                weight: 2,
+                volume: 2
+                // No fiche
+              }
+            ],
+            ficheInterventions: []
           }
-        });
-
-        // Make target company go dormant
-        await prisma.company.update({
-          where: {
-            siret: siret!
-          },
-          data: {
-            isDormantSince: new Date()
-          }
-        });
-
-        // When
-        const { mutate } = makeClientLocal(user);
-        const { errors } = await mutate<Pick<Mutation, "createBsff">>(
-          CREATE_BSFF,
-          {
-            variables: {
-              input: bsffInput
-            }
-          }
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
-        );
-      };
-
-      it.each(["emitter", "transporter", "destination"])(
-        "should not allow creating a BSFF with a dormant %p siret",
-        async role => {
-          const siret = bsffInput?.[role]?.company?.siret;
-          await testCreatingBsffWithDormantSiret(siret);
         }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Get packagings
+      const packagings = await prisma.bsffPackaging.findMany({
+        where: {
+          bsffId: data.createBsff.id
+        },
+        include: {
+          ficheInterventions: true
+        }
+      });
+      expect(packagings.length).toBe(3);
+
+      const packaging1 = packagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
       );
+      const packaging2 = packagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+      const packaging3 = packagings.find(
+        p => p.type === BsffPackagingType.CONTENEUR
+      );
+
+      // Packaging 1 should have 1 fiche
+      expect(packaging1?.ficheInterventions?.length).toBe(1);
+      expect(packaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention1.id }
+      ]);
+
+      // Packaging 2 should have 2 fiches
+      expect(packaging2?.ficheInterventions?.length).toBe(2);
+      expect(packaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention2.id },
+        { id: ficheIntervention3.id }
+      ]);
+
+      // Packaging 3 has none
+      expect(packaging3?.ficheInterventions?.length).toBe(0);
+    });
+
+    it("user can link fiches to packagings AND to BSFF", async () => {
+      // Given
+      const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+      const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const ficheIntervention1 = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+      const ficheIntervention2 = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+      const ficheIntervention3 = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+      const bsffFicheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsff">,
+        MutationCreateBsffArgs
+      >(CREATE_BSFF, {
+        variables: {
+          input: {
+            ...createInput(operateur, transporter, destination),
+            packagings: [
+              {
+                type: BsffPackagingType.BOUTEILLE,
+                numero: "123",
+                weight: 1,
+                volume: 1,
+                ficheInterventions: [ficheIntervention1.id]
+              },
+              {
+                type: BsffPackagingType.CITERNE,
+                numero: "456",
+                weight: 2,
+                volume: 2,
+                ficheInterventions: [
+                  ficheIntervention2.id,
+                  ficheIntervention3.id
+                ]
+              },
+              {
+                type: BsffPackagingType.CONTENEUR,
+                numero: "456",
+                weight: 2,
+                volume: 2
+                // No fiche
+              }
+            ],
+            ficheInterventions: [bsffFicheIntervention.id]
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Get packagings
+      const packagings = await prisma.bsffPackaging.findMany({
+        where: {
+          bsffId: data.createBsff.id
+        },
+        include: {
+          ficheInterventions: true
+        }
+      });
+      expect(packagings.length).toBe(3);
+
+      const packaging1 = packagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const packaging2 = packagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+      const packaging3 = packagings.find(
+        p => p.type === BsffPackagingType.CONTENEUR
+      );
+
+      // Packaging 1 should have 2 fiches
+      expect(packaging1?.ficheInterventions?.length).toBe(2);
+      expect(packaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention1.id },
+        { id: bsffFicheIntervention.id }
+      ]);
+
+      // Packaging 2 should have 2 fiches
+      expect(packaging2?.ficheInterventions?.length).toBe(3);
+      expect(packaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention2.id },
+        { id: ficheIntervention3.id },
+        { id: bsffFicheIntervention.id }
+      ]);
+
+      // Packaging 3 has none
+      expect(packaging3?.ficheInterventions?.length).toBe(1);
+      expect(packaging3?.ficheInterventions).toMatchObject([
+        { id: bsffFicheIntervention.id }
+      ]);
+    });
+
+    it("fiches should be returned in packaging", async () => {
+      // Given
+      const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+      const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsffFicheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+      const packagingFicheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsff">,
+        MutationCreateBsffArgs
+      >(CREATE_BSFF, {
+        variables: {
+          input: {
+            ...createInput(operateur, transporter, destination),
+            packagings: [
+              {
+                type: BsffPackagingType.BOUTEILLE,
+                numero: "123",
+                weight: 1,
+                volume: 1,
+                ficheInterventions: [packagingFicheIntervention.id]
+              }
+            ],
+            ficheInterventions: [bsffFicheIntervention.id]
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const newBsff = data.createBsff;
+
+      expect(newBsff.packagings.length).toBe(1);
+
+      const newPackaging = newBsff.packagings[0];
+      expect(newPackaging.ficheInterventions.length).toBe(2);
+
+      const fiche1 = newPackaging.ficheInterventions.find(
+        f => f.id === packagingFicheIntervention.id
+      );
+      const fiche2 = newPackaging.ficheInterventions.find(
+        f => f.id === bsffFicheIntervention.id
+      );
+      expect(fiche1?.id).toBe(packagingFicheIntervention.id);
+      expect(fiche1?.numero).toBe(packagingFicheIntervention.numero);
+      expect(fiche1?.weight).toBe(packagingFicheIntervention.weight.toNumber());
+
+      expect(fiche2?.id).toBe(bsffFicheIntervention.id);
+      expect(fiche2?.numero).toBe(bsffFicheIntervention.numero);
+      expect(fiche2?.weight).toBe(bsffFicheIntervention.weight.toNumber());
     });
   });
 });

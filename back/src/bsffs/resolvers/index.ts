@@ -4,6 +4,7 @@ import { Bsff } from "./Bsff";
 import { InitialBsff } from "./InitialBsff";
 import { BsffPackaging } from "./BsffPackaging";
 import BsffMetadata from "./BsffMetadata";
+import { BsffFicheIntervention } from "./BsffFicheIntervention";
 
 export default {
   Query,
@@ -11,5 +12,6 @@ export default {
   Bsff,
   InitialBsff,
   BsffPackaging,
-  BsffMetadata
+  BsffMetadata,
+  BsffFicheIntervention
 };

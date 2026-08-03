@@ -6,6 +6,7 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 import {
+  addBsffPackagingsFichesIntervention,
   updateDetenteurCompanySirets,
   updateTransporterOrgIds
 } from "../../database";
@@ -22,10 +23,9 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
     logMetadata?: LogMetadata
   ) => {
     const { prisma, user } = deps;
-    
-        if (!args.data.rowNumber) {
+    if (!args.data.rowNumber) {
       const maxBsff = await prisma.bsff.findFirst({
-        orderBy: { rowNumber: 'desc' },
+        orderBy: { rowNumber: "desc" },
         select: { rowNumber: true }
       });
       args.data.rowNumber = (maxBsff?.rowNumber ?? 0) + 1;
@@ -35,7 +35,11 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
 
     const fullBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id },
-      include: { transporters: true, ficheInterventions: true }
+      include: {
+        transporters: true,
+        ficheInterventions: true,
+        packagings: true
+      }
     });
 
     if (args.data.transporters) {
@@ -52,10 +56,10 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
     //   await addBsffPackagingsFichesIntervention(
     //     fullBsff.packagings,
     //     fullBsff.ficheInterventions,
-    //     prisma
+    //     prisma    const { prisma, user } = deps;
     //   );
     // }
-    
+
     // update transporters ordering when connecting transporters records
     if (
       args.data.transporters?.connect &&

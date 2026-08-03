@@ -23,7 +23,7 @@ export function buildUpdateBsffPackaging(
     const previousBsffPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
       where: args.where
     });
-        const bsffPackaging = await prisma.bsffPackaging.update(args);
+    const bsffPackaging = await prisma.bsffPackaging.update(args);
     if (args.data.bsff?.connect?.id) {
       await checkPackagingGroupIntegrity(
         previousBsffPackaging.id,
