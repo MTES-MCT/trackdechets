@@ -15,6 +15,7 @@ export interface CompanySelectorProps {
   // Texte qui s'affiche en petit sous le label du filtre de département
   departmentHint?: string;
   searchRequired?: boolean;
+  departmentLabel?: string;
   onSearch: (search: string, postalCode: string) => void;
   onSelect: (company: CompanySearchResult) => void;
 }

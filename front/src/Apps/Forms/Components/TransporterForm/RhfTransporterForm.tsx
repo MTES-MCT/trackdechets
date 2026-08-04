@@ -42,6 +42,7 @@ export function RhfTransporterForm<T extends AnyTransporterInput>({
   } = useTransporterRhf<T>(fieldName, bsdType);
 
   const actor = fieldName;
+  const isBsff = bsdType === BsdType.Bsff;
 
   const isForeign = React.useMemo(
     () => isForeignVat(transporterOrgId),
@@ -65,11 +66,13 @@ export function RhfTransporterForm<T extends AnyTransporterInput>({
   return (
     <div className="fr-container">
       <CompanySelectorWrapper
+        searchRequired={isBsff}
         orgId={orgId}
         favoriteType={FavoriteType.Transporter}
         selectedCompanyOrgId={transporterOrgId}
         allowForeignCompanies={true}
         selectedCompanyError={selectedCompanyError}
+        departmentLabel={isBsff ? "Code postal" : undefined}
         onCompanySelected={company => {
           if (company) {
             if (company.siret !== transporter?.company?.siret) {
@@ -108,7 +111,12 @@ export function RhfTransporterForm<T extends AnyTransporterInput>({
         }}
       />
 
-      <CompanyContactInfo fieldName={`${actor}.company`} key={orgId} />
+      <CompanyContactInfo
+        fieldName={`${actor}.company`}
+        key={orgId}
+        required={isBsff}
+        requiredMarkers={isBsff}
+      />
 
       <Controller
         control={control}
@@ -156,7 +164,18 @@ export function RhfTransporterForm<T extends AnyTransporterInput>({
             control={control}
             name={transportModeFieldName}
             render={({ field }) => (
-              <Select label="Mode de transport" nativeSelectProps={field}>
+              <Select
+                label={
+                  <>
+                    Mode de transport
+                    {isBsff && <span aria-hidden="true"> *</span>}
+                  </>
+                }
+                nativeSelectProps={{
+                  ...field,
+                  "aria-required": isBsff
+                }}
+              >
                 <option value="ROAD">Route</option>
                 <option value="AIR">Voie aérienne</option>
                 <option value="RAIL">Voie ferrée</option>
@@ -171,6 +190,7 @@ export function RhfTransporterForm<T extends AnyTransporterInput>({
           <RhfTransportPlates
             bsdType={bsdType}
             fieldName={transportPlatesFieldName}
+            required={isBsff}
           />
         </div>
       </div>

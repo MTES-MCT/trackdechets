@@ -4,7 +4,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
 
 export type TagsInputProps = {
-  label: string;
+  label: React.ReactNode;
   readonly tags: string[];
   readonly onAddTag: (tag: string) => void;
   readonly onDeleteTag: (idx: number) => void;
@@ -12,6 +12,7 @@ export type TagsInputProps = {
   readonly disabled?: boolean;
   readonly errorMessage?: string;
   readonly hintText?: string;
+  readonly required?: boolean;
 };
 
 /**
@@ -26,7 +27,8 @@ const TagsInput = ({
   maxTags,
   disabled = false,
   errorMessage,
-  hintText = ""
+  hintText = "",
+  required = false
 }: TagsInputProps): React.JSX.Element => {
   const [tag, setTag] = useState("");
 
@@ -47,6 +49,7 @@ const TagsInput = ({
         className="fr-mb-2w"
         nativeInputProps={{
           value: tag,
+          "aria-required": required,
           ...{ "data-testid": "tagsInput" },
           onChange: e => setTag(e.target.value),
           onBlur: () => {

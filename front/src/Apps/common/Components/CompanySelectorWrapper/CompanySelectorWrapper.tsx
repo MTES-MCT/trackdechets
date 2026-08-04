@@ -37,6 +37,7 @@ interface CompanySelectorWrapperProps {
   orgId?: string;
   disabled?: boolean;
   searchRequired?: boolean;
+  departmentLabel?: string;
 }
 
 /**
@@ -57,7 +58,6 @@ export default function CompanySelectorWrapper({
   selectedCompanyError,
   orgId,
   disabled = false,
-  searchRequired,
   onCompanySelected,
   onUnknownInputCompany
 }: Readonly<CompanySelectorWrapperProps>) {
@@ -226,6 +226,7 @@ export default function CompanySelectorWrapper({
         departmentHint={
           allowForeignCompanies ? "si l'entreprise est française" : undefined
         }
+        departmentLabel={departmentLabel}
       />
     </>
   );

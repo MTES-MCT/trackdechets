@@ -19,6 +19,24 @@ describe("<TagsInput/> ", () => {
     expect(container).toBeTruthy();
   });
 
+  test("forwards the required state to the input", () => {
+    render(
+      <Formik initialValues={{ plates: [] }} onSubmit={jest.fn()}>
+        <TagsInputWrapper
+          fieldName="plates"
+          label="Immatriculations"
+          maxTags={2}
+          required
+        />
+      </Formik>
+    );
+
+    expect(screen.getByLabelText("Immatriculations")).toHaveAttribute(
+      "aria-required",
+      "true"
+    );
+  });
+
   test("clicking button should add tags until maxTags", () => {
     render(component());
     const plate1 = "AD-008-BG";

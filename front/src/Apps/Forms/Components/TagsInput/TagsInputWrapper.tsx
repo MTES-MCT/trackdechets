@@ -7,7 +7,7 @@ type TagsInputWrapperProps = {
   readonly fieldName: string;
   readonly hintText?: string;
   readonly disabled?: boolean;
-} & Pick<TagsInputProps, "label" | "maxTags">;
+} & Pick<TagsInputProps, "label" | "maxTags" | "required">;
 
 /**
  * Wrapper autour de TagsInput qui permet de contrôler son
@@ -16,7 +16,8 @@ type TagsInputWrapperProps = {
 const TagsInputWrapper = ({
   fieldName,
   label,
-  maxTags
+  maxTags,
+  required
 }: TagsInputWrapperProps): React.JSX.Element => {
   const [tags] = useField<string[]>(fieldName);
 
@@ -27,6 +28,7 @@ const TagsInputWrapper = ({
           <TagsInput
             label={label}
             maxTags={maxTags}
+            required={required}
             tags={tags.value}
             onAddTag={tag => arrayHelpers.push(tag)}
             onDeleteTag={idx => arrayHelpers.remove(idx)}
@@ -48,7 +50,8 @@ export const RhfTagsInputWrapper = ({
   label,
   maxTags,
   hintText,
-  disabled
+  disabled,
+  required
 }: RhfTagsInputWrapperProps): React.JSX.Element => {
   const { setValue, watch, getFieldState } = useFormContext();
 
@@ -72,6 +75,7 @@ export const RhfTagsInputWrapper = ({
       errorMessage={errorMessage}
       hintText={hintText}
       disabled={disabled}
+      required={required}
     />
   );
 };

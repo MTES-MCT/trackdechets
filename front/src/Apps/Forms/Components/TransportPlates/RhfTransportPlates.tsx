@@ -7,11 +7,13 @@ import { RhfTagsInputWrapper } from "../TagsInput/TagsInputWrapper";
 type RhfTransporterTransportPlatesProps = {
   readonly bsdType: BsdType;
   readonly fieldName: string;
+  readonly required?: boolean;
 };
 
 const RhfTransportPlates = ({
   bsdType,
-  fieldName
+  fieldName,
+  required = false
 }: RhfTransporterTransportPlatesProps): React.JSX.Element => {
   const { control } = useFormContext();
 
@@ -28,9 +30,15 @@ const RhfTransportPlates = ({
   } else {
     return (
       <RhfTagsInputWrapper
-        label="Immatriculations"
+        label={
+          <>
+            Immatriculations
+            {required && <span aria-hidden="true"> *</span>}
+          </>
+        }
         fieldName={fieldName}
         maxTags={2}
+        required={required}
       />
     );
   }

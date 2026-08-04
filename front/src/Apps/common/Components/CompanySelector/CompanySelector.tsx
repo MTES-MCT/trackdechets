@@ -25,6 +25,7 @@ const CompanySelector = ({
   searchHint,
   departmentHint,
   searchRequired,
+  departmentLabel = "Département ou code postal",
   onSelect,
   onSearch
 }: CompanySelectorProps) => {
@@ -110,6 +111,7 @@ const CompanySelector = ({
             nativeInputProps={{
               value: searchString,
               placeholder: "Rechercher",
+              "aria-required": true,
               onFocus: handleOnFocus,
               onChange: e => {
                 setSearchString(e.target.value);
@@ -127,12 +129,13 @@ const CompanySelector = ({
         </div>
         <div className="fr-col-12 fr-col-md-4">
           <Input
-            label="Département ou code postal"
+            label={departmentLabel}
             hintText={departmentHint}
             disabled={disabled}
             nativeInputProps={{
               value: postalCodeString,
               placeholder: "Rechercher",
+              "aria-required": false,
               onFocus: handleOnFocus,
               onChange: e => {
                 setPostalCodeString(e.target.value);
