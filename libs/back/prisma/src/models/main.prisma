@@ -1618,11 +1618,19 @@ model Bsff {
   emitterCustomInfo              String?
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
+  emitterPickupSiteName        String?
+  emitterPickupSiteAddress     String?
+  emitterPickupSiteStreet      String?
+  emitterPickupSiteAddress2    String?
+  emitterPickupSitePostalCode  String?
+  emitterPickupSiteCity        String?
+  emitterPickupSiteInfos       String?
   wasteCode                      String?
   wasteAdr                       String?
   weightValue                    Decimal?  @db.Decimal(65, 30)
   weightIsEstimate               Boolean?
   wasteDescription               String?
+
 
   // Date de signature du premier transporteur
   // Cette valeur est dupliquée entre le modèle Bsff et BsffTransporter[0]

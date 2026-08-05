@@ -34,6 +34,27 @@ function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter | null }) {
     emitterCompanyMail: chain(input.emitter, e =>
       chain(e.company, c => c.mail)
     ),
+    emitterPickupSiteName: chain(input.emitter, e =>
+  chain(e.pickupSite, p => p.name)
+),
+emitterPickupSiteAddress: chain(input.emitter, e =>
+  chain(e.pickupSite, p => p.address)
+),
+emitterPickupSiteStreet: chain(input.emitter, e =>
+  chain(e.pickupSite, p => p.street)
+),
+emitterPickupSiteAddress2: chain(input.emitter, e =>
+  chain(e.pickupSite, p => p.address2)
+),
+emitterPickupSitePostalCode: chain(input.emitter, e =>
+  chain(e.pickupSite, p => p.postalCode)
+),
+emitterPickupSiteCity: chain(input.emitter, e =>
+  chain(e.pickupSite, p => p.city)
+),
+emitterPickupSiteInfos: chain(input.emitter, e =>
+  chain(e.pickupSite, p => p.infos)
+),
     emitterCustomInfo: chain(input.emitter, e => e.customInfo)
   };
 }
@@ -167,6 +188,15 @@ export function expandBsffFromDB(
         phone: prismaBsff.emitterCompanyPhone,
         mail: prismaBsff.emitterCompanyMail
       }),
+      pickupSite: nullIfNoValues<GraphQL.BsffPickupSite>({
+  name: prismaBsff.emitterPickupSiteName,
+  address: prismaBsff.emitterPickupSiteAddress,
+  street: prismaBsff.emitterPickupSiteStreet,
+  address2: prismaBsff.emitterPickupSiteAddress2,
+  postalCode: prismaBsff.emitterPickupSitePostalCode,
+  city: prismaBsff.emitterPickupSiteCity,
+  infos: prismaBsff.emitterPickupSiteInfos
+}),
       customInfo: prismaBsff.emitterCustomInfo,
       emission: nullIfNoValues<GraphQL.BsffEmission>({
         signature: nullIfNoValues<GraphQL.Signature>({
@@ -422,8 +452,13 @@ export function flattenFicheInterventionBsffInput(
   };
 }
 
+export type BsffFicheInterventionWithPackagings =
+  Prisma.BsffFicheIntervention & {
+    packagings: Prisma.BsffPackaging[];
+  };
+
 export function expandFicheInterventionBsffFromDB(
-  prismaFicheIntervention: Prisma.BsffFicheIntervention
+  prismaFicheIntervention: BsffFicheInterventionWithPackagings
 ): GraphQL.BsffFicheIntervention {
   return {
     id: prismaFicheIntervention.id,
@@ -441,7 +476,9 @@ export function expandFicheInterventionBsffFromDB(
       }),
       isPrivateIndividual: prismaFicheIntervention.detenteurIsPrivateIndividual
     }),
-    operateur: nullIfNoValues<GraphQL.BsffOperateur>({
+  packagings: prismaFicheIntervention.packagings.map(
+  expandBsffPackagingFromDB
+),    operateur: nullIfNoValues<GraphQL.BsffOperateur>({
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaFicheIntervention.operateurCompanyName,
         siret: prismaFicheIntervention.operateurCompanySiret,

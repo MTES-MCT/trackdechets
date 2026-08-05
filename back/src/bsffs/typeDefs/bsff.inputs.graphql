@@ -209,9 +209,63 @@ input BsffInput {
   "Identifiant des contenants regroupés dans ce BSFF"
   grouping: [ID!]
 }
+input BsffPickupSiteInput {
+  """
+  Nom du site d'enlèvement
+
+  Max: 250 caractères
+  """
+  name: String
+
+  """
+  Adresse du lieu de collecte
+
+  Max: 250 caractères
+  """
+  address: String
+
+  """
+  N° et libellé de voie
+
+  Max: 250 caractères
+  """
+  street: String
+
+  """
+  Complément d'adresse
+
+  Max: 250 caractères
+  """
+  address2: String
+
+  """
+  Code postal
+
+  Max: 250 caractères
+  """
+  postalCode: String
+
+  """
+  Commune
+
+  Max: 250 caractères
+  """
+  city: String
+
+  """
+  Informations complémentaires
+
+  Max: 250 caractères
+  """
+  infos: String
+}
 
 input BsffEmitterInput {
   company: CompanyInput
+
+  "Lieu de collecte"
+  pickupSite: BsffPickupSiteInput
+
   """
   Champ libre
 

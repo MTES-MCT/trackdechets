@@ -118,6 +118,13 @@ const rawBsffSchema = z.object({
     .max(250)
     .email("E-mail émetteur invalide")
     .nullish(),
+  emitterPickupSiteName: z.string().max(250).nullish(),
+  emitterPickupSiteAddress: z.string().max(250).nullish(),
+  emitterPickupSiteStreet: z.string().max(250).nullish(),
+  emitterPickupSiteAddress2: z.string().max(250).nullish(),
+  emitterPickupSitePostalCode: z.string().max(250).nullish(),
+  emitterPickupSiteCity: z.string().max(250).nullish(),
+  emitterPickupSiteInfos: z.string().max(250).nullish(),
   emitterCustomInfo: z.string().max(250).nullish(),
   emitterEmissionSignatureAuthor: z.string().max(250).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),

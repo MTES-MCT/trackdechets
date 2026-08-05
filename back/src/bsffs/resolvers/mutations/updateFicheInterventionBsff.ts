@@ -45,7 +45,7 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
         ...ficheInterventionData,
         // 👇 Si packagings fourni : on reset et reconnecte
         // Si non fourni : on ne touche pas aux relations existantes
-        ...(packagings !== undefined
+        ...(packagings != null
           ? {
               packagings: {
                 set: [],

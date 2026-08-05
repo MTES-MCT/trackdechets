@@ -1,4 +1,4 @@
-import { BsffFicheIntervention, Prisma } from "@td/prisma";
+import { Prisma } from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps
@@ -10,7 +10,13 @@ import { updateDetenteurCompanySirets } from "../../database";
 export type UpdateBsffFicheInterventionFn = (
   args: Prisma.BsffFicheInterventionUpdateArgs,
   logMetadata?: LogMetadata
-) => Promise<BsffFicheIntervention>;
+) => Promise<
+  Prisma.BsffFicheInterventionGetPayload<{
+    include: {
+      packagings: true;
+    };
+  }>
+>;
 
 export function buildUpdateBsffFicheIntervention(
   deps: RepositoryFnDeps
@@ -20,10 +26,17 @@ export function buildUpdateBsffFicheIntervention(
 
     const previousFi = await prisma.bsffFicheIntervention.findUnique({
       where: args.where,
-      include: { bsffs: { select: { id: true } } }
+      include: {
+        bsffs: { select: { id: true } }
+      }
     });
 
-    const fi = await prisma.bsffFicheIntervention.update(args);
+    const fi = await prisma.bsffFicheIntervention.update({
+      ...args,
+      include: {
+        packagings: true
+      }
+    });
 
     const updateDiff = objectDiff(previousFi, fi);
 
@@ -31,12 +44,15 @@ export function buildUpdateBsffFicheIntervention(
       for (const bsff of previousFi.bsffs) {
         const fullBsff = await prisma.bsff.findUniqueOrThrow({
           where: { id: bsff.id },
-          include: { ficheInterventions: true }
+          include: {
+            ficheInterventions: true
+          }
         });
 
         await updateDetenteurCompanySirets(fullBsff, prisma);
       }
     }
+
     await prisma.event.create({
       data: {
         streamId: fi.id,
