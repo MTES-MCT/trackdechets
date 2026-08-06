@@ -8,6 +8,10 @@ import { IconEmptyCompany } from "../Icons/Icons";
 import "./companySelector.scss";
 import CompanySelectorItem from "./CompanySelectorItem";
 import { CompanySelectorProps } from "./companySelectorTypes";
+import {
+  requiredAria,
+  requiredLabel
+} from "../../../Forms/Components/RequiredField/requiredField";
 
 const isSearchValid = searchClue => searchClue.length >= 3;
 
@@ -20,6 +24,7 @@ const CompanySelector = ({
   disabled = false,
   searchHint,
   departmentHint,
+  searchRequired,
   onSelect,
   onSearch
 }: CompanySelectorProps) => {
@@ -99,7 +104,7 @@ const CompanySelector = ({
       >
         <div className="fr-col-12 fr-col-md-8">
           <Input
-            label="SIRET ou raison sociale"
+            label={requiredLabel("SIRET ou raison sociale", !!searchRequired)}
             hintText={searchHint}
             disabled={disabled}
             nativeInputProps={{
@@ -112,7 +117,10 @@ const CompanySelector = ({
                   searchString: e.target.value,
                   postalCodeString: postalCodeString
                 });
-              }
+              },
+              ...(searchRequired === undefined
+                ? {}
+                : requiredAria(searchRequired))
             }}
             ref={triggerRef}
           />
@@ -132,7 +140,8 @@ const CompanySelector = ({
                   searchString,
                   postalCodeString: e.target.value
                 });
-              }
+              },
+              ...(searchRequired === undefined ? {} : requiredAria(false))
             }}
           />
         </div>

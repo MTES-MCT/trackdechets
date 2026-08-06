@@ -20,7 +20,8 @@ import {
   TransportMode,
   BsffDestinationInput,
   MutationCreateFicheInterventionBsffArgs,
-  MutationUpdateFicheInterventionBsffArgs
+  MutationUpdateFicheInterventionBsffArgs,
+  BsffEmitterInput
 } from "@td/codegen-ui";
 
 import { useMutation, useQuery } from "@apollo/client";
@@ -55,13 +56,16 @@ import { Loader } from "../../../common/Components";
 import initialState from "./utils/initial-state";
 
 import { getComputedState } from "../getComputedState";
-
+import {
+  buildBsffPickupSiteInput,
+  isManualBsffPickupSite
+} from "./utils/pickupSite";
 import WasteBsff from "./steps/Waste";
 import EmitterBsff from "./steps/Emitter";
 import DestinationBsff from "./steps/Destination";
 import TransporterBsff from "./steps/Transporter";
 import DetenteurBsff from "./steps/Detenteur";
-
+import BordereauBsff from "./steps/Bordereau";
 import { isForeignVat } from "@td/constants";
 
 import {
@@ -152,10 +156,9 @@ const BsffFormSteps = ({
     >(UPDATE_BSFF_TRANSPORTER);
 
   const [createBsff, { loading: creatingBsff, error: createBsffError }] =
-    useMutation<
-      Pick<Mutation, "createBsff">,
-      MutationCreateBsffArgs // ← vérifier que ce type existe dans @td/codegen-ui
-    >(CREATE_BSFF);
+    useMutation<Pick<Mutation, "createBsff">, MutationCreateBsffArgs>(
+      CREATE_BSFF
+    );
 
   const [createFicheIntervention, { error: ficheError }] = useMutation<
     Pick<Mutation, "createFicheInterventionBsff">,
@@ -167,50 +170,54 @@ const BsffFormSteps = ({
     MutationUpdateFicheInterventionBsffArgs
   >(UPDATE_BSFF_FICHE_INTERVENTION);
 
-  const bsffState = useMemo(
-    () =>
-      getComputedState(initialState, bsffQuery.data?.bsff, [
-        {
-          path: "packagings",
-          getComputedValue: (initialValue, actualValue) =>
-            actualValue.length ? actualValue : initialValue
-        },
-        {
-          path: "grouping",
-          getComputedValue: (initialValue, actualValue) =>
-            actualValue?.length ? actualValue : initialValue
-        },
-        {
-          path: "forwarding",
-          getComputedValue: (initialValue, actualValue) => {
-            if (Array.isArray(actualValue)) {
-              return actualValue[0] ?? initialValue;
-            }
-
-            return actualValue ?? initialValue;
+  const bsffState = useMemo(() => {
+    const state = getComputedState(initialState, bsffQuery.data?.bsff, [
+      {
+        path: "packagings",
+        getComputedValue: (initialValue, actualValue) =>
+          actualValue.length ? actualValue : initialValue
+      },
+      {
+        path: "grouping",
+        getComputedValue: (initialValue, actualValue) =>
+          actualValue?.length ? actualValue : initialValue
+      },
+      {
+        path: "forwarding",
+        getComputedValue: (initialValue, actualValue) => {
+          if (Array.isArray(actualValue)) {
+            return actualValue[0] ?? initialValue;
           }
-        },
-        {
-          path: "repackaging",
-          getComputedValue: (initialValue, actualValue) =>
-            Array.isArray(actualValue) && actualValue.length
-              ? actualValue
-              : initialValue
-        },
-        {
-          path: "transporters",
-          getComputedValue: (initialValue, actualValue) =>
-            actualValue?.length ? actualValue : initialValue
-        },
-        {
-          path: "ficheInterventions",
-          getComputedValue: (initialValue, actualValue) =>
-            actualValue?.length ? actualValue : initialValue
+          return actualValue ?? initialValue;
         }
-      ]),
-    [bsffQuery.data]
-  );
+      },
+      {
+        path: "repackaging",
+        getComputedValue: (initialValue, actualValue) =>
+          Array.isArray(actualValue) && actualValue.length
+            ? actualValue
+            : initialValue
+      },
+      {
+        path: "transporters",
+        getComputedValue: (initialValue, actualValue) =>
+          actualValue?.length ? actualValue : initialValue
+      },
+      {
+        path: "ficheInterventions",
+        getComputedValue: (initialValue, actualValue) =>
+          actualValue?.length ? actualValue : initialValue
+      }
+    ]);
+    const pickupSite = bsffQuery.data?.bsff?.emitter?.pickupSite;
 
+    return {
+      ...state,
+      pickupSiteEnabled: Boolean(pickupSite),
+      pickupSiteManualMode: isManualBsffPickupSite(pickupSite),
+      equipmentHolderDifferent: false
+    };
+  }, [bsffQuery.data]);
   const methods = useForm<ZodBsff>({
     values: bsffState,
     mode: "onChange",
@@ -233,10 +240,11 @@ const BsffFormSteps = ({
   // ======================================================
 
   const errorsFromPublishApi = publishErrors || publishErrorsFromRedirect;
-
+  const type = methods.watch("type");
   const publishErrorTabIds = getPublishErrorTabIds(
     BsdType.Bsff,
-    errorsFromPublishApi
+    errorsFromPublishApi,
+    type as BsffType
   );
 
   const formStateErrorsKeys = Object.keys(methods?.formState?.errors);
@@ -244,13 +252,18 @@ const BsffFormSteps = ({
   const errorTabIds = getErrorTabIds(
     BsdType.Bsff,
     publishErrorTabIds,
-    formStateErrorsKeys
+    formStateErrorsKeys,
+    type as BsffType
   );
 
   const publishErrorMessages = useMemo(
-    () => getPublishErrorMessages(BsdType.Bsff, errorsFromPublishApi),
-
-    [errorsFromPublishApi]
+    () =>
+      getPublishErrorMessages(
+        BsdType.Bsff,
+        errorsFromPublishApi,
+        type as BsffType
+      ),
+    [errorsFromPublishApi, type]
   );
 
   useEffect(() => {
@@ -278,16 +291,15 @@ const BsffFormSteps = ({
   // TABS
   // ======================================================
 
-  const type = methods.watch("type");
-
   const tabsContent = useMemo(
     () => ({
+      bordereau: type === BsffType.TracerFluide ? <BordereauBsff /> : undefined,
       waste: <WasteBsff />,
       emitter:
         type === BsffType.CollectePetitesQuantites ? (
           <EmitterBsff />
         ) : undefined,
-      detenteur: <DetenteurBsff />,
+      detenteur: type === BsffType.TracerFluide ? undefined : <DetenteurBsff />,
       transporter: <TransporterBsff />,
       destination: <DestinationBsff />
     }),
@@ -473,16 +485,21 @@ const BsffFormSteps = ({
       weight
     } = values;
 
+    const emitterInput: BsffEmitterInput | undefined = emitter
+      ? {
+          company: cleanCompany(emitter.company),
+          customInfo: emitter.customInfo,
+          ...(type === BsffType.TracerFluide
+            ? {
+                pickupSite: buildBsffPickupSiteInput(values)
+              }
+            : {})
+        }
+      : undefined;
+
     return {
       type: type as unknown as BsffType,
-
-      emitter: emitter
-        ? {
-            ...emitter,
-            company: cleanCompany(emitter.company)
-          }
-        : undefined,
-
+      emitter: emitterInput,
       waste: waste?.code
         ? {
             code: waste.code,
@@ -716,6 +733,7 @@ const BsffFormSteps = ({
   return (
     <BsffContext.Provider value={bsffContext}>
       <FormStepsContent
+        key={type}
         bsdType={BsdType.Bsff}
         draftCtaLabel={draftCtaLabel}
         isLoading={loading}
@@ -729,6 +747,9 @@ const BsffFormSteps = ({
         genericErrorMessage={publishErrorMessages.filter(
           error => error.tabId === TabId.none
         )}
+        initialTabId={
+          type === BsffType.TracerFluide ? TabId.bordereau : TabId.waste
+        }
       />
       {(createBsffError || ficheError) && (
         <div className="fr-mb-8w">

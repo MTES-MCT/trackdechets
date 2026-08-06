@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { BsffPackaging, BsffType } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
 import { bsffPackagingTypes } from "../../../../Forms/Components/PackagingList/helpers";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { BSFF_WASTES } from "@td/constants";
@@ -15,6 +14,7 @@ import RhfBsffPackagingList from "../components/RhfBsffPackagingList";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import BsffSelectableWasteTableWrapper from "../components/BsffSelectableWasteTableWrapper";
 import MyBsffCompanySelector from "../components/MyBsffComapnySelector";
+import BsffTypeRadioGroup from "../components/BsffTypeRadioGroup";
 
 const WasteBsff = () => {
   const methods = useFormContext();
@@ -93,50 +93,7 @@ const WasteBsff = () => {
       {!!sealedFields.length && <DisabledParagraphStep />}
 
       <div className="fr-col">
-        <WasteRadioGroup
-          title="Type de bordereau"
-          legend="J'édite un BSFF pour :"
-          disabled={sealedFields.includes("type")}
-          options={[
-            {
-              label:
-                "Un opérateur qui collecte des déchets dangereux de fluides frigorigènes (ou autres déchets dangereux de fluides) lors d'opérations sur les équipements en contenant de ses clients",
-              nativeInputProps: {
-                ...register("type"),
-                value: BsffType.CollectePetitesQuantites
-              }
-            },
-            {
-              label:
-                "Un détenteur de contenant(s) de déchets de fluides à tracer (sans fiche d'intervention)",
-              nativeInputProps: {
-                ...register("type"),
-                value: BsffType.TracerFluide
-              }
-            },
-            {
-              label: "Le regroupement",
-              nativeInputProps: {
-                ...register("type"),
-                value: BsffType.Groupement
-              }
-            },
-            {
-              label: "Le reconditionnement",
-              nativeInputProps: {
-                ...register("type"),
-                value: BsffType.Reconditionnement
-              }
-            },
-            {
-              label: "La réexpédition",
-              nativeInputProps: {
-                ...register("type"),
-                value: BsffType.Reexpedition
-              }
-            }
-          ]}
-        />
+        {bsffType !== BsffType.TracerFluide && <BsffTypeRadioGroup />}
 
         <h4 className="form__section-heading">{heading}</h4>
 

@@ -26,6 +26,17 @@ const CREATE_DRAFT_BSFF = `
   mutation CreateDraftBsff($input: BsffInput!) {
     createDraftBsff(input: $input) {
       id
+      emitter {
+        pickupSite {
+          name
+          address
+          street
+          address2
+          postalCode
+          city
+          infos
+        }
+      }
       ficheInterventions {
         id
       }
@@ -41,6 +52,53 @@ const CREATE_DRAFT_BSFF = `
 
 describe("Mutation.createDraftBsff", () => {
   afterEach(resetDatabase);
+
+  it("should persist a pickup site on a tracer fluid draft", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(user);
+    const pickupSite = {
+      name: "Chantier Nord",
+      address: null,
+      street: "12 rue des Fleurs",
+      address2: "Bâtiment B",
+      postalCode: "75001",
+      city: "Paris",
+      infos: "Accès par la cour"
+    };
+
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createDraftBsff">,
+      MutationCreateDraftBsffArgs
+    >(CREATE_DRAFT_BSFF, {
+      variables: {
+        input: {
+          type: BsffType.TRACER_FLUIDE,
+          emitter: {
+            company: { siret: company.siret },
+            pickupSite
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.createDraftBsff.emitter?.pickupSite).toEqual(pickupSite);
+
+    const bsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: data.createDraftBsff.id }
+    });
+    expect(bsff).toEqual(
+      expect.objectContaining({
+        emitterPickupSiteName: pickupSite.name,
+        emitterPickupSiteAddress: pickupSite.address,
+        emitterPickupSiteStreet: pickupSite.street,
+        emitterPickupSiteAddress2: pickupSite.address2,
+        emitterPickupSitePostalCode: pickupSite.postalCode,
+        emitterPickupSiteCity: pickupSite.city,
+        emitterPickupSiteInfos: pickupSite.infos
+      })
+    );
+  });
 
   it.each(["emitter", "transporter", "destination"])(
     "should allow %p to create a bsff",

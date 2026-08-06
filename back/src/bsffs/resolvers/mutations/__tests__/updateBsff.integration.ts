@@ -82,6 +82,55 @@ const BSFF = gql`
 describe("Mutation.updateBsff", () => {
   afterEach(resetDatabase);
 
+  it("should clear every pickup site field when pickupSite is null", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter },
+      {
+        data: {
+          isDraft: true,
+          emitterPickupSiteName: "Chantier Nord",
+          emitterPickupSiteAddress: null,
+          emitterPickupSiteStreet: "12 rue des Fleurs",
+          emitterPickupSiteAddress2: "Bâtiment B",
+          emitterPickupSitePostalCode: "75001",
+          emitterPickupSiteCity: "Paris",
+          emitterPickupSiteInfos: "Accès par la cour"
+        },
+        userId: emitter.user.id
+      }
+    );
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: { emitter: { pickupSite: null } }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsff.emitter?.pickupSite).toBeNull();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id }
+    });
+    expect(updatedBsff).toEqual(
+      expect.objectContaining({
+        emitterPickupSiteName: null,
+        emitterPickupSiteAddress: null,
+        emitterPickupSiteStreet: null,
+        emitterPickupSiteAddress2: null,
+        emitterPickupSitePostalCode: null,
+        emitterPickupSiteCity: null,
+        emitterPickupSiteInfos: null
+      })
+    );
+  });
+
   it("should allow user to update a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(

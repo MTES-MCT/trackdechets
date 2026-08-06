@@ -52,6 +52,15 @@ export const fullBsff = gql`
         phone
         mail
       }
+      pickupSite {
+        name
+        address
+        street
+        address2
+        postalCode
+        city
+        infos
+      }
       emission {
         signature {
           author

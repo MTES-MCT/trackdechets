@@ -56,6 +56,35 @@ describe("Mutation.duplicateBsff", () => {
     expect(data.duplicateBsff.isDuplicateOf).toEqual(bsff.id);
   });
 
+  it("should preserve the pickup site when duplicating a bsff", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
+    const pickupSite = {
+      emitterPickupSiteName: "Chantier Nord",
+      emitterPickupSiteAddress: null,
+      emitterPickupSiteStreet: "12 rue des Fleurs",
+      emitterPickupSiteAddress2: "Bâtiment B",
+      emitterPickupSitePostalCode: "75001",
+      emitterPickupSiteCity: "Paris",
+      emitterPickupSiteInfos: "Accès par la cour"
+    };
+    const bsff = await createBsff(
+      { emitter },
+      { data: pickupSite, userId: emitter.user.id }
+    );
+
+    const { data, errors } = await mutate<
+      Pick<Mutation, "duplicateBsff">,
+      MutationDuplicateBsffArgs
+    >(DUPLICATE_BSFF, { variables: { id: bsff.id } });
+
+    expect(errors).toBeUndefined();
+    const duplicate = await prisma.bsff.findUniqueOrThrow({
+      where: { id: data.duplicateBsff.id }
+    });
+    expect(duplicate).toEqual(expect.objectContaining(pickupSite));
+  });
+
   it("should disallow unauthenticated user from duplicating a bsff", async () => {
     const { mutate } = makeClient();
     const { errors } = await mutate<

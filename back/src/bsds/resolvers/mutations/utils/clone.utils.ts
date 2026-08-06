@@ -487,6 +487,13 @@ export const cloneBsff = async (user: Express.User, id: string) => {
     emitterCompanyPhone: bsff.emitterCompanyPhone,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCustomInfo: bsff.emitterCustomInfo,
+    emitterPickupSiteName: bsff.emitterPickupSiteName,
+    emitterPickupSiteAddress: bsff.emitterPickupSiteAddress,
+    emitterPickupSiteStreet: bsff.emitterPickupSiteStreet,
+    emitterPickupSiteAddress2: bsff.emitterPickupSiteAddress2,
+    emitterPickupSitePostalCode: bsff.emitterPickupSitePostalCode,
+    emitterPickupSiteCity: bsff.emitterPickupSiteCity,
+    emitterPickupSiteInfos: bsff.emitterPickupSiteInfos,
     emitterEmissionSignatureAuthor: bsff.emitterEmissionSignatureAuthor,
     emitterEmissionSignatureDate: bsff.emitterEmissionSignatureDate,
     ficheInterventions: bsff.ficheInterventions.length

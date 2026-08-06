@@ -129,6 +129,15 @@ export const FullBsffFragment = gql`
       company {
         ...CompanyFragment
       }
+      pickupSite {
+        name
+        address
+        street
+        address2
+        postalCode
+        city
+        infos
+      }
       emission {
         signature {
           author

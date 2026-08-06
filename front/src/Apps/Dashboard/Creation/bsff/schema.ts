@@ -199,9 +199,23 @@ export const rawBsffSchema = z
       .object({
         company: zodCompany,
         customInfo: z.string().max(250).nullish(),
-        emission: zodSignature
+        emission: zodSignature,
+        pickupSite: z
+          .object({
+            name: z.string().max(250).nullish(),
+            address: z.string().max(250).nullish(),
+            street: z.string().max(250).nullish(),
+            address2: z.string().max(250).nullish(),
+            city: z.string().max(250).nullish(),
+            postalCode: z.string().max(250).nullish(),
+            infos: z.string().max(250).nullish()
+          })
+          .nullish()
       })
       .nullish(),
+    pickupSiteEnabled: z.boolean().default(false),
+    pickupSiteManualMode: z.boolean().default(false),
+    equipmentHolderDifferent: z.boolean().default(false),
     waste: z
       .object({
         code: ZodWasteCodeEnum,
@@ -260,6 +274,84 @@ export const rawBsffSchema = z
     forwarding: bsffGroupingOrForwardingSchema.nullish()
   })
   .superRefine((data, ctx) => {
+    const blank = (value?: string | null) => !value?.trim();
+    if (data.type === BsffType.TRACER_FLUIDE) {
+      const company = data.emitter?.company;
+      const requiredCompanyFields: [string, string][] = [
+        ["contact", "La personne à contacter est requise"],
+        ["phone", "Le téléphone est requis"],
+        ["mail", "Le courriel est requis"]
+      ];
+      if (blank(company?.siret) && blank(company?.orgId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["emitter", "company", "siret"],
+          message: "Le détenteur est requis"
+        });
+      }
+      requiredCompanyFields.forEach(([field, message]) => {
+        if (blank(company?.[field]))
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "company", field],
+            message
+          });
+      });
+      if (
+        company?.phone &&
+        !/^(?=.*\d)[0-9#.+-]+$/.test(company.phone.trim())
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["emitter", "company", "phone"],
+          message:
+            "Le téléphone ne peut contenir que des chiffres et les caractères # - + ."
+        });
+      }
+      if (data.pickupSiteEnabled) {
+        const site = data.emitter?.pickupSite;
+        if (blank(site?.name)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "name"],
+            message: "Le nom du site d'enlèvement est requis"
+          });
+        }
+
+        if (!data.pickupSiteManualMode && blank(site?.address)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "address"],
+            message: "L'adresse de collecte est requise"
+          });
+        }
+
+        if (data.pickupSiteManualMode && blank(site?.street)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "street"],
+            message: "Le numéro et libellé de voie est requis"
+          });
+        }
+
+        if (data.pickupSiteManualMode && blank(site?.postalCode)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "postalCode"],
+            message: "Le code postal est requis"
+          });
+        }
+
+        if (data.pickupSiteManualMode && blank(site?.city)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "city"],
+            message: "La commune est requise"
+          });
+        }
+      }
+    }
+
     if (data.type !== BsffType.COLLECTE_PETITES_QUANTITES) return;
 
     (data.ficheInterventions ?? []).forEach((fi, index) => {

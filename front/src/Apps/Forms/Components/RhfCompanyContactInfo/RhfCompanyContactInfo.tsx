@@ -1,11 +1,13 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import Input from "@codegouvfr/react-dsfr/Input";
+import { requiredAria, requiredLabel } from "../RequiredField/requiredField";
 
 interface CompanyContactInfoProps {
   fieldName: string;
   disabled?: boolean;
   required?: boolean;
+  requiredMarkers?: boolean;
   errorObject?: any;
 }
 
@@ -30,6 +32,7 @@ export default function CompanyContactInfo({
   fieldName,
   disabled = false,
   required = false,
+  requiredMarkers,
   errorObject
 }: Readonly<CompanyContactInfoProps>) {
   const { register } = useFormContext();
@@ -39,7 +42,7 @@ export default function CompanyContactInfo({
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
         <div className="fr-col-12 fr-col-md-6">
           <Input
-            label="Personne à contacter"
+            label={requiredLabel("Personne à contacter", !!requiredMarkers)}
             disabled={disabled}
             state={errorObject?.contact && "error"}
             stateRelatedMessage={
@@ -49,7 +52,10 @@ export default function CompanyContactInfo({
               ...register(
                 `${fieldName}.contact`,
                 required ? { required: "Champ requis" } : {}
-              )
+              ),
+              ...(requiredMarkers === undefined
+                ? {}
+                : requiredAria(requiredMarkers))
             }}
           />
         </div>
@@ -57,7 +63,7 @@ export default function CompanyContactInfo({
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
         <div className="fr-col-12 fr-col-md-6">
           <Input
-            label="Téléphone"
+            label={requiredLabel("Téléphone", !!requiredMarkers)}
             disabled={disabled}
             state={errorObject?.phone && "error"}
             stateRelatedMessage={(errorObject?.phone?.message as string) ?? ""}
@@ -65,13 +71,16 @@ export default function CompanyContactInfo({
               ...register(
                 `${fieldName}.phone`,
                 required ? { required: "Champ requis" } : {}
-              )
+              ),
+              ...(requiredMarkers === undefined
+                ? {}
+                : requiredAria(requiredMarkers))
             }}
           />
         </div>
         <div className="fr-col-12 fr-col-md-6">
           <Input
-            label="Courriel"
+            label={requiredLabel("Courriel", !!requiredMarkers)}
             disabled={disabled}
             state={errorObject?.mail && "error"}
             stateRelatedMessage={(errorObject?.mail?.message as string) ?? ""}
@@ -80,7 +89,10 @@ export default function CompanyContactInfo({
                 `${fieldName}.mail`,
                 required ? { required: "Champ requis" } : {}
               ),
-              type: "email"
+              type: "email",
+              ...(requiredMarkers === undefined
+                ? {}
+                : requiredAria(requiredMarkers))
             }}
           />
         </div>

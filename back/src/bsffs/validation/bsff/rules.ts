@@ -367,6 +367,41 @@ export const bsffEditionRules: BsffEditionRules = {
     readableFieldName: "le champ libre de l'émetteur",
     path: ["emitter", "customInfo"]
   },
+  emitterPickupSiteName: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    readableFieldName: "Le nom du lieu de collecte",
+    path: ["emitter", "pickupSite", "name"]
+  },
+  emitterPickupSiteAddress: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    readableFieldName: "L'adresse du lieu de collecte",
+    path: ["emitter", "pickupSite", "address"]
+  },
+  emitterPickupSiteStreet: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    readableFieldName: "La voie du lieu de collecte",
+    path: ["emitter", "pickupSite", "street"]
+  },
+  emitterPickupSiteAddress2: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    readableFieldName: "Le complément d'adresse du lieu de collecte",
+    path: ["emitter", "pickupSite", "address2"]
+  },
+  emitterPickupSitePostalCode: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    readableFieldName: "Le code postal du lieu de collecte",
+    path: ["emitter", "pickupSite", "postalCode"]
+  },
+  emitterPickupSiteCity: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    readableFieldName: "La commune du lieu de collecte",
+    path: ["emitter", "pickupSite", "city"]
+  },
+  emitterPickupSiteInfos: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    readableFieldName: "Les informations complémentaires du lieu de collecte",
+    path: ["emitter", "pickupSite", "infos"]
+  },
   emitterEmissionSignatureAuthor: {
     sealed: { from: "EMISSION" },
     required: {
