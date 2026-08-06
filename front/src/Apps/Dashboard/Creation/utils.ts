@@ -1,7 +1,7 @@
 import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
 import { getTabClassName } from "../../Forms/Components/FormStepsTabs/utils";
 import { toastApolloError } from "./toaster";
-import { BsdType } from "@td/codegen-ui";
+import { BsdType, BsffType } from "@td/codegen-ui";
 import { ApolloError } from "@apollo/client";
 
 export const getNextTab = (tabIds: TabId[], currentTabId: TabId) => {
@@ -21,6 +21,7 @@ export const getPrevTab = (tabIds: TabId[], currentTabId: TabId) => {
 };
 
 export enum TabId {
+  bordereau = "bordereau",
   waste = "waste",
   emitter = "emitter",
   worker = "worker",
@@ -150,6 +151,11 @@ const getBsdaTabs = (commonTabs, errorTabIds) => {
 const getBsffTabs = (commonTabs, errorTabIds) => {
   const bsffTabs = [
     {
+      tabId: TabId.bordereau,
+      label: "Bordereau",
+      iconId: getTabClassName(errorTabIds, "bordereau")
+    },
+    {
       ...commonTabs[0] //waste
     },
     {
@@ -214,6 +220,12 @@ const pathPrefixToTab = {
 
   [BsdType.Bsff]: (pathPrefix: string): TabId | null => {
     if (
+      pathPrefix === "pickupSiteEnabled" ||
+      pathPrefix === "pickupSiteManualMode"
+    ) {
+      return TabId.bordereau;
+    }
+    if (
       pathPrefix.startsWith("emitter") ||
       pathPrefix.startsWith("operateur")
     ) {
@@ -251,9 +263,23 @@ const pathPrefixToTab = {
     return null;
   }
 };
+
+const getTabForPath = (
+  bsdType: SupportedBsdTypes,
+  pathPrefix: string,
+  bsffType?: BsffType | null
+) => {
+  if (bsdType === BsdType.Bsff && bsffType === BsffType.TracerFluide) {
+    if (pathPrefix === "type" || pathPrefix.startsWith("emitter")) {
+      return TabId.bordereau;
+    }
+  }
+  return pathPrefixToTab[bsdType](pathPrefix);
+};
 export const getPublishErrorTabIds = (
   bsdType: SupportedBsdTypes,
-  apiErrors?: NormalizedError[]
+  apiErrors?: NormalizedError[],
+  bsffType?: BsffType | null
 ): TabId[] => {
   // search for presence of tabId return in zod path api errors then return tab ids in error
   const publishErrorTabIds = [
@@ -271,7 +297,7 @@ export const getPublishErrorTabIds = (
         }
 
         if (pathPrefix && typeof pathPrefix === "string") {
-          return pathPrefixToTab[bsdType](pathPrefix);
+          return getTabForPath(bsdType, pathPrefix, bsffType);
         }
         return null;
       })
@@ -283,7 +309,8 @@ export const getPublishErrorTabIds = (
 
 export const getPublishErrorMessages = (
   bsdType: SupportedBsdTypes,
-  apiErrors?: NormalizedError[]
+  apiErrors?: NormalizedError[],
+  bsffType?: BsffType | null
 ): TabError[] => {
   // return an array of messages with tabId, name (path) and the related message
 
@@ -295,7 +322,7 @@ export const getPublishErrorMessages = (
         const name = errorPath.join(".");
         let tabId =
           pathPrefix && typeof pathPrefix === "string"
-            ? pathPrefixToTab[bsdType](pathPrefix)
+            ? getTabForPath(bsdType, pathPrefix, bsffType)
             : null;
 
         let message = apiError.message;
@@ -325,15 +352,18 @@ export const getPublishErrorMessages = (
 };
 
 export const getErrorTabIds = (
-  bsdType: BsdType,
+  bsdType: SupportedBsdTypes,
   apiErrorTabIds: TabId[],
-  formStateErrorsKeys: string[]
+  formStateErrorsKeys: string[],
+  bsffType?: BsffType | null
 ): TabId[] => {
   // get tab id in error in order to display icon tab error (either api or front validation we need to display the right icon)
   const errorTabIds = apiErrorTabIds?.length
     ? apiErrorTabIds
     : formStateErrorsKeys?.length > 0
-    ? formStateErrorsKeys.map(errKey => pathPrefixToTab[bsdType](errKey))
+    ? formStateErrorsKeys
+        .map(errKey => getTabForPath(bsdType, errKey, bsffType))
+        .filter((tabId): tabId is TabId => tabId !== null)
     : [];
 
   return errorTabIds;

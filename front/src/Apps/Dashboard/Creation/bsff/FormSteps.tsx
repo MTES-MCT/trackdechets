@@ -16,7 +16,8 @@ import {
   TransportMode,
   BsffDestinationInput,
   MutationCreateFicheInterventionBsffArgs,
-  MutationUpdateFicheInterventionBsffArgs
+  MutationUpdateFicheInterventionBsffArgs,
+  BsffEmitterInput
 } from "@td/codegen-ui";
 
 import { useMutation, useQuery } from "@apollo/client";
@@ -43,11 +44,16 @@ import FormStepsContent from "../FormStepsContent";
 import { Loader } from "../../../common/Components";
 import initialState from "./utils/initial-state";
 import { getComputedState } from "../getComputedState";
+import {
+  BsffEmitterInputWithPickupSite,
+  getBsffPickupSite
+} from "../../../Forms/Components/PickupSiteBlock/types";
 import WasteBsff from "./steps/Waste";
 import EmitterBsff from "./steps/Emitter";
 import DestinationBsff from "./steps/Destination";
 import TransporterBsff from "./steps/Transporter";
 import DetenteurBsff from "./steps/Detenteur";
+import BordereauBsff from "./steps/Bordereau";
 import { isForeignVat } from "@td/constants";
 import {
   getErrorTabIds,
@@ -141,48 +147,53 @@ const BsffFormSteps = ({
     MutationUpdateFicheInterventionBsffArgs
   >(UPDATE_BSFF_FICHE_INTERVENTION);
 
-  const bsffState = useMemo(
-    () =>
-      getComputedState(initialState, bsffQuery.data?.bsff, [
-        {
-          path: "packagings",
-          getComputedValue: (intialValue, actualValue) =>
-            actualValue.length ? actualValue : intialValue
-        },
-        {
-          path: "grouping",
-          getComputedValue: (initialValue, actualValue) =>
-            actualValue?.length ? actualValue : initialValue
-        },
-        {
-          path: "forwarding",
-          getComputedValue: (initialValue, actualValue) => {
-            if (Array.isArray(actualValue)) {
-              return actualValue[0] ?? initialValue;
-            }
-            return actualValue ?? initialValue;
+  const bsffState = useMemo(() => {
+    const state = getComputedState(initialState, bsffQuery.data?.bsff, [
+      {
+        path: "packagings",
+        getComputedValue: (intialValue, actualValue) =>
+          actualValue.length ? actualValue : intialValue
+      },
+      {
+        path: "grouping",
+        getComputedValue: (initialValue, actualValue) =>
+          actualValue?.length ? actualValue : initialValue
+      },
+      {
+        path: "forwarding",
+        getComputedValue: (initialValue, actualValue) => {
+          if (Array.isArray(actualValue)) {
+            return actualValue[0] ?? initialValue;
           }
-        },
-        {
-          path: "repackaging",
-          getComputedValue: (initialValue, actualValue) =>
-            Array.isArray(actualValue) && actualValue.length
-              ? actualValue
-              : initialValue
-        },
-        {
-          path: "transporters",
-          getComputedValue: (initialValue, actualValue) =>
-            actualValue?.length ? actualValue : initialValue
-        },
-        {
-          path: "ficheInterventions",
-          getComputedValue: (initialValue, actualValue) =>
-            actualValue?.length ? actualValue : initialValue
+          return actualValue ?? initialValue;
         }
-      ]),
-    [bsffQuery.data]
-  );
+      },
+      {
+        path: "repackaging",
+        getComputedValue: (initialValue, actualValue) =>
+          Array.isArray(actualValue) && actualValue.length
+            ? actualValue
+            : initialValue
+      },
+      {
+        path: "transporters",
+        getComputedValue: (initialValue, actualValue) =>
+          actualValue?.length ? actualValue : initialValue
+      },
+      {
+        path: "ficheInterventions",
+        getComputedValue: (initialValue, actualValue) =>
+          actualValue?.length ? actualValue : initialValue
+      }
+    ]);
+    return {
+      ...state,
+      // TRA-18515 will add this field to the query's generated type.
+      pickupSiteEnabled: !!getBsffPickupSite(bsffQuery.data?.bsff?.emitter),
+      pickupSiteManualMode: false,
+      equipmentHolderDifferent: false
+    };
+  }, [bsffQuery.data]);
   const methods = useForm<ZodBsff>({
     values: bsffState,
     mode: "onChange",
@@ -201,20 +212,28 @@ const BsffFormSteps = ({
   }, [bsffState, bsffQuery.data?.bsff?.id, methods]);
 
   const errorsFromPublishApi = publishErrors || publishErrorsFromRedirect;
+  const type = methods.watch("type");
   const publishErrorTabIds = getPublishErrorTabIds(
     BsdType.Bsff,
-    errorsFromPublishApi
+    errorsFromPublishApi,
+    type as BsffType
   );
 
   const formStateErrorsKeys = Object.keys(methods?.formState?.errors);
   const errorTabIds = getErrorTabIds(
     BsdType.Bsff,
     publishErrorTabIds,
-    formStateErrorsKeys
+    formStateErrorsKeys,
+    type as BsffType
   );
   const publishErrorMessages = useMemo(
-    () => getPublishErrorMessages(BsdType.Bsff, errorsFromPublishApi),
-    [errorsFromPublishApi]
+    () =>
+      getPublishErrorMessages(
+        BsdType.Bsff,
+        errorsFromPublishApi,
+        type as BsffType
+      ),
+    [errorsFromPublishApi, type]
   );
 
   useEffect(() => {
@@ -234,16 +253,15 @@ const BsffFormSteps = ({
     }
   }, [bsffQuery.data?.bsff]);
 
-  const type = methods.watch("type");
-
   const tabsContent = useMemo(
     () => ({
+      bordereau: type === BsffType.TracerFluide ? <BordereauBsff /> : undefined,
       waste: <WasteBsff />,
       emitter:
         type === BsffType.CollectePetitesQuantites ? (
           <EmitterBsff />
         ) : undefined,
-      detenteur: <DetenteurBsff />,
+      detenteur: type === BsffType.TracerFluide ? undefined : <DetenteurBsff />,
       transporter: <TransporterBsff />,
       destination: <DestinationBsff />
     }),
@@ -378,11 +396,34 @@ const BsffFormSteps = ({
       weight
     } = values;
 
+    const emitterInput: BsffEmitterInputWithPickupSite | undefined = emitter
+      ? {
+          company: cleanCompany(emitter.company),
+          customInfo: emitter.customInfo,
+          // This variable field becomes active when TRA-18515 is merged and
+          // must never leak into the other BSFF workflows.
+          ...(type === BsffType.TracerFluide
+            ? {
+                pickupSite: values.pickupSiteEnabled
+                  ? {
+                      name: emitter.pickupSite?.name?.trim() || null,
+                      address: emitter.pickupSite?.address?.trim() || null,
+                      addressComplement:
+                        emitter.pickupSite?.addressComplement?.trim() || null,
+                      city: emitter.pickupSite?.city?.trim() || null,
+                      postalCode:
+                        emitter.pickupSite?.postalCode?.trim() || null,
+                      infos: emitter.pickupSite?.infos?.trim() || null
+                    }
+                  : null
+              }
+            : {})
+        }
+      : undefined;
+
     return {
       type: type as unknown as BsffType,
-      emitter: emitter
-        ? { ...emitter, company: cleanCompany(emitter.company) }
-        : undefined,
+      emitter: emitterInput as BsffEmitterInput | undefined,
       waste: waste?.code
         ? {
             code: waste.code,
@@ -523,6 +564,7 @@ const BsffFormSteps = ({
   return (
     <BsffContext.Provider value={bsffContext}>
       <FormStepsContent
+        key={type}
         bsdType={BsdType.Bsff}
         draftCtaLabel={draftCtaLabel}
         isLoading={loading}
@@ -536,6 +578,9 @@ const BsffFormSteps = ({
         genericErrorMessage={publishErrorMessages.filter(
           error => error.tabId === TabId.none
         )}
+        initialTabId={
+          type === BsffType.TracerFluide ? TabId.bordereau : TabId.waste
+        }
       />
       {loading && <Loader />}
     </BsffContext.Provider>

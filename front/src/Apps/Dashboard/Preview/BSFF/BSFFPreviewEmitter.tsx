@@ -8,11 +8,18 @@ import {
   PreviewTextRow,
   PreviewCompanyContact
 } from "../BSDPreviewComponents";
+import { getBsffPickupSite } from "../../../Forms/Components/PickupSiteBlock/types";
 
 interface BSFFPreviewEmitterProps {
   bsd: Bsff;
 }
 const BSFFPreviewEmitter = ({ bsd }: BSFFPreviewEmitterProps) => {
+  const site = getBsffPickupSite(bsd.emitter);
+  const pickupAddress = site
+    ? [site.address, site.addressComplement, site.postalCode, site.city]
+        .filter(Boolean)
+        .join(" ")
+    : null;
   return (
     <PreviewContainer>
       <PreviewContainerRow>
@@ -31,6 +38,22 @@ const BSFFPreviewEmitter = ({ bsd }: BSFFPreviewEmitterProps) => {
             label="Adresse"
             value={bsd.emitter?.company?.address}
           />
+          {!!site && (
+            <>
+              <PreviewTextRow
+                label="Nom du site d'enlèvement"
+                value={site.name}
+              />
+              <PreviewTextRow
+                label="Adresse de collecte des déchets"
+                value={pickupAddress}
+              />
+              <PreviewTextRow
+                label="Informations complémentaires"
+                value={site.infos}
+              />
+            </>
+          )}
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={6}>

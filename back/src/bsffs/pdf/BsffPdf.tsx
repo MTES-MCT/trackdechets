@@ -32,6 +32,15 @@ type Props = {
   renderEmpty?: boolean;
 };
 
+type BsffPickupSite = {
+  name?: string | null;
+  address?: string | null;
+  addressComplement?: string | null;
+  postalCode?: string | null;
+  city?: string | null;
+  infos?: string | null;
+};
+
 export function BsffPdf({ bsff, qrCode, renderEmpty = false }: Props) {
   const hasFicheInterventions = bsff.ficheInterventions?.length > 0;
   const hasPreviousBsffs = bsff.previousBsffs?.length > 0;
@@ -208,11 +217,39 @@ function BsffEmitterType({ bsff }: Pick<Props, "bsff">) {
 }
 
 function BsffEmitter({ bsff }: Pick<Props, "bsff">) {
+  // Compatibility boundary to remove once TRA-18515 exposes pickupSite.
+  const site = (
+    bsff.emitter as
+      | (NonNullable<typeof bsff.emitter> & {
+          pickupSite?: BsffPickupSite | null;
+        })
+      | null
+      | undefined
+  )?.pickupSite;
+  const pickupAddress = site
+    ? [site.address, site.addressComplement, site.postalCode, site.city]
+        .filter(Boolean)
+        .join(" ")
+    : null;
   return (
     <div className="BoxCol">
       <p>
         <strong>1. Émetteur du bordereau</strong>
         <FormCompanyFields company={bsff.emitter?.company} />
+        {!!site && (
+          <>
+            <br />
+            Nom du site d'enlèvement : {site.name}
+            <br />
+            Adresse de collecte des déchets : {pickupAddress}
+            {!!site.infos && (
+              <>
+                <br />
+                Informations complémentaires : {site.infos}
+              </>
+            )}
+          </>
+        )}
       </p>
     </div>
   );
