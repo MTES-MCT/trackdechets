@@ -1,4 +1,4 @@
-import { BsffFicheIntervention, BsffPackaging, Prisma } from "@td/prisma";
+import { BsffPackaging, Prisma } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindUniqueBsffFn = <Args extends Prisma.BsffFindUniqueArgs>(
@@ -13,7 +13,12 @@ export type FindUniqueBsffGetPackagingsFn = (
 export type FindUniqueBsffGetFicheInterventionsFn = (
   bsffFindUniqueArgs: Prisma.BsffFindUniqueArgs,
   bsffFicheInterventionsFindManyArgs?: Prisma.BsffFicheInterventionFindManyArgs
-) => Promise<BsffFicheIntervention[] | null>;
+) => Promise<
+  | Prisma.BsffFicheInterventionGetPayload<{
+      include: { packagings: true };
+    }>[]
+  | null
+>;
 
 export function buildFinduniqueBsff({
   prisma
@@ -42,8 +47,12 @@ export function buildFindUniqueBsffGetFicheInterventions({
   prisma
 }: ReadRepositoryFnDeps): FindUniqueBsffGetFicheInterventionsFn {
   return (bsffFindUniqueArgs, bsffFicheInterventionsFindManyArgs = {}) => {
-    return prisma.bsff
-      .findUnique(bsffFindUniqueArgs)
-      .ficheInterventions(bsffFicheInterventionsFindManyArgs);
+    return prisma.bsff.findUnique(bsffFindUniqueArgs).ficheInterventions({
+      ...bsffFicheInterventionsFindManyArgs,
+      include: {
+        ...bsffFicheInterventionsFindManyArgs.include,
+        packagings: true
+      }
+    });
   };
 }

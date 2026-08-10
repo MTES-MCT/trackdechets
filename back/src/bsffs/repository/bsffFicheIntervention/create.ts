@@ -1,4 +1,4 @@
-import { BsffFicheIntervention, Prisma } from "@td/prisma";
+import { Prisma } from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps
@@ -8,7 +8,11 @@ import { bsffEventTypes } from "../types";
 export type CreateBsffFicheInterventionFn = (
   args: Prisma.BsffFicheInterventionCreateArgs,
   logMetadata?: LogMetadata
-) => Promise<BsffFicheIntervention>;
+) => Promise<
+  Prisma.BsffFicheInterventionGetPayload<{
+    include: { packagings: true };
+  }>
+>;
 
 export function buildCreateBsffFicheIntervention(
   deps: RepositoryFnDeps
@@ -16,7 +20,13 @@ export function buildCreateBsffFicheIntervention(
   return async (args, logMetadata?) => {
     const { prisma, user } = deps;
 
-    const FI = await prisma.bsffFicheIntervention.create(args);
+    const FI = await prisma.bsffFicheIntervention.create({
+      ...args,
+      include: {
+        ...args.include,
+        packagings: true
+      }
+    });
 
     await prisma.event.create({
       data: {
