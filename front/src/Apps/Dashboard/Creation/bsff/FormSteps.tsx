@@ -206,7 +206,27 @@ const BsffFormSteps = ({
       {
         path: "ficheInterventions",
         getComputedValue: (initialValue, actualValue) =>
-          actualValue?.length ? actualValue : initialValue
+          actualValue?.length
+            ? actualValue.map(fiche => {
+                const company = fiche.detenteur?.company;
+                const isPrivate = fiche.detenteur?.isPrivateIndividual;
+                const holderType = !isPrivate
+                  ? "ENTREPRISE"
+                  : /^OMI\d{7}$/.test(company?.name ?? "")
+                  ? "NAVIRE"
+                  : /^W\d{9}$/.test(company?.name ?? "")
+                  ? "ASSOCIATION"
+                  : "PARTICULIER";
+                return {
+                  ...fiche,
+                  holderType,
+                  identification:
+                    holderType === "ASSOCIATION" || holderType === "NAVIRE"
+                      ? company?.name ?? ""
+                      : ""
+                };
+              })
+            : initialValue
       }
     ]);
     const pickupSite = bsffQuery.data?.bsff?.emitter?.pickupSite;
@@ -215,7 +235,9 @@ const BsffFormSteps = ({
       ...state,
       pickupSiteEnabled: Boolean(pickupSite),
       pickupSiteManualMode: isManualBsffPickupSite(pickupSite),
-      equipmentHolderDifferent: false
+      equipmentHolderDifferent:
+        state.type === BsffType.TracerFluide &&
+        Boolean(state.ficheInterventions?.length)
     };
   }, [bsffQuery.data]);
   const methods = useForm<ZodBsff>({
@@ -241,6 +263,7 @@ const BsffFormSteps = ({
 
   const errorsFromPublishApi = publishErrors || publishErrorsFromRedirect;
   const type = methods.watch("type");
+  const equipmentHolderDifferent = methods.watch("equipmentHolderDifferent");
   const publishErrorTabIds = getPublishErrorTabIds(
     BsdType.Bsff,
     errorsFromPublishApi,
@@ -299,11 +322,14 @@ const BsffFormSteps = ({
         type === BsffType.CollectePetitesQuantites ? (
           <EmitterBsff />
         ) : undefined,
-      detenteur: type === BsffType.TracerFluide ? undefined : <DetenteurBsff />,
+      detenteur:
+        type !== BsffType.TracerFluide || equipmentHolderDifferent ? (
+          <DetenteurBsff />
+        ) : undefined,
       transporter: <TransporterBsff />,
       destination: <DestinationBsff />
     }),
-    [type]
+    [equipmentHolderDifferent, type]
   );
 
   // ======================================================
@@ -389,28 +415,58 @@ const BsffFormSteps = ({
       [
         BsffType.Groupement,
         BsffType.Reexpedition,
-        BsffType.Reconditionnement,
-        BsffType.TracerFluide
+        BsffType.Reconditionnement
       ].includes(values.type as BsffType)
     ) {
       return {};
     }
-    const ficheInterventions = values.ficheInterventions ?? [];
+    const ficheInterventions =
+      values.type === BsffType.TracerFluide && !values.equipmentHolderDifferent
+        ? []
+        : values.ficheInterventions ?? [];
     if (!ficheInterventions.length) return {};
 
     const entries = await Promise.all(
       ficheInterventions
-        .filter(fi => fi.numero && fi.postalCode && fi.weight && fi.weight > 0)
+        .filter(fi =>
+          values.type === BsffType.TracerFluide
+            ? !!fi.holderType
+            : fi.numero && fi.postalCode && fi.weight && fi.weight > 0
+        )
         .map(async fi => {
           const detenteurCompany = fi.detenteur?.company;
 
+          const isEquipmentHolder = values.type === BsffType.TracerFluide;
+          const identification = fi.identification?.trim();
+          const isPrivateIndividual = isEquipmentHolder
+            ? fi.holderType !== "ENTREPRISE"
+            : fi.detenteur?.isPrivateIndividual ?? false;
+          const linkedPackagingNumbers = new Set(
+            (fi.packagings ?? []).map(packaging => packaging.numero)
+          );
+          const linkedWeight = (values.packagings ?? []).reduce(
+            (sum, packaging) =>
+              linkedPackagingNumbers.has(packaging.numero)
+                ? sum + Number(packaging.weight ?? 0)
+                : sum,
+            0
+          );
+          const holderKey =
+            fi.numero ?? `DETENTEUR_${fi.holderType}_${Date.now()}`;
           const cleanedDetenteur = {
-            isPrivateIndividual: fi.detenteur?.isPrivateIndividual ?? false,
+            isPrivateIndividual,
             company: detenteurCompany
               ? {
-                  siret: detenteurCompany.siret ?? null,
-                  name: detenteurCompany.name ?? null,
-                  address: detenteurCompany.address ?? null,
+                  siret: isPrivateIndividual
+                    ? null
+                    : detenteurCompany.siret ?? null,
+                  name:
+                    detenteurCompany.name?.trim() ||
+                    identification ||
+                    detenteurCompany.contact?.trim() ||
+                    "Détenteur d'équipement",
+                  address:
+                    detenteurCompany.address?.trim() || "Non renseignée",
                   contact: detenteurCompany.contact ?? null,
                   phone: detenteurCompany.phone ?? null,
                   mail: detenteurCompany.mail ?? null
@@ -419,9 +475,9 @@ const BsffFormSteps = ({
           };
 
           const ficheInput = {
-            numero: fi.numero!,
-            weight: Number(fi.weight),
-            postalCode: fi.postalCode!,
+            numero: holderKey,
+            weight: isEquipmentHolder ? linkedWeight : Number(fi.weight),
+            postalCode: isEquipmentHolder ? "00000" : fi.postalCode!,
             detenteur: cleanedDetenteur,
             operateur: { company: cleanCompany(emitterCompany) }
           };
@@ -434,16 +490,13 @@ const BsffFormSteps = ({
               }
             });
 
-            return [fi.numero!, fi.id] as const;
+            return [holderKey, fi.id] as const;
           }
 
           const { data } = await createFicheIntervention({
             variables: {
               input: {
-                numero: fi.numero!,
-                weight: Number(fi.weight!),
-                postalCode: fi.postalCode!,
-                detenteur: fi.detenteur,
+                ...ficheInput,
                 operateur: {
                   company: cleanCompany(emitterCompany)
                 }
@@ -453,7 +506,7 @@ const BsffFormSteps = ({
 
           const createdId = data?.createFicheInterventionBsff?.id ?? null;
 
-          return [fi.numero, createdId] as const;
+          return [holderKey, createdId] as const;
         })
     );
 
