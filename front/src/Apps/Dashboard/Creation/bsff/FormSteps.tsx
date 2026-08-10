@@ -465,8 +465,7 @@ const BsffFormSteps = ({
                     identification ||
                     detenteurCompany.contact?.trim() ||
                     "Détenteur d'équipement",
-                  address:
-                    detenteurCompany.address?.trim() || "Non renseignée",
+                  address: detenteurCompany.address?.trim() || "Non renseignée",
                   contact: detenteurCompany.contact ?? null,
                   phone: detenteurCompany.phone ?? null,
                   mail: detenteurCompany.mail ?? null
