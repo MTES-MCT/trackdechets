@@ -195,23 +195,23 @@ const WasteBsff = () => {
               }
             />
             <p className="fr-info-text">A renseigner si vous êtes concerné</p>
-            <h4 className="fr-h4 fr-mt-4w">
-              {isDetenteur ? "Contenant" : "Contenants"}
-            </h4>
-            <RhfBsffPackagingList
-              disabled={
-                sealedFields.includes("packagings") ||
-                bsffType === BsffType.Groupement ||
-                bsffType === BsffType.Reexpedition
-              }
-              volumeEditable={
-                bsffType === BsffType.Groupement ||
-                bsffType === BsffType.Reexpedition
-              }
-              fieldName="packagings"
-              packagingTypes={bsffPackagingTypes}
-              detenteurMode={isDetenteur}
-            />
+            {!isDetenteur && <h4 className="fr-h4 fr-mt-4w">Contenants</h4>}
+            <div className={isDetenteur ? "fr-mt-4w" : undefined}>
+              <RhfBsffPackagingList
+                disabled={
+                  sealedFields.includes("packagings") ||
+                  bsffType === BsffType.Groupement ||
+                  bsffType === BsffType.Reexpedition
+                }
+                volumeEditable={
+                  bsffType === BsffType.Groupement ||
+                  bsffType === BsffType.Reexpedition
+                }
+                fieldName="packagings"
+                packagingTypes={bsffPackagingTypes}
+                detenteurMode={isDetenteur}
+              />
+            </div>
             <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>
             <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
               <div className="fr-col-md-6">
