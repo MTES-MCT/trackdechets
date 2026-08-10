@@ -1,8 +1,6 @@
 import {
   BsffPackagingType,
   BsffType,
-  Company,
-  User,
   UserRole
 } from "@td/prisma";
 import { gql } from "graphql-tag";
@@ -11,14 +9,12 @@ import { BSFF_WASTE_CODES } from "@td/constants";
 import type {
   Mutation,
   MutationCreateBsffArgs,
-  BsffOperationCode,
-  BsffInput
+  BsffOperationCode
 } from "@td/codegen-back";
 import {
   siretify,
   userWithCompanyFactory,
-  transporterReceiptFactory,
-  companyFactory
+  transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";

@@ -7,8 +7,6 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 import { objectDiff } from "../../../forms/workflow/diff";
 import {
-  addBsffPackagingsFichesIntervention,
-  removeBsffPackagingsFichesIntervention,
   updateDetenteurCompanySirets,
   updateTransporterOrgIds
 } from "../../database";
