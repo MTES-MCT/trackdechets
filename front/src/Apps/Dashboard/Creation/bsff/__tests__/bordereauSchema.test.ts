@@ -11,7 +11,12 @@ const parse = (values: Record<string, unknown>) =>
   rawBsffSchema.safeParse({
     type: "TRACER_FLUIDE",
     emitter: { company: holder },
-    packagings: [],
+    waste: {
+      code: "13 03 10*",
+      description: "Autres huiles isolantes et fluides caloporteurs"
+    },
+    packagings: [{ type: "BOUTEILLE", volume: 1, weight: 1, numero: "1" }],
+    weight: { value: 1, isEstimate: true },
     ...values
   });
 
@@ -91,5 +96,20 @@ describe("onglet Bordereau du parcours détenteur", () => {
         pickupSiteEnabled: true
       }).success
     ).toBe(true);
+  });
+
+  it("exige les champs obligatoires de l'onglet déchet", () => {
+    const result = parse({ waste: null, packagings: [], weight: null });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map(issue => issue.path.join("."))).toEqual(
+        expect.arrayContaining([
+          "waste.code",
+          "waste.description",
+          "packagings",
+          "weight.value"
+        ])
+      );
+    }
   });
 });

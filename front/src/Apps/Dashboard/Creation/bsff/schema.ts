@@ -229,6 +229,7 @@ export const rawBsffSchema = z
         isEstimate: z.boolean().nullish()
       })
       .nullish(),
+    totalWeight: z.coerce.number().nonnegative().nullish(),
     destination: z
       .object({
         company: zodCompany,
@@ -297,6 +298,34 @@ export const rawBsffSchema = z
             message
           });
       });
+      if (blank(data.waste?.code)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["waste", "code"],
+          message: "Le code déchet est requis"
+        });
+      }
+      if (blank(data.waste?.description)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["waste", "description"],
+          message: "La dénomination usuelle du déchet est requise"
+        });
+      }
+      if (!data.packagings?.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["packagings"],
+          message: "Au moins un contenant est requis"
+        });
+      }
+      if (data.weight?.value == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["weight", "value"],
+          message: "La quantité totale de fluide est requise"
+        });
+      }
       if (
         company?.phone &&
         !/^(?=.*\d)[0-9#.+-]+$/.test(company.phone.trim())
