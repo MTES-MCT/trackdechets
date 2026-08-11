@@ -6,6 +6,7 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 import {
+  addBsffPackagingsFichesIntervention,
   updateDetenteurCompanySirets,
   updateTransporterOrgIds
 } from "../../database";
@@ -51,13 +52,13 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
 
     // Si le BSFF a des fiches d'intervention et des packagings,
     // on fait le lien entre eux
-    // if (fullBsff.ficheInterventions?.length && fullBsff.packagings?.length) {
-    //   await addBsffPackagingsFichesIntervention(
-    //     fullBsff.packagings,
-    //     fullBsff.ficheInterventions,
-    //     prisma    const { prisma, user } = deps;
-    //   );
-    // }
+    if (fullBsff.ficheInterventions?.length && fullBsff.packagings?.length) {
+      await addBsffPackagingsFichesIntervention(
+        fullBsff.packagings,
+        fullBsff.ficheInterventions,
+        prisma
+      );
+    }
 
     // update transporters ordering when connecting transporters records
     if (
