@@ -1,7 +1,7 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
 import React, { useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 
 export const EQUIPMENT_HOLDER_TYPES = [
@@ -18,7 +18,7 @@ export function BsffEquipmentHolderForm({
   orgId,
   disabled = false
 }: Props) {
-  const { control, register, watch, setValue, formState } = useFormContext();
+  const { register, watch, setValue, formState } = useFormContext();
   const [selectedPackaging, setSelectedPackaging] = useState("");
   const holderType = watch(`${fieldName}.holderType`);
   const packagings = watch("packagings") ?? [];
