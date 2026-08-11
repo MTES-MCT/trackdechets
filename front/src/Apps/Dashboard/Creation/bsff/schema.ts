@@ -93,6 +93,7 @@ export const ZodOperationEnum = z
 
 const bsffPackagingSchema = z
   .object({
+    id: z.string().nullish(),
     type: z.nativeEnum(BsffPackagingType),
     other: z.string().max(250).nullish(),
     quantity: z.coerce.number().nonnegative().nullish(),
@@ -164,6 +165,13 @@ const bsffGroupingOrForwardingSchema = z.object({
 const ficheInterventionSchema = z.object({
   id: z.string().nullish(),
 
+  holderType: z
+    .enum(["ENTREPRISE", "PARTICULIER", "ASSOCIATION", "NAVIRE"])
+    .optional()
+    .or(z.literal("")),
+
+  identification: z.string().max(250).optional().or(z.literal("")),
+
   numero: z.string().max(250).optional().or(z.literal("")),
 
   weight: z.preprocess(
@@ -173,10 +181,20 @@ const ficheInterventionSchema = z.object({
 
   postalCode: z.string().optional().or(z.literal("")),
 
-  detenteur: z.object({
-    isPrivateIndividual: z.boolean().optional(),
-    company: zodCompany
-  })
+  detenteur: z
+    .object({
+      isPrivateIndividual: z.boolean().optional(),
+      company: zodCompany
+    })
+    .optional(),
+  packagings: z
+    .array(
+      z.object({
+        numero: z.string()
+      })
+    )
+    .optional()
+    .nullish()
 });
 
 export const rawBsffSchema = z
@@ -190,9 +208,23 @@ export const rawBsffSchema = z
       .object({
         company: zodCompany,
         customInfo: z.string().max(250).nullish(),
-        emission: zodSignature
+        emission: zodSignature,
+        pickupSite: z
+          .object({
+            name: z.string().max(250).nullish(),
+            address: z.string().max(250).nullish(),
+            street: z.string().max(250).nullish(),
+            address2: z.string().max(250).nullish(),
+            city: z.string().max(250).nullish(),
+            postalCode: z.string().max(250).nullish(),
+            infos: z.string().max(250).nullish()
+          })
+          .nullish()
       })
       .nullish(),
+    pickupSiteEnabled: z.boolean().default(false),
+    pickupSiteManualMode: z.boolean().default(false),
+    equipmentHolderDifferent: z.boolean().default(false),
     waste: z
       .object({
         code: ZodWasteCodeEnum,
@@ -206,6 +238,7 @@ export const rawBsffSchema = z
         isEstimate: z.boolean().nullish()
       })
       .nullish(),
+    totalWeight: z.coerce.number().nonnegative().nullish(),
     destination: z
       .object({
         company: zodCompany,
@@ -251,6 +284,233 @@ export const rawBsffSchema = z
     forwarding: bsffGroupingOrForwardingSchema.nullish()
   })
   .superRefine((data, ctx) => {
+    const blank = (value?: string | null) => !value?.trim();
+    if (data.type === BsffType.TRACER_FLUIDE) {
+      const company = data.emitter?.company;
+      const requiredCompanyFields: [string, string][] = [
+        ["contact", "La personne à contacter est requise"],
+        ["phone", "Le téléphone est requis"],
+        ["mail", "Le courriel est requis"]
+      ];
+      if (blank(company?.siret) && blank(company?.orgId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["emitter", "company", "siret"],
+          message: "Le détenteur est requis"
+        });
+      }
+      requiredCompanyFields.forEach(([field, message]) => {
+        if (blank(company?.[field]))
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "company", field],
+            message
+          });
+      });
+      if (blank(data.waste?.code)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["waste", "code"],
+          message: "Le code déchet est requis"
+        });
+      }
+      if (blank(data.waste?.description)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["waste", "description"],
+          message: "La dénomination usuelle du déchet est requise"
+        });
+      }
+      if (!data.packagings?.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["packagings"],
+          message: "Au moins un contenant est requis"
+        });
+      }
+      if (data.weight?.value == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["weight", "value"],
+          message: "La quantité totale de fluide est requise"
+        });
+      }
+      if (
+        company?.phone &&
+        !/^(?=.*\d)[0-9#.+-]+$/.test(company.phone.trim())
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["emitter", "company", "phone"],
+          message:
+            "Le téléphone ne peut contenir que des chiffres et les caractères # - + ."
+        });
+      }
+      if (data.pickupSiteEnabled) {
+        const site = data.emitter?.pickupSite;
+        if (blank(site?.name)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "name"],
+            message: "Le nom du site d'enlèvement est requis"
+          });
+        }
+
+        if (!data.pickupSiteManualMode && blank(site?.address)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "address"],
+            message: "L'adresse de collecte est requise"
+          });
+        }
+
+        if (data.pickupSiteManualMode && blank(site?.street)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "street"],
+            message: "Le numéro et libellé de voie est requis"
+          });
+        }
+
+        if (data.pickupSiteManualMode && blank(site?.postalCode)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "postalCode"],
+            message: "Le code postal est requis"
+          });
+        }
+
+        if (data.pickupSiteManualMode && blank(site?.city)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["emitter", "pickupSite", "city"],
+            message: "La commune est requise"
+          });
+        }
+      }
+
+      if (data.equipmentHolderDifferent) {
+        const holders = data.ficheInterventions ?? [];
+        if (!holders.length) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["ficheInterventions"],
+            message: "Au moins un détenteur doit être renseigné"
+          });
+        }
+
+        holders.forEach((holder, index) => {
+          const path = ["ficheInterventions", index];
+          const holderCompany = holder.detenteur?.company;
+          if (!holder.holderType) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [...path, "holderType"],
+              message: "Le type de détenteur est requis"
+            });
+          }
+          if (
+            holder.holderType === "ENTREPRISE" &&
+            blank(holderCompany?.siret) &&
+            blank(holderCompany?.orgId)
+          ) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [...path, "identification"],
+              message: "L'entreprise détentrice est requise"
+            });
+          }
+          if (
+            ["ASSOCIATION", "NAVIRE"].includes(holder.holderType ?? "") &&
+            blank(holder.identification)
+          ) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [...path, "identification"],
+              message: "L'identification du détenteur est requise"
+            });
+          }
+          if (
+            holder.holderType === "NAVIRE" &&
+            holder.identification &&
+            !/^OMI\d{7}$/.test(holder.identification)
+          ) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [...path, "identification"],
+              message: "Le numéro OMI doit contenir OMI suivi de 7 chiffres"
+            });
+          }
+          if (
+            holder.holderType === "ASSOCIATION" &&
+            holder.identification &&
+            !/^W\d{9}$/.test(holder.identification)
+          ) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [...path, "identification"],
+              message: "Le numéro RNA doit contenir W suivi de 9 chiffres"
+            });
+          }
+          (["contact", "phone", "mail"] as const).forEach(field => {
+            if (blank(holderCompany?.[field])) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: [...path, "detenteur", "company", field],
+                message: `Le champ ${field} est requis`
+              });
+            }
+          });
+          if (
+            holderCompany?.phone &&
+            !/^(?=.*\d)[0-9#.+-]+$/.test(holderCompany.phone.trim())
+          ) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [...path, "detenteur", "company", "phone"],
+              message:
+                "Le téléphone ne peut contenir que des chiffres et les caractères # - + ."
+            });
+          }
+          if (
+            holderCompany?.mail &&
+            !z.string().email().safeParse(holderCompany.mail).success
+          ) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [...path, "detenteur", "company", "mail"],
+              message: "Le courriel n'est pas valide"
+            });
+          }
+          if (!holder.packagings?.length) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [...path, "packagings"],
+              message: "Au moins un contenant doit être rattaché à ce détenteur"
+            });
+          }
+        });
+
+        const linkedPackagingNumbers = new Set(
+          holders.flatMap(holder =>
+            (holder.packagings ?? []).map(packaging => packaging.numero)
+          )
+        );
+        (data.packagings ?? []).forEach((packaging, index) => {
+          if (
+            packaging.numero &&
+            !linkedPackagingNumbers.has(packaging.numero)
+          ) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ["packagings", index, "numero"],
+              message: `Le contenant #${packaging.numero} n'a pas été affecté à un détenteur`
+            });
+          }
+        });
+      }
+    }
+
     if (data.type !== BsffType.COLLECTE_PETITES_QUANTITES) return;
 
     (data.ficheInterventions ?? []).forEach((fi, index) => {

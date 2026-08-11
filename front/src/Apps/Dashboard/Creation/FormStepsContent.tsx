@@ -23,15 +23,11 @@ interface FormStepsContentProps {
   saveForm: Function;
   draftCtaLabel: string;
   mainCtaLabel: string;
-  tabsContent: {
-    waste?: React.JSX.Element;
-    emitter?: React.JSX.Element;
-    transporter?: React.JSX.Element;
-    destination?: React.JSX.Element;
-  };
+  tabsContent: Partial<Record<TabId, React.JSX.Element | null>>;
   setPublishErrors: (normalizedErrors: NormalizedError[]) => void;
   errorTabIds?: TabId[];
   genericErrorMessage?: TabError[];
+  initialTabId?: TabId;
 }
 const FormStepsContent = ({
   bsdType,
@@ -44,9 +40,10 @@ const FormStepsContent = ({
   saveForm,
   setPublishErrors,
   errorTabIds,
-  genericErrorMessage
+  genericErrorMessage,
+  initialTabId = TabId.waste
 }: FormStepsContentProps) => {
-  const [selectedTabId, setSelectedTabId] = useState<TabId>(TabId.waste);
+  const [selectedTabId, setSelectedTabId] = useState<TabId>(initialTabId);
   const navigate = useNavigate();
   const tabList = getTabs(bsdType, errorTabIds).filter(
     tab => tabsContent[tab.tabId]

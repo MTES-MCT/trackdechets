@@ -26,6 +26,17 @@ const CREATE_DRAFT_BSFF = `
   mutation CreateDraftBsff($input: BsffInput!) {
     createDraftBsff(input: $input) {
       id
+      emitter {
+        pickupSite {
+          name
+          address
+          street
+          address2
+          postalCode
+          city
+          infos
+        }
+      }
       ficheInterventions {
         id
       }
@@ -41,6 +52,53 @@ const CREATE_DRAFT_BSFF = `
 
 describe("Mutation.createDraftBsff", () => {
   afterEach(resetDatabase);
+
+  it("should persist a pickup site on a tracer fluid draft", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(user);
+    const pickupSite = {
+      name: "Chantier Nord",
+      address: null,
+      street: "12 rue des Fleurs",
+      address2: "Bâtiment B",
+      postalCode: "75001",
+      city: "Paris",
+      infos: "Accès par la cour"
+    };
+
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createDraftBsff">,
+      MutationCreateDraftBsffArgs
+    >(CREATE_DRAFT_BSFF, {
+      variables: {
+        input: {
+          type: BsffType.TRACER_FLUIDE,
+          emitter: {
+            company: { siret: company.siret },
+            pickupSite
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.createDraftBsff.emitter?.pickupSite).toEqual(pickupSite);
+
+    const bsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: data.createDraftBsff.id }
+    });
+    expect(bsff).toEqual(
+      expect.objectContaining({
+        emitterPickupSiteName: pickupSite.name,
+        emitterPickupSiteAddress: pickupSite.address,
+        emitterPickupSiteStreet: pickupSite.street,
+        emitterPickupSiteAddress2: pickupSite.address2,
+        emitterPickupSitePostalCode: pickupSite.postalCode,
+        emitterPickupSiteCity: pickupSite.city,
+        emitterPickupSiteInfos: pickupSite.infos
+      })
+    );
+  });
 
   it.each(["emitter", "transporter", "destination"])(
     "should allow %p to create a bsff",
@@ -520,7 +578,8 @@ describe("Mutation.createDraftBsff", () => {
         }
       );
 
-      const { id, previousPackagings, ...packagingData } = bsff.packagings[0];
+      const { id, previousPackagings, ficheInterventions, ...packagingData } =
+        bsff.packagings[0];
       await prisma.bsffPackaging.create({
         data: { ...packagingData, acceptationWasteCode: "14 06 02*" }
       });
@@ -528,7 +587,9 @@ describe("Mutation.createDraftBsff", () => {
       bsff = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff.id },
         include: {
-          packagings: { include: { previousPackagings: true } },
+          packagings: {
+            include: { previousPackagings: true, ficheInterventions: true }
+          },
           transporters: true,
           ficheInterventions: true
         }
@@ -972,7 +1033,11 @@ describe("Mutation.createDraftBsff", () => {
       const operateurCompany1 = await companyFactory();
       const operateurCompany2 = await companyFactory();
       for (const company of [operateurCompany1, operateurCompany2]) {
-        await associateUserToCompany(operateurUser.id, company.siret, "MEMBER");
+        await associateUserToCompany(
+          operateurUser.id,
+          company.siret ?? "",
+          "MEMBER"
+        );
       }
       const ficheIntervention = await createFicheIntervention({
         operateur: { user: operateurUser, company: operateurCompany1 },

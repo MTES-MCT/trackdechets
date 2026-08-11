@@ -34,8 +34,20 @@ const initialTransporter: BsffTransporterInput = {
 export default {
   type: BsffType.CollectePetitesQuantites,
   emitter: {
-    company: getInitialEmitterCompany()
+    company: getInitialEmitterCompany(),
+    pickupSite: {
+      name: "",
+      address: "",
+      street: "",
+      address2: "",
+      postalCode: "",
+      city: "",
+      infos: ""
+    }
   },
+  pickupSiteEnabled: false,
+  pickupSiteManualMode: false,
+  equipmentHolderDifferent: false,
   waste: {
     code: null,
     description: "",
@@ -46,6 +58,7 @@ export default {
     isEstimate: false,
     value: null
   },
+  totalWeight: null,
   broker: {
     company: getInitialCompany()
   },

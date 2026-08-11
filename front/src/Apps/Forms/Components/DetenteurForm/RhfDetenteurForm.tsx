@@ -9,6 +9,7 @@ import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWr
 import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DsfrfWorkSiteAddress from "../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 import { SealedFieldsContext } from "../../../../Apps/Dashboard/Creation/context";
+import SingleCheckbox from "../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 type Props = {
   orgId?: string;
@@ -21,7 +22,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   const emitterCompany = watch("emitter.company");
 
   const type = watch("type");
-
+  const packagingInfos = watch("packagings");
   const isCollectePetitesQuantites = type === BsffType.CollectePetitesQuantites;
 
   const INSTALLATION_TYPES = [
@@ -47,7 +48,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   const selectedOrgId = watch(`${companyField}.orgId`);
 
   const sealedFields = useContext(SealedFieldsContext);
-
   const hasInitializedTracerFluide = useRef(false);
   useEffect(() => {
     if (!isTracerFluide || hasInitializedTracerFluide.current) return;
@@ -95,14 +95,26 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
     if (isEmpty || isSameCompany) {
       setValue(`${companyField}.orgId`, emitterCompany.orgId);
       setValue(`${companyField}.siret`, emitterCompany.siret);
-      if (!current?.name) setValue(`${companyField}.name`, emitterCompany.name);
-      if (!current?.address)
+
+      if (!current?.name) {
+        setValue(`${companyField}.name`, emitterCompany.name);
+      }
+
+      if (!current?.address) {
         setValue(`${companyField}.address`, emitterCompany.address);
-      if (!current?.contact)
+      }
+
+      if (!current?.contact) {
         setValue(`${companyField}.contact`, emitterCompany.contact);
-      if (!current?.phone)
+      }
+
+      if (!current?.phone) {
         setValue(`${companyField}.phone`, emitterCompany.phone);
-      if (!current?.mail) setValue(`${companyField}.mail`, emitterCompany.mail);
+      }
+
+      if (!current?.mail) {
+        setValue(`${companyField}.mail`, emitterCompany.mail);
+      }
     }
 
     hasInitializedInstallationDetenteur.current = true;
@@ -116,24 +128,29 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
     setValue(`${companyField}.orgId`, company.orgId);
     setValue(`${companyField}.siret`, company.siret);
+
     setValue(
       `${companyField}.name`,
       isNewCompany ? company.name : current?.name ?? company.name
     );
+
     setValue(
       `${companyField}.address`,
       isNewCompany ? company.address : current?.address ?? company.address
     );
+
     setValue(
       `${companyField}.contact`,
       isNewCompany ? company.contact : current?.contact ?? company.contact
     );
+
     setValue(
       `${companyField}.phone`,
       isNewCompany
         ? company.contactPhone
         : current?.phone ?? company.contactPhone
     );
+
     setValue(
       `${companyField}.mail`,
       isNewCompany
@@ -141,6 +158,42 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
         : current?.mail ?? company.contactEmail
     );
   };
+
+  // ======================================================
+  // NOUVELLE FONCTIONNALITÉ : synchronisation fiche ↔ contenants
+  // ======================================================
+
+  const ficheInterventions = watch("ficheInterventions");
+
+  // le numéro saisi dans CETTE fiche
+  const currentNumero = watch(`${fieldName}.numero`);
+
+  // la fiche correspondant au numéro
+  const currentFicheIntervention = ficheInterventions?.find(
+    fi => fi.numero === currentNumero
+  );
+
+  React.useEffect(() => {
+    if (!currentFicheIntervention) return;
+
+    const alreadyLinked = (currentFicheIntervention.packagings ?? [])
+      .map((p: any) => p.numero)
+      .filter(Boolean);
+
+    if (!alreadyLinked.length) return;
+
+    const current = watch(`${fieldName}.contenantsRattaches`) ?? [];
+
+    if (current.length === 0) {
+      setValue(`${fieldName}.contenantsRattaches`, alreadyLinked);
+    }
+  }, [
+    currentFicheIntervention?.numero,
+    currentFicheIntervention?.packagings,
+    fieldName,
+    setValue,
+    watch
+  ]);
 
   return (
     <div className="fr-col-12">
@@ -287,6 +340,83 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
               )}
             </div>
           </div>
+
+          {/* CONTENANTS RATTACHÉS */}
+          {packagingInfos.length > 0 && (
+            <>
+              <h4 className="fr-mt-4w">Contenants rattachés</h4>
+
+              <Controller
+                control={control}
+                name={`${fieldName}.contenantsRattaches`}
+                defaultValue={[]}
+                render={({ field }) => (
+                  <SingleCheckbox
+                    options={packagingInfos.map((packaging, index) => {
+                      const numero =
+                        packaging.numero ?? `Contenant ${index + 1}`;
+
+                      return {
+                        label: numero,
+                        nativeInputProps: {
+                          checked: field.value?.includes(numero),
+                          onChange: e => {
+                            const checked = e.target.checked;
+
+                            const nextValue = checked
+                              ? [...(field.value ?? []), numero]
+                              : (field.value ?? []).filter(
+                                  (n: string) => n !== numero
+                                );
+
+                            field.onChange(nextValue);
+
+                            // index de la fiche actuelle
+                            const ficheIndex = (
+                              watch("ficheInterventions") ?? []
+                            ).findIndex(
+                              (fi: any) => fi.numero === currentNumero
+                            );
+
+                            if (ficheIndex === -1) return;
+
+                            // packagings actuels de la fiche
+                            const currentPackagings =
+                              watch(
+                                `ficheInterventions.${ficheIndex}.packagings`
+                              ) ?? [];
+
+                            let updatedPackagings;
+                            if (checked) {
+                              updatedPackagings = [
+                                ...currentPackagings,
+                                { id: packagingInfos[index].id, numero: numero }
+                              ];
+                            } else {
+                              updatedPackagings = currentPackagings.filter(
+                                (p: any) => p.numero !== numero
+                              );
+                            }
+
+                            setValue(
+                              `ficheInterventions.${ficheIndex}.packagings`,
+                              updatedPackagings
+                            );
+
+                            console.log(
+                              "PACKAGINGS FICHE UPDATED",
+                              updatedPackagings
+                            );
+                          }
+                        }
+                      };
+                    })}
+                  />
+                )}
+              />
+              <hr className="fr-mt-4w" />
+            </>
+          )}
 
           <h4 className="fr-mt-4w">Détenteur</h4>
 

@@ -36,6 +36,7 @@ interface CompanySelectorWrapperProps {
   // SIRET ou VAT de l'établissement courant (utile pour le calcul des favoris)
   orgId?: string;
   disabled?: boolean;
+  searchRequired?: boolean;
 }
 
 /**
@@ -56,6 +57,7 @@ export default function CompanySelectorWrapper({
   selectedCompanyError,
   orgId,
   disabled = false,
+  searchRequired,
   onCompanySelected,
   onUnknownInputCompany
 }: Readonly<CompanySelectorWrapperProps>) {
@@ -215,6 +217,7 @@ export default function CompanySelectorWrapper({
         selectedCompany={selectedCompany}
         selectedCompanyError={memoizedSelectedCompanyError}
         disabled={disabled}
+        searchRequired={searchRequired}
         searchHint={
           allowForeignCompanies
             ? "ou numéro TVA pour un établissement de l'UE"

@@ -147,9 +147,62 @@ type InitialBsff {
   ficheInterventions: [BsffFicheIntervention!]!
 }
 
+type BsffPickupSite {
+  """
+  Nom du site d'enlèvement
+
+  Max: 250 caractères
+  """
+  name: String
+
+  """
+  Adresse du lieu de collecte
+
+  Max: 250 caractères
+  """
+  address: String
+
+  """
+  N° et libellé de voie
+
+  Max: 250 caractères
+  """
+  street: String
+
+  """
+  Complément d'adresse
+
+  Max: 250 caractères
+  """
+  address2: String
+
+  """
+  Code postal
+
+  Max: 250 caractères
+  """
+  postalCode: String
+
+  """
+  Commune
+
+  Max: 250 caractères
+  """
+  city: String
+
+  """
+  Informations complémentaires
+
+  Max: 250 caractères
+  """
+  infos: String
+}
+
 type BsffEmitter {
   "Entreprise émettant le déchet."
   company: FormCompany
+  "Lieu de collecte"
+  pickupSite: BsffPickupSite
   "Déclaration de l'émetteur lors de l'enlèvement par le transporteur."
   emission: BsffEmission
   "Champ libre"
@@ -193,6 +246,8 @@ type BsffPackaging {
   nextBsffs: [Bsff!]!
   "Liste de tous les BSFF précédents"
   previousBsffs: [InitialBsff!]!
+  "List des fiches d'intervention liées au contenant"
+  ficheInterventions: [BsffFicheIntervention!]!
 }
 
 type BsffWaste {
@@ -320,6 +375,8 @@ type BsffFicheIntervention {
   operateur: BsffOperateur
   "Code postal du lieu où l'intervention a eu lieu."
   postalCode: String!
+  "Liste des contenants associés à cette fiche d'intervention."
+  packagings: [BsffPackaging!]!
 }
 
 "Informations sur le détenteur d'un équipement"

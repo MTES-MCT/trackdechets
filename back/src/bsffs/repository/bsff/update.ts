@@ -7,6 +7,8 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 import { objectDiff } from "../../../forms/workflow/diff";
 import {
+  addBsffPackagingsFichesIntervention,
+  removeBsffPackagingsFichesIntervention,
   updateDetenteurCompanySirets,
   updateTransporterOrgIds
 } from "../../database";
@@ -26,13 +28,25 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
 
     const previousBsff = await prisma.bsff.findUniqueOrThrow({
       where: args.where,
-      include: { transporters: true }
+      include: {
+        transporters: true,
+        ficheInterventions: true,
+        packagings: {
+          include: {
+            ficheInterventions: true
+          }
+        }
+      }
     });
     const updatedBsff = await prisma.bsff.update(args);
 
     const fullBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: updatedBsff.id },
-      include: { transporters: true, ficheInterventions: true }
+      include: {
+        transporters: true,
+        ficheInterventions: true,
+        packagings: true
+      }
     });
 
     // update transporters ordering when connecting transporters records
@@ -82,8 +96,26 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       await updateTransporterOrgIds(fullBsff, prisma);
     }
 
-    if (args.data.ficheInterventions) {
+    if (args.data.ficheInterventions || args.data.packagings) {
       await updateDetenteurCompanySirets(fullBsff, prisma);
+    }
+
+    // Si le BSFF a des fiches d'intervention et des packagings,
+    // on fait le lien entre eux
+    if (args.data.ficheInterventions || args.data.packagings) {
+      // D'abord on enlève les anciennes relations
+      await removeBsffPackagingsFichesIntervention(
+        previousBsff.packagings,
+        previousBsff.ficheInterventions,
+        prisma
+      );
+
+      // Puis on ajoute les nouvelles
+      await addBsffPackagingsFichesIntervention(
+        fullBsff.packagings,
+        fullBsff.ficheInterventions,
+        prisma
+      );
     }
 
     const { updatedAt, ...updateDiff } = objectDiff(previousBsff, updatedBsff);

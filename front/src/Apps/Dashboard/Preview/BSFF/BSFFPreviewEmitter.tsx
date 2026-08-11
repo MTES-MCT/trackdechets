@@ -13,6 +13,12 @@ interface BSFFPreviewEmitterProps {
   bsd: Bsff;
 }
 const BSFFPreviewEmitter = ({ bsd }: BSFFPreviewEmitterProps) => {
+  const site = bsd.emitter?.pickupSite;
+  const pickupAddress =
+    site?.address?.trim() ||
+    [site?.street, site?.address2, site?.postalCode, site?.city]
+      .filter(Boolean)
+      .join(" ");
   return (
     <PreviewContainer>
       <PreviewContainerRow>
@@ -31,6 +37,22 @@ const BSFFPreviewEmitter = ({ bsd }: BSFFPreviewEmitterProps) => {
             label="Adresse"
             value={bsd.emitter?.company?.address}
           />
+          {!!site && (
+            <>
+              <PreviewTextRow
+                label="Nom du site d'enlèvement"
+                value={site.name}
+              />
+              <PreviewTextRow
+                label="Adresse de collecte des déchets"
+                value={pickupAddress}
+              />
+              <PreviewTextRow
+                label="Informations complémentaires"
+                value={site.infos}
+              />
+            </>
+          )}
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={6}>

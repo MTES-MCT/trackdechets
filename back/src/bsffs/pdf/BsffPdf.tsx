@@ -208,11 +208,31 @@ function BsffEmitterType({ bsff }: Pick<Props, "bsff">) {
 }
 
 function BsffEmitter({ bsff }: Pick<Props, "bsff">) {
+  const site = bsff.emitter?.pickupSite;
+  const pickupAddress =
+    site?.address?.trim() ||
+    [site?.street, site?.address2, site?.postalCode, site?.city]
+      .filter(Boolean)
+      .join(" ");
   return (
     <div className="BoxCol">
       <p>
         <strong>1. Émetteur du bordereau</strong>
         <FormCompanyFields company={bsff.emitter?.company} />
+        {!!site && (
+          <>
+            <br />
+            Nom du site d'enlèvement : {site.name}
+            <br />
+            Adresse de collecte des déchets : {pickupAddress}
+            {!!site.infos && (
+              <>
+                <br />
+                Informations complémentaires : {site.infos}
+              </>
+            )}
+          </>
+        )}
       </p>
     </div>
   );

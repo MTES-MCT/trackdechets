@@ -73,7 +73,8 @@ const ficheInterventionSchema: yup.SchemaOf<BsffFicheInterventionInput> =
     weight: yup.number().required(),
     postalCode: yup.string().required(),
     detenteur: detenteurSchema,
-    operateur: operateurSchema
+    operateur: operateurSchema,
+    packagings: yup.array().of(yup.string()).notRequired()
   });
 
 interface AddFicheInterventionModalProps {

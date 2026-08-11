@@ -106,6 +106,13 @@ export const FicheInterventionFragment = gql`
         ...CompanyFragment
       }
     }
+    packagings {
+      id
+      numero
+      type
+      weight
+      volume
+    }
   }
   ${companyFragment}
 `;
@@ -122,6 +129,15 @@ export const FullBsffFragment = gql`
       company {
         ...CompanyFragment
       }
+      pickupSite {
+        name
+        address
+        street
+        address2
+        postalCode
+        city
+        infos
+      }
       emission {
         signature {
           author
@@ -136,6 +152,10 @@ export const FullBsffFragment = gql`
       numero
       volume
       weight
+      ficheInterventions {
+        id
+        numero
+      }
       acceptation {
         date
         status
