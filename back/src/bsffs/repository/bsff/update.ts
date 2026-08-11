@@ -31,7 +31,11 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       include: {
         transporters: true,
         ficheInterventions: true,
-        packagings: true
+        packagings: {
+          include: {
+            ficheInterventions: true
+          }
+        }
       }
     });
     const updatedBsff = await prisma.bsff.update(args);
@@ -92,7 +96,7 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       await updateTransporterOrgIds(fullBsff, prisma);
     }
 
-    if (args.data.ficheInterventions) {
+    if (args.data.ficheInterventions || args.data.packagings) {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 

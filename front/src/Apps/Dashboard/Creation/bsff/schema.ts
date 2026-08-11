@@ -167,7 +167,8 @@ const ficheInterventionSchema = z.object({
 
   holderType: z
     .enum(["ENTREPRISE", "PARTICULIER", "ASSOCIATION", "NAVIRE"])
-    .optional(),
+    .optional()
+    .or(z.literal("")),
 
   identification: z.string().max(250).optional().or(z.literal("")),
 
@@ -180,10 +181,12 @@ const ficheInterventionSchema = z.object({
 
   postalCode: z.string().optional().or(z.literal("")),
 
-  detenteur: z.object({
-    isPrivateIndividual: z.boolean().optional(),
-    company: zodCompany
-  }),
+  detenteur: z
+    .object({
+      isPrivateIndividual: z.boolean().optional(),
+      company: zodCompany
+    })
+    .optional(),
   packagings: z
     .array(
       z.object({

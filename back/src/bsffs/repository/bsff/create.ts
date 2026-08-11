@@ -38,7 +38,11 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       include: {
         transporters: true,
         ficheInterventions: true,
-        packagings: true
+        packagings: {
+          include: {
+            ficheInterventions: true
+          }
+        }
       }
     });
 
@@ -46,7 +50,7 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       await updateTransporterOrgIds(fullBsff, prisma);
     }
 
-    if (args.data.ficheInterventions) {
+    if (args.data.ficheInterventions || args.data.packagings) {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 

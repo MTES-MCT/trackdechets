@@ -409,8 +409,16 @@ const BsffFormSteps = ({
         })
     );
   }
+  function getFicheInterventionKey(fi: any, index: number) {
+    return (
+      fi.numero?.trim() ||
+      fi.id ||
+      `DETENTEUR_${fi.holderType || "ENTREPRISE"}_${index}`
+    );
+  }
   async function getFicheInterventionIds(values: ZodBsff) {
     const emitterCompany = values.emitter?.company;
+
     if (
       [
         BsffType.Groupement,
@@ -420,39 +428,75 @@ const BsffFormSteps = ({
     ) {
       return {};
     }
+
     const ficheInterventions =
       values.type === BsffType.TracerFluide && !values.equipmentHolderDifferent
         ? []
         : values.ficheInterventions ?? [];
+
     if (!ficheInterventions.length) return {};
 
     const entries = await Promise.all(
       ficheInterventions
-        .filter(fi =>
-          values.type === BsffType.TracerFluide
-            ? !!fi.holderType
-            : fi.numero && fi.postalCode && fi.weight && fi.weight > 0
-        )
-        .map(async fi => {
+        .filter(fi => {
+          const hasDetenteur = Boolean(
+            fi.detenteur?.company?.siret ||
+              fi.detenteur?.company?.orgId ||
+              fi.detenteur?.company?.name ||
+              fi.detenteur?.isPrivateIndividual
+          );
+
+          // TRACER_FLUIDE :
+          // On accepte une fiche qui contient uniquement
+          // le détenteur + les contenants sélectionnés.
+          if (values.type === BsffType.TracerFluide) {
+            return Boolean(fi.holderType) || hasDetenteur;
+          }
+
+          // Autres types : on conserve le comportement existant.
+          return (
+            hasDetenteur ||
+            Boolean(fi.numero && fi.postalCode && fi.weight && fi.weight > 0)
+          );
+        })
+        .map(async (fi, index) => {
           const detenteurCompany = fi.detenteur?.company;
 
           const isEquipmentHolder = values.type === BsffType.TracerFluide;
+
           const identification = fi.identification?.trim();
+
           const isPrivateIndividual = isEquipmentHolder
             ? fi.holderType !== "ENTREPRISE"
             : fi.detenteur?.isPrivateIndividual ?? false;
+
+          // ======================================================
+          // CONTENANTS RATTACHÉS À CETTE FICHE / CE DÉTENTEUR
+          // ======================================================
+
           const linkedPackagingNumbers = new Set(
-            (fi.packagings ?? []).map(packaging => packaging.numero)
+            (fi.packagings ?? [])
+              .map(packaging => packaging.numero)
+              .filter(Boolean)
           );
+
           const linkedWeight = (values.packagings ?? []).reduce(
-            (sum, packaging) =>
-              linkedPackagingNumbers.has(packaging.numero)
-                ? sum + Number(packaging.weight ?? 0)
-                : sum,
+            (sum, packaging) => {
+              if (linkedPackagingNumbers.has(packaging.numero)) {
+                return sum + Number(packaging.weight ?? 0);
+              }
+
+              return sum;
+            },
             0
           );
-          const holderKey =
-            fi.numero ?? `DETENTEUR_${fi.holderType}_${Date.now()}`;
+
+          const holderKey = getFicheInterventionKey(fi, index);
+
+          // ======================================================
+          // DÉTENTEUR
+          // ======================================================
+
           const cleanedDetenteur = {
             isPrivateIndividual,
             company: detenteurCompany
@@ -460,6 +504,7 @@ const BsffFormSteps = ({
                   siret: isPrivateIndividual
                     ? null
                     : detenteurCompany.siret ?? null,
+
                   name:
                     detenteurCompany.name?.trim() ||
                     identification ||
@@ -473,13 +518,37 @@ const BsffFormSteps = ({
               : undefined
           };
 
+          // ======================================================
+          // FICHE INTERVENTION
+          // ======================================================
+
           const ficheInput = {
             numero: holderKey,
-            weight: isEquipmentHolder ? linkedWeight : Number(fi.weight),
-            postalCode: isEquipmentHolder ? "00000" : fi.postalCode!,
+
+            // IMPORTANT :
+            // Pour TRACER_FLUIDE, le poids vient des contenants
+            // rattachés à cette fiche.
+            //
+            // Pour les autres types, on conserve fi.weight.
+            weight: isEquipmentHolder ? linkedWeight : Number(fi.weight ?? 0),
+
+            // GraphQL exige postalCode: String!
+            //
+            // Pour TRACER_FLUIDE, la valeur n'est pas utilisée
+            // comme adresse du détenteur : on fournit simplement
+            // une valeur technique obligatoire.
+            postalCode: isEquipmentHolder ? "00000" : fi.postalCode ?? "00000",
+
             detenteur: cleanedDetenteur,
-            operateur: { company: cleanCompany(emitterCompany) }
+
+            operateur: {
+              company: cleanCompany(emitterCompany)
+            }
           };
+
+          // ======================================================
+          // UPDATE FICHE EXISTANTE
+          // ======================================================
 
           if (fi.id) {
             await updateFicheInterventionBsff({
@@ -492,14 +561,13 @@ const BsffFormSteps = ({
             return [holderKey, fi.id] as const;
           }
 
+          // ======================================================
+          // CREATE FICHE
+          // ======================================================
+
           const { data } = await createFicheIntervention({
             variables: {
-              input: {
-                ...ficheInput,
-                operateur: {
-                  company: cleanCompany(emitterCompany)
-                }
-              }
+              input: ficheInput
             }
           });
 
@@ -509,12 +577,10 @@ const BsffFormSteps = ({
         })
     );
 
-    return Object.fromEntries(entries.filter(([, id]) => !!id)) as Record<
-      string,
-      string
-    >;
+    return Object.fromEntries(
+      entries.filter(([, id]) => Boolean(id))
+    ) as Record<string, string>;
   }
-
   // ======================================================
   // BUILD INPUT
   // ======================================================
@@ -623,6 +689,38 @@ const BsffFormSteps = ({
   // PACKAGINGS
   // ======================================================
 
+  // function buildPackagings(
+  //   type: BsffType,
+  //   packagings: any[] | null | undefined,
+  //   ficheInterventions: any[] | null | undefined,
+  //   ficheInterventionMap: Record<string, string>
+  // ) {
+  //   if ([BsffType.Groupement, BsffType.Reexpedition].includes(type)) {
+  //     return undefined;
+  //   }
+
+  //   return packagings?.map(p => ({
+  //     type: p.type,
+
+  //     numero: p.numero,
+
+  //     other: p.other ?? null,
+
+  //     volume: p.volume ?? null,
+
+  //     weight: Number(p.weight ?? 0),
+
+  //     ficheInterventions:
+  //       ficheInterventions
+  //         ?.filter(fi =>
+  //           fi.packagings?.some(
+  //             (linkedPackaging: any) => linkedPackaging.numero === p.numero
+  //           )
+  //         )
+  //         .map(fi => ficheInterventionMap[fi.numero])
+  //         .filter(Boolean) ?? []
+  //   }));
+  // }
   function buildPackagings(
     type: BsffType,
     packagings: any[] | null | undefined,
@@ -635,27 +733,29 @@ const BsffFormSteps = ({
 
     return packagings?.map(p => ({
       type: p.type,
-
       numero: p.numero,
-
       other: p.other ?? null,
-
       volume: p.volume ?? null,
-
       weight: Number(p.weight ?? 0),
 
       ficheInterventions:
         ficheInterventions
-          ?.filter(fi =>
-            fi.packagings?.some(
+          ?.map((fi, index) => {
+            const isLinked = fi.packagings?.some(
               (linkedPackaging: any) => linkedPackaging.numero === p.numero
-            )
-          )
-          .map(fi => ficheInterventionMap[fi.numero])
-          .filter(Boolean) ?? []
+            );
+
+            if (!isLinked) {
+              return null;
+            }
+
+            const ficheKey = getFicheInterventionKey(fi, index);
+
+            return ficheInterventionMap[ficheKey] ?? null;
+          })
+          .filter((id): id is string => Boolean(id)) ?? []
     }));
   }
-
   // ======================================================
   // UPDATE FLOW
   // ======================================================
