@@ -248,6 +248,8 @@ type BsffPackaging {
   previousBsffs: [InitialBsff!]!
   "List des fiches d'intervention liées au contenant"
   ficheInterventions: [BsffFicheIntervention!]!
+  "Liste des détenteurs associés au contenant"
+  detenteurs: [BsffDetenteur!]!
 }
 
 type BsffWaste {

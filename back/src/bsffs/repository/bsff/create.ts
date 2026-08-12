@@ -40,7 +40,8 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
         ficheInterventions: true,
         packagings: {
           include: {
-            ficheInterventions: true
+            ficheInterventions: true,
+            detenteurs: true
           }
         }
       }
@@ -56,7 +57,15 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
 
     // Si le BSFF a des fiches d'intervention et des packagings,
     // on fait le lien entre eux
-    if (fullBsff.ficheInterventions?.length && fullBsff.packagings?.length) {
+    const hasExplicitPackagingFicheInterventions = fullBsff.packagings.some(
+      packaging => packaging.ficheInterventions.length > 0
+    );
+
+    if (
+      !hasExplicitPackagingFicheInterventions &&
+      fullBsff.ficheInterventions.length &&
+      fullBsff.packagings.length
+    ) {
       await addBsffPackagingsFichesIntervention(
         fullBsff.packagings,
         fullBsff.ficheInterventions,

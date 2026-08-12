@@ -33,7 +33,8 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
         ficheInterventions: true,
         packagings: {
           include: {
-            ficheInterventions: true
+            ficheInterventions: true,
+            detenteurs: true
           }
         }
       }
@@ -45,7 +46,12 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       include: {
         transporters: true,
         ficheInterventions: true,
-        packagings: true
+        packagings: {
+          include: {
+            ficheInterventions: true,
+            detenteurs: true
+          }
+        }
       }
     });
 
@@ -100,24 +106,31 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
-    // Si le BSFF a des fiches d'intervention et des packagings,
-    // on fait le lien entre eux
-    if (args.data.ficheInterventions || args.data.packagings) {
-      // D'abord on enlève les anciennes relations
+    const hasExplicitPackagingFicheInterventions = fullBsff.packagings.some(
+      packaging => packaging.ficheInterventions.length > 0
+    );
+
+    // Compatibilité : on conserve l'association historique « toutes les FI avec
+    // tous les contenants » seulement lorsqu'aucune association explicite n'est
+    // portée par les contenants.
+    if (
+      !hasExplicitPackagingFicheInterventions &&
+      (args.data.ficheInterventions || args.data.packagings) &&
+      fullBsff.ficheInterventions.length > 0 &&
+      fullBsff.packagings.length > 0
+    ) {
       await removeBsffPackagingsFichesIntervention(
         previousBsff.packagings,
         previousBsff.ficheInterventions,
         prisma
       );
 
-      // Puis on ajoute les nouvelles
       await addBsffPackagingsFichesIntervention(
         fullBsff.packagings,
         fullBsff.ficheInterventions,
         prisma
       );
     }
-
     const { updatedAt, ...updateDiff } = objectDiff(previousBsff, updatedBsff);
 
     await prisma.event.create({
