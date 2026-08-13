@@ -4,6 +4,7 @@ import {
   getNextTab,
   getPublishErrorTabIds,
   getTabs,
+  isBsffDetenteurTabVisible,
   isFluidesFrigorigenesTabVisible,
   TabId
 } from "../../utils";
@@ -23,6 +24,18 @@ describe("onglets du parcours BSFF détenteur", () => {
     expect(
       getErrorTabIds(BsdType.Bsff, [], ["emitter"], BsffType.TracerFluide)
     ).toEqual([TabId.bordereau]);
+  });
+
+  it("affiche l'onglet Détenteur quand le détenteur d'équipement est différent", () => {
+    expect(isBsffDetenteurTabVisible(BsffType.TracerFluide, false)).toBe(false);
+    expect(isBsffDetenteurTabVisible(BsffType.TracerFluide, true)).toBe(true);
+  });
+
+  it("conserve l'onglet Détenteur dans les autres parcours", () => {
+    expect(
+      isBsffDetenteurTabVisible(BsffType.CollectePetitesQuantites, false)
+    ).toBe(true);
+    expect(isBsffDetenteurTabVisible(BsffType.Groupement, false)).toBe(true);
   });
 
   it("rattache aussi les erreurs opérateur à l'onglet Bordereau", () => {

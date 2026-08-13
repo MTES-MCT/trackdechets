@@ -25,6 +25,11 @@ export const isFluidesFrigorigenesTabVisible = (
   enabled: boolean
 ) => bsffType === BsffType.CollectePetitesQuantites && enabled;
 
+export const isBsffDetenteurTabVisible = (
+  bsffType: BsffType | null | undefined,
+  equipmentHolderDifferent: boolean
+) => bsffType !== BsffType.TracerFluide || equipmentHolderDifferent;
+
 export enum TabId {
   bordereau = "bordereau",
   fluidesFrigorigenes = "fluidesFrigorigenes",
