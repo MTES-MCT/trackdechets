@@ -216,6 +216,7 @@ export const rawBsffSchema = z
     pickupSiteEnabled: z.boolean().default(false),
     pickupSiteManualMode: z.boolean().default(false),
     equipmentHolderDifferent: z.boolean().default(false),
+    fluidesFrigorigenesEnabled: z.boolean().default(false),
     waste: z
       .object({
         code: ZodWasteCodeEnum,
