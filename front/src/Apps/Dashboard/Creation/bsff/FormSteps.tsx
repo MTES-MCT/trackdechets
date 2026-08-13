@@ -74,6 +74,7 @@ import {
   getPublishErrorMessages,
   getPublishErrorTabIds,
   handleGraphQlError,
+  isBsffDetenteurTabVisible,
   isFluidesFrigorigenesTabVisible,
   TabId
 } from "../utils";
@@ -427,6 +428,7 @@ const BsffFormSteps = ({
   const fluidesFrigorigenesEnabled = methods.watch(
     "fluidesFrigorigenesEnabled"
   );
+  const equipmentHolderDifferent = methods.watch("equipmentHolderDifferent");
   const publishErrorTabIds = getPublishErrorTabIds(
     BsdType.Bsff,
     errorsFromPublishApi,
@@ -558,10 +560,12 @@ const BsffFormSteps = ({
         type === BsffType.CollectePetitesQuantites ? (
           <EmitterBsff />
         ) : undefined,
-      detenteur:
-        type !== BsffType.TracerFluide || equipmentHolderDifferent ? (
-          <DetenteurBsff />
-        ) : undefined,
+      detenteur: isBsffDetenteurTabVisible(
+        type as BsffType,
+        equipmentHolderDifferent
+      ) ? (
+        <DetenteurBsff />
+      ) : undefined,
       transporter: <TransporterBsff />,
       destination: <DestinationBsff />
     }),
