@@ -3,7 +3,8 @@ import {
   FINAL_OPERATION_CODES,
   MIN_DATE_FOR_REGISTRY,
   TdOperationCode,
-  isSiret
+  isSiret,
+  isSiretExemptFromRegistryDateLimit
 } from "@td/constants";
 import { envConfig } from "../config";
 import { checkVAT, countries } from "jsvat";
@@ -706,7 +707,10 @@ export const refineDateLimits =
   ): Refinement<T> =>
   (item, { addIssue }) => {
     const reportForSiret = item.reportForCompanySiret;
-    if (envConfig.NO_DATE_LIMIT_SIRETS.includes(reportForSiret)) {
+    if (
+      envConfig.NO_DATE_LIMIT_SIRETS.includes(reportForSiret) ||
+      isSiretExemptFromRegistryDateLimit(reportForSiret)
+    ) {
       return;
     }
     for (const dateField of dateFields) {

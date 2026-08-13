@@ -11,7 +11,10 @@ import { envConfig } from "../../../common/envConfig";
 import type { FormShapeFieldWithState } from "./types";
 import { formatError } from "./error";
 import "./FormTab.scss";
-import { MIN_DATE_FOR_REGISTRY } from "@td/constants";
+import {
+  MIN_DATE_FOR_REGISTRY,
+  isSiretExemptFromRegistryDateLimit
+} from "@td/constants";
 
 type Props = { fields: FormShapeFieldWithState[]; methods: UseFormReturn<any> };
 
@@ -19,7 +22,9 @@ export function FormTab({ fields, methods }: Props) {
   const { errors } = methods.formState;
   const reportForCompanySiret = methods.watch("reportForCompanySiret");
   const noDateLimit = useMemo(
-    () => envConfig.VITE_NO_DATE_LIMIT_SIRETS.includes(reportForCompanySiret),
+    () =>
+      envConfig.VITE_NO_DATE_LIMIT_SIRETS.includes(reportForCompanySiret) ||
+      isSiretExemptFromRegistryDateLimit(reportForCompanySiret),
     [reportForCompanySiret]
   );
 
