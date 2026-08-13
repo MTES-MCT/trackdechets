@@ -58,6 +58,7 @@ import initialState from "./utils/initial-state";
 import { getComputedState } from "../getComputedState";
 import {
   buildBsffPickupSiteInput,
+  hasPickupSite,
   isManualBsffPickupSite
 } from "./utils/pickupSite";
 import WasteBsff from "./steps/Waste";
@@ -508,7 +509,7 @@ const BsffFormSteps = ({
       ? {
           company: cleanCompany(emitter.company),
           customInfo: emitter.customInfo,
-          ...(type === BsffType.TracerFluide
+          ...(hasPickupSite(type as BsffType)
             ? {
                 pickupSite: buildBsffPickupSiteInput(values)
               }
