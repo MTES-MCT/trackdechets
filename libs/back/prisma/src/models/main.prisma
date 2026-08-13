@@ -1618,6 +1618,7 @@ model Bsff {
   emitterCustomInfo              String?
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
+
   emitterPickupSiteName        String?
   emitterPickupSiteAddress     String?
   emitterPickupSiteStreet      String?
@@ -1625,16 +1626,16 @@ model Bsff {
   emitterPickupSitePostalCode  String?
   emitterPickupSiteCity        String?
   emitterPickupSiteInfos       String?
-  wasteCode                      String?
-  wasteAdr                       String?
-  weightValue                    Decimal?  @db.Decimal(65, 30)
-  weightIsEstimate               Boolean?
-  wasteDescription               String?
 
+  wasteCode          String?
+  wasteAdr           String?
+  weightValue        Decimal? @db.Decimal(65, 30)
+  weightIsEstimate   Boolean?
+  wasteDescription   String?
 
-  // Date de signature du premier transporteur
+  // Date de signature du premier transporteur.
   // Cette valeur est dupliquée entre le modèle Bsff et BsffTransporter[0]
-  // pour optimiser certains calculs
+  // pour optimiser certains calculs.
   transporterTransportSignatureDate DateTime? @db.Timestamptz(6)
 
   destinationCompanyName              String?
@@ -1657,8 +1658,9 @@ model Bsff {
 
   // Denormalized detenteur sirets to speed up query `bsffs`
   detenteurCompanySirets String[] @default([])
+
   // Denormalized transporter sirets to speed up query `bsffs`
-  transportersOrgIds     String[] @default([])
+  transportersOrgIds String[] @default([])
 
   canAccessDraftOrgIds String[] @default([])
 
@@ -1674,13 +1676,16 @@ model Bsff {
   @@index([canAccessDraftOrgIds], map: "_BsffCanAccessDraftOrgIdsIdx", type: Gin)
 }
 
+
 model BsffTransporter {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
-  number    Int
-  bsff      Bsff?    @relation(fields: [bsffId], references: [id], onDelete: Cascade)
-  bsffId    String?
+
+  number Int
+
+  bsff   Bsff?  @relation(fields: [bsffId], references: [id], onDelete: Cascade)
+  bsffId String?
 
   transporterCompanySiret             String?
   transporterCompanyName              String?
@@ -1705,35 +1710,19 @@ model BsffTransporter {
   @@index([transporterCompanyVatNumber], map: "_BsffTransporterCompanyVatNumberIdx")
 }
 
-model BsffPackagingFinalOperation {
+
+model BsffFicheIntervention {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  operationCode  String
-  noTraceability Boolean
-  // quantité qui doit être affectée à ce traitement final
-  quantity       Decimal @db.Decimal(65, 30)
-
-  finalBsffPackagingId String
-  finalBsffPackaging   BsffPackaging @relation("FinalOperationToFinalBsffPackaging", fields: [finalBsffPackagingId], references: [id], onDelete: Cascade)
-
-  initialBsffPackagingId String
-  initialBsffPackaging   BsffPackaging @relation("FinalOperationToInitialBsffPackaging", fields: [initialBsffPackagingId], references: [id], onDelete: Cascade)
-
-  @@unique([initialBsffPackagingId, finalBsffPackagingId], map: "_FinalOperationBsffPackagingsUniqueTogether")
-  @@index([initialBsffPackagingId], map: "_FinalOperationInitialBsffPackagingIdIdx")
-  @@index([finalBsffPackagingId], map: "_FinalOperationFinalBsffPackagingIdIdx")
-}
-
-model BsffFicheIntervention {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
   numero     String
-  weight     Decimal  @db.Decimal(65, 30)
+  weight     Decimal @db.Decimal(65, 30)
   postalCode String
 
+  // Détenteur porté par la FI.
+  // On conserve ces informations pour l'historique et pour la
+  // rétrocompatibilité avec les FI existantes.
   detenteurCompanyName         String
   detenteurCompanySiret        String?
   detenteurCompanyAddress      String
@@ -1751,11 +1740,14 @@ model BsffFicheIntervention {
 
   bsffs Bsff[] @relation("BsffToBsffFicheIntervention")
 
-  packagings BsffPackaging[]  
+  // RG2 : une FI peut être associée à plusieurs contenants.
+  // La relation inverse est portée par BsffPackaging.ficheInterventions.
+  packagings BsffPackaging[]
 
   @@index([detenteurCompanySiret], map: "_BsffFicheInterventionDetenteurCompanySiretIdx")
   @@index([operateurCompanySiret], map: "_BsffFicheInterventionOperateurCompanySiretIdx")
 }
+
 
 model BsffPackaging {
   id             String            @id @default(cuid())
@@ -1769,20 +1761,19 @@ model BsffPackaging {
   acceptationDate             DateTime?               @db.Timestamptz(6)
   acceptationRefusalReason    String?
   acceptationStatus           WasteAcceptationStatus?
-  acceptationWeight           Float?
+  acceptationWeight            Float?
   acceptationWasteCode        String?
   acceptationWasteDescription String?
+  acceptationSignatureAuthor  String?
+  acceptationSignatureDate    DateTime?               @db.Timestamptz(6)
 
-  acceptationSignatureAuthor String?
-  acceptationSignatureDate   DateTime? @db.Timestamptz(6)
-
-  operationDate            DateTime?      @db.Timestamptz(6)
-  operationNoTraceability  Boolean        @default(false)
+  operationDate            DateTime?     @db.Timestamptz(6)
+  operationNoTraceability  Boolean       @default(false)
   operationCode            String?
   operationMode            OperationMode?
   operationDescription     String?
   operationSignatureAuthor String?
-  operationSignatureDate   DateTime?      @db.Timestamptz(6)
+  operationSignatureDate   DateTime?     @db.Timestamptz(6)
 
   operationNextDestinationPlannedOperationCode String?
   operationNextDestinationCap                  String?
@@ -1801,13 +1792,31 @@ model BsffPackaging {
   nextPackaging      BsffPackaging?  @relation("NextPackaging", fields: [nextPackagingId], references: [id])
   previousPackagings BsffPackaging[] @relation("NextPackaging")
 
-  //  partial indices _BsffPackagingOperationNoTraceabilityIdx
+  // ============================================================
+  // Détenteurs
+  // ============================================================
 
-  // Relation vers les infos de traçabilité finales
+  // RG1 : 0..N détenteurs par contenant.
+  //
+  // Nullable au niveau fonctionnel :
+  // - les contenants historiques n'ont aucune ligne dans
+  //   BsffPackagingDetenteur ;
+  // - on ne déduit donc jamais leur détenteur a posteriori.
+  detenteurs BsffPackagingDetenteur[]
+
+  // ============================================================
+  // Fiches d'intervention
+  // ============================================================
+
+  // RG2 : une FI est associée à un ou plusieurs contenants.
+  ficheInterventions BsffFicheIntervention[]
+
+  // ============================================================
+  // Traçabilité finale
+  // ============================================================
+
   finalOperations                    BsffPackagingFinalOperation[] @relation("FinalOperationToInitialBsffPackaging")
   FinalOperationToFinalBsffPackaging BsffPackagingFinalOperation[] @relation("FinalOperationToFinalBsffPackaging")
-
-  ficheInterventions BsffFicheIntervention[]
 
   @@index([bsffId], map: "_BsffPackagingBsffId")
   @@index([nextPackagingId], map: "_BsffPackagingNextPackagingIdx")
@@ -1816,6 +1825,60 @@ model BsffPackaging {
   @@index([acceptationSignatureDate], map: "_BsffPackagingAcceptationSignatureDateIdx")
   @@index([operationCode], map: "_BsffPackagingOperationCodeIdx")
   @@index([operationSignatureDate], map: "_BsffPackagingOperationSignatureDateIdx")
+}
+
+
+/**
+ * Relation explicite Contenant <-> Détenteur.
+ *
+ * Il n'y a volontairement PAS de contrainte d'existence du détenteur
+ * dans BsffFicheIntervention :
+ *
+ * - un contenant peut avoir un détenteur sans FI ;
+ * - un contenant peut avoir plusieurs détenteurs ;
+ * - une FI peut également être associée au contenant ;
+ * - les contenants historiques peuvent ne posséder aucune ligne ici.
+ *
+ * Cette dernière propriété est essentielle pour ne pas créer de fausse
+ * information sur l'historique.
+ */
+model BsffPackagingDetenteur {
+  id String @id @default(cuid())
+
+  bsffPackagingId String
+  bsffPackaging BsffPackaging @relation(fields: [bsffPackagingId], references: [id], onDelete: Cascade)
+
+  detenteurCompanySiret        String?
+  detenteurCompanyName         String
+  detenteurCompanyAddress      String
+  detenteurCompanyContact      String?
+  detenteurCompanyPhone        String?
+  detenteurCompanyMail         String?
+  detenteurIsPrivateIndividual Boolean @default(false)
+
+  @@unique([bsffPackagingId, detenteurCompanySiret], map: "_BsffPackagingDetenteurUnique")
+  @@index([detenteurCompanySiret], map: "_BsffPackagingDetenteurCompanySiretIdx")
+  @@index([bsffPackagingId], map: "_BsffPackagingDetenteurPackagingIdIdx")
+}
+
+model BsffPackagingFinalOperation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  operationCode  String
+  noTraceability Boolean
+  quantity       Decimal @db.Decimal(65, 30)
+
+  finalBsffPackagingId String
+  finalBsffPackaging BsffPackaging @relation("FinalOperationToFinalBsffPackaging", fields: [finalBsffPackagingId], references: [id], onDelete: Cascade)
+
+  initialBsffPackagingId String
+  initialBsffPackaging BsffPackaging @relation("FinalOperationToInitialBsffPackaging", fields: [initialBsffPackagingId], references: [id], onDelete: Cascade)
+
+  @@unique([initialBsffPackagingId, finalBsffPackagingId], map: "_FinalOperationBsffPackagingsUniqueTogether")
+  @@index([initialBsffPackagingId], map: "_FinalOperationInitialBsffPackagingIdIdx")
+  @@index([finalBsffPackagingId], map: "_FinalOperationFinalBsffPackagingIdIdx")
 }
 
 model Bsda {

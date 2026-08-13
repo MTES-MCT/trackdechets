@@ -329,7 +329,9 @@ function checkEmitterSiretIsDefined(
 
 const PreviousPackagingInclude = {
   bsff: true,
-  nextPackaging: { select: { bsffId: true } }
+  nextPackaging: { select: { bsffId: true } },
+  ficheInterventions: { select: { id: true } },
+  detenteurs: true
 } satisfies Prisma.BsffPackagingInclude;
 
 export type PreviousPackaging = Prisma.BsffPackagingGetPayload<{

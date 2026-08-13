@@ -338,9 +338,27 @@ export function flattenBsffPackagingInput(
     )
   });
 }
+type BsffPackagingWithDetenteurs = Prisma.BsffPackaging & {
+  detenteurs: Prisma.BsffPackagingDetenteur[];
+};
 
+function expandBsffDetenteurFromDB(
+  detenteur: Prisma.BsffPackagingDetenteur
+): GraphQL.BsffDetenteur {
+  return {
+    company: nullIfNoValues<GraphQL.FormCompany>({
+      name: detenteur.detenteurCompanyName,
+      siret: detenteur.detenteurCompanySiret,
+      address: detenteur.detenteurCompanyAddress,
+      contact: detenteur.detenteurCompanyContact,
+      phone: detenteur.detenteurCompanyPhone,
+      mail: detenteur.detenteurCompanyMail
+    }),
+    isPrivateIndividual: detenteur.detenteurIsPrivateIndividual
+  };
+}
 export function expandBsffPackagingFromDB(
-  prismaBsffPackaging: BsffPackaging
+  prismaBsffPackaging: BsffPackagingWithDetenteurs
 ): GraphQL.BsffPackaging {
   return {
     id: prismaBsffPackaging.id,
@@ -354,6 +372,7 @@ export function expandBsffPackagingFromDB(
         : prismaBsffPackaging.type,
     volume: prismaBsffPackaging.volume,
     weight: prismaBsffPackaging.weight,
+
     acceptation: nullIfNoValues<GraphQL.BsffPackagingAcceptation>({
       date: prismaBsffPackaging.acceptationDate,
       weight: prismaBsffPackaging.acceptationWeight,
@@ -366,6 +385,7 @@ export function expandBsffPackagingFromDB(
         author: prismaBsffPackaging.acceptationSignatureAuthor
       })
     }),
+
     operation: nullIfNoValues<GraphQL.BsffPackagingOperation>({
       code: prismaBsffPackaging.operationCode as GraphQL.BsffOperationCode,
       mode: prismaBsffPackaging.operationMode as GraphQL.OperationMode,
@@ -392,7 +412,12 @@ export function expandBsffPackagingFromDB(
         author: prismaBsffPackaging.operationSignatureAuthor
       })
     }),
-    // the following fields will be resolved in BsddPackaging resolver
+
+    detenteurs: (prismaBsffPackaging.detenteurs ?? []).map(
+      expandBsffDetenteurFromDB
+    ),
+
+    // the following fields will be resolved in BsffPackaging resolver
     nextBsffs: [],
     previousBsffs: [],
     bsff: null as any,

@@ -170,6 +170,30 @@ const BsffFormSteps = ({
     MutationUpdateFicheInterventionBsffArgs
   >(UPDATE_BSFF_FICHE_INTERVENTION);
 
+  function getDetenteurFromPackagingDetenteur(detenteur: any) {
+    const company = detenteur.company;
+    const isPrivate = detenteur.isPrivateIndividual;
+
+    const holderType = !isPrivate
+      ? "ENTREPRISE"
+      : /^OMI\d{7}$/.test(company?.name ?? "")
+      ? "NAVIRE"
+      : /^W\d{9}$/.test(company?.name ?? "")
+      ? "ASSOCIATION"
+      : "PARTICULIER";
+
+    return {
+      holderType,
+      identification:
+        holderType === "ASSOCIATION" || holderType === "NAVIRE"
+          ? company?.name ?? ""
+          : "",
+      detenteur: {
+        isPrivateIndividual: isPrivate,
+        company
+      }
+    };
+  }
   const bsffState = useMemo(() => {
     const state = getComputedState(initialState, bsffQuery.data?.bsff, [
       {
@@ -205,28 +229,70 @@ const BsffFormSteps = ({
       },
       {
         path: "ficheInterventions",
-        getComputedValue: (initialValue, actualValue) =>
-          actualValue?.length
-            ? actualValue.map(fiche => {
-                const company = fiche.detenteur?.company;
-                const isPrivate = fiche.detenteur?.isPrivateIndividual;
-                const holderType = !isPrivate
-                  ? "ENTREPRISE"
-                  : /^OMI\d{7}$/.test(company?.name ?? "")
-                  ? "NAVIRE"
-                  : /^W\d{9}$/.test(company?.name ?? "")
-                  ? "ASSOCIATION"
-                  : "PARTICULIER";
-                return {
-                  ...fiche,
-                  holderType,
-                  identification:
-                    holderType === "ASSOCIATION" || holderType === "NAVIRE"
-                      ? company?.name ?? ""
-                      : ""
-                };
-              })
-            : initialValue
+        getComputedValue: (initialValue, actualValue) => {
+          // Les vraies fiches d'intervention restent prioritaires.
+          if (actualValue?.length) {
+            return actualValue.map(fiche => {
+              const company = fiche.detenteur?.company;
+              const isPrivate = fiche.detenteur?.isPrivateIndividual;
+
+              const holderType = !isPrivate
+                ? "ENTREPRISE"
+                : /^OMI\d{7}$/.test(company?.name ?? "")
+                ? "NAVIRE"
+                : /^W\d{9}$/.test(company?.name ?? "")
+                ? "ASSOCIATION"
+                : "PARTICULIER";
+
+              return {
+                ...fiche,
+                holderType,
+                identification:
+                  holderType === "ASSOCIATION" || holderType === "NAVIRE"
+                    ? company?.name ?? ""
+                    : ""
+              };
+            });
+          }
+
+          // Pour les collectes, le détenteur peut être enregistré
+          // directement sur le packaging sans fiche d'intervention.
+          if (
+            bsffQuery.data?.bsff?.type === BsffType.CollectePetitesQuantites
+          ) {
+            const holders = new Map<string, any>();
+
+            for (const packaging of bsffQuery.data.bsff.packagings ?? []) {
+              for (const detenteur of packaging.detenteurs ?? []) {
+                const company = detenteur.company;
+
+                const key =
+                  company?.siret ??
+                  company?.orgId ??
+                  company?.name ??
+                  JSON.stringify(detenteur);
+
+                if (!holders.has(key)) {
+                  holders.set(key, {
+                    ...getDetenteurFromPackagingDetenteur(detenteur),
+                    numero: "",
+                    postalCode: "",
+                    weight: 0,
+                    packagings: []
+                  });
+                }
+
+                holders.get(key).packagings.push({
+                  ...packaging
+                });
+              }
+            }
+
+            return Array.from(holders.values());
+          }
+
+          return initialValue;
+        }
       }
     ]);
     const pickupSite = bsffQuery.data?.bsff?.emitter?.pickupSite;
@@ -360,6 +426,40 @@ const BsffFormSteps = ({
     return isEmpty ? undefined : company;
   }
 
+  function hasFicheInterventionData(ficheIntervention: any) {
+    return Boolean(
+      ficheIntervention.numero?.trim() ||
+        ficheIntervention.postalCode?.trim() ||
+        Number(ficheIntervention.weight ?? 0) > 0
+    );
+  }
+
+  function toPackagingDetenteur(ficheIntervention: any) {
+    const company = ficheIntervention.detenteur?.company;
+    const isPrivateIndividual =
+      ficheIntervention.holderType !== undefined
+        ? ficheIntervention.holderType !== "ENTREPRISE"
+        : ficheIntervention.detenteur?.isPrivateIndividual ?? false;
+
+    if (!company) return undefined;
+
+    return {
+      isPrivateIndividual,
+      company: {
+        siret: isPrivateIndividual ? null : company.siret ?? null,
+        name:
+          company.name?.trim() ||
+          ficheIntervention.identification?.trim() ||
+          company.contact?.trim() ||
+          "Détenteur d'équipement",
+        address: company.address?.trim() || "Non renseignée",
+        contact: company.contact ?? null,
+        phone: company.phone ?? null,
+        mail: company.mail ?? null
+      }
+    };
+  }
+
   // ======================================================
   // SAVE
   // ======================================================
@@ -439,6 +539,13 @@ const BsffFormSteps = ({
     const entries = await Promise.all(
       ficheInterventions
         .filter(fi => {
+          // Pour les BSFF de collecte, la fiche est réellement facultative :
+          // sélectionner un détenteur et ses contenants ne doit pas créer de
+          // fiche avec des valeurs techniques.
+          if (values.type === BsffType.CollectePetitesQuantites) {
+            return hasFicheInterventionData(fi);
+          }
+
           const hasDetenteur = Boolean(
             fi.detenteur?.company?.siret ||
               fi.detenteur?.company?.orgId ||
@@ -731,30 +838,48 @@ const BsffFormSteps = ({
       return undefined;
     }
 
-    return packagings?.map(p => ({
-      type: p.type,
-      numero: p.numero,
-      other: p.other ?? null,
-      volume: p.volume ?? null,
-      weight: Number(p.weight ?? 0),
+    return packagings?.map(p => {
+      const linkedFicheInterventions = (ficheInterventions ?? [])
+        .map((ficheIntervention, index) => ({ ficheIntervention, index }))
+        .filter(({ ficheIntervention }) =>
+          ficheIntervention.packagings?.some(
+            (linkedPackaging: any) => linkedPackaging.numero === p.numero
+          )
+        );
 
-      ficheInterventions:
-        ficheInterventions
-          ?.map((fi, index) => {
-            const isLinked = fi.packagings?.some(
-              (linkedPackaging: any) => linkedPackaging.numero === p.numero
-            );
+      const detenteurs = linkedFicheInterventions
+        .map(({ ficheIntervention }) => toPackagingDetenteur(ficheIntervention))
+        .filter(
+          (
+            detenteur
+          ): detenteur is NonNullable<
+            ReturnType<typeof toPackagingDetenteur>
+          > => Boolean(detenteur)
+        )
+        .filter(
+          (detenteur, index, allDetenteurs) =>
+            allDetenteurs.findIndex(
+              candidate =>
+                candidate!.company.siret === detenteur!.company.siret &&
+                candidate!.company.name === detenteur!.company.name
+            ) === index
+        );
 
-            if (!isLinked) {
-              return null;
-            }
-
-            const ficheKey = getFicheInterventionKey(fi, index);
-
+      return {
+        type: p.type,
+        numero: p.numero,
+        other: p.other ?? null,
+        volume: p.volume ?? null,
+        weight: Number(p.weight ?? 0),
+        detenteurs,
+        ficheInterventions: linkedFicheInterventions
+          .map(({ ficheIntervention, index }) => {
+            const ficheKey = getFicheInterventionKey(ficheIntervention, index);
             return ficheInterventionMap[ficheKey] ?? null;
           })
-          .filter((id): id is string => Boolean(id)) ?? []
-    }));
+          .filter((id): id is string => Boolean(id))
+      };
+    });
   }
   // ======================================================
   // UPDATE FLOW

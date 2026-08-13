@@ -16,7 +16,9 @@ import {
   BsffWithPackagingsInclude,
   BsffWithFicheInterventionInclude,
   BsffWithTransporters,
-  BsffWithTransportersInclude
+  BsffWithTransportersInclude,
+  BsffWithPackagingsAndDetenteurs,
+  BsffWithPackagingsAndDetenteursInclude
 } from "./types";
 import { prisma } from "@td/prisma";
 import {
@@ -30,12 +32,12 @@ import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
 
 export type BsffForElastic = Bsff &
-  BsffWithPackagings &
+  BsffWithPackagingsAndDetenteurs &
   BsffWithFicheInterventions &
   BsffWithTransporters;
 
 export const BsffForElasticInclude = {
-  ...BsffWithPackagingsInclude,
+  ...BsffWithPackagingsAndDetenteursInclude,
   ...BsffWithFicheInterventionInclude,
   ...BsffWithTransportersInclude
 };
