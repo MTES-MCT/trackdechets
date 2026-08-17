@@ -8,7 +8,7 @@ import {
   processDecimal
 } from "../common/converter";
 import * as GraphQL from "@td/codegen-back";
-import { BsffPackaging, BsffPackagingType } from "@td/prisma";
+import { BsffPackagingType } from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsffForElastic } from "./elastic";
 import { getFirstTransporterSync } from "./database";
@@ -501,7 +501,7 @@ export function expandFicheInterventionBsffFromDB(
       }),
       isPrivateIndividual: prismaFicheIntervention.detenteurIsPrivateIndividual
     }),
-    packagings: prismaFicheIntervention.packagings.map(
+    packagings: (prismaFicheIntervention.packagings ?? []).map(
       expandBsffPackagingFromDB
     ),
     operateur: nullIfNoValues<GraphQL.BsffOperateur>({

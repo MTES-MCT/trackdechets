@@ -13,7 +13,6 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   BsffWithFicheInterventions,
   BsffWithPackagings,
-  BsffWithPackagingsInclude,
   BsffWithFicheInterventionInclude,
   BsffWithTransporters,
   BsffWithTransportersInclude,

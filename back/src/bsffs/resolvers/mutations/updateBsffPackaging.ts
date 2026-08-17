@@ -1,7 +1,10 @@
 import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffPackagingFromDB } from "../../converter";
-import { getBsffPackagingOrNotFound } from "../../database";
+import {
+  getBsffPackagingOrNotFound,
+  getDetenteursCreateInput
+} from "../../database";
 import { getBsffPackagingRepository } from "../../repository";
 import { checkCanUpdateBsffPackaging } from "../../permissions";
 import { mergeInputAndParseBsffPackagingAsync } from "../../validation/bsffPackaging";
@@ -32,12 +35,38 @@ const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
 
   const { update: updateBsffPackaging } = getBsffPackagingRepository(user);
 
-  const updatedBsffPackaging = await updateBsffPackaging({
+  const { detenteurs, ficheInterventions, ...packagingScalars } =
+    parsedBsffPackaging;
+
+  await updateBsffPackaging({
     where: { id },
-    data: parsedBsffPackaging
+    data: {
+      ...packagingScalars,
+      ...(updatedFields.includes("detenteurs")
+        ? {
+            detenteurs: {
+              deleteMany: {},
+              ...getDetenteursCreateInput(detenteurs)
+            }
+          }
+        : {}),
+      ...(updatedFields.includes("ficheInterventions")
+        ? {
+            ficheInterventions: {
+              set: [],
+              connect: (ficheInterventions ?? []).map(id => ({ id }))
+            }
+          }
+        : {})
+    }
   });
 
-  return expandBsffPackagingFromDB(updatedBsffPackaging);
+  // Fetch the updated packaging with detenteurs relation
+  const updatedBsffPackagingWithDetenteurs = await getBsffPackagingOrNotFound({
+    id
+  });
+
+  return expandBsffPackagingFromDB(updatedBsffPackagingWithDetenteurs);
 };
 
 export default updateBsffPackaging;
