@@ -176,7 +176,10 @@ const ficheInterventionSchema = z.object({
 
   weight: z.preprocess(
     val => (val === "" ? undefined : val),
-    z.number().positive("le poids doit être supérieur à 0").optional()
+    z
+      .number()
+      .nonnegative("le poids doit être supérieur ou égal à 0")
+      .optional()
   ),
 
   postalCode: z.string().optional().or(z.literal("")),
@@ -515,7 +518,7 @@ export const rawBsffSchema = z
 
     (data.ficheInterventions ?? []).forEach((fi, index) => {
       const hasStarted =
-        !!fi.numero || !!fi.postalCode || fi.weight !== undefined;
+        !!fi.numero || !!fi.postalCode || (fi.weight && fi.weight > 0);
 
       if (!hasStarted) return;
 

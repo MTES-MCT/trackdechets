@@ -230,39 +230,67 @@ const BsffFormSteps = ({
       {
         path: "ficheInterventions",
         getComputedValue: (initialValue, actualValue) => {
+          const result: any[] = [];
+
           // Les vraies fiches d'intervention restent prioritaires.
           if (actualValue?.length) {
-            return actualValue.map(fiche => {
-              const company = fiche.detenteur?.company;
-              const isPrivate = fiche.detenteur?.isPrivateIndividual;
+            result.push(
+              ...actualValue.map(fiche => {
+                const company = fiche.detenteur?.company;
+                const isPrivate = fiche.detenteur?.isPrivateIndividual;
 
-              const holderType = !isPrivate
-                ? "ENTREPRISE"
-                : /^OMI\d{7}$/.test(company?.name ?? "")
-                ? "NAVIRE"
-                : /^W\d{9}$/.test(company?.name ?? "")
-                ? "ASSOCIATION"
-                : "PARTICULIER";
+                const holderType = !isPrivate
+                  ? "ENTREPRISE"
+                  : /^OMI\d{7}$/.test(company?.name ?? "")
+                  ? "NAVIRE"
+                  : /^W\d{9}$/.test(company?.name ?? "")
+                  ? "ASSOCIATION"
+                  : "PARTICULIER";
 
-              return {
-                ...fiche,
-                holderType,
-                identification:
-                  holderType === "ASSOCIATION" || holderType === "NAVIRE"
-                    ? company?.name ?? ""
-                    : ""
-              };
-            });
+                return {
+                  ...fiche,
+                  holderType,
+                  identification:
+                    holderType === "ASSOCIATION" || holderType === "NAVIRE"
+                      ? company?.name ?? ""
+                      : ""
+                };
+              })
+            );
           }
 
-          // Pour les collectes, le détenteur peut être enregistré
+          // Pour les collectes et TracerFluide, le détenteur peut être enregistré
           // directement sur le packaging sans fiche d'intervention.
           if (
-            bsffQuery.data?.bsff?.type === BsffType.CollectePetitesQuantites
+            [BsffType.CollectePetitesQuantites, BsffType.TracerFluide].includes(
+              bsffQuery.data?.bsff?.type as BsffType
+            )
           ) {
             const holders = new Map<string, any>();
+            const ficheDetenteurKeys = new Set<string>();
 
-            for (const packaging of bsffQuery.data.bsff.packagings ?? []) {
+            // Mémoriser les détenteurs des fiches existantes pour les ignorer
+            for (const fiche of actualValue ?? []) {
+              const company = fiche.detenteur?.company;
+              const key =
+                company?.siret ??
+                company?.orgId ??
+                company?.name ??
+                JSON.stringify(fiche.detenteur);
+              ficheDetenteurKeys.add(key);
+            }
+
+            // Ajouter les détenteurs des packagings qui n'ont pas de fiche
+            for (const packaging of bsffQuery.data?.bsff?.packagings ?? []) {
+              // Ignorer les packagings qui ont des fiches (pour COLLECTE_PETITES_QUANTITES)
+              if (
+                bsffQuery.data?.bsff?.type ===
+                  BsffType.CollectePetitesQuantites &&
+                packaging.ficheInterventions?.length
+              ) {
+                continue;
+              }
+
               for (const detenteur of packaging.detenteurs ?? []) {
                 const company = detenteur.company;
 
@@ -272,26 +300,29 @@ const BsffFormSteps = ({
                   company?.name ??
                   JSON.stringify(detenteur);
 
-                if (!holders.has(key)) {
+                // Ne pas ajouter si ce détenteur est déjà présent via une fiche
+                if (!ficheDetenteurKeys.has(key) && !holders.has(key)) {
                   holders.set(key, {
                     ...getDetenteurFromPackagingDetenteur(detenteur),
-                    numero: "",
-                    postalCode: "",
-                    weight: 0,
+                    numero: undefined,
+                    postalCode: undefined,
+                    weight: undefined,
                     packagings: []
                   });
                 }
 
-                holders.get(key).packagings.push({
-                  ...packaging
-                });
+                if (holders.has(key)) {
+                  holders.get(key).packagings.push({
+                    ...packaging
+                  });
+                }
               }
             }
 
-            return Array.from(holders.values());
+            result.push(...Array.from(holders.values()));
           }
 
-          return initialValue;
+          return result.length ? result : initialValue;
         }
       }
     ]);
@@ -742,7 +773,8 @@ const BsffFormSteps = ({
 
       transporters: transporterIds,
 
-      ficheInterventions: ficheInterventionIds,
+      ficheInterventions:
+        type === BsffType.CollectePetitesQuantites ? ficheInterventionIds : [],
 
       packagings: buildPackagings(
         type as unknown as BsffType,
@@ -872,12 +904,18 @@ const BsffFormSteps = ({
         volume: p.volume ?? null,
         weight: Number(p.weight ?? 0),
         detenteurs,
-        ficheInterventions: linkedFicheInterventions
-          .map(({ ficheIntervention, index }) => {
-            const ficheKey = getFicheInterventionKey(ficheIntervention, index);
-            return ficheInterventionMap[ficheKey] ?? null;
-          })
-          .filter((id): id is string => Boolean(id))
+        ficheInterventions:
+          type === BsffType.CollectePetitesQuantites
+            ? linkedFicheInterventions
+                .map(({ ficheIntervention, index }) => {
+                  const ficheKey = getFicheInterventionKey(
+                    ficheIntervention,
+                    index
+                  );
+                  return ficheInterventionMap[ficheKey] ?? null;
+                })
+                .filter((id): id is string => Boolean(id))
+            : []
       };
     });
   }
