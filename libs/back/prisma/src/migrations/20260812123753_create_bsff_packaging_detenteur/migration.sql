@@ -2,7 +2,7 @@
 ALTER TABLE "default$default"."TotpRecoveryCode" DROP CONSTRAINT "TotpRecoveryCode_userId_fkey";
 
 -- DropIndex
-DROP INDEX "default$default"."TotpRecoveryCode_userId_idx";
+-- DROP INDEX "default$default"."TotpRecoveryCode_userId_idx";
 
 -- AlterTable
 ALTER TABLE "TotpRecoveryCode" ALTER COLUMN "userId" SET DATA TYPE TEXT,
