@@ -37,10 +37,18 @@ export async function mergeInputAndParseBsffAsync(
   };
 
   // Fusion spéciale pour les packagings: préserver les détenteurs
-  // si l'input n'en envoie pas
+  // si l'input n'en envoie pas.
+  // On apparie les packagings par `id` (ou à défaut `numero`) plutôt que
+  // par position dans le tableau : l'ordre envoyé par le front peut différer
+  // de l'ordre renvoyé par Prisma, un appariement par index associerait
+  // alors les mauvais détenteurs au mauvais packaging.
   if (zodInput.packagings && zodPersisted.packagings) {
-    bsff.packagings = zodInput.packagings.map((inputPackaging, idx) => {
-      const persistedPackaging = zodPersisted.packagings![idx];
+    bsff.packagings = zodInput.packagings.map(inputPackaging => {
+      const persistedPackaging = zodPersisted.packagings!.find(p =>
+        inputPackaging.id
+          ? p.id === inputPackaging.id
+          : p.numero === inputPackaging.numero
+      );
       if (!persistedPackaging) {
         // Nouveau packaging
         return inputPackaging;
@@ -106,7 +114,8 @@ export async function mergeInputAndParseBsffAsync(
         volume: p.volume,
         numero: p.numero,
         emissionNumero: p.emissionNumero,
-        weight: p.weight
+        weight: p.weight,
+        detenteurs: p.detenteurs
       }))
     },
     bsff,

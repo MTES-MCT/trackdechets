@@ -489,7 +489,8 @@ export const rawBsffSchema = z
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               path: [...path, "packagings"],
-              message: "Au moins un contenant doit être rattaché à ce détenteur"
+              message:
+                "Vous avez déclaré au moins un contenant sans détenteur associé ou un détenteur sans lui associer de contenant merci de vérifier."
             });
           }
         });
@@ -499,6 +500,11 @@ export const rawBsffSchema = z
             (holder.packagings ?? []).map(packaging => packaging.numero)
           )
         );
+        // RG7 cas 6 : l'émetteur du bordereau n'a pas été déclaré comme détenteur
+        const emitterSiret = data.emitter?.company?.siret;
+        const isEmitterDeclaredAsHolder = holders.some(
+          holder => holder.detenteur?.company?.siret === emitterSiret
+        );
         (data.packagings ?? []).forEach((packaging, index) => {
           if (
             packaging.numero &&
@@ -507,7 +513,10 @@ export const rawBsffSchema = z
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               path: ["packagings", index, "numero"],
-              message: `Le contenant #${packaging.numero} n'a pas été affecté à un détenteur`
+              message:
+                emitterSiret && !isEmitterDeclaredAsHolder
+                  ? `Le contenant #${packaging.numero} n'a pas été affecté. Si vous êtes détenteur de ce déchet et détenteur de l'équipement vous devez vous ajouter dans l'onglet détenteur afin de pouvoir vous affecter le contenant.`
+                  : `Vous avez déclaré au moins un contenant sans détenteur associé ou un détenteur sans lui associer de contenant merci de vérifier.`
             });
           }
         });

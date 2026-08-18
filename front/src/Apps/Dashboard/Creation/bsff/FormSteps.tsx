@@ -72,10 +72,72 @@ import {
   getErrorTabIds,
   getPublishErrorMessages,
   getPublishErrorTabIds,
+  getTabs,
   handleGraphQlError,
   TabId
 } from "../utils";
 import { DsfrNotificationError } from "../../../common/Components/Error/Error";
+
+// RG2 : libellé du champ en erreur, déduit des 2 derniers segments du path
+// zod (en ignorant les index numériques de tableau), utilisé pour construire
+// le message "Le champ X de l'onglet Y est obligatoire et n'a pas été renseigné."
+const FIELD_LABELS: Record<string, string> = {
+  "company.name": "SIRET ou raison sociale",
+  "company.siret": "SIRET ou raison sociale",
+  "company.contact": "Personne à contacter",
+  "company.phone": "Téléphone",
+  "company.mail": "Courriel",
+  "waste.code": "Code déchet",
+  "waste.description": "Dénomination usuelle du déchet",
+  "packagings.type": "Type de contenant",
+  "packagings.volume": "Volume en litres",
+  "packagings.weight": "Quantité de fluides en kg",
+  "packagings.numero": "N° de contenant",
+  packagings: "Nombre total de contenants",
+  "weight.value": "Quantité totale de fluide en kg",
+  "transport.mode": "Mode de transport",
+  "transport.plates": "Immatriculations",
+  "destination.plannedOperationCode": "Opération d'élimination",
+  detenteurs: "Contenants rattachés",
+  isPrivateIndividual: "Type de détenteur"
+};
+
+const getFieldLabel = (name: string): string => {
+  const segments = name.split(".").filter(s => !/^\d+$/.test(s));
+  const lastTwo = segments.slice(-2).join(".");
+  const lastOne = segments.at(-1) ?? name;
+  return FIELD_LABELS[lastTwo] ?? FIELD_LABELS[lastOne] ?? lastOne;
+};
+
+// Champs internes ajoutés par react-hook-form sur chaque noeud d'erreur,
+// à ignorer pour ne pas re-descendre dedans (notamment `ref` qui pointe
+// vers un noeud DOM).
+const RHF_ERROR_LEAF_KEYS = new Set(["type", "message", "types", "ref"]);
+
+// Aplatit l'objet d'erreurs react-hook-form (imbriqué, avec tableaux) en
+// une liste de { path, message } exploitable par `getPublishErrorMessages`.
+function flattenFormErrors(
+  errors: any,
+  path: string[] = []
+): { path: string[]; message: string }[] {
+  if (!errors || typeof errors !== "object") {
+    return [];
+  }
+  const result: { path: string[]; message: string }[] = [];
+  for (const [key, value] of Object.entries(errors)) {
+    if (value == null || RHF_ERROR_LEAF_KEYS.has(key)) {
+      continue;
+    }
+    const currentPath = [...path, key];
+    if (typeof value === "object") {
+      if (typeof (value as any).message === "string") {
+        result.push({ path: currentPath, message: (value as any).message });
+      }
+      result.push(...flattenFormErrors(value, currentPath));
+    }
+  }
+  return result;
+}
 
 interface Props {
   bsdId?: string;
@@ -394,6 +456,68 @@ const BsffFormSteps = ({
       });
     }
   }, [publishErrorMessages, methods]);
+
+  // RG2 : les erreurs de validation front (react-hook-form / zod), présentes
+  // dès la saisie sur n'importe quel onglet, doivent aussi remonter dans le
+  // message global, pas seulement s'afficher sur l'onglet actif.
+  const formStateErrorMessages = useMemo(() => {
+    const normalizedFormErrors = flattenFormErrors(
+      methods.formState.errors
+    ).map(({ path, message }) => ({
+      code: "custom",
+      path,
+      message
+    }));
+    return getPublishErrorMessages(
+      BsdType.Bsff,
+      normalizedFormErrors,
+      type as BsffType
+    );
+  }, [methods.formState.errors, type]);
+
+  const allErrorMessages = useMemo(() => {
+    const seen = new Set<string>();
+    return [...publishErrorMessages, ...formStateErrorMessages].filter(
+      error => {
+        const key = `${error.name}:${error.message}`;
+        if (seen.has(key)) {
+          return false;
+        }
+        seen.add(key);
+        return true;
+      }
+    );
+  }, [publishErrorMessages, formStateErrorMessages]);
+
+  // RG2 : toutes les erreurs de publication (tous onglets confondus) sont
+  // affichées simultanément, au format DsfrNotificationError
+  const bsffTabLabels = useMemo(() => {
+    const labels: Partial<Record<TabId, string>> = {};
+    getTabs(BsdType.Bsff).forEach(tab => {
+      labels[tab.tabId] = tab.label;
+    });
+    return labels;
+  }, []);
+
+  const publishErrorForDisplay = useMemo(() => {
+    if (!allErrorMessages.length) {
+      return null;
+    }
+    const message = [
+      "Des erreurs ont été rencontrées lors de la publication du bordereau :",
+      "",
+      ...allErrorMessages.map(error => {
+        const tabLabel = bsffTabLabels[error.tabId] ?? "Bordereau";
+        const fieldLabel = getFieldLabel(error.name);
+        return `Le champ "${fieldLabel}" de l'onglet "${tabLabel}" est obligatoire et n'a pas été renseigné.`;
+      })
+    ].join("\n");
+    return {
+      message,
+      graphQLErrors: [{ message }],
+      networkError: null
+    } as any;
+  }, [allErrorMessages, bsffTabLabels]);
 
   // ======================================================
   // CONTEXT
@@ -780,7 +904,9 @@ const BsffFormSteps = ({
         type as unknown as BsffType,
         packagings,
         values.ficheInterventions,
-        ficheInterventionMap
+        ficheInterventionMap,
+        emitter,
+        values.equipmentHolderDifferent
       ),
 
       forwarding:
@@ -864,13 +990,49 @@ const BsffFormSteps = ({
     type: BsffType,
     packagings: any[] | null | undefined,
     ficheInterventions: any[] | null | undefined,
-    ficheInterventionMap: Record<string, string>
+    ficheInterventionMap: Record<string, string>,
+    emitter?: any,
+    equipmentHolderDifferent?: boolean
   ) {
     if ([BsffType.Groupement, BsffType.Reexpedition].includes(type)) {
       return undefined;
     }
 
+    // RG1 : si l'onglet détenteur est inactif, l'émetteur (onglet Bordereau)
+    // est considéré comme détenteur de tous les contenants.
+    const emitterAsDetenteur =
+      type === BsffType.TracerFluide &&
+      !equipmentHolderDifferent &&
+      emitter?.company &&
+      !Object.values(emitter.company).every(v => !v)
+        ? [
+            {
+              isPrivateIndividual: Boolean(emitter.isPrivateIndividual),
+              company: {
+                siret: emitter.company.siret ?? null,
+                name: emitter.company.name ?? "",
+                address: emitter.company.address ?? "",
+                contact: emitter.company.contact ?? null,
+                phone: emitter.company.phone ?? null,
+                mail: emitter.company.mail ?? null
+              }
+            }
+          ]
+        : undefined;
+
     return packagings?.map(p => {
+      if (emitterAsDetenteur) {
+        return {
+          type: p.type,
+          numero: p.numero,
+          other: p.other ?? null,
+          volume: p.volume ?? null,
+          weight: Number(p.weight ?? 0),
+          detenteurs: emitterAsDetenteur,
+          ficheInterventions: []
+        };
+      }
+
       const linkedFicheInterventions = (ficheInterventions ?? [])
         .map((ficheIntervention, index) => ({ ficheIntervention, index }))
         .filter(({ ficheIntervention }) =>
@@ -924,12 +1086,18 @@ const BsffFormSteps = ({
   // ======================================================
 
   async function handleUpdateFlow(input: BsffInput, draft: boolean) {
-    await updateBsff({
-      variables: {
-        id: bsffState.id!,
-        input
-      }
-    });
+    try {
+      await updateBsff({
+        variables: {
+          id: bsffState.id!,
+          input
+        }
+      });
+    } catch (err: any) {
+      setPublishErrors(handleGraphQlError(err));
+
+      throw err;
+    }
 
     if (draft) return;
 
@@ -1066,12 +1234,15 @@ const BsffFormSteps = ({
           type === BsffType.TracerFluide ? TabId.bordereau : TabId.waste
         }
       />
-      {(createBsffError || ficheError) && (
+      {(createBsffError || ficheError || publishErrorForDisplay) && (
         <div className="fr-mb-8w">
           {createBsffError && (
             <DsfrNotificationError apolloError={createBsffError} />
           )}
           {ficheError && <DsfrNotificationError apolloError={ficheError} />}
+          {publishErrorForDisplay && (
+            <DsfrNotificationError apolloError={publishErrorForDisplay} />
+          )}
         </div>
       )}
       {loading && <Loader />}

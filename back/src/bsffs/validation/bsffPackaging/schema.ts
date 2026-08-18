@@ -81,7 +81,8 @@ const rawBsffPackagingSchema = z.object({
           siret: z.string().nullable(),
           name: z.string(),
           address: z.string(),
-          contact: z.string(),
+          // Nullable pour matcher BsffPackagingDetenteur.detenteurCompanyContact en base
+          contact: z.string().nullable(),
           phone: z.string().nullable(),
           mail: z.string().nullable()
         })
