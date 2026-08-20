@@ -138,7 +138,8 @@ const WasteBsff = () => {
               nativeSelectProps={{
                 ...register("waste.code", {
                   onChange: event => {
-                    if (!isDetenteur) return;
+                    // harmoniser le fonctionnement entre les deux types de BSFF initial afin que la sélection d’un code déchet préremplisse automatiquement la dénomination usuelle correspondante.
+                    //if (!isDetenteur) return;
                     const selectedWaste = BSFF_WASTES.find(
                       waste => waste.code === event.target.value
                     );
