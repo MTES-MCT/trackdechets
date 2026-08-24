@@ -6,7 +6,6 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 import {
-  addBsffPackagingsFichesIntervention,
   updateDetenteurCompanySirets,
   updateTransporterOrgIds
 } from "../../database";

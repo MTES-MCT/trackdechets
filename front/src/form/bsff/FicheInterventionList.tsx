@@ -17,7 +17,6 @@ import * as React from "react";
 import * as yup from "yup";
 import { FicheInterventionFragment } from "../../Apps/common/queries/fragments";
 import { getInitialCompany } from "../../Apps/common/data/initialState";
-import { nullable } from "zod";
 
 const CREATE_BSFF_FICHE_INTERVENTION = gql`
   mutation CreateBsffFicheIntervention($input: BsffFicheInterventionInput!) {
