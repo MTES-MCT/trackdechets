@@ -152,6 +152,12 @@ export const FullBsffFragment = gql`
       numero
       volume
       weight
+      detenteurs {
+        isPrivateIndividual
+        company {
+          ...CompanyFragment
+        }
+      }
       ficheInterventions {
         id
         numero

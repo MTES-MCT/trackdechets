@@ -23,6 +23,7 @@ const WasteBsff = () => {
 
   const id = watch("id", null);
   const bsffType = watch("type");
+  const isDetenteur = bsffType === BsffType.TracerFluide;
   const packagings = watch("packagings");
   const weight = watch("weight", {});
   const emitterCompany = watch("emitter.company");
@@ -38,7 +39,10 @@ const WasteBsff = () => {
         setValue("waste.code", "");
         setValue("waste.description", "");
         setValue("waste.adr", "");
-        setValue("weight", { value: "", isEstimate: false });
+        setValue("weight", {
+          value: "",
+          isEstimate: bsffType === BsffType.TracerFluide
+        });
       }
     }
     prevTypeRef.current = bsffType;
@@ -61,6 +65,7 @@ const WasteBsff = () => {
   );
 
   const totalWeight = totalWeightNumber === 0 ? "" : totalWeightNumber;
+  const totalPackagings = packagings?.length ?? 0;
 
   useEffect(() => {
     setValue("weight.value", totalWeight);
@@ -129,8 +134,25 @@ const WasteBsff = () => {
             <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
             <Select
               className="fr-col-md-8 fr-mt-2w"
-              label="Code déchet"
-              nativeSelectProps={{ ...register("waste.code") }}
+              label={`Code déchet${isDetenteur ? " *" : ""}`}
+              nativeSelectProps={{
+                ...register("waste.code", {
+                  onChange: event => {
+                    // harmoniser le fonctionnement entre les deux types de BSFF initial afin que la sélection d’un code déchet préremplisse automatiquement la dénomination usuelle correspondante.
+                    //if (!isDetenteur) return;
+                    const selectedWaste = BSFF_WASTES.find(
+                      waste => waste.code === event.target.value
+                    );
+                    setValue(
+                      "waste.description",
+                      selectedWaste?.description ?? "",
+                      { shouldDirty: true, shouldValidate: true }
+                    );
+                  }
+                }),
+                required: isDetenteur,
+                "aria-required": isDetenteur
+              }}
               state={formState.errors.waste?.["code"] ? "error" : "default"}
               stateRelatedMessage={formState.errors.waste?.["code"]?.message}
               disabled={
@@ -146,9 +168,13 @@ const WasteBsff = () => {
             </Select>
             <Input
               className="fr-col-md-8"
-              label="Dénomination usuelle du déchet"
+              label={`Dénomination usuelle du déchet${isDetenteur ? " *" : ""}`}
               disabled={sealedFields.includes("waste.description")}
-              nativeInputProps={{ ...register("waste.description") }}
+              nativeInputProps={{
+                ...register("waste.description"),
+                required: isDetenteur,
+                "aria-required": isDetenteur
+              }}
               state={
                 formState.errors.waste?.["description"] ? "error" : "default"
               }
@@ -158,40 +184,52 @@ const WasteBsff = () => {
             />
             <Input
               className="fr-col-md-8 fr-mt-4w"
-              label="Mentions au titre des règlements ADR, RID, ADNR, IMDG (optionnel)"
+              label="Mentions au titre des règlements ADR, RID, ADNR, IMDG"
               disabled={sealedFields.includes("waste.adr")}
-              nativeInputProps={{ ...register("waste.adr") }}
+              nativeInputProps={{
+                ...register("waste.adr"),
+                "aria-required": false
+              }}
               state={formState.errors.waste?.["adr"] && "error"}
               stateRelatedMessage={
                 (formState.errors.waste?.["adr"]?.message as string) ?? ""
               }
             />
             <p className="fr-info-text">A renseigner si vous êtes concerné</p>
-            <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
-            <RhfBsffPackagingList
-              disabled={
-                sealedFields.includes("packagings") ||
-                bsffType === BsffType.Groupement ||
-                bsffType === BsffType.Reexpedition
-              }
-              volumeEditable={
-                bsffType === BsffType.Groupement ||
-                bsffType === BsffType.Reexpedition
-              }
-              fieldName="packagings"
-              packagingTypes={bsffPackagingTypes}
-            />
+            {!isDetenteur && <h4 className="fr-h4 fr-mt-4w">Contenants</h4>}
+            <div className={isDetenteur ? "fr-mt-4w" : undefined}>
+              <RhfBsffPackagingList
+                disabled={
+                  sealedFields.includes("packagings") ||
+                  bsffType === BsffType.Groupement ||
+                  bsffType === BsffType.Reexpedition
+                }
+                volumeEditable={
+                  bsffType === BsffType.Groupement ||
+                  bsffType === BsffType.Reexpedition
+                }
+                fieldName="packagings"
+                packagingTypes={bsffPackagingTypes}
+                detenteurMode={isDetenteur}
+              />
+            </div>
             <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>
             <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
-              <div className="fr-col-md-3">
+              <div className="fr-col-md-6">
                 <NonScrollableInput
-                  label="Poids total en kilos"
+                  label={
+                    isDetenteur
+                      ? "Quantité totale de fluide en kg *"
+                      : "Poids total en kilos"
+                  }
                   disabled={sealedFields.includes("weight.value")}
                   nativeInputProps={{
                     inputMode: "decimal",
                     step: "0.000001",
                     type: "number",
-                    ...register("weight.value")
+                    ...register("weight.value"),
+                    required: isDetenteur,
+                    "aria-required": isDetenteur
                   }}
                   state={formState.errors?.weight?.["value"] && "error"}
                   stateRelatedMessage={
@@ -204,9 +242,46 @@ const WasteBsff = () => {
                 </p>
               </div>
 
+              {isDetenteur && (
+                <>
+                  <div className="fr-col-md-6">
+                    <NonScrollableInput
+                      label="Quantité totale en kg (fluide + contenant)"
+                      nativeInputProps={{
+                        inputMode: "decimal",
+                        step: "0.000001",
+                        type: "number",
+                        ...register("totalWeight"),
+                        "aria-required": false
+                      }}
+                    />
+                    <p className="fr-info-text fr-mt-5v">
+                      Soit {(watch("totalWeight") || 0) / 1000} tonne
+                    </p>
+                  </div>
+
+                  <div className="fr-col-md-6">
+                    <NonScrollableInput
+                      label="Nombre total de contenants *"
+                      disabled
+                      nativeInputProps={{
+                        value: totalPackagings,
+                        readOnly: true,
+                        required: true,
+                        "aria-required": true
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+
               <div className="fr-col-md-6">
                 <RadioButtons
-                  legend="Cette quantité est"
+                  legend={
+                    isDetenteur
+                      ? "Cette quantité de fluide est *"
+                      : "Cette quantité est"
+                  }
                   disabled={sealedFields.includes("weight.isEstimate")}
                   orientation="horizontal"
                   state={formState.errors?.weight?.["isEstimate"] && "error"}

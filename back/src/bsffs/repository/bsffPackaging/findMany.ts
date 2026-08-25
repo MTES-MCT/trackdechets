@@ -1,14 +1,18 @@
-import { BsffPackaging, Prisma } from "@td/prisma";
+import { Prisma } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
-export type FindManyBsffPackagingsFn = (
-  args: Prisma.BsffPackagingFindManyArgs
-) => Promise<BsffPackaging[]>;
+export type FindManyBsffPackagingsFn = <
+  Args extends Prisma.BsffPackagingFindManyArgs
+>(
+  args: Args
+) => Promise<Prisma.BsffPackagingGetPayload<Args>[]>;
 
 export function buildFindManyBsffPackagings({
   prisma
 }: ReadRepositoryFnDeps): FindManyBsffPackagingsFn {
-  return args => {
-    return prisma.bsffPackaging.findMany(args);
+  return async <Args extends Prisma.BsffPackagingFindManyArgs>(args: Args) => {
+    return prisma.bsffPackaging.findMany(args) as Promise<
+      Prisma.BsffPackagingGetPayload<Args>[]
+    >;
   };
 }

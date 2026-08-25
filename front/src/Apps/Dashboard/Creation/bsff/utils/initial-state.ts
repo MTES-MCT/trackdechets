@@ -59,6 +59,7 @@ export default {
     isEstimate: false,
     value: null
   },
+  totalWeight: null,
   broker: {
     company: getInitialCompany()
   },

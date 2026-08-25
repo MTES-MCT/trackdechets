@@ -37,9 +37,13 @@ export function buildFindUniqueBsffGetPackagings({
   prisma
 }: ReadRepositoryFnDeps): FindUniqueBsffGetPackagingsFn {
   return (bsffFindUniqueArgs, bsffPackagingsFindManyArgs = {}) => {
-    return prisma.bsff
-      .findUnique(bsffFindUniqueArgs)
-      .packagings(bsffPackagingsFindManyArgs);
+    return prisma.bsff.findUnique(bsffFindUniqueArgs).packagings({
+      ...bsffPackagingsFindManyArgs,
+      include: {
+        ...bsffPackagingsFindManyArgs.include,
+        detenteurs: true
+      }
+    });
   };
 }
 

@@ -173,6 +173,30 @@ const BsffFormSteps = ({
     MutationUpdateFicheInterventionBsffArgs
   >(UPDATE_BSFF_FICHE_INTERVENTION);
 
+  function getDetenteurFromPackagingDetenteur(detenteur: any) {
+    const company = detenteur.company;
+    const isPrivate = detenteur.isPrivateIndividual;
+
+    const holderType = !isPrivate
+      ? "ENTREPRISE"
+      : /^OMI\d{7}$/.test(company?.name ?? "")
+      ? "NAVIRE"
+      : /^W\d{9}$/.test(company?.name ?? "")
+      ? "ASSOCIATION"
+      : "PARTICULIER";
+
+    return {
+      holderType,
+      identification:
+        holderType === "ASSOCIATION" || holderType === "NAVIRE"
+          ? company?.name ?? ""
+          : "",
+      detenteur: {
+        isPrivateIndividual: isPrivate,
+        company
+      }
+    };
+  }
   const bsffState = useMemo(() => {
     const state = getComputedState(initialState, bsffQuery.data?.bsff, [
       {
@@ -208,8 +232,101 @@ const BsffFormSteps = ({
       },
       {
         path: "ficheInterventions",
-        getComputedValue: (initialValue, actualValue) =>
-          actualValue?.length ? actualValue : initialValue
+        getComputedValue: (initialValue, actualValue) => {
+          const result: any[] = [];
+
+          // Les vraies fiches d'intervention restent prioritaires.
+          if (actualValue?.length) {
+            result.push(
+              ...actualValue.map(fiche => {
+                const company = fiche.detenteur?.company;
+                const isPrivate = fiche.detenteur?.isPrivateIndividual;
+
+                const holderType = !isPrivate
+                  ? "ENTREPRISE"
+                  : /^OMI\d{7}$/.test(company?.name ?? "")
+                  ? "NAVIRE"
+                  : /^W\d{9}$/.test(company?.name ?? "")
+                  ? "ASSOCIATION"
+                  : "PARTICULIER";
+
+                return {
+                  ...fiche,
+                  holderType,
+                  identification:
+                    holderType === "ASSOCIATION" || holderType === "NAVIRE"
+                      ? company?.name ?? ""
+                      : ""
+                };
+              })
+            );
+          }
+
+          // Pour les collectes et TracerFluide, le détenteur peut être enregistré
+          // directement sur le packaging sans fiche d'intervention.
+          if (
+            [BsffType.CollectePetitesQuantites, BsffType.TracerFluide].includes(
+              bsffQuery.data?.bsff?.type as BsffType
+            )
+          ) {
+            const holders = new Map<string, any>();
+            const ficheDetenteurKeys = new Set<string>();
+
+            // Mémoriser les détenteurs des fiches existantes pour les ignorer
+            for (const fiche of actualValue ?? []) {
+              const company = fiche.detenteur?.company;
+              const key =
+                company?.siret ??
+                company?.orgId ??
+                company?.name ??
+                JSON.stringify(fiche.detenteur);
+              ficheDetenteurKeys.add(key);
+            }
+
+            // Ajouter les détenteurs des packagings qui n'ont pas de fiche
+            for (const packaging of bsffQuery.data?.bsff?.packagings ?? []) {
+              // Ignorer les packagings qui ont des fiches (pour COLLECTE_PETITES_QUANTITES)
+              if (
+                bsffQuery.data?.bsff?.type ===
+                  BsffType.CollectePetitesQuantites &&
+                packaging.ficheInterventions?.length
+              ) {
+                continue;
+              }
+
+              for (const detenteur of packaging.detenteurs ?? []) {
+                const company = detenteur.company;
+
+                const key =
+                  company?.siret ??
+                  company?.orgId ??
+                  company?.name ??
+                  JSON.stringify(detenteur);
+
+                // Ne pas ajouter si ce détenteur est déjà présent via une fiche
+                if (!ficheDetenteurKeys.has(key) && !holders.has(key)) {
+                  holders.set(key, {
+                    ...getDetenteurFromPackagingDetenteur(detenteur),
+                    numero: undefined,
+                    postalCode: undefined,
+                    weight: undefined,
+                    packagings: []
+                  });
+                }
+
+                if (holders.has(key)) {
+                  holders.get(key).packagings.push({
+                    ...packaging
+                  });
+                }
+              }
+            }
+
+            result.push(...Array.from(holders.values()));
+          }
+
+          return result.length ? result : initialValue;
+        }
       }
     ]);
     const pickupSite = bsffQuery.data?.bsff?.emitter?.pickupSite;
@@ -218,7 +335,9 @@ const BsffFormSteps = ({
       ...state,
       pickupSiteEnabled: Boolean(pickupSite),
       pickupSiteManualMode: isManualBsffPickupSite(pickupSite),
-      equipmentHolderDifferent: false
+      equipmentHolderDifferent:
+        state.type === BsffType.TracerFluide &&
+        Boolean(state.ficheInterventions?.length)
     };
   }, [bsffQuery.data]);
   const methods = useForm<ZodBsff>({
@@ -324,6 +443,18 @@ const BsffFormSteps = ({
       destination: <DestinationBsff />
     }),
     [equipmentHolderDifferent, fluidesFrigorigenesEnabled, type]
+      emitter:
+        type === BsffType.CollectePetitesQuantites ? (
+          <EmitterBsff />
+        ) : undefined,
+      detenteur:
+        type !== BsffType.TracerFluide || equipmentHolderDifferent ? (
+          <DetenteurBsff />
+        ) : undefined,
+      transporter: <TransporterBsff />,
+      destination: <DestinationBsff />
+    }),
+    [equipmentHolderDifferent, type]
   );
 
   // ======================================================
@@ -352,6 +483,40 @@ const BsffFormSteps = ({
     const isEmpty = Object.values(company).every(v => !v);
 
     return isEmpty ? undefined : company;
+  }
+
+  function hasFicheInterventionData(ficheIntervention: any) {
+    return Boolean(
+      ficheIntervention.numero?.trim() ||
+        ficheIntervention.postalCode?.trim() ||
+        Number(ficheIntervention.weight ?? 0) > 0
+    );
+  }
+
+  function toPackagingDetenteur(ficheIntervention: any) {
+    const company = ficheIntervention.detenteur?.company;
+    const isPrivateIndividual =
+      ficheIntervention.holderType !== undefined
+        ? ficheIntervention.holderType !== "ENTREPRISE"
+        : ficheIntervention.detenteur?.isPrivateIndividual ?? false;
+
+    if (!company) return undefined;
+
+    return {
+      isPrivateIndividual,
+      company: {
+        siret: isPrivateIndividual ? null : company.siret ?? null,
+        name:
+          company.name?.trim() ||
+          ficheIntervention.identification?.trim() ||
+          company.contact?.trim() ||
+          "Détenteur d'équipement",
+        address: company.address?.trim() || "Non renseignée",
+        contact: company.contact ?? null,
+        phone: company.phone ?? null,
+        mail: company.mail ?? null
+      }
+    };
   }
 
   // ======================================================
@@ -403,34 +568,115 @@ const BsffFormSteps = ({
         })
     );
   }
+  function getFicheInterventionKey(fi: any, index: number) {
+    return (
+      fi.numero?.trim() ||
+      fi.id ||
+      `DETENTEUR_${fi.holderType || "ENTREPRISE"}_${index}`
+    );
+  }
   async function getFicheInterventionIds(values: ZodBsff) {
     const emitterCompany = values.emitter?.company;
+
     if (
       [
         BsffType.Groupement,
         BsffType.Reexpedition,
-        BsffType.Reconditionnement,
-        BsffType.TracerFluide
+        BsffType.Reconditionnement
       ].includes(values.type as BsffType)
     ) {
       return {};
     }
-    const ficheInterventions = values.ficheInterventions ?? [];
+
+    const ficheInterventions =
+      values.type === BsffType.TracerFluide && !values.equipmentHolderDifferent
+        ? []
+        : values.ficheInterventions ?? [];
+
     if (!ficheInterventions.length) return {};
 
     const entries = await Promise.all(
       ficheInterventions
-        .filter(fi => fi.numero && fi.postalCode && fi.weight && fi.weight > 0)
-        .map(async fi => {
+        .filter(fi => {
+          // Pour les BSFF de collecte, la fiche est réellement facultative :
+          // sélectionner un détenteur et ses contenants ne doit pas créer de
+          // fiche avec des valeurs techniques.
+          if (values.type === BsffType.CollectePetitesQuantites) {
+            return hasFicheInterventionData(fi);
+          }
+
+          const hasDetenteur = Boolean(
+            fi.detenteur?.company?.siret ||
+              fi.detenteur?.company?.orgId ||
+              fi.detenteur?.company?.name ||
+              fi.detenteur?.isPrivateIndividual
+          );
+
+          // TRACER_FLUIDE :
+          // On accepte une fiche qui contient uniquement
+          // le détenteur + les contenants sélectionnés.
+          if (values.type === BsffType.TracerFluide) {
+            return Boolean(fi.holderType) || hasDetenteur;
+          }
+
+          // Autres types : on conserve le comportement existant.
+          return (
+            hasDetenteur ||
+            Boolean(fi.numero && fi.postalCode && fi.weight && fi.weight > 0)
+          );
+        })
+        .map(async (fi, index) => {
           const detenteurCompany = fi.detenteur?.company;
 
+          const isEquipmentHolder = values.type === BsffType.TracerFluide;
+
+          const identification = fi.identification?.trim();
+
+          const isPrivateIndividual = isEquipmentHolder
+            ? fi.holderType !== "ENTREPRISE"
+            : fi.detenteur?.isPrivateIndividual ?? false;
+
+          // ======================================================
+          // CONTENANTS RATTACHÉS À CETTE FICHE / CE DÉTENTEUR
+          // ======================================================
+
+          const linkedPackagingNumbers = new Set(
+            (fi.packagings ?? [])
+              .map(packaging => packaging.numero)
+              .filter(Boolean)
+          );
+
+          const linkedWeight = (values.packagings ?? []).reduce(
+            (sum, packaging) => {
+              if (linkedPackagingNumbers.has(packaging.numero)) {
+                return sum + Number(packaging.weight ?? 0);
+              }
+
+              return sum;
+            },
+            0
+          );
+
+          const holderKey = getFicheInterventionKey(fi, index);
+
+          // ======================================================
+          // DÉTENTEUR
+          // ======================================================
+
           const cleanedDetenteur = {
-            isPrivateIndividual: fi.detenteur?.isPrivateIndividual ?? false,
+            isPrivateIndividual,
             company: detenteurCompany
               ? {
-                  siret: detenteurCompany.siret ?? null,
-                  name: detenteurCompany.name ?? null,
-                  address: detenteurCompany.address ?? null,
+                  siret: isPrivateIndividual
+                    ? null
+                    : detenteurCompany.siret ?? null,
+
+                  name:
+                    detenteurCompany.name?.trim() ||
+                    identification ||
+                    detenteurCompany.contact?.trim() ||
+                    "Détenteur d'équipement",
+                  address: detenteurCompany.address?.trim() || "Non renseignée",
                   contact: detenteurCompany.contact ?? null,
                   phone: detenteurCompany.phone ?? null,
                   mail: detenteurCompany.mail ?? null
@@ -438,13 +684,37 @@ const BsffFormSteps = ({
               : undefined
           };
 
+          // ======================================================
+          // FICHE INTERVENTION
+          // ======================================================
+
           const ficheInput = {
-            numero: fi.numero!,
-            weight: Number(fi.weight),
-            postalCode: fi.postalCode!,
+            numero: holderKey,
+
+            // IMPORTANT :
+            // Pour TRACER_FLUIDE, le poids vient des contenants
+            // rattachés à cette fiche.
+            //
+            // Pour les autres types, on conserve fi.weight.
+            weight: isEquipmentHolder ? linkedWeight : Number(fi.weight ?? 0),
+
+            // GraphQL exige postalCode: String!
+            //
+            // Pour TRACER_FLUIDE, la valeur n'est pas utilisée
+            // comme adresse du détenteur : on fournit simplement
+            // une valeur technique obligatoire.
+            postalCode: isEquipmentHolder ? "00000" : fi.postalCode ?? "00000",
+
             detenteur: cleanedDetenteur,
-            operateur: { company: cleanCompany(emitterCompany) }
+
+            operateur: {
+              company: cleanCompany(emitterCompany)
+            }
           };
+
+          // ======================================================
+          // UPDATE FICHE EXISTANTE
+          // ======================================================
 
           if (fi.id) {
             await updateFicheInterventionBsff({
@@ -454,35 +724,29 @@ const BsffFormSteps = ({
               }
             });
 
-            return [fi.numero!, fi.id] as const;
+            return [holderKey, fi.id] as const;
           }
+
+          // ======================================================
+          // CREATE FICHE
+          // ======================================================
 
           const { data } = await createFicheIntervention({
             variables: {
-              input: {
-                numero: fi.numero!,
-                weight: Number(fi.weight!),
-                postalCode: fi.postalCode!,
-                detenteur: fi.detenteur,
-                operateur: {
-                  company: cleanCompany(emitterCompany)
-                }
-              }
+              input: ficheInput
             }
           });
 
           const createdId = data?.createFicheInterventionBsff?.id ?? null;
 
-          return [fi.numero, createdId] as const;
+          return [holderKey, createdId] as const;
         })
     );
 
-    return Object.fromEntries(entries.filter(([, id]) => !!id)) as Record<
-      string,
-      string
-    >;
+    return Object.fromEntries(
+      entries.filter(([, id]) => Boolean(id))
+    ) as Record<string, string>;
   }
-
   // ======================================================
   // BUILD INPUT
   // ======================================================
@@ -537,7 +801,8 @@ const BsffFormSteps = ({
 
       transporters: transporterIds,
 
-      ficheInterventions: ficheInterventionIds,
+      ficheInterventions:
+        type === BsffType.CollectePetitesQuantites ? ficheInterventionIds : [],
 
       packagings: buildPackagings(
         type as unknown as BsffType,
@@ -591,6 +856,38 @@ const BsffFormSteps = ({
   // PACKAGINGS
   // ======================================================
 
+  // function buildPackagings(
+  //   type: BsffType,
+  //   packagings: any[] | null | undefined,
+  //   ficheInterventions: any[] | null | undefined,
+  //   ficheInterventionMap: Record<string, string>
+  // ) {
+  //   if ([BsffType.Groupement, BsffType.Reexpedition].includes(type)) {
+  //     return undefined;
+  //   }
+
+  //   return packagings?.map(p => ({
+  //     type: p.type,
+
+  //     numero: p.numero,
+
+  //     other: p.other ?? null,
+
+  //     volume: p.volume ?? null,
+
+  //     weight: Number(p.weight ?? 0),
+
+  //     ficheInterventions:
+  //       ficheInterventions
+  //         ?.filter(fi =>
+  //           fi.packagings?.some(
+  //             (linkedPackaging: any) => linkedPackaging.numero === p.numero
+  //           )
+  //         )
+  //         .map(fi => ficheInterventionMap[fi.numero])
+  //         .filter(Boolean) ?? []
+  //   }));
+  // }
   function buildPackagings(
     type: BsffType,
     packagings: any[] | null | undefined,
@@ -601,29 +898,55 @@ const BsffFormSteps = ({
       return undefined;
     }
 
-    return packagings?.map(p => ({
-      type: p.type,
-
-      numero: p.numero,
-
-      other: p.other ?? null,
-
-      volume: p.volume ?? null,
-
-      weight: Number(p.weight ?? 0),
-
-      ficheInterventions:
-        ficheInterventions
-          ?.filter(fi =>
-            fi.packagings?.some(
-              (linkedPackaging: any) => linkedPackaging.numero === p.numero
-            )
+    return packagings?.map(p => {
+      const linkedFicheInterventions = (ficheInterventions ?? [])
+        .map((ficheIntervention, index) => ({ ficheIntervention, index }))
+        .filter(({ ficheIntervention }) =>
+          ficheIntervention.packagings?.some(
+            (linkedPackaging: any) => linkedPackaging.numero === p.numero
           )
-          .map(fi => ficheInterventionMap[fi.numero])
-          .filter(Boolean) ?? []
-    }));
-  }
+        );
 
+      const detenteurs = linkedFicheInterventions
+        .map(({ ficheIntervention }) => toPackagingDetenteur(ficheIntervention))
+        .filter(
+          (
+            detenteur
+          ): detenteur is NonNullable<
+            ReturnType<typeof toPackagingDetenteur>
+          > => Boolean(detenteur)
+        )
+        .filter(
+          (detenteur, index, allDetenteurs) =>
+            allDetenteurs.findIndex(
+              candidate =>
+                candidate!.company.siret === detenteur!.company.siret &&
+                candidate!.company.name === detenteur!.company.name
+            ) === index
+        );
+
+      return {
+        type: p.type,
+        numero: p.numero,
+        other: p.other ?? null,
+        volume: p.volume ?? null,
+        weight: Number(p.weight ?? 0),
+        detenteurs,
+        ficheInterventions:
+          type === BsffType.CollectePetitesQuantites
+            ? linkedFicheInterventions
+                .map(({ ficheIntervention, index }) => {
+                  const ficheKey = getFicheInterventionKey(
+                    ficheIntervention,
+                    index
+                  );
+                  return ficheInterventionMap[ficheKey] ?? null;
+                })
+                .filter((id): id is string => Boolean(id))
+            : []
+      };
+    });
+  }
   // ======================================================
   // UPDATE FLOW
   // ======================================================
