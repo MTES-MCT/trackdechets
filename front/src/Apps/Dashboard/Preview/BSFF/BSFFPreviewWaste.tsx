@@ -19,7 +19,7 @@ const BSFFPreviewWaste = ({ bsd }: BSFFPreviewWasteProps) => {
       <PreviewContainerRow title={"Quantité"}>
         <PreviewContainerCol gridWidth={4}>
           <PreviewTextRow
-            label="Quantité totale de fluide"
+            label={`Poids ${bsd.weight?.isEstimate ? "estimé" : "réel"}`}
             tooltip={
               bsd.weight?.isEstimate
                 ? `"Quantité estimée conformément à l'article 5.4.1.1.3.2 de l'ADR" si soumis`

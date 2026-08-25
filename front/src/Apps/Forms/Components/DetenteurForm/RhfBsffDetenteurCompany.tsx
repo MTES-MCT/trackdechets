@@ -2,7 +2,6 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import CompanyContactInfo from "../RhfCompanyContactInfo/RhfCompanyContactInfo";
-import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 export default function RhfBsffDetenteurCompany({
   orgId,
@@ -42,16 +41,6 @@ export default function RhfBsffDetenteurCompany({
             { shouldDirty: true, shouldValidate: true }
           );
         }}
-      />
-      <ToggleSwitch
-        className="fr-mt-3w"
-        label="Avec un détenteur d’équipement différent"
-        inputTitle="Détenteur d'équipement différent"
-        checked={!!watch("equipmentHolderDifferent")}
-        disabled={disabled}
-        onChange={value =>
-          setValue("equipmentHolderDifferent", value, { shouldDirty: true })
-        }
       />
       <CompanyContactInfo
         fieldName={field}

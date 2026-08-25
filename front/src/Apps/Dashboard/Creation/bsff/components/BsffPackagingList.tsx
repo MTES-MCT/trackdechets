@@ -4,11 +4,10 @@ import {
   PackagingInfoInput,
   Packagings
 } from "@td/codegen-ui";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { PackagingFormProps } from "./BsffPackagingForm";
 import { useWatch } from "react-hook-form";
 import { emptyBsddPackaging } from "../../../../Forms/Components/PackagingList/helpers";
-import { DetenteurAccordion } from "../../../../Forms/Components/DetenteurAccordion/DetenteurAccordion";
 
 export interface RenderPackagingFormProps
   extends Omit<PackagingFormProps, "inputProps" | "errors" | "touched"> {
@@ -23,11 +22,8 @@ export type PackagingListProps = {
   packagingInfos: PackagingInfoInput[];
   disabled?: boolean;
   volumeEditable?: boolean;
-  detenteurMode?: boolean;
   push: (packaging: PackagingInfoInput) => void;
-  insert: (idx: number, packaging: PackagingInfoInput) => void;
   remove: (idx: number) => void;
-  swap: (from: number, to: number) => void;
   onRemoveFromTable?: (id: string) => void;
   children: React.FC<RenderPackagingFormProps>;
 };
@@ -37,19 +33,15 @@ function BsffPackagingList({
   packagingTypes,
   packagingInfos = [],
   push,
-  insert,
   remove,
-  swap,
   onRemoveFromTable,
   disabled = false,
   volumeEditable = false,
-  detenteurMode = false,
 
   children
 }: PackagingListProps) {
   const bsffType = useWatch({ name: "type" });
   const repackaging: any[] = useWatch({ name: "repackaging" }) ?? [];
-  const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
 
   const stableKeys = useRef<Map<PackagingInfoInput, string>>(new Map());
   const getStableKey = (p: PackagingInfoInput, idx: number): string => {
@@ -92,70 +84,17 @@ function BsffPackagingList({
         const fromTable = isFromTable(p);
         const stableKey = getStableKey(p, idx);
 
-        const packagingForm = children({
-          fieldName,
-          packagingTypes,
-          packagingsLength: packagingInfos.length,
-          idx,
-          packaging: p,
-          disabled,
-          volumeEditable
-        });
-
-        if (detenteurMode) {
-          return (
-            <DetenteurAccordion
-              key={stableKey}
-              numero={idx + 1}
-              name={`${idx + 1} - Contenant`}
-              expanded={expandedIdx === idx}
-              onExpanded={() =>
-                setExpandedIdx(expandedIdx === idx ? null : idx)
-              }
-              onActorAdd={() => {
-                insert(idx + 1, emptyBsddPackaging);
-                setExpandedIdx(idx + 1);
-              }}
-              onActorDelete={() => {
-                remove(idx);
-                if (expandedIdx === idx) {
-                  setExpandedIdx(null);
-                } else if (expandedIdx !== null && expandedIdx > idx) {
-                  setExpandedIdx(expandedIdx - 1);
-                }
-              }}
-              onActorShiftUp={() => {
-                if (idx === 0) return;
-                swap(idx, idx - 1);
-                if (expandedIdx === idx) {
-                  setExpandedIdx(idx - 1);
-                } else if (expandedIdx === idx - 1) {
-                  setExpandedIdx(idx);
-                }
-              }}
-              onActorShiftDown={() => {
-                if (idx === packagingInfos.length - 1) return;
-                swap(idx, idx + 1);
-                if (expandedIdx === idx) {
-                  setExpandedIdx(idx + 1);
-                } else if (expandedIdx === idx + 1) {
-                  setExpandedIdx(idx);
-                }
-              }}
-              disableAdd={disabled}
-              disableDelete={disabled || packagingInfos.length <= 1}
-              disableUp={disabled || idx === 0}
-              disableDown={disabled || idx === packagingInfos.length - 1}
-              deleteLabel="Supprimer"
-            >
-              <>{packagingForm}</>
-            </DetenteurAccordion>
-          );
-        }
-
         return (
           <div key={stableKey}>
-            {packagingForm}
+            {children({
+              fieldName,
+              packagingTypes,
+              packagingsLength: packagingInfos.length,
+              idx,
+              packaging: p,
+              disabled,
+              volumeEditable
+            })}
 
             {fromTable
               ? !disabled && (
@@ -190,7 +129,7 @@ function BsffPackagingList({
         );
       })}
 
-      {!detenteurMode && !disabled && canAdd && !showbutton && (
+      {!disabled && canAdd && !showbutton && (
         <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
           <button
             type="button"

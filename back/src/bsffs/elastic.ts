@@ -13,11 +13,10 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   BsffWithFicheInterventions,
   BsffWithPackagings,
+  BsffWithPackagingsInclude,
   BsffWithFicheInterventionInclude,
   BsffWithTransporters,
-  BsffWithTransportersInclude,
-  BsffWithPackagingsAndDetenteurs,
-  BsffWithPackagingsAndDetenteursInclude
+  BsffWithTransportersInclude
 } from "./types";
 import { prisma } from "@td/prisma";
 import {
@@ -31,12 +30,12 @@ import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
 
 export type BsffForElastic = Bsff &
-  BsffWithPackagingsAndDetenteurs &
+  BsffWithPackagings &
   BsffWithFicheInterventions &
   BsffWithTransporters;
 
 export const BsffForElasticInclude = {
-  ...BsffWithPackagingsAndDetenteursInclude,
+  ...BsffWithPackagingsInclude,
   ...BsffWithFicheInterventionInclude,
   ...BsffWithTransportersInclude
 };

@@ -14,12 +14,8 @@ function RhfBsffPackagingForm({
   packagingTypes,
   idx,
   disabled = false,
-  volumeEditable = false,
-  detenteurMode = false
-}: RenderPackagingFormProps & {
-  volumeEditable?: boolean;
-  detenteurMode?: boolean;
-}) {
+  volumeEditable = false
+}: RenderPackagingFormProps & { volumeEditable?: boolean }) {
   const fieldPath = (name: string) => `${fieldName}.${idx}.${name}`;
 
   const { register, getFieldState, formState, setValue, resetField } =
@@ -72,7 +68,6 @@ function RhfBsffPackagingForm({
       packagingsLength={packagingsLength}
       packagingTypes={packagingTypes}
       volumeEditable={volumeEditable}
-      detenteurMode={detenteurMode}
       disabled={disabled}
       errors={errors}
       touched={touched}

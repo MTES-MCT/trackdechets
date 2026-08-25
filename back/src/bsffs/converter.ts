@@ -8,7 +8,7 @@ import {
   processDecimal
 } from "../common/converter";
 import * as GraphQL from "@td/codegen-back";
-import { BsffPackagingType } from "@td/prisma";
+import { BsffPackaging, BsffPackagingType } from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsffForElastic } from "./elastic";
 import { getFirstTransporterSync } from "./database";
@@ -338,27 +338,9 @@ export function flattenBsffPackagingInput(
     )
   });
 }
-type BsffPackagingWithDetenteurs = Prisma.BsffPackaging & {
-  detenteurs: Prisma.BsffPackagingDetenteur[];
-};
 
-function expandBsffDetenteurFromDB(
-  detenteur: Prisma.BsffPackagingDetenteur
-): GraphQL.BsffDetenteur {
-  return {
-    company: nullIfNoValues<GraphQL.FormCompany>({
-      name: detenteur.detenteurCompanyName,
-      siret: detenteur.detenteurCompanySiret,
-      address: detenteur.detenteurCompanyAddress,
-      contact: detenteur.detenteurCompanyContact,
-      phone: detenteur.detenteurCompanyPhone,
-      mail: detenteur.detenteurCompanyMail
-    }),
-    isPrivateIndividual: detenteur.detenteurIsPrivateIndividual
-  };
-}
 export function expandBsffPackagingFromDB(
-  prismaBsffPackaging: BsffPackagingWithDetenteurs
+  prismaBsffPackaging: BsffPackaging
 ): GraphQL.BsffPackaging {
   return {
     id: prismaBsffPackaging.id,
@@ -372,7 +354,6 @@ export function expandBsffPackagingFromDB(
         : prismaBsffPackaging.type,
     volume: prismaBsffPackaging.volume,
     weight: prismaBsffPackaging.weight,
-
     acceptation: nullIfNoValues<GraphQL.BsffPackagingAcceptation>({
       date: prismaBsffPackaging.acceptationDate,
       weight: prismaBsffPackaging.acceptationWeight,
@@ -385,7 +366,6 @@ export function expandBsffPackagingFromDB(
         author: prismaBsffPackaging.acceptationSignatureAuthor
       })
     }),
-
     operation: nullIfNoValues<GraphQL.BsffPackagingOperation>({
       code: prismaBsffPackaging.operationCode as GraphQL.BsffOperationCode,
       mode: prismaBsffPackaging.operationMode as GraphQL.OperationMode,
@@ -412,12 +392,7 @@ export function expandBsffPackagingFromDB(
         author: prismaBsffPackaging.operationSignatureAuthor
       })
     }),
-
-    detenteurs: (prismaBsffPackaging.detenteurs ?? []).map(
-      expandBsffDetenteurFromDB
-    ),
-
-    // the following fields will be resolved in BsffPackaging resolver
+    // the following fields will be resolved in BsddPackaging resolver
     nextBsffs: [],
     previousBsffs: [],
     bsff: null as any,
@@ -501,7 +476,7 @@ export function expandFicheInterventionBsffFromDB(
       }),
       isPrivateIndividual: prismaFicheIntervention.detenteurIsPrivateIndividual
     }),
-    packagings: (prismaFicheIntervention.packagings ?? []).map(
+    packagings: prismaFicheIntervention.packagings.map(
       expandBsffPackagingFromDB
     ),
     operateur: nullIfNoValues<GraphQL.BsffOperateur>({

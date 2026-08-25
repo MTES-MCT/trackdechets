@@ -36,33 +36,6 @@ export async function mergeInputAndParseBsffAsync(
     ...zodInput
   };
 
-  // Fusion spéciale pour les packagings: préserver les détenteurs
-  // si l'input n'en envoie pas
-  if (zodInput.packagings && zodPersisted.packagings) {
-    bsff.packagings = zodInput.packagings.map((inputPackaging, idx) => {
-      const persistedPackaging = zodPersisted.packagings![idx];
-      if (!persistedPackaging) {
-        // Nouveau packaging
-        return inputPackaging;
-      }
-
-      // Préserver les détenteurs du persisted si l'input n'en a pas
-      if (
-        (!inputPackaging.detenteurs ||
-          inputPackaging.detenteurs.length === 0) &&
-        persistedPackaging.detenteurs &&
-        persistedPackaging.detenteurs.length > 0
-      ) {
-        return {
-          ...inputPackaging,
-          detenteurs: persistedPackaging.detenteurs
-        };
-      }
-
-      return inputPackaging;
-    });
-  }
-
   // La fusion des transporteurs est un peu plus compliquée à cause de l'utilisation
   // possible du du champ `BsffInput.transporter (rétro-comptabilité avec l'API
   // BSFF pré multi-modal)

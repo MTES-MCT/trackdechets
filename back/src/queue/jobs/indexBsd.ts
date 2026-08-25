@@ -87,8 +87,7 @@ export async function indexBsdJob(
       include: {
         packagings: {
           include: {
-            ficheInterventions: true,
-            detenteurs: true
+            ficheInterventions: true
           }
         },
         ficheInterventions: true,

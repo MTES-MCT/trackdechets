@@ -1,8 +1,10 @@
 import type { ZodBsff } from "../schema";
 import {
   buildBsffPickupSiteInput,
+  hasPickupSite,
   isManualBsffPickupSite
 } from "../utils/pickupSite";
+import { BsffType } from "@td/codegen-ui";
 
 const values = (overrides: Partial<ZodBsff> = {}) =>
   ({
@@ -62,5 +64,22 @@ describe("buildBsffPickupSiteInput", () => {
       false
     );
     expect(isManualBsffPickupSite({ street: "2 rue manuelle" })).toBe(true);
+  });
+});
+
+describe("hasPickupSite", () => {
+  it.each([BsffType.TracerFluide, BsffType.CollectePetitesQuantites])(
+    "conserve le lieu de collecte pour le parcours %s",
+    type => {
+      expect(hasPickupSite(type)).toBe(true);
+    }
+  );
+
+  it.each([
+    BsffType.Groupement,
+    BsffType.Reconditionnement,
+    BsffType.Reexpedition
+  ])("ne l'ajoute pas aux autres parcours (%s)", type => {
+    expect(hasPickupSite(type)).toBe(false);
   });
 });
