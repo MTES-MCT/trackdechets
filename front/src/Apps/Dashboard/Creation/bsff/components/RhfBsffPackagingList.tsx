@@ -8,17 +8,12 @@ function RhfBsffPackagingList({
   fieldName,
   packagingTypes,
   disabled = false,
-  volumeEditable = false,
-  detenteurMode = false
+  volumeEditable = false
 }: Pick<PackagingListProps, "fieldName" | "packagingTypes" | "disabled"> & {
   volumeEditable?: boolean;
-  detenteurMode?: boolean;
 }) {
   const { control, watch, setValue, getValues } = useFormContext(); // ← getValues
-  const { append, insert, remove, swap } = useFieldArray({
-    control,
-    name: fieldName
-  });
+  const { append, remove } = useFieldArray({ control, name: fieldName });
 
   const packagings: PackagingInfoInput[] = watch(fieldName) ?? [];
 
@@ -62,16 +57,11 @@ function RhfBsffPackagingList({
       fieldName={fieldName}
       volumeEditable={volumeEditable} // ← à transmettre
       push={append}
-      insert={insert}
       remove={remove}
-      swap={swap}
       disabled={disabled}
-      detenteurMode={detenteurMode}
       onRemoveFromTable={handleRemoveFromTable}
     >
-      {props => (
-        <RhfBsffPackagingForm {...props} detenteurMode={detenteurMode} />
-      )}
+      {props => <RhfBsffPackagingForm {...props} />}
     </BsffPackagingList>
   );
 }

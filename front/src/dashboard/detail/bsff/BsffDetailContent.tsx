@@ -145,35 +145,12 @@ export function BsffDetailContent({ form: bsff }: Props) {
         <Tabs selectedTabClassName={styles.detailTabSelected}>
           {/* Tabs menu */}
           <TabList className={styles.detailTabs}>
-            {(() => {
-              // Vérifier s'il y a des détenteurs sans fiche
-              const hasDetenteursWithoutFiche = bsff.packagings?.some(
-                p =>
-                  p.detenteurs &&
-                  p.detenteurs.length > 0 &&
-                  (!p.ficheInterventions || p.ficheInterventions.length === 0)
-              );
-              console.log("DEBUG TabList - bsff.packagings:", bsff.packagings);
-              console.log(
-                "DEBUG TabList - hasDetenteursWithoutFiche:",
-                hasDetenteursWithoutFiche
-              );
-              console.log(
-                "DEBUG TabList - bsff.ficheInterventions?.length:",
-                bsff.ficheInterventions?.length
-              );
-              return (
-                (bsff.ficheInterventions?.length > 0 ||
-                  hasDetenteursWithoutFiche) && (
-                  <Tab className={styles.detailTab}>
-                    <IconRenewableEnergyEarth size="25px" />
-                    <span className={styles.detailTabCaption}>
-                      Détenteur(s)
-                    </span>
-                  </Tab>
-                )
-              );
-            })()}
+            {bsff.ficheInterventions?.length > 0 && (
+              <Tab className={styles.detailTab}>
+                <IconRenewableEnergyEarth size="25px" />
+                <span className={styles.detailTabCaption}>Détenteur(s)</span>
+              </Tab>
+            )}
             <Tab className={styles.detailTab}>
               <IconWaterDam size="25px" />
               <span className={styles.detailTabCaption}>{emitterLabel}</span>
@@ -200,25 +177,13 @@ export function BsffDetailContent({ form: bsff }: Props) {
           {/* Tabs content */}
           <div className={styles.detailTabPanels}>
             {/* Fiche d'interventions */}
-            {(() => {
-              // Vérifier s'il y a des détenteurs sans fiche
-              const hasDetenteursWithoutFiche = bsff.packagings?.some(
-                p =>
-                  p.detenteurs &&
-                  p.detenteurs.length > 0 &&
-                  (!p.ficheInterventions || p.ficheInterventions.length === 0)
-              );
-              return (
-                (bsff.ficheInterventions?.length > 0 ||
-                  hasDetenteursWithoutFiche) && (
-                  <TabPanel className={styles.detailTabPanel}>
-                    <div className={styles.detailColumns}>
-                      <FicheInterventions form={bsff} />
-                    </div>
-                  </TabPanel>
-                )
-              );
-            })()}
+            {bsff.ficheInterventions?.length > 0 && (
+              <TabPanel className={styles.detailTabPanel}>
+                <div className={styles.detailColumns}>
+                  <FicheInterventions form={bsff} />
+                </div>
+              </TabPanel>
+            )}
             {/* Emitter tab panel */}
             <TabPanel className={styles.detailTabPanel}>
               <Emitter form={bsff} />
@@ -489,383 +454,133 @@ function Destination({ form }: { form: Bsff }) {
 }
 
 function FicheInterventions({ form }: { form: Bsff }) {
-  // Détenteurs des packagings qui n'ont PAS de fiche d'intervention
-  const detenteursWithoutFiche: Array<{
-    detenteur: any;
-    packagingNumero: string;
-  }> = [];
-
-  form.packagings.forEach(p => {
-    // Si le packaging a des détenteurs et PAS de fiche d'intervention
-    if (
-      p.detenteurs &&
-      p.detenteurs.length > 0 &&
-      (!p.ficheInterventions || p.ficheInterventions.length === 0)
-    ) {
-      p.detenteurs.forEach(detenteur => {
-        detenteursWithoutFiche.push({
-          detenteur,
-          packagingNumero: p.numero
-        });
-      });
-    }
-  });
-
-  const hasDetenteursWithoutFiche = detenteursWithoutFiche.length > 0;
-  const hasFicheInterventions = form.ficheInterventions.length > 0;
-
   return (
     <div style={{ display: "flex", flexWrap: "wrap" }}>
-      {hasFicheInterventions && (
-        <>
-          <h4 style={{ width: "100%", marginBottom: "1rem", color: "#0063a6" }}>
-            Détenteur(s) avec fiche d'intervention
-          </h4>
-          {form.ficheInterventions.map(ficheIntervention => {
-            // Vérifier que detenteur existe
-            if (!ficheIntervention.detenteur) {
-              return null;
+      {form.ficheInterventions.map(ficheIntervention => (
+        <div
+          key={ficheIntervention.id}
+          className={styles.detailGrid}
+          style={{ flex: "0 0 50%", padding: "0 0 2rem 0", margin: "0" }}
+        >
+          <DetailRow
+            label={
+              ficheIntervention.detenteur?.isPrivateIndividual
+                ? "Nom (particulier)"
+                : "Raison sociale"
             }
-            return (
-              <div
-                key={ficheIntervention.id}
-                className={styles.detailGrid}
-                style={{ flex: "0 0 50%", padding: "0 0 2rem 0", margin: "0" }}
-              >
-                <DetailRow
-                  label={
-                    ficheIntervention.detenteur.isPrivateIndividual
-                      ? "Nom (particulier)"
-                      : "Raison sociale"
-                  }
-                  value={ficheIntervention.detenteur.company?.name}
-                />
-                <DetailRow
-                  label="SIRET"
-                  value={ficheIntervention.detenteur.company?.siret}
-                />
-                <DetailRow
-                  label="Adresse"
-                  value={ficheIntervention.detenteur.company?.address}
-                />
-                <DetailRow
-                  label="Contact"
-                  value={ficheIntervention.detenteur.company?.contact}
-                />
-                <DetailRow
-                  label="Téléphone"
-                  value={ficheIntervention.detenteur.company?.phone}
-                />
-                <DetailRow
-                  label="Email"
-                  value={ficheIntervention.detenteur.company?.mail}
-                />
-                <DetailRow
-                  label="Numéro fiche d'intervention"
-                  value={ficheIntervention.numero}
-                />
-                <DetailRow
-                  label="Quantité fluides en kg"
-                  value={ficheIntervention.weight}
-                />
-                <DetailRow
-                  label="Code postal lieu de collecte"
-                  value={ficheIntervention.postalCode}
-                />
-              </div>
-            );
-          })}
-        </>
-      )}
-
-      {hasDetenteursWithoutFiche && (
-        <>
-          <h4
-            style={{
-              width: "100%",
-              marginBottom: "1rem",
-              marginTop: hasFicheInterventions ? "2rem" : "0",
-              color: "#a59d00"
-            }}
-          >
-            Détenteur(s) sans fiche d'intervention
-          </h4>
-          {detenteursWithoutFiche.map((item, idx) => (
-            <div
-              key={`without-fiche-${idx}`}
-              className={styles.detailGrid}
-              style={{ flex: "0 0 50%", padding: "0 0 2rem 0", margin: "0" }}
-            >
-              <DetailRow
-                label={
-                  item.detenteur.isPrivateIndividual
-                    ? "Nom (particulier)"
-                    : "Raison sociale"
-                }
-                value={item.detenteur.company?.name}
-              />
-              <DetailRow label="SIRET" value={item.detenteur.company?.siret} />
-              <DetailRow
-                label="Adresse"
-                value={item.detenteur.company?.address}
-              />
-              <DetailRow
-                label="Contact"
-                value={item.detenteur.company?.contact}
-              />
-              <DetailRow
-                label="Téléphone"
-                value={item.detenteur.company?.phone}
-              />
-              <DetailRow label="Email" value={item.detenteur.company?.mail} />
-              <DetailRow
-                label="Contenant associé"
-                value={item.packagingNumero}
-              />
-            </div>
-          ))}
-        </>
-      )}
+            value={ficheIntervention.detenteur?.company?.name}
+          />
+          <DetailRow
+            label="SIRET"
+            value={ficheIntervention.detenteur?.company?.siret}
+          />
+          <DetailRow
+            label="Numéro fiche d'intervention"
+            value={ficheIntervention.numero}
+          />
+          <DetailRow
+            label="Quantité fluides en kg"
+            value={ficheIntervention.weight}
+          />
+          <DetailRow
+            label="Code postal lieu de collecte"
+            value={ficheIntervention.postalCode}
+          />
+        </div>
+      ))}
     </div>
   );
 }
 
 function Packagings({ form }: { form: Bsff }) {
   return (
-    <>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeaderCell>Nom</TableHeaderCell>
-            <TableHeaderCell>Numéro</TableHeaderCell>
-            <TableHeaderCell>Quantité (kg)</TableHeaderCell>
-            <TableHeaderCell>Volume (litres)</TableHeaderCell>
-            <TableHeaderCell>Acceptation</TableHeaderCell>
-            <TableHeaderCell>Opération</TableHeaderCell>
-            <TableHeaderCell>Destination ultérieure</TableHeaderCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {form.packagings.map(p => {
-            return (
-              <TableRow key={p.id}>
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Nom</TableHeaderCell>
+          <TableHeaderCell>Numéro</TableHeaderCell>
+          <TableHeaderCell>Quantité (kg)</TableHeaderCell>
+          <TableHeaderCell>Volume (litres)</TableHeaderCell>
+          <TableHeaderCell>Acceptation</TableHeaderCell>
+          <TableHeaderCell>Opération</TableHeaderCell>
+          <TableHeaderCell>Destination ultérieure</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {form.packagings.map(p => {
+          return (
+            <TableRow key={p.id}>
+              <TableCell>
+                {p.type === "AUTRE" ? p.other : PACKAGINGS_NAMES[p.type]}
+              </TableCell>
+              <TableCell>{p.numero}</TableCell>
+              <TableCell>{p.weight}</TableCell>
+              <TableCell>{p.volume}</TableCell>
+              {!!p.acceptation?.signature?.date ? (
                 <TableCell>
-                  {p.type === "AUTRE" ? p.other : PACKAGINGS_NAMES[p.type]}
-                </TableCell>
-                <TableCell>{p.numero}</TableCell>
-                <TableCell>{p.weight}</TableCell>
-                <TableCell>{p.volume}</TableCell>
-                {!!p.acceptation?.signature?.date ? (
-                  <TableCell>
-                    {p.acceptation?.status ===
-                    WasteAcceptationStatus.Accepted ? (
-                      <>
-                        <div>
-                          Accepté le {formatDate(p.acceptation?.date ?? "")} par{" "}
-                          {p.acceptation?.signature?.author}
-                        </div>
-                        <div>{`${p.acceptation?.weight} kg - ${p.acceptation?.wasteCode} (${p.acceptation?.wasteDescription})`}</div>
-                      </>
-                    ) : (
-                      <>
-                        <div>
-                          Refusé le {formatDate(p.acceptation?.date ?? "")} par{" "}
-                          {p.acceptation?.signature?.author}
-                        </div>
-                        <div>{p.acceptation?.refusalReason}</div>
-                      </>
-                    )}
-                  </TableCell>
-                ) : (
-                  <TableCell> </TableCell>
-                )}
-                {!!p.operation?.signature?.date ? (
-                  <TableCell>
-                    <div>
-                      Traité le {formatDate(p.operation?.date ?? "")} par{" "}
-                      {p.operation?.signature?.author}
-                    </div>
-                    <div>
-                      {p.operation?.code} ({p?.operation?.description})
-                      <br />
-                      {getOperationModeLabel(
-                        p?.operation?.mode as OperationMode
-                      )}
-                    </div>
-                    {p.operation?.noTraceability && (
-                      <div>Rupture de traçabilité</div>
-                    )}
-                    {p.operation?.nextDestination?.company?.siret && (
+                  {p.acceptation?.status === WasteAcceptationStatus.Accepted ? (
+                    <>
                       <div>
-                        Destination ultérieure prévue :{" "}
-                        {p.operation?.nextDestination?.company?.name} (
-                        {p.operation?.nextDestination?.company?.siret}) -{" "}
-                        {p.operation?.nextDestination?.plannedOperationCode}
+                        Accepté le {formatDate(p.acceptation?.date ?? "")} par{" "}
+                        {p.acceptation?.signature?.author}
                       </div>
-                    )}
-                  </TableCell>
-                ) : (
-                  <TableCell> </TableCell>
-                )}
+                      <div>{`${p.acceptation?.weight} kg - ${p.acceptation?.wasteCode} (${p.acceptation?.wasteDescription})`}</div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        Refusé le {formatDate(p.acceptation?.date ?? "")} par{" "}
+                        {p.acceptation?.signature?.author}
+                      </div>
+                      <div>{p.acceptation?.refusalReason}</div>
+                    </>
+                  )}
+                </TableCell>
+              ) : (
+                <TableCell> </TableCell>
+              )}
+              {!!p.operation?.signature?.date ? (
                 <TableCell>
-                  {p.nextBsffs.map(bsff => {
-                    return (
-                      <div>
-                        <div>
-                          {bsff.destination?.company?.name} - (
-                          {bsff.destination?.company?.siret})
-                        </div>
-                      </div>
-                    );
-                  })}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-
-      {(form.packagings.some(p => p.detenteurs?.length > 0) ||
-        form.ficheInterventions?.length > 0) && (
-        <div style={{ marginTop: "2rem" }}>
-          <h3>Détenteurs des contenants</h3>
-          {form.packagings.map(p => {
-            // Détenteurs du packaging lui-même
-            const packagingDetenteurs = (p.detenteurs ?? []).filter(
-              (d): d is NonNullable<typeof d> => d != null
-            );
-
-            // Détenteurs provenant des fiches d'intervention associées
-            const ficheDetenteurs =
-              p.ficheInterventions
-                ?.map(fi => {
-                  const fiche = form.ficheInterventions?.find(
-                    f => f.id === fi.id
-                  );
-                  return fiche?.detenteur;
-                })
-                .filter((d): d is NonNullable<typeof d> => d != null) ?? [];
-
-            // Tous les détenteurs du packaging
-            const allDetenteurs = [...packagingDetenteurs, ...ficheDetenteurs];
-
-            if (allDetenteurs.length === 0) return null;
-
-            return (
-              <div
-                key={p.id}
-                style={{
-                  marginBottom: "2rem",
-                  padding: "1rem",
-                  backgroundColor: "#f5f5f5",
-                  borderRadius: "4px"
-                }}
-              >
-                <h4>
-                  Contenant {p.numero} (
-                  {p.type === "AUTRE" ? p.other : PACKAGINGS_NAMES[p.type]})
-                </h4>
-
-                {packagingDetenteurs.length > 0 && (
-                  <div style={{ marginBottom: "1.5rem" }}>
-                    <h5 style={{ marginBottom: "1rem", color: "#a59d00" }}>
-                      Détenteur(s) sans fiche d'intervention
-                    </h5>
-                    {packagingDetenteurs.map((detenteur, idx) => (
-                      <div
-                        key={`packaging-${idx}`}
-                        style={{
-                          marginBottom: "1rem",
-                          padding: "0.75rem",
-                          backgroundColor: "#fff",
-                          borderLeft: "4px solid #a59d00"
-                        }}
-                      >
-                        <DetailRow
-                          label={
-                            detenteur.isPrivateIndividual
-                              ? "Nom (particulier)"
-                              : "Raison sociale"
-                          }
-                          value={detenteur.company?.name}
-                        />
-                        <DetailRow
-                          label="SIRET"
-                          value={detenteur.company?.siret}
-                        />
-                        <DetailRow
-                          label="Adresse"
-                          value={detenteur.company?.address}
-                        />
-                        <DetailRow
-                          label="Contact"
-                          value={detenteur.company?.contact}
-                        />
-                        <DetailRow
-                          label="Téléphone"
-                          value={detenteur.company?.phone}
-                        />
-                        <DetailRow
-                          label="Email"
-                          value={detenteur.company?.mail}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {ficheDetenteurs.length > 0 && (
                   <div>
-                    <h5 style={{ marginBottom: "1rem", color: "#0063a6" }}>
-                      Détenteur(s) avec fiche d'intervention
-                    </h5>
-                    {ficheDetenteurs.map((detenteur, idx) => (
-                      <div
-                        key={`fiche-${idx}`}
-                        style={{
-                          marginBottom: "1rem",
-                          padding: "0.75rem",
-                          backgroundColor: "#fff",
-                          borderLeft: "4px solid #0063a6"
-                        }}
-                      >
-                        <DetailRow
-                          label={
-                            detenteur.isPrivateIndividual
-                              ? "Nom (particulier)"
-                              : "Raison sociale"
-                          }
-                          value={detenteur.company?.name}
-                        />
-                        <DetailRow
-                          label="SIRET"
-                          value={detenteur.company?.siret}
-                        />
-                        <DetailRow
-                          label="Adresse"
-                          value={detenteur.company?.address}
-                        />
-                        <DetailRow
-                          label="Contact"
-                          value={detenteur.company?.contact}
-                        />
-                        <DetailRow
-                          label="Téléphone"
-                          value={detenteur.company?.phone}
-                        />
-                        <DetailRow
-                          label="Email"
-                          value={detenteur.company?.mail}
-                        />
-                      </div>
-                    ))}
+                    Traité le {formatDate(p.operation?.date ?? "")} par{" "}
+                    {p.operation?.signature?.author}
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </>
+                  <div>
+                    {p.operation?.code} ({p?.operation?.description})
+                    <br />
+                    {getOperationModeLabel(p?.operation?.mode as OperationMode)}
+                  </div>
+                  {p.operation?.noTraceability && (
+                    <div>Rupture de traçabilité</div>
+                  )}
+                  {p.operation?.nextDestination?.company?.siret && (
+                    <div>
+                      Destination ultérieure prévue :{" "}
+                      {p.operation?.nextDestination?.company?.name} (
+                      {p.operation?.nextDestination?.company?.siret}) -{" "}
+                      {p.operation?.nextDestination?.plannedOperationCode}
+                    </div>
+                  )}
+                </TableCell>
+              ) : (
+                <TableCell> </TableCell>
+              )}
+              <TableCell>
+                {p.nextBsffs.map(bsff => {
+                  return (
+                    <div>
+                      <div>
+                        {bsff.destination?.company?.name} - (
+                        {bsff.destination?.company?.siret})
+                      </div>
+                    </div>
+                  );
+                })}
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }

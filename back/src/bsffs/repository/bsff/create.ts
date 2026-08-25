@@ -37,12 +37,7 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       include: {
         transporters: true,
         ficheInterventions: true,
-        packagings: {
-          include: {
-            ficheInterventions: true,
-            detenteurs: true
-          }
-        }
+        packagings: true
       }
     });
 
@@ -50,27 +45,19 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       await updateTransporterOrgIds(fullBsff, prisma);
     }
 
-    if (args.data.ficheInterventions || args.data.packagings) {
+    if (args.data.ficheInterventions) {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
     // Si le BSFF a des fiches d'intervention et des packagings,
     // on fait le lien entre eux
-    const hasExplicitPackagingFicheInterventions = fullBsff.packagings.some(
-      packaging => packaging.ficheInterventions.length > 0
-    );
-
-    if (
-      !hasExplicitPackagingFicheInterventions &&
-      fullBsff.ficheInterventions.length &&
-      fullBsff.packagings.length
-    ) {
-      await addBsffPackagingsFichesIntervention(
-        fullBsff.packagings,
-        fullBsff.ficheInterventions,
-        prisma
-      );
-    }
+    // if (fullBsff.ficheInterventions?.length && fullBsff.packagings?.length) {
+    //   await addBsffPackagingsFichesIntervention(
+    //     fullBsff.packagings,
+    //     fullBsff.ficheInterventions,
+    //     prisma    const { prisma, user } = deps;
+    //   );
+    // }
 
     // update transporters ordering when connecting transporters records
     if (

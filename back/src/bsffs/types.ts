@@ -20,19 +20,6 @@ export type BsffWithPackagings = Prisma.BsffGetPayload<{
   include: typeof BsffWithPackagingsInclude;
 }>;
 
-export const BsffWithPackagingsAndDetenteursInclude = {
-  packagings: {
-    include: {
-      ficheInterventions: true,
-      detenteurs: true
-    }
-  }
-} satisfies Prisma.BsffInclude;
-
-export type BsffWithPackagingsAndDetenteurs = Prisma.BsffGetPayload<{
-  include: typeof BsffWithPackagingsAndDetenteursInclude;
-}>;
-
 export const BsffWithFicheInterventionInclude = {
   ficheInterventions: true
 } satisfies Prisma.BsffInclude;

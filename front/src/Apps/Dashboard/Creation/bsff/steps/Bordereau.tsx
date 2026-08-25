@@ -11,7 +11,7 @@ import EmitterBsff from "./Emitter";
 
 export default function BordereauBsff() {
   const { siret } = useParams<{ siret: string }>();
-
+  const { watch, setValue } = useFormContext();
   const sealed = useContext(SealedFieldsContext);
   const disabled = sealed.includes("emitter.company.siret");
   const pickupSiteDisabled = sealed.some(
@@ -41,7 +41,6 @@ export default function BordereauBsff() {
           />
         </>
       )}
-      <RhfBsffDetenteurCompany orgId={siret} disabled={disabled} />
       <RhfPickupSiteBlock disabled={pickupSiteDisabled} />
       {isOperateur && (
         <div className="fr-mt-4w">

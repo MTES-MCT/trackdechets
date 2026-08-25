@@ -29,12 +29,7 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       include: {
         transporters: true,
         ficheInterventions: true,
-        packagings: {
-          include: {
-            ficheInterventions: true,
-            detenteurs: true
-          }
-        }
+        packagings: true
       }
     });
     const updatedBsff = await prisma.bsff.update(args);
@@ -44,12 +39,7 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       include: {
         transporters: true,
         ficheInterventions: true,
-        packagings: {
-          include: {
-            ficheInterventions: true,
-            detenteurs: true
-          }
-        }
+        packagings: true
       }
     });
 
@@ -100,35 +90,28 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       await updateTransporterOrgIds(fullBsff, prisma);
     }
 
-    if (args.data.ficheInterventions || args.data.packagings) {
+    if (args.data.ficheInterventions) {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
-    const hasExplicitPackagingFicheInterventions = fullBsff.packagings.some(
-      packaging => packaging.ficheInterventions.length > 0
-    );
+    // Si le BSFF a des fiches d'intervention et des packagings,
+    // on fait le lien entre eux
+    // if (args.data.ficheInterventions || args.data.packagings) {
+    //   // D'abord on enlève les anciennes relations
+    //   await removeBsffPackagingsFichesIntervention(
+    //     previousBsff.packagings,
+    //     previousBsff.ficheInterventions,
+    //     prisma
+    //   );
 
-    // Compatibilité : on conserve l'association historique « toutes les FI avec
-    // tous les contenants » seulement lorsqu'aucune association explicite n'est
-    // portée par les contenants.
-    if (
-      !hasExplicitPackagingFicheInterventions &&
-      (args.data.ficheInterventions || args.data.packagings) &&
-      fullBsff.ficheInterventions.length > 0 &&
-      fullBsff.packagings.length > 0
-    ) {
-      await removeBsffPackagingsFichesIntervention(
-        previousBsff.packagings,
-        previousBsff.ficheInterventions,
-        prisma
-      );
+    //   // Puis on ajoute les nouvelles
+    //   await addBsffPackagingsFichesIntervention(
+    //     fullBsff.packagings,
+    //     fullBsff.ficheInterventions,
+    //     prisma
+    //   );
+    // }
 
-      await addBsffPackagingsFichesIntervention(
-        fullBsff.packagings,
-        fullBsff.ficheInterventions,
-        prisma
-      );
-    }
     const { updatedAt, ...updateDiff } = objectDiff(previousBsff, updatedBsff);
 
     await prisma.event.create({

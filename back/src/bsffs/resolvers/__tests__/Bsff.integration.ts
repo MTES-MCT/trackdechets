@@ -42,22 +42,6 @@ const GET_NEXT_BSFF = gql`
   }
 `;
 
-const GET_BSFF_PACKAGINGS = gql`
-  query GetBsffPackagings($id: ID!) {
-    bsff(id: $id) {
-      packagings {
-        id
-        numero
-        detenteurs {
-          company {
-            siret
-          }
-        }
-      }
-    }
-  }
-`;
-
 describe("Bsff.ficheInterventions", () => {
   afterAll(resetDatabase);
 
@@ -160,73 +144,5 @@ describe("Bsff.ficheInterventions", () => {
           "Vous n'êtes pas autorisé à consulter les fiches d'interventions de ce BSFF"
       })
     ]);
-  });
-});
-
-describe("Bsff.packagings", () => {
-  afterAll(resetDatabase);
-
-  it("only returns packagings associated with the requesting detenteur", async () => {
-    const detenteur1 = await userWithCompanyFactory("MEMBER");
-    const detenteur2 = await userWithCompanyFactory("MEMBER");
-    const operateur = await userWithCompanyFactory("MEMBER");
-    const bsff = await createBsff({ emitter: operateur });
-
-    const secondPackaging = await prisma.bsffPackaging.create({
-      data: {
-        bsffId: bsff.id,
-        type: "BOUTEILLE",
-        numero: "second-packaging",
-        emissionNumero: "second-packaging",
-        weight: 1
-      }
-    });
-
-    await prisma.bsffPackaging.update({
-      where: { id: bsff.packagings[0].id },
-      data: {
-        detenteurs: {
-          create: {
-            detenteurCompanyName: detenteur1.company.name,
-            detenteurCompanySiret: detenteur1.company.siret,
-            detenteurCompanyAddress: detenteur1.company.address
-          }
-        }
-      }
-    });
-    await prisma.bsffPackaging.update({
-      where: { id: secondPackaging.id },
-      data: {
-        detenteurs: {
-          create: {
-            detenteurCompanyName: detenteur2.company.name,
-            detenteurCompanySiret: detenteur2.company.siret,
-            detenteurCompanyAddress: detenteur2.company.address
-          }
-        }
-      }
-    });
-    await prisma.bsff.update({
-      where: { id: bsff.id },
-      data: {
-        detenteurCompanySirets: [
-          detenteur1.company.siret!,
-          detenteur2.company.siret!
-        ]
-      }
-    });
-
-    const { query } = makeClient(detenteur1.user);
-    const { data, errors } = await query<Pick<Query, "bsff">>(
-      GET_BSFF_PACKAGINGS,
-      { variables: { id: bsff.id } }
-    );
-
-    expect(errors).toBeUndefined();
-    expect(data.bsff.packagings).toHaveLength(1);
-    expect(data.bsff.packagings[0].id).toEqual(bsff.packagings[0].id);
-    expect(data.bsff.packagings[0].detenteurs[0].company!.siret).toEqual(
-      detenteur1.company.siret
-    );
   });
 });

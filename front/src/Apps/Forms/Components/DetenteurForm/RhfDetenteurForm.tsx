@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useEffect, useCallback } from "react";
+import React, { useContext, useRef, useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -57,39 +57,19 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   /**
    * CAS PARTICULIER
    */
-
-  const previousIsPrivate = useRef(isPrivate);
-  const resetHolderCompanyFields = useCallback(
-    (nextIsPrivate: boolean) => {
-      setValue(`${companyField}.orgId`, undefined);
+  React.useEffect(() => {
+    if (isPrivate) {
       setValue(`${companyField}.siret`, undefined);
-      setValue(`${companyField}.vatNumber`, undefined);
-      setValue(`${companyField}.country`, undefined);
+      setValue(`${companyField}.orgId`, undefined);
+
+      const contactValue = watch(`${companyField}.contact`);
       setValue(
         `${companyField}.name`,
-        nextIsPrivate ? "Détenteur particulier" : ""
+        contactValue?.trim() || "Détenteur particulier"
       );
-      setValue(`${companyField}.address`, "");
-      setValue(`${companyField}.city`, "");
-      setValue(`${companyField}.postalCode`, "");
-      setValue(`${companyField}.contact`, "");
-      setValue(`${companyField}.phone`, "");
-      setValue(`${companyField}.mail`, "");
-    },
-    [companyField, setValue]
-  );
-
-  useEffect(() => {
-    const holderTypeChanged = previousIsPrivate.current !== isPrivate;
-
-    if (!holderTypeChanged) {
-      return;
     }
+  }, [isPrivate, setValue, companyField, watch]);
 
-    resetHolderCompanyFields(isPrivate);
-
-    previousIsPrivate.current = isPrivate;
-  }, [isPrivate, resetHolderCompanyFields]);
   /**
    * CAS INSTALLATION
    */
@@ -447,13 +427,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
               <ToggleSwitch
                 label="Le détenteur est un particulier"
                 checked={field.value ?? false}
-                onChange={checked => {
-                  if (checked !== Boolean(field.value)) {
-                    resetHolderCompanyFields(checked);
-                  }
-
-                  setValue(privateField, checked);
-                }}
+                onChange={checked => setValue(privateField, checked)}
                 disabled={sealedFields.includes("ficheInterventions")}
               />
             )}
@@ -501,7 +475,6 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
               <div className="fr-mt-3w">
                 <DsfrfWorkSiteAddress
-                  key={`${companyField}-${isPrivate}`}
                   address={watch(`${companyField}.address`)}
                   city={watch(`${companyField}.city`)}
                   postalCode={watch(`${companyField}.postalCode`)}
