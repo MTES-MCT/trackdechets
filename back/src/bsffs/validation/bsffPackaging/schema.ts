@@ -81,7 +81,7 @@ const rawBsffPackagingSchema = z.object({
           siret: z.string().nullable(),
           name: z.string(),
           address: z.string(),
-          contact: z.string(),
+          contact: z.string().nullable(),
           phone: z.string().nullable(),
           mail: z.string().nullable()
         })

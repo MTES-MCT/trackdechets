@@ -165,9 +165,9 @@ describe("onglet Bordereau du parcours détenteur", () => {
         const messages = result.error.issues.map(issue => issue.message);
         expect(messages).toEqual(
           expect.arrayContaining([
-            "Au moins un contenant doit être rattaché à ce détenteur",
-            "Le contenant #1 n'a pas été affecté à un détenteur",
-            "Le contenant #2 n'a pas été affecté à un détenteur"
+            "Vous avez déclaré au moins un contenant sans détenteur associé ou un détenteur sans lui associer de contenant merci de vérifier.",
+            "Le contenant #1 n'a pas été affecté. Si vous êtes détenteur de ce déchet et détenteur de l'équipement vous devez vous ajouter dans l'onglet détenteur afin de pouvoir vous affecter le contenant.",
+            "Le contenant #2 n'a pas été affecté. Si vous êtes détenteur de ce déchet et détenteur de l'équipement vous devez vous ajouter dans l'onglet détenteur afin de pouvoir vous affecter le contenant."
           ])
         );
       }
