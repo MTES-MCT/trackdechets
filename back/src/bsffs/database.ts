@@ -9,6 +9,7 @@ import {
 } from "@td/prisma";
 import type {
   BsffFicheIntervention,
+  BsffDetenteurInput,
   BsffInput,
   BsffPackagingInput
 } from "@td/codegen-back";
@@ -46,7 +47,11 @@ export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
       ...BsffWithTransportersInclude,
       ...BsffWithFicheInterventionInclude,
       packagings: {
-        include: { previousPackagings: true, ficheInterventions: true },
+        include: {
+          previousPackagings: true,
+          ficheInterventions: true,
+          detenteurs: true
+        },
         orderBy: { numero: "asc" }
       }
     }
@@ -66,7 +71,12 @@ export async function getBsffPackagingOrNotFound(
 
   const bsffpackaging = await findUnique({
     where,
-    include: { bsff: { include: BsffWithTransportersInclude } }
+    include: {
+      detenteurs: true,
+      bsff: {
+        include: BsffWithTransportersInclude
+      }
+    }
   });
 
   if (bsffpackaging == null) {
@@ -207,19 +217,37 @@ export async function updateTransporterOrgIds(
  * Permet de mettre à jour le champ dénormalisé `detenteurCompanySirets`
  */
 export async function updateDetenteurCompanySirets(
-  bsff: BsffWithFicheInterventions,
+  bsff: BsffWithFicheInterventions & {
+    packagings?: {
+      detenteurs: {
+        detenteurCompanySiret: string | null;
+      }[];
+    }[];
+  },
   transaction: PrismaTransaction
 ) {
+  const ficheInterventionSirets = bsff.ficheInterventions
+    .map(fi => fi.detenteurCompanySiret)
+    .filter((siret): siret is string => Boolean(siret));
+
+  const packagingDetenteurSirets =
+    bsff.packagings?.flatMap(packaging =>
+      packaging.detenteurs
+        .map(detenteur => detenteur.detenteurCompanySiret)
+        .filter((siret): siret is string => Boolean(siret))
+    ) ?? [];
+
+  const detenteurCompanySirets = [
+    ...new Set([...ficheInterventionSirets, ...packagingDetenteurSirets])
+  ];
+
   await transaction.bsff.update({
     where: { id: bsff.id },
     data: {
-      detenteurCompanySirets: bsff.ficheInterventions
-        .map(fi => fi.detenteurCompanySiret)
-        .filter(Boolean)
+      detenteurCompanySirets
     }
   });
 }
-
 export const removeBsffPackagingsFichesIntervention = async (
   packagings: BsffPackaging[],
   fiches: PrismaBsffFicheIntervention[],
@@ -357,10 +385,12 @@ export async function createBsff(
                 id,
                 previousPackagings,
                 ficheInterventions,
+                detenteurs,
                 ...packagingData
               } = packaging;
               return {
                 ...packagingData,
+                ...getDetenteursCreateInput(detenteurs),
                 ...(ficheInterventions?.length
                   ? {
                       ficheInterventions: {
@@ -428,12 +458,49 @@ export function getPackagingCreateInput(
         }
       ]
     : bsff.packagings?.map(p => {
-        const { ficheInterventions, ...packagingWithoutFicheInterventions } = p;
+        const { ficheInterventions, detenteurs, ...packagingData } = p;
+
         return {
-          ...packagingWithoutFicheInterventions,
-          emissionNumero: p.numero
+          ...packagingData,
+          emissionNumero: p.numero,
+          ...(detenteurs?.length
+            ? {
+                detenteurs: {
+                  create: detenteurs.map(detenteur => ({
+                    detenteurCompanyName: detenteur.company?.name ?? "",
+                    detenteurCompanySiret: detenteur.company?.siret ?? null,
+                    detenteurCompanyAddress: detenteur.company?.address ?? "",
+                    detenteurCompanyContact: detenteur.company?.contact ?? null,
+                    detenteurCompanyPhone: detenteur.company?.phone ?? null,
+                    detenteurCompanyMail: detenteur.company?.mail ?? null,
+                    detenteurIsPrivateIndividual:
+                      detenteur.isPrivateIndividual ?? false
+                  }))
+                }
+              }
+            : {})
         };
       }) ?? [];
+}
+
+export function getDetenteursCreateInput(
+  detenteurs?: BsffDetenteurInput[] | null
+): Pick<Prisma.BsffPackagingCreateWithoutBsffInput, "detenteurs"> {
+  if (!detenteurs?.length) return {};
+
+  return {
+    detenteurs: {
+      create: detenteurs.map(detenteur => ({
+        detenteurCompanyName: detenteur.company?.name ?? "",
+        detenteurCompanySiret: detenteur.company?.siret ?? null,
+        detenteurCompanyAddress: detenteur.company?.address ?? "",
+        detenteurCompanyContact: detenteur.company?.contact ?? null,
+        detenteurCompanyPhone: detenteur.company?.phone ?? null,
+        detenteurCompanyMail: detenteur.company?.mail ?? null,
+        detenteurIsPrivateIndividual: detenteur.isPrivateIndividual ?? false
+      }))
+    }
+  };
 }
 
 export async function getTransporters(

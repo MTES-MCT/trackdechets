@@ -143,7 +143,19 @@ export function prismaToZodBsff(bsff: PrismaBsffForParsing): ZodBsff {
       emissionNumero: p.emissionNumero,
       numero: p.numero,
       acceptationSignatureDate: p.acceptationSignatureDate,
-      operationSignatureDate: p.operationSignatureDate
+      operationSignatureDate: p.operationSignatureDate,
+      detenteurs: (p.detenteurs ?? []).map(d => ({
+        company: {
+          name: d.detenteurCompanyName,
+          siret: d.detenteurCompanySiret,
+          address: d.detenteurCompanyAddress,
+          contact: d.detenteurCompanyContact,
+          phone: d.detenteurCompanyPhone,
+          mail: d.detenteurCompanyMail
+        },
+        isPrivateIndividual: d.detenteurIsPrivateIndividual
+      })),
+      ficheInterventions: p.ficheInterventions?.map(fi => fi.id) ?? []
     })),
     transporters: getTransportersSync({ transporters }).map(t => {
       const { createdAt, updatedAt, ...transporterData } = t;

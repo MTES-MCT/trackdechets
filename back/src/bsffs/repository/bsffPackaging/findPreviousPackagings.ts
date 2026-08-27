@@ -1,10 +1,14 @@
-import { BsffPackaging } from "@td/prisma";
+import * as Prisma from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
+
+type BsffPackagingWithDetenteurs = Prisma.BsffPackaging & {
+  detenteurs: Prisma.BsffPackagingDetenteur[];
+};
 
 export type FindPreviousPackagingsFn = (
   packagingIds: string[],
   maxHops?: number
-) => Promise<BsffPackaging[]>;
+) => Promise<BsffPackagingWithDetenteurs[]>;
 
 /**
  * Returns previous packagings in the traceability history of one or several packagings
@@ -17,14 +21,20 @@ export function buildFindPreviousPackagings({
     async function inner(
       packagingIds: string[],
       hops: number
-    ): Promise<BsffPackaging[]> {
+    ): Promise<BsffPackagingWithDetenteurs[]> {
       if (hops >= maxHops) {
         return [];
       }
 
       const packagings = await prisma.bsffPackaging.findMany({
         where: { id: { in: packagingIds } },
-        include: { previousPackagings: true }
+        include: {
+          previousPackagings: {
+            include: {
+              detenteurs: true
+            }
+          }
+        }
       });
 
       const previousPackagings = packagings.flatMap(p => p.previousPackagings);

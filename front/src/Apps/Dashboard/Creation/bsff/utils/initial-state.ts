@@ -48,7 +48,6 @@ export default {
   pickupSiteEnabled: false,
   pickupSiteManualMode: false,
   equipmentHolderDifferent: false,
-  fluidesFrigorigenesEnabled: false,
   waste: {
     code: null,
     description: "",
@@ -59,6 +58,7 @@ export default {
     isEstimate: false,
     value: null
   },
+  totalWeight: null,
   broker: {
     company: getInitialCompany()
   },

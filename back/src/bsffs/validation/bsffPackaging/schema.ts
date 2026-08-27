@@ -71,7 +71,25 @@ const rawBsffPackagingSchema = z.object({
     .max(250)
     .email("E-mail destination ultérieure invalide")
     .nullish(),
-  nextPackagingId: z.string().max(250).nullish()
+  nextPackagingId: z.string().max(250).nullish(),
+  // Détenteurs du packaging
+  detenteurs: z
+    .array(
+      z.object({
+        isPrivateIndividual: z.boolean(),
+        company: z.object({
+          siret: z.string().nullable(),
+          name: z.string(),
+          address: z.string(),
+          contact: z.string(),
+          phone: z.string().nullable(),
+          mail: z.string().nullable()
+        })
+      })
+    )
+    .optional(),
+  // Fiches d'intervention associées au packaging
+  ficheInterventions: z.array(z.string()).optional()
 });
 
 // Type inféré par Zod - avant parsing
