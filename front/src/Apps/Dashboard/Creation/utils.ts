@@ -20,19 +20,8 @@ export const getPrevTab = (tabIds: TabId[], currentTabId: TabId) => {
   return tabIds[idx - 1];
 };
 
-export const isFluidesFrigorigenesTabVisible = (
-  bsffType: BsffType | null | undefined,
-  enabled: boolean
-) => bsffType === BsffType.CollectePetitesQuantites && enabled;
-
-export const isBsffDetenteurTabVisible = (
-  bsffType: BsffType | null | undefined,
-  equipmentHolderDifferent: boolean
-) => bsffType !== BsffType.TracerFluide || equipmentHolderDifferent;
-
 export enum TabId {
   bordereau = "bordereau",
-  fluidesFrigorigenes = "fluidesFrigorigenes",
   waste = "waste",
   emitter = "emitter",
   worker = "worker",
@@ -167,11 +156,6 @@ const getBsffTabs = (commonTabs, errorTabIds) => {
       iconId: getTabClassName(errorTabIds, "bordereau")
     },
     {
-      tabId: TabId.fluidesFrigorigenes,
-      label: "App Fluides Frigorigènes",
-      iconId: getTabClassName(errorTabIds, "fluidesFrigorigenes")
-    },
-    {
       ...commonTabs[0] //waste
     },
     {
@@ -285,11 +269,7 @@ const getTabForPath = (
   pathPrefix: string,
   bsffType?: BsffType | null
 ) => {
-  if (
-    bsdType === BsdType.Bsff &&
-    (bsffType === BsffType.TracerFluide ||
-      bsffType === BsffType.CollectePetitesQuantites)
-  ) {
+  if (bsdType === BsdType.Bsff && bsffType === BsffType.TracerFluide) {
     if (pathPrefix === "type" || pathPrefix.startsWith("emitter")) {
       return TabId.bordereau;
     }

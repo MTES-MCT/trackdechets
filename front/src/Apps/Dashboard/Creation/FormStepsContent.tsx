@@ -85,9 +85,6 @@ const FormStepsContent = ({
     scrollToTop();
   };
   const onTabChange = tabId => {
-    if (tabId === TabId.fluidesFrigorigenes) {
-      // TODO: Connecter cette navigation à l'API Fluides Frigorigènes.
-    }
     setSelectedTabId(tabId);
     scrollToTop();
   };
@@ -115,11 +112,7 @@ const FormStepsContent = ({
                 scrollToTop();
               }}
               onNextTab={() => {
-                const nextTabId = getNextTab(tabIds, selectedTabId);
-                if (nextTabId === TabId.fluidesFrigorigenes) {
-                  // TODO: Déclencher la connexion à l'API Fluides Frigorigènes lorsque l'intégration sera disponible.
-                }
-                setSelectedTabId(nextTabId);
+                setSelectedTabId(getNextTab(tabIds, selectedTabId));
                 scrollToTop();
               }}
               onTabChange={onTabChange}

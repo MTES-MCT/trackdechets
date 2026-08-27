@@ -17,7 +17,11 @@ import {
 export type BsffPackagingEditableFields = Required<
   Omit<
     ZodBsffPackaging,
-    "operationSignatureDate" | "operationSignatureAuthor" | "nextPackagingId"
+    | "operationSignatureDate"
+    | "operationSignatureAuthor"
+    | "nextPackagingId"
+    | "detenteurs"
+    | "ficheInterventions"
   >
 >;
 

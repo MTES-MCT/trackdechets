@@ -1,14 +1,5 @@
 import { BsdType, BsffType } from "@td/codegen-ui";
-import {
-  getErrorTabIds,
-  getNextTab,
-  getPublishErrorTabIds,
-  getTabs,
-  isBsffDetenteurTabVisible,
-  isFluidesFrigorigenesTabVisible,
-  TabId
-} from "../../utils";
-import initialState from "../utils/initial-state";
+import { getErrorTabIds, getPublishErrorTabIds, TabId } from "../../utils";
 
 const emitterError = {
   code: "BAD_USER_INPUT",
@@ -26,26 +17,14 @@ describe("onglets du parcours BSFF détenteur", () => {
     ).toEqual([TabId.bordereau]);
   });
 
-  it("affiche l'onglet Détenteur quand le détenteur d'équipement est différent", () => {
-    expect(isBsffDetenteurTabVisible(BsffType.TracerFluide, false)).toBe(false);
-    expect(isBsffDetenteurTabVisible(BsffType.TracerFluide, true)).toBe(true);
-  });
-
-  it("conserve l'onglet Détenteur dans les autres parcours", () => {
-    expect(
-      isBsffDetenteurTabVisible(BsffType.CollectePetitesQuantites, false)
-    ).toBe(true);
-    expect(isBsffDetenteurTabVisible(BsffType.Groupement, false)).toBe(true);
-  });
-
-  it("rattache aussi les erreurs opérateur à l'onglet Bordereau", () => {
+  it("conserve l'onglet Opérateur pour les autres parcours BSFF", () => {
     expect(
       getPublishErrorTabIds(
         BsdType.Bsff,
         [emitterError],
         BsffType.CollectePetitesQuantites
       )
-    ).toEqual([TabId.bordereau]);
+    ).toEqual([TabId.emitter]);
     expect(
       getErrorTabIds(
         BsdType.Bsff,
@@ -53,47 +32,6 @@ describe("onglets du parcours BSFF détenteur", () => {
         ["emitter"],
         BsffType.CollectePetitesQuantites
       )
-    ).toEqual([TabId.bordereau]);
-  });
-});
-
-describe("onglet App Fluides Frigorigènes du parcours opérateur", () => {
-  const bsffTabIds = getTabs(BsdType.Bsff).map(tab => tab.tabId);
-
-  it("désactive la connexion par défaut", () => {
-    expect(initialState.fluidesFrigorigenesEnabled).toBe(false);
-  });
-
-  it("affiche l'onglet uniquement pour l'opérateur lorsque le toggle est actif", () => {
-    expect(
-      isFluidesFrigorigenesTabVisible(BsffType.CollectePetitesQuantites, false)
-    ).toBe(false);
-    expect(
-      isFluidesFrigorigenesTabVisible(BsffType.CollectePetitesQuantites, true)
-    ).toBe(true);
-    expect(isFluidesFrigorigenesTabVisible(BsffType.TracerFluide, true)).toBe(
-      false
-    );
-  });
-
-  it("place l'onglet entre Bordereau et Déchet", () => {
-    expect(bsffTabIds.slice(0, 3)).toEqual([
-      TabId.bordereau,
-      TabId.fluidesFrigorigenes,
-      TabId.waste
-    ]);
-  });
-
-  it("navigue vers Déchet quand l'onglet est masqué", () => {
-    const visibleTabIds = bsffTabIds.filter(
-      tabId => tabId !== TabId.fluidesFrigorigenes
-    );
-    expect(getNextTab(visibleTabIds, TabId.bordereau)).toBe(TabId.waste);
-  });
-
-  it("navigue vers App Fluides Frigorigènes quand l'onglet est affiché", () => {
-    expect(getNextTab(bsffTabIds, TabId.bordereau)).toBe(
-      TabId.fluidesFrigorigenes
-    );
+    ).toEqual([TabId.emitter]);
   });
 });

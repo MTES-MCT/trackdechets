@@ -278,34 +278,43 @@ input BsffEmitterInput {
 input BsffPackagingInput {
   "Type de contenant : bouteille, ou autre à préciser ;"
   type: BsffPackagingType!
+
   """
   Précision sur le type de contenant lorsque type=AUTRE
 
   Max: 250 caractères
   """
   other: String
+
   "DEPRECATED - Dénomination du contenant."
   name: String @deprecated(reason: "Utiliser `type`")
+
   """
   Volume du contenant.
 
   Min: 0L
   """
   volume: Float
+
   """
   Numéro du contenant.
 
   Min: 1 caractère, Max: 250 caractères
   """
   numero: String!
+
   """
   Poids en kilogrammes
 
   Min: 0kg
   """
   weight: Float!
+
   "Fiches d'intervention associées"
   ficheInterventions: [ID!]
+
+  "Liste des détenteurs associés au contenant"
+  detenteurs: [BsffDetenteurInput!]
 }
 
 input UpdateBsffPackagingInput {

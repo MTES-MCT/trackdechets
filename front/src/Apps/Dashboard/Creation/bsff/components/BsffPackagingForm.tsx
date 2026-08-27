@@ -42,6 +42,7 @@ export type PackagingFormProps = {
     Record<keyof (PackagingInfoInput | BsffPackagingInput), boolean>
   >;
   volumeEditable?: boolean;
+  detenteurMode?: boolean;
 };
 
 /**
@@ -55,6 +56,7 @@ function BsffPackagingForm({
   inputProps,
   disabled = false,
   volumeEditable = false, // ← ajouter
+  detenteurMode = false,
 
   errors,
   touched
@@ -85,11 +87,15 @@ function BsffPackagingForm({
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-md-6 fr-col-12">
           <Select
-            label="Type de contenant"
+            label={`Type de contenant${detenteurMode ? " *" : ""}`}
             disabled={disabled}
             state={errors?.type && touched?.type ? "error" : "default"}
             stateRelatedMessage={errors?.type}
-            nativeSelectProps={inputProps.type}
+            nativeSelectProps={{
+              ...inputProps.type,
+              required: detenteurMode,
+              "aria-required": detenteurMode
+            }}
             className="fr-mb-2w"
           >
             <option value="">Sélectionnez une valeur</option>
@@ -102,7 +108,7 @@ function BsffPackagingForm({
         </div>
         <div className="fr-col-md-4 fr-col-12">
           <NonScrollableInput
-            label={`Volume en litres`}
+            label={`Volume en litres${detenteurMode ? " *" : ""}`}
             className="fr-mb-2w"
             disabled={disabled && !volumeEditable}
             state={errors?.volume && touched?.volume ? "error" : "default"}
@@ -111,7 +117,9 @@ function BsffPackagingForm({
               type: "number",
               inputMode: "decimal",
               step: "0.001",
-              ...inputProps.volume
+              ...inputProps.volume,
+              required: detenteurMode,
+              "aria-required": detenteurMode
             }}
           />
 
@@ -121,7 +129,9 @@ function BsffPackagingForm({
         </div>
         <div className="fr-col-md-2 fr-col-12">
           <NonScrollableInput
-            label="Poids en kg"
+            label={
+              detenteurMode ? "Quantité de fluides en kg *" : "Poids en kg"
+            }
             className="fr-mb-2w"
             disabled={disabled}
             state={errors?.weight && touched?.weight ? "error" : "default"}
@@ -130,7 +140,9 @@ function BsffPackagingForm({
               type: "number",
               inputMode: "decimal",
               step: "0.001",
-              ...inputProps.weight
+              ...inputProps.weight,
+              required: detenteurMode,
+              "aria-required": detenteurMode
             }}
           />
         </div>
@@ -154,13 +166,15 @@ function BsffPackagingForm({
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-md-12 fr-col-12">
           <Input
-            label="N° de contenant"
+            label={`N° de contenant${detenteurMode ? " *" : ""}`}
             disabled={disabled}
             state={errors?.numero && touched?.numero ? "error" : "default"}
             stateRelatedMessage={errors?.numero}
             nativeInputProps={{
               type: "text",
-              ...inputProps.numero
+              ...inputProps.numero,
+              required: detenteurMode,
+              "aria-required": detenteurMode
             }}
           />
         </div>
