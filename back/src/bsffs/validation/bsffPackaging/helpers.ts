@@ -41,18 +41,7 @@ export async function graphQlInputToZodBsffPackaging(
  * à faire un casting de type.
  */
 export function prismaToZodBsffPackaging(
-  bsffPackaging: BsffPackaging & {
-    detenteurs?: Array<{
-      detenteurIsPrivateIndividual: boolean | null;
-      detenteurCompanySiret: string | null;
-      detenteurCompanyName: string | null;
-      detenteurCompanyAddress: string | null;
-      detenteurCompanyContact: string | null;
-      detenteurCompanyPhone: string | null;
-      detenteurCompanyMail: string | null;
-    }>;
-    ficheInterventions?: { id: string }[];
-  }
+  bsffPackaging: BsffPackaging
 ): ZodBsffPackaging {
   const {
     id,
@@ -69,20 +58,6 @@ export function prismaToZodBsffPackaging(
 
   return {
     ...p,
-    detenteurs: (bsffPackaging.detenteurs ?? []).map(detenteur => ({
-      isPrivateIndividual: Boolean(detenteur.detenteurIsPrivateIndividual),
-      company: {
-        siret: detenteur.detenteurCompanySiret,
-        name: detenteur.detenteurCompanyName ?? "",
-        address: detenteur.detenteurCompanyAddress ?? "",
-        contact: detenteur.detenteurCompanyContact ?? "",
-        phone: detenteur.detenteurCompanyPhone,
-        mail: detenteur.detenteurCompanyMail
-      }
-    })),
-    ficheInterventions: (bsffPackaging.ficheInterventions ?? []).map(
-      ficheIntervention => ficheIntervention.id
-    ),
     acceptationWasteCode: acceptationWasteCode as ZodWasteCodeEnum,
     operationCode: operationCode as ZodOperationEnum,
     operationNextDestinationPlannedOperationCode:
