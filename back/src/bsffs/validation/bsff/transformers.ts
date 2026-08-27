@@ -11,37 +11,6 @@ import { sirenifyBsff } from "./sirenify";
 import { recipifyBsff } from "./recipify";
 import { getSealedFields } from "./rules";
 
-const toDetenteurInput = (detenteur: {
-  detenteurCompanyName: string;
-  detenteurCompanySiret: string | null;
-  detenteurCompanyAddress: string;
-  detenteurCompanyContact: string | null;
-  detenteurCompanyPhone: string | null;
-  detenteurCompanyMail: string | null;
-  detenteurIsPrivateIndividual: boolean;
-}) => ({
-  company: {
-    name: detenteur.detenteurCompanyName,
-    siret: detenteur.detenteurCompanySiret,
-    address: detenteur.detenteurCompanyAddress,
-    contact: detenteur.detenteurCompanyContact,
-    phone: detenteur.detenteurCompanyPhone,
-    mail: detenteur.detenteurCompanyMail
-  },
-  isPrivateIndividual: detenteur.detenteurIsPrivateIndividual
-});
-
-const uniqueDetenteurs = <T extends { company?: { siret?: string | null } }>(
-  detenteurs: T[]
-) =>
-  detenteurs.filter(
-    (detenteur, index) =>
-      !detenteur.company?.siret ||
-      detenteurs.findIndex(
-        candidate => candidate.company?.siret === detenteur.company?.siret
-      ) === index
-  );
-
 export const runTransformers = async (
   bsff: ParsedZodBsff,
   context: BsffValidationContext
@@ -87,11 +56,7 @@ export const checkAndSetPreviousPackagings: ZodBsffTransformer = async (
           volume: userPackaging?.volume ?? p.volume,
           weight: p.acceptationWeight ?? 0,
           operationNoTraceability: false,
-          previousPackagings: [p.id],
-          // FI and holder associations follow a packaging to ensure that a
-          // group of packagings linked by one FI stays together over time.
-          ficheInterventions: p.ficheInterventions.map(fi => fi.id),
-          detenteurs: p.detenteurs.map(toDetenteurInput)
+          previousPackagings: [p.id]
         };
       })
     };
@@ -100,17 +65,7 @@ export const checkAndSetPreviousPackagings: ZodBsffTransformer = async (
       ...rest,
       packagings: bsff.packagings?.map(p => ({
         ...p,
-        previousPackagings: previousPackagings.map(p => p.id),
-        ficheInterventions: [
-          ...new Set(
-            previousPackagings.flatMap(p =>
-              p.ficheInterventions.map(fi => fi.id)
-            )
-          )
-        ],
-        detenteurs: uniqueDetenteurs(
-          previousPackagings.flatMap(p => p.detenteurs.map(toDetenteurInput))
-        )
+        previousPackagings: previousPackagings.map(p => p.id)
       }))
     };
   }

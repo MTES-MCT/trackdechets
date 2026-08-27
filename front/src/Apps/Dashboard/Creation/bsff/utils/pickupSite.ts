@@ -1,7 +1,10 @@
-import type { BsffPickupSiteInput } from "@td/codegen-ui";
+import { BsffType, type BsffPickupSiteInput } from "@td/codegen-ui";
 import type { ZodBsff } from "../schema";
 
 const trimOrNull = (value?: string | null) => value?.trim() || null;
+
+export const hasPickupSite = (type?: BsffType | null) =>
+  type === BsffType.TracerFluide || type === BsffType.CollectePetitesQuantites;
 
 /**
  * Builds the persisted pickup site without clearing the values kept in the

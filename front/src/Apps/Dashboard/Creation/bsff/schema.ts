@@ -165,31 +165,19 @@ const bsffGroupingOrForwardingSchema = z.object({
 const ficheInterventionSchema = z.object({
   id: z.string().nullish(),
 
-  holderType: z
-    .enum(["ENTREPRISE", "PARTICULIER", "ASSOCIATION", "NAVIRE"])
-    .optional()
-    .or(z.literal("")),
-
-  identification: z.string().max(250).optional().or(z.literal("")),
-
   numero: z.string().max(250).optional().or(z.literal("")),
 
   weight: z.preprocess(
     val => (val === "" ? undefined : val),
-    z
-      .number()
-      .nonnegative("le poids doit être supérieur ou égal à 0")
-      .optional()
+    z.number().positive("le poids doit être supérieur à 0").optional()
   ),
 
   postalCode: z.string().optional().or(z.literal("")),
 
-  detenteur: z
-    .object({
-      isPrivateIndividual: z.boolean().optional(),
-      company: zodCompany
-    })
-    .optional(),
+  detenteur: z.object({
+    isPrivateIndividual: z.boolean().optional(),
+    company: zodCompany
+  }),
   packagings: z
     .array(
       z.object({
@@ -228,6 +216,7 @@ export const rawBsffSchema = z
     pickupSiteEnabled: z.boolean().default(false),
     pickupSiteManualMode: z.boolean().default(false),
     equipmentHolderDifferent: z.boolean().default(false),
+    fluidesFrigorigenesEnabled: z.boolean().default(false),
     waste: z
       .object({
         code: ZodWasteCodeEnum,
@@ -241,7 +230,6 @@ export const rawBsffSchema = z
         isEstimate: z.boolean().nullish()
       })
       .nullish(),
-    totalWeight: z.coerce.number().nonnegative().nullish(),
     destination: z
       .object({
         company: zodCompany,
@@ -310,34 +298,6 @@ export const rawBsffSchema = z
             message
           });
       });
-      if (blank(data.waste?.code)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["waste", "code"],
-          message: "Le code déchet est requis"
-        });
-      }
-      if (blank(data.waste?.description)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["waste", "description"],
-          message: "La dénomination usuelle du déchet est requise"
-        });
-      }
-      if (!data.packagings?.length) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["packagings"],
-          message: "Au moins un contenant est requis"
-        });
-      }
-      if (data.weight?.value == null) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["weight", "value"],
-          message: "La quantité totale de fluide est requise"
-        });
-      }
       if (
         company?.phone &&
         !/^(?=.*\d)[0-9#.+-]+$/.test(company.phone.trim())
@@ -527,7 +487,7 @@ export const rawBsffSchema = z
 
     (data.ficheInterventions ?? []).forEach((fi, index) => {
       const hasStarted =
-        !!fi.numero || !!fi.postalCode || (fi.weight && fi.weight > 0);
+        !!fi.numero || !!fi.postalCode || fi.weight !== undefined;
 
       if (!hasStarted) return;
 

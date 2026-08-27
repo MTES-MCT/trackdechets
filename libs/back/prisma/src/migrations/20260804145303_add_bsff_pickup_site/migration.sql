@@ -6,3 +6,4 @@ ADD COLUMN     "emitterPickupSiteInfos" TEXT,
 ADD COLUMN     "emitterPickupSiteName" TEXT,
 ADD COLUMN     "emitterPickupSitePostalCode" TEXT,
 ADD COLUMN     "emitterPickupSiteStreet" TEXT;
+

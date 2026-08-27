@@ -4,7 +4,6 @@ import { BsdType } from "@td/codegen-ui";
 import { DetenteurAccordion } from "../DetenteurAccordion/DetenteurAccordion";
 import { RhfDetenteurForm } from "../DetenteurForm/RhfDetenteurForm";
 import { BsffType } from "@td/codegen-ui";
-import { BsffEquipmentHolderForm } from "../../../Dashboard/Creation/bsff/components/BsffEquipmentHolderForm";
 
 type RhfDetenteurListProps = {
   orgId?: string;
@@ -30,29 +29,17 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
 
   const isInstallationType = INSTALLATION_TYPES.includes(type);
 
-  const emptyHolder = React.useCallback(
-    () =>
-      isTracerFluide
-        ? {
-            numero: `DETENTEUR_${Date.now()}_${Math.random()
-              .toString(36)
-              .slice(2)}`,
-            holderType: "",
-            identification: "",
-            detenteur: { isPrivateIndividual: false, company: {} },
-            packagings: []
-          }
-        : {},
-    [isTracerFluide]
-  );
-
   React.useEffect(() => {
-    if (fields.length === 0) {
-      insert(0, emptyHolder());
+    if (!isTracerFluide && fields.length === 0) {
+      insert(0, {});
     }
-  }, [emptyHolder, fields.length, insert]);
+  }, [fields.length, insert, isTracerFluide]);
 
   const [expandedIdx, setExpandedIdx] = React.useState<number | null>(0);
+
+  if (isTracerFluide) {
+    return <RhfDetenteurForm orgId={orgId} fieldName="emitter" />;
+  }
 
   return (
     <>
@@ -60,7 +47,7 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
         const numero = idx + 1;
 
         const onAdd = () => {
-          insert(idx + 1, emptyHolder());
+          insert(idx + 1, {});
           setExpandedIdx(idx + 1);
         };
 
@@ -111,17 +98,7 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
             deleteLabel="Supprimer"
             hideHeader={isInstallationType}
           >
-            {isTracerFluide ? (
-              <BsffEquipmentHolderForm
-                orgId={orgId}
-                fieldName={`${fieldName}.${idx}`}
-              />
-            ) : (
-              <RhfDetenteurForm
-                orgId={orgId}
-                fieldName={`${fieldName}.${idx}`}
-              />
-            )}
+            <RhfDetenteurForm orgId={orgId} fieldName={`${fieldName}.${idx}`} />
           </DetenteurAccordion>
         );
       })}

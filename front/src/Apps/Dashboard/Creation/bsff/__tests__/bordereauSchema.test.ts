@@ -11,12 +11,7 @@ const parse = (values: Record<string, unknown>) =>
   rawBsffSchema.safeParse({
     type: "TRACER_FLUIDE",
     emitter: { company: holder },
-    waste: {
-      code: "13 03 10*",
-      description: "Autres huiles isolantes et fluides caloporteurs"
-    },
-    packagings: [{ type: "BOUTEILLE", volume: 1, weight: 1, numero: "1" }],
-    weight: { value: 1, isEstimate: true },
+    packagings: [],
     ...values
   });
 
@@ -96,103 +91,5 @@ describe("onglet Bordereau du parcours détenteur", () => {
         pickupSiteEnabled: true
       }).success
     ).toBe(true);
-  });
-
-  it("exige les champs obligatoires de l'onglet déchet", () => {
-    const result = parse({ waste: null, packagings: [], weight: null });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues.map(issue => issue.path.join("."))).toEqual(
-        expect.arrayContaining([
-          "waste.code",
-          "waste.description",
-          "packagings",
-          "weight.value"
-        ])
-      );
-    }
-  });
-
-  describe("onglet détenteur différent", () => {
-    const equipmentHolder = {
-      numero: "DETENTEUR_1",
-      holderType: "ENTREPRISE",
-      detenteur: {
-        isPrivateIndividual: false,
-        company: {
-          siret: "11111111111111",
-          contact: "Jean Dupont",
-          phone: "0102030405",
-          mail: "jean@example.com"
-        }
-      },
-      packagings: [{ numero: "1" }]
-    };
-
-    it("accepte un détenteur complet couvrant tous les contenants", () => {
-      expect(
-        parse({
-          equipmentHolderDifferent: true,
-          ficheInterventions: [equipmentHolder]
-        }).success
-      ).toBe(true);
-    });
-
-    it("exige au moins un détenteur", () => {
-      const result = parse({
-        equipmentHolderDifferent: true,
-        ficheInterventions: []
-      });
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(
-          result.error.issues.map(issue => issue.path.join("."))
-        ).toContain("ficheInterventions");
-      }
-    });
-
-    it("refuse un contenant ou un détenteur sans rattachement", () => {
-      const result = parse({
-        equipmentHolderDifferent: true,
-        packagings: [
-          { type: "BOUTEILLE", volume: 1, weight: 1, numero: "1" },
-          { type: "BOUTEILLE", volume: 1, weight: 1, numero: "2" }
-        ],
-        ficheInterventions: [{ ...equipmentHolder, packagings: [] }]
-      });
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        const messages = result.error.issues.map(issue => issue.message);
-        expect(messages).toEqual(
-          expect.arrayContaining([
-            "Au moins un contenant doit être rattaché à ce détenteur",
-            "Le contenant #1 n'a pas été affecté à un détenteur",
-            "Le contenant #2 n'a pas été affecté à un détenteur"
-          ])
-        );
-      }
-    });
-
-    it.each([
-      ["NAVIRE", "OMI1234567"],
-      ["ASSOCIATION", "W123456789"]
-    ])("valide l'identification du type %s", (holderType, identification) => {
-      expect(
-        parse({
-          equipmentHolderDifferent: true,
-          ficheInterventions: [
-            {
-              ...equipmentHolder,
-              holderType,
-              identification,
-              detenteur: {
-                isPrivateIndividual: true,
-                company: equipmentHolder.detenteur.company
-              }
-            }
-          ]
-        }).success
-      ).toBe(true);
-    });
   });
 });

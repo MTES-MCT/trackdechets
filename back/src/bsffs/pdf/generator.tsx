@@ -13,8 +13,8 @@ import {
 import {
   BsffWithFicheInterventionInclude,
   BsffWithFicheInterventions,
-  BsffWithPackagingsAndDetenteurs,
-  BsffWithPackagingsAndDetenteursInclude,
+  BsffWithPackagings,
+  BsffWithPackagingsInclude,
   BsffWithTransporters,
   BsffWithTransportersInclude
 } from "../types";
@@ -23,16 +23,14 @@ import { getReadonlyBsffPackagingRepository } from "../repository";
 import { emptyValues } from "../../common/pdf/emptypdf";
 
 export type BsffForBuildPdf = Bsff &
-  BsffWithPackagingsAndDetenteurs &
+  BsffWithPackagings &
   BsffWithFicheInterventions &
   BsffWithTransporters & {
-    previousBsffs: (Bsff &
-      BsffWithPackagingsAndDetenteurs &
-      BsffWithTransporters)[];
+    previousBsffs: (Bsff & BsffWithPackagings & BsffWithTransporters)[];
   };
 
 export const BsffForBuildPdfInclude = {
-  ...BsffWithPackagingsAndDetenteursInclude,
+  ...BsffWithPackagingsInclude,
   ...BsffWithFicheInterventionInclude,
   ...BsffWithTransportersInclude
 };
@@ -58,7 +56,7 @@ export async function getBsffForBuildPdf({
       // includes only packagings in the dependency graph of the BSFF
       packagings: {
         where: { id: { in: previousPackagings.map(p => p.id) } },
-        include: { ficheInterventions: true, detenteurs: true }
+        include: { ficheInterventions: true }
       }
     }
   });

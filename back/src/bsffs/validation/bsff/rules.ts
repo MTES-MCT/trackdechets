@@ -647,12 +647,6 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
       from: "EMISSION"
     },
     readableFieldName: "Les fiches d'intervention associées au contenant"
-  },
-  detenteurs: {
-    sealed: {
-      from: "EMISSION"
-    },
-    readableFieldName: "Les détenteurs du contenant"
   }
 };
 

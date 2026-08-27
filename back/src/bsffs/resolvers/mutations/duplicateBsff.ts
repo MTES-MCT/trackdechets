@@ -45,13 +45,6 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
       emitter?.contactPhone ?? existingBsff.emitterCompanyPhone,
     emitterCompanyMail:
       emitter?.contactEmail ?? existingBsff.emitterCompanyMail,
-    emitterPickupSiteName: existingBsff.emitterPickupSiteName,
-    emitterPickupSiteAddress: existingBsff.emitterPickupSiteAddress,
-    emitterPickupSiteStreet: existingBsff.emitterPickupSiteStreet,
-    emitterPickupSiteAddress2: existingBsff.emitterPickupSiteAddress2,
-    emitterPickupSitePostalCode: existingBsff.emitterPickupSitePostalCode,
-    emitterPickupSiteCity: existingBsff.emitterPickupSiteCity,
-    emitterPickupSiteInfos: existingBsff.emitterPickupSiteInfos,
     wasteCode: existingBsff.wasteCode,
     wasteDescription: existingBsff.wasteDescription,
     wasteAdr: existingBsff.wasteAdr,

@@ -1,11 +1,7 @@
 import { Prisma } from "@td/prisma";
 import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  getBsffOrNotFound,
-  getDetenteursCreateInput,
-  getFirstTransporterSync
-} from "../../database";
+import { getBsffOrNotFound, getFirstTransporterSync } from "../../database";
 import { expandBsffFromDB } from "../../converter";
 import { checkCanUpdate } from "../../permissions";
 import { getBsffRepository } from "../../repository";
@@ -77,17 +73,11 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     data.packagings = {
       deleteMany: {},
       create: (packagings ?? []).map(packaging => {
-        const {
-          id,
-          previousPackagings,
-          ficheInterventions,
-          detenteurs,
-          ...packagingData
-        } = packaging;
+        const { id, previousPackagings, ficheInterventions, ...packagingData } =
+          packaging;
 
         return {
           ...packagingData,
-          ...getDetenteursCreateInput(detenteurs),
           previousPackagings: {
             connect: (previousPackagings ?? []).map(id => ({ id }))
           },

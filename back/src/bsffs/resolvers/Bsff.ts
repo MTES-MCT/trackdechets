@@ -9,7 +9,6 @@ import {
 } from "../repository";
 import { isGetBsdsQuery } from "../../bsds/resolvers/queries/bsds";
 import { BsffWithTransportersInclude } from "../types";
-import { Permission, can, getUserRoles } from "../../permissions";
 
 export const Bsff: BsffResolvers = {
   ficheInterventions: async ({ id }, _, context) => {
@@ -25,24 +24,8 @@ export const Bsff: BsffResolvers = {
     return ficheInterventions;
   },
   packagings: async (bsff, _, ctx) => {
-    const userRoles = ctx.user ? await getUserRoles(ctx.user.id) : {};
-    const canReadAllPackagings =
-      ctx.user?.isAdmin ||
-      [
-        bsff.emitter?.company?.siret,
-        ...(bsff.transporters ?? []).map(t => t.company?.siret),
-        bsff.destination?.company?.siret
-      ]
-        .filter(Boolean)
-        .some(
-          orgId =>
-            orgId &&
-            userRoles[orgId] &&
-            can(userRoles[orgId], Permission.BsdCanRead)
-        );
-
     // use ES indexed field when requested from dashboard
-    if (isGetBsdsQuery(ctx) && isSessionUser(ctx) && canReadAllPackagings) {
+    if (isGetBsdsQuery(ctx) && isSessionUser(ctx)) {
       // Dans ce cas de figure, bsff.packagings est pré-calculé dans
       // bsffs/converter@expandBsffFromElastic, on peut donc renvoyer
       // directement le résultat
@@ -51,25 +34,13 @@ export const Bsff: BsffResolvers = {
     const { findUniqueGetPackagings } = getReadonlyBsffRepository();
     const packagings =
       (await findUniqueGetPackagings(
-        { where: { id: bsff.id } },
         {
-          orderBy: { numero: "asc" },
-          include: { detenteurs: true },
-          ...(!canReadAllPackagings
-            ? {
-                where: {
-                  detenteurs: {
-                    some: {
-                      detenteurCompanySiret: { in: Object.keys(userRoles) }
-                    }
-                  }
-                }
-              }
-            : {})
-        }
+          where: { id: bsff.id }
+        },
+        { orderBy: { numero: "asc" } }
       )) ?? [];
 
-    return packagings.map(expandBsffPackagingFromDB);
+    return packagings.map(packaging => expandBsffPackagingFromDB(packaging));
   },
   forwarding: async ({ id, type }) => {
     if (type !== BsffType.REEXPEDITION) {

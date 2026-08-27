@@ -8,14 +8,11 @@ export const BsffFicheIntervention: BsffFicheInterventionResolvers = {
 
     const packagings = await findMany({
       where: {
-        ficheInterventions: {
-          some: { id: ficheIntervention.id }
-        }
-      },
-      include: {
-        detenteurs: true
+        ficheInterventions: { some: { id: ficheIntervention.id } }
       }
     });
+
+    if (!packagings?.length) return [];
 
     return packagings.map(p => expandBsffPackagingFromDB(p));
   }

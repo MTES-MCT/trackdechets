@@ -91,26 +91,7 @@ const rawBsffPackagingSchema = z.object({
   previousPackagings: z.string().max(250).array().nullish(),
   acceptationSignatureDate: z.coerce.date().nullish(),
   operationSignatureDate: z.coerce.date().nullish(),
-  ficheInterventions: z.array(z.string()).nullish(),
-  // This information is owned by the packaging. It must never be inferred
-  // from intervention sheets for historical BSFFs.
-  detenteurs: z
-    .array(
-      z.object({
-        company: z
-          .object({
-            name: z.string().nullish(),
-            siret: z.string().nullish(),
-            address: z.string().nullish(),
-            contact: z.string().nullish(),
-            phone: z.string().nullish(),
-            mail: z.string().nullish()
-          })
-          .nullish(),
-        isPrivateIndividual: z.boolean().nullish()
-      })
-    )
-    .nullish()
+  ficheInterventions: z.array(z.string()).nullish()
 });
 
 const rawBsffSchema = z.object({
