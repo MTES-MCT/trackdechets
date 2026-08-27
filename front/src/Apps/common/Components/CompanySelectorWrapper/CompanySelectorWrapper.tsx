@@ -58,6 +58,8 @@ export default function CompanySelectorWrapper({
   selectedCompanyError,
   orgId,
   disabled = false,
+  searchRequired,
+  departmentLabel,
   onCompanySelected,
   onUnknownInputCompany
 }: Readonly<CompanySelectorWrapperProps>) {

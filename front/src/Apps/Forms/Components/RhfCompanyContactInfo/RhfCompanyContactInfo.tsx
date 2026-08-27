@@ -49,14 +49,11 @@ export default function CompanyContactInfo({
               (errorObject?.contact?.message as string) ?? ""
             }
             nativeInputProps={{
-              "aria-required": true,
               ...register(
                 `${fieldName}.contact`,
                 required ? { required: "Champ requis" } : {}
               ),
-              ...(requiredMarkers === undefined
-                ? {}
-                : requiredAria(requiredMarkers))
+              ...requiredAria(requiredMarkers ?? required)
             }}
           />
         </div>
@@ -69,14 +66,11 @@ export default function CompanyContactInfo({
             state={errorObject?.phone && "error"}
             stateRelatedMessage={(errorObject?.phone?.message as string) ?? ""}
             nativeInputProps={{
-              "aria-required": true,
               ...register(
                 `${fieldName}.phone`,
                 required ? { required: "Champ requis" } : {}
               ),
-              ...(requiredMarkers === undefined
-                ? {}
-                : requiredAria(requiredMarkers))
+              ...requiredAria(requiredMarkers ?? required)
             }}
           />
         </div>
@@ -87,15 +81,12 @@ export default function CompanyContactInfo({
             state={errorObject?.mail && "error"}
             stateRelatedMessage={(errorObject?.mail?.message as string) ?? ""}
             nativeInputProps={{
-              "aria-required": true,
               ...register(
                 `${fieldName}.mail`,
                 required ? { required: "Champ requis" } : {}
               ),
               type: "email",
-              ...(requiredMarkers === undefined
-                ? {}
-                : requiredAria(requiredMarkers))
+              ...requiredAria(requiredMarkers ?? required)
             }}
           />
         </div>

@@ -111,7 +111,6 @@ const CompanySelector = ({
             nativeInputProps={{
               value: searchString,
               placeholder: "Rechercher",
-              "aria-required": true,
               onFocus: handleOnFocus,
               onChange: e => {
                 setSearchString(e.target.value);
@@ -120,9 +119,7 @@ const CompanySelector = ({
                   postalCodeString: postalCodeString
                 });
               },
-              ...(searchRequired === undefined
-                ? {}
-                : requiredAria(searchRequired))
+              ...requiredAria(searchRequired ?? false)
             }}
             ref={triggerRef}
           />
@@ -135,7 +132,6 @@ const CompanySelector = ({
             nativeInputProps={{
               value: postalCodeString,
               placeholder: "Rechercher",
-              "aria-required": false,
               onFocus: handleOnFocus,
               onChange: e => {
                 setPostalCodeString(e.target.value);
@@ -144,7 +140,7 @@ const CompanySelector = ({
                   postalCodeString: e.target.value
                 });
               },
-              ...(searchRequired === undefined ? {} : requiredAria(false))
+              ...requiredAria(false)
             }}
           />
         </div>
