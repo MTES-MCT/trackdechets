@@ -39,8 +39,12 @@ export async function mergeInputAndParseBsffAsync(
   // Fusion spéciale pour les packagings: préserver les détenteurs
   // si l'input n'en envoie pas
   if (zodInput.packagings && zodPersisted.packagings) {
-    bsff.packagings = zodInput.packagings.map((inputPackaging, idx) => {
-      const persistedPackaging = zodPersisted.packagings![idx];
+    bsff.packagings = zodInput.packagings.map(inputPackaging => {
+      const persistedPackaging = zodPersisted.packagings!.find(p =>
+        inputPackaging.id
+          ? p.id === inputPackaging.id
+          : p.numero === inputPackaging.numero
+      );
       if (!persistedPackaging) {
         // Nouveau packaging
         return inputPackaging;
@@ -106,7 +110,8 @@ export async function mergeInputAndParseBsffAsync(
         volume: p.volume,
         numero: p.numero,
         emissionNumero: p.emissionNumero,
-        weight: p.weight
+        weight: p.weight,
+        detenteurs: p.detenteurs
       }))
     },
     bsff,
