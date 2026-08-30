@@ -429,7 +429,6 @@ const BsffFormSteps = ({
   const fluidesFrigorigenesEnabled = methods.watch(
     "fluidesFrigorigenesEnabled"
   );
-  const equipmentHolderDifferent = methods.watch("equipmentHolderDifferent");
   const publishErrorTabIds = getPublishErrorTabIds(
     BsdType.Bsff,
     errorsFromPublishApi,
@@ -557,10 +556,7 @@ const BsffFormSteps = ({
         <FluidesFrigorigenesBsff />
       ) : undefined,
       waste: <WasteBsff />,
-      emitter:
-        type === BsffType.CollectePetitesQuantites ? (
-          <EmitterBsff />
-        ) : undefined,
+      emitter: undefined,
       detenteur: isBsffDetenteurTabVisible(
         type as BsffType,
         equipmentHolderDifferent
