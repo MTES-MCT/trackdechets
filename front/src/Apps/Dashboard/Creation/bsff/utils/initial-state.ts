@@ -48,6 +48,7 @@ export default {
   pickupSiteEnabled: false,
   pickupSiteManualMode: false,
   equipmentHolderDifferent: false,
+  fluidesFrigorigenesEnabled: false,
   waste: {
     code: null,
     description: "",

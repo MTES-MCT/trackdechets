@@ -58,14 +58,15 @@ import initialState from "./utils/initial-state";
 import { getComputedState } from "../getComputedState";
 import {
   buildBsffPickupSiteInput,
+  hasPickupSite,
   isManualBsffPickupSite
 } from "./utils/pickupSite";
 import WasteBsff from "./steps/Waste";
-import EmitterBsff from "./steps/Emitter";
 import DestinationBsff from "./steps/Destination";
 import TransporterBsff from "./steps/Transporter";
 import DetenteurBsff from "./steps/Detenteur";
 import BordereauBsff from "./steps/Bordereau";
+import FluidesFrigorigenesBsff from "./steps/FluidesFrigorigenes";
 import { isForeignVat } from "@td/constants";
 
 import {
@@ -74,6 +75,8 @@ import {
   getPublishErrorMessages,
   getPublishErrorTabIds,
   handleGraphQlError,
+  isBsffDetenteurTabVisible,
+  isFluidesFrigorigenesTabVisible,
   TabId
 } from "../utils";
 import { DsfrNotificationError } from "../../../common/Components/Error/Error";
@@ -423,6 +426,9 @@ const BsffFormSteps = ({
   const errorsFromPublishApi = publishErrors || publishErrorsFromRedirect;
   const type = methods.watch("type");
   const equipmentHolderDifferent = methods.watch("equipmentHolderDifferent");
+  const fluidesFrigorigenesEnabled = methods.watch(
+    "fluidesFrigorigenesEnabled"
+  );
   const publishErrorTabIds = getPublishErrorTabIds(
     BsdType.Bsff,
     errorsFromPublishApi,
@@ -537,20 +543,30 @@ const BsffFormSteps = ({
 
   const tabsContent = useMemo(
     () => ({
-      bordereau: type === BsffType.TracerFluide ? <BordereauBsff /> : undefined,
+      bordereau: [
+        BsffType.TracerFluide,
+        BsffType.CollectePetitesQuantites
+      ].includes(type as BsffType) ? (
+        <BordereauBsff />
+      ) : undefined,
+      fluidesFrigorigenes: isFluidesFrigorigenesTabVisible(
+        type as BsffType,
+        fluidesFrigorigenesEnabled
+      ) ? (
+        <FluidesFrigorigenesBsff />
+      ) : undefined,
       waste: <WasteBsff />,
-      emitter:
-        type === BsffType.CollectePetitesQuantites ? (
-          <EmitterBsff />
-        ) : undefined,
-      detenteur:
-        type !== BsffType.TracerFluide || equipmentHolderDifferent ? (
-          <DetenteurBsff />
-        ) : undefined,
+      emitter: undefined,
+      detenteur: isBsffDetenteurTabVisible(
+        type as BsffType,
+        equipmentHolderDifferent
+      ) ? (
+        <DetenteurBsff />
+      ) : undefined,
       transporter: <TransporterBsff />,
       destination: <DestinationBsff />
     }),
-    [equipmentHolderDifferent, type]
+    [equipmentHolderDifferent, fluidesFrigorigenesEnabled, type]
   );
 
   // ======================================================
@@ -869,7 +885,7 @@ const BsffFormSteps = ({
       ? {
           company: cleanCompany(emitter.company),
           customInfo: emitter.customInfo,
-          ...(type === BsffType.TracerFluide
+          ...(hasPickupSite(type as BsffType)
             ? {
                 pickupSite: buildBsffPickupSiteInput(values)
               }
@@ -1230,7 +1246,10 @@ const BsffFormSteps = ({
           error => error.tabId === TabId.none
         )}
         initialTabId={
-          type === BsffType.TracerFluide ? TabId.bordereau : TabId.waste
+          type === BsffType.TracerFluide ||
+          type === BsffType.CollectePetitesQuantites
+            ? TabId.bordereau
+            : TabId.waste
         }
       />
       {(createBsffError || ficheError || publishErrorForDisplay) && (
