@@ -5405,14 +5405,12 @@ export const ALL_WASTES_TREE = [
               "médicaments autres que ceux visés à la rubrique 20 01 31",
             children: []
           },
-          /* Code décommissionné 
           {
             code: "20 01 33*",
             description:
               "piles et accumulateurs visés aux rubriques 16 06 01, 16 06 02 ou 16 06 03 et piles et accumulateurs non triés contenant ces piles",
             children: []
-          }, 
-          */
+          },
           {
             code: "20 01 34",
             description:
