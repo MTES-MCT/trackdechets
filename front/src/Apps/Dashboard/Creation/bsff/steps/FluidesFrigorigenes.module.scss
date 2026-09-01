@@ -1,0 +1,5 @@
+.filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0 .75rem; }
+.tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+.expandButton { min-height: 2rem; min-width: 2rem; color: var(--text-action-high-blue-france); }
+.actions { display: flex; justify-content: flex-end; margin-top: 1rem; }
+@media (max-width: 48em) { .filters { grid-template-columns: 1fr; } }
