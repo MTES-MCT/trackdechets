@@ -25,21 +25,7 @@ export default function BordereauBsff() {
       {isOperateur ? (
         <EmitterBsff />
       ) : (
-        <>
-          <RhfBsffDetenteurCompany orgId={siret} disabled={disabled} />
-          <ToggleSwitch
-            className="fr-mt-3w"
-            label="Le détenteur de déchet n'est pas le détenteur d'équipement"
-            inputTitle="Détenteur d'équipement différent"
-            checked={!!watch("equipmentHolderDifferent")}
-            disabled={disabled}
-            onChange={value =>
-              setValue("equipmentHolderDifferent", value, {
-                shouldDirty: true
-              })
-            }
-          />
-        </>
+        <RhfBsffDetenteurCompany orgId={siret} disabled={disabled} />
       )}
       <RhfPickupSiteBlock disabled={pickupSiteDisabled} />
       {isOperateur && (
