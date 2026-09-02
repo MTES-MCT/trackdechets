@@ -97,6 +97,7 @@ export const dashboardBsffFragment = gql`
 export const FicheInterventionFragment = gql`
   fragment FicheInterventionFragment on BsffFicheIntervention {
     id
+    isExempted
     numero
     weight
     postalCode

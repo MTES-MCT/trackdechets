@@ -14,6 +14,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
   Pick<
     Prisma.BsffFicheInterventionUpdateInput,
     | "numero"
+    | "isExempted"
     | "weight"
     | "postalCode"
     | "detenteurCompanyName"
@@ -31,9 +32,13 @@ export const ficheInterventionSchema: yup.SchemaOf<
     | "operateurCompanyMail"
   >
 > = yup.object({
-  numero: yup
-    .string()
-    .required("Le numéro de la fiche d'intervention est requis"),
+  isExempted: yup.boolean().default(false),
+  numero: yup.string().when("isExempted", {
+    is: true,
+    then: schema => schema.ensure().notRequired(),
+    otherwise: schema =>
+      schema.required("Le numéro de la fiche d'intervention est requis")
+  }),
   weight: weight(WeightUnits.Kilogramme).required(
     "Le poids en kilogramme est requis"
   ),

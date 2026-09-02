@@ -20,6 +20,7 @@ jest.mock("../../../sirenify");
 const ADD_FICHE_INTERVENTION = `
   mutation CreateFicheIntervention($input: BsffFicheInterventionInput!) {
     createFicheInterventionBsff(input: $input) {
+      isExempted
       numero
       detenteur {
         isPrivateIndividual
@@ -91,6 +92,30 @@ describe("Mutation.createFicheInterventionBsff", () => {
     expect(
       sirenifyBsffFicheInterventionInput as jest.Mock
     ).toHaveBeenCalledTimes(1);
+  });
+
+  it("should persist an exemption with an empty intervention number", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      siret: ficheInterventionInput.operateur.company.siret,
+      name: ficheInterventionInput.operateur.company.name!
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createFicheInterventionBsff">,
+      MutationCreateFicheInterventionBsffArgs
+    >(ADD_FICHE_INTERVENTION, {
+      variables: {
+        input: {
+          ...ficheInterventionInput,
+          numero: "",
+          isExempted: true
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.createFicheInterventionBsff.isExempted).toBe(true);
+    expect(data.createFicheInterventionBsff.numero).toBe("");
   });
 
   it("should throw error if detenteur company info is missing", async () => {

@@ -69,6 +69,7 @@ const operateurSchema: yup.SchemaOf<BsffFicheInterventionInput["operateur"]> =
   });
 const ficheInterventionSchema: yup.SchemaOf<BsffFicheInterventionInput> =
   yup.object({
+    isExempted: yup.boolean().notRequired(),
     numero: yup.string().required(),
     weight: yup.number().required(),
     postalCode: yup.string().required(),
@@ -123,6 +124,7 @@ function AddFicheInterventionModal({
 
       <Formik<Values>
         initialValues={{
+          isExempted: false,
           weight: 0,
           numero: "",
           detenteur: {

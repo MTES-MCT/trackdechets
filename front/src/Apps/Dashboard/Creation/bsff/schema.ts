@@ -172,6 +172,8 @@ const ficheInterventionSchema = z.object({
 
   identification: z.string().max(250).optional().or(z.literal("")),
 
+  isExempted: z.boolean().default(false),
+
   numero: z.string().max(250).optional().or(z.literal("")),
 
   weight: z.preprocess(
@@ -392,169 +394,147 @@ export const rawBsffSchema = z
           });
         }
       }
-
-      if (data.equipmentHolderDifferent) {
-        const holders = data.ficheInterventions ?? [];
-        if (!holders.length) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["ficheInterventions"],
-            message: "Au moins un détenteur doit être renseigné"
-          });
-        }
-
-        holders.forEach((holder, index) => {
-          const path = ["ficheInterventions", index];
-          const holderCompany = holder.detenteur?.company;
-          if (!holder.holderType) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [...path, "holderType"],
-              message: "Le type de détenteur est requis"
-            });
-          }
-          if (
-            holder.holderType === "ENTREPRISE" &&
-            blank(holderCompany?.siret) &&
-            blank(holderCompany?.orgId)
-          ) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [...path, "identification"],
-              message: "L'entreprise détentrice est requise"
-            });
-          }
-          if (
-            ["ASSOCIATION", "NAVIRE"].includes(holder.holderType ?? "") &&
-            blank(holder.identification)
-          ) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [...path, "identification"],
-              message: "L'identification du détenteur est requise"
-            });
-          }
-          if (
-            holder.holderType === "NAVIRE" &&
-            holder.identification &&
-            !/^OMI\d{7}$/.test(holder.identification)
-          ) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [...path, "identification"],
-              message: "Le numéro OMI doit contenir OMI suivi de 7 chiffres"
-            });
-          }
-          if (
-            holder.holderType === "ASSOCIATION" &&
-            holder.identification &&
-            !/^W\d{9}$/.test(holder.identification)
-          ) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [...path, "identification"],
-              message: "Le numéro RNA doit contenir W suivi de 9 chiffres"
-            });
-          }
-          (["contact", "phone", "mail"] as const).forEach(field => {
-            if (blank(holderCompany?.[field])) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: [...path, "detenteur", "company", field],
-                message: `Le champ ${field} est requis`
-              });
-            }
-          });
-          if (
-            holderCompany?.phone &&
-            !/^(?=.*\d)[0-9#.+-]+$/.test(holderCompany.phone.trim())
-          ) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [...path, "detenteur", "company", "phone"],
-              message:
-                "Le téléphone ne peut contenir que des chiffres et les caractères # - + ."
-            });
-          }
-          if (
-            holderCompany?.mail &&
-            !z.string().email().safeParse(holderCompany.mail).success
-          ) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [...path, "detenteur", "company", "mail"],
-              message: "Le courriel n'est pas valide"
-            });
-          }
-          if (!holder.packagings?.length) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [...path, "packagings"],
-              message:
-                "Vous avez déclaré au moins un contenant sans détenteur associé ou un détenteur sans lui associer de contenant merci de vérifier."
-            });
-          }
-        });
-
-        const linkedPackagingNumbers = new Set(
-          holders.flatMap(holder =>
-            (holder.packagings ?? []).map(packaging => packaging.numero)
-          )
-        );
-        const emitterSiret = data.emitter?.company?.siret;
-        const isEmitterDeclaredAsHolder = holders.some(
-          holder => holder.detenteur?.company?.siret === emitterSiret
-        );
-        (data.packagings ?? []).forEach((packaging, index) => {
-          if (
-            packaging.numero &&
-            !linkedPackagingNumbers.has(packaging.numero)
-          ) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: ["packagings", index, "numero"],
-              message:
-                emitterSiret && !isEmitterDeclaredAsHolder
-                  ? `Le contenant #${packaging.numero} n'a pas été affecté. Si vous êtes détenteur de ce déchet et détenteur de l'équipement vous devez vous ajouter dans l'onglet détenteur afin de pouvoir vous affecter le contenant.`
-                  : `Vous avez déclaré au moins un contenant sans détenteur associé ou un détenteur sans lui associer de contenant merci de vérifier.`
-            });
-          }
-        });
-      }
     }
 
-    if (data.type !== BsffType.COLLECTE_PETITES_QUANTITES) return;
-
-    (data.ficheInterventions ?? []).forEach((fi, index) => {
-      const hasStarted =
-        !!fi.numero || !!fi.postalCode || (fi.weight && fi.weight > 0);
-
-      if (!hasStarted) return;
-
-      if (!fi.numero || fi.numero.trim().length === 0) {
+    if (
+      data.type === BsffType.COLLECTE_PETITES_QUANTITES ||
+      (data.type === BsffType.TRACER_FLUIDE && data.equipmentHolderDifferent)
+    ) {
+      const holders = data.ficheInterventions ?? [];
+      if (!holders.length) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["ficheInterventions", index, "numero"],
-          message: "Le numéro de fiche d'intervention est requis"
+          path: ["ficheInterventions"],
+          message: "Au moins un détenteur doit être renseigné"
         });
       }
 
-      if (!fi.postalCode || fi.postalCode.trim().length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["ficheInterventions", index, "postalCode"],
-          message: "Le code postal est requis"
+      holders.forEach((holder, index) => {
+        const path = ["ficheInterventions", index];
+        const holderCompany = holder.detenteur?.company;
+        if (
+          data.type === BsffType.COLLECTE_PETITES_QUANTITES &&
+          !holder.isExempted &&
+          blank(holder.numero)
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [...path, "numero"],
+            message: "Le numéro de fiche d'intervention est requis"
+          });
+        }
+        if (!holder.holderType) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [...path, "holderType"],
+            message: "Le type de détenteur est requis"
+          });
+        }
+        if (
+          holder.holderType === "ENTREPRISE" &&
+          blank(holderCompany?.siret) &&
+          blank(holderCompany?.orgId)
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [...path, "identification"],
+            message: "L'entreprise détentrice est requise"
+          });
+        }
+        if (
+          ["ASSOCIATION", "NAVIRE"].includes(holder.holderType ?? "") &&
+          blank(holder.identification)
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [...path, "identification"],
+            message: "L'identification du détenteur est requise"
+          });
+        }
+        if (
+          holder.holderType === "NAVIRE" &&
+          holder.identification &&
+          !/^OMI\d{7}$/.test(holder.identification)
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [...path, "identification"],
+            message: "Le numéro OMI doit contenir OMI suivi de 7 chiffres"
+          });
+        }
+        if (
+          holder.holderType === "ASSOCIATION" &&
+          holder.identification &&
+          !/^W\d{9}$/.test(holder.identification)
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [...path, "identification"],
+            message: "Le numéro RNA doit contenir W suivi de 9 chiffres"
+          });
+        }
+        (["contact", "phone", "mail"] as const).forEach(field => {
+          if (blank(holderCompany?.[field])) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [...path, "detenteur", "company", field],
+              message: `Le champ ${field} est requis`
+            });
+          }
         });
-      }
+        if (
+          holderCompany?.phone &&
+          !/^(?=.*\d)[0-9#.+-]+$/.test(holderCompany.phone.trim())
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [...path, "detenteur", "company", "phone"],
+            message:
+              "Le téléphone ne peut contenir que des chiffres et les caractères # - + ."
+          });
+        }
+        if (
+          holderCompany?.mail &&
+          !z.string().email().safeParse(holderCompany.mail).success
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [...path, "detenteur", "company", "mail"],
+            message: "Le courriel n'est pas valide"
+          });
+        }
+        if (!holder.packagings?.length) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [...path, "packagings"],
+            message:
+              "Vous avez déclaré au moins un contenant sans détenteur associé ou un détenteur sans lui associer de contenant merci de vérifier."
+          });
+        }
+      });
 
-      if (!fi.weight || fi.weight <= 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["ficheInterventions", index, "weight"],
-          message: "Le poids doit être supérieur à 0"
-        });
-      }
-    });
+      const linkedPackagingNumbers = new Set(
+        holders.flatMap(holder =>
+          (holder.packagings ?? []).map(packaging => packaging.numero)
+        )
+      );
+      const emitterSiret = data.emitter?.company?.siret;
+      const isEmitterDeclaredAsHolder = holders.some(
+        holder => holder.detenteur?.company?.siret === emitterSiret
+      );
+      (data.packagings ?? []).forEach((packaging, index) => {
+        if (packaging.numero && !linkedPackagingNumbers.has(packaging.numero)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["packagings", index, "numero"],
+            message:
+              emitterSiret && !isEmitterDeclaredAsHolder
+                ? `Le contenant #${packaging.numero} n'a pas été affecté. Si vous êtes détenteur de ce déchet et détenteur de l'équipement vous devez vous ajouter dans l'onglet détenteur afin de pouvoir vous affecter le contenant.`
+                : `Vous avez déclaré au moins un contenant sans détenteur associé ou un détenteur sans lui associer de contenant merci de vérifier.`
+          });
+        }
+      });
+    }
   });
 export type ZodBsff = z.infer<typeof rawBsffSchema>;
 

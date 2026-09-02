@@ -20,6 +20,34 @@ const parse = (values: Record<string, unknown>) =>
     ...values
   });
 
+const operatorHolder = {
+  numero: "FI-1",
+  isExempted: false,
+  holderType: "ENTREPRISE",
+  detenteur: {
+    isPrivateIndividual: false,
+    company: {
+      siret: "11111111111111",
+      contact: "Jean Dupont",
+      phone: "0102030405",
+      mail: "jean@example.com"
+    }
+  },
+  packagings: [{ numero: "1" }]
+};
+
+const parseOperator = (holderValues: Record<string, unknown>) =>
+  rawBsffSchema.safeParse({
+    type: "COLLECTE_PETITES_QUANTITES",
+    emitter: { company: holder },
+    waste: {
+      code: "13 03 10*",
+      description: "Autres huiles isolantes et fluides caloporteurs"
+    },
+    packagings: [{ type: "BOUTEILLE", volume: 1, weight: 1, numero: "1" }],
+    ficheInterventions: [{ ...operatorHolder, ...holderValues }]
+  });
+
 describe("onglet Bordereau du parcours détenteur", () => {
   it("exige les coordonnées du détenteur", () => {
     const result = parse({ emitter: { company: {} } });
@@ -43,7 +71,8 @@ describe("onglet Bordereau du parcours détenteur", () => {
     expect(
       parse({
         type: "COLLECTE_PETITES_QUANTITES",
-        emitter: { company: { ...holder, phone: "01 02 03" } }
+        emitter: { company: { ...holder, phone: "01 02 03" } },
+        ficheInterventions: [operatorHolder]
       }).success
     ).toBe(true);
   });
@@ -89,10 +118,10 @@ describe("onglet Bordereau du parcours détenteur", () => {
     }
   });
 
-  it("n'applique pas les règles détenteur aux autres parcours BSFF", () => {
+  it("n'applique pas les règles détenteur aux parcours d'installation", () => {
     expect(
       parse({
-        type: "COLLECTE_PETITES_QUANTITES",
+        type: "GROUPEMENT",
         pickupSiteEnabled: true
       }).success
     ).toBe(true);
@@ -194,5 +223,40 @@ describe("onglet Bordereau du parcours détenteur", () => {
         }).success
       ).toBe(true);
     });
+  });
+});
+
+describe("onglet Détenteur du parcours opérateur", () => {
+  it("désactive l'exemption par défaut", () => {
+    const result = parseOperator({ isExempted: undefined });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.ficheInterventions?.[0].isExempted).toBe(false);
+    }
+  });
+
+  it("exige le numéro lorsque l'équipement n'est pas exempté", () => {
+    const result = parseOperator({ numero: "", isExempted: false });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            path: ["ficheInterventions", 0, "numero"],
+            message: "Le numéro de fiche d'intervention est requis"
+          })
+        ])
+      );
+    }
+  });
+
+  it.each([
+    [false, "FI-1"],
+    [true, ""],
+    [true, "FI-1"]
+  ])("accepte isExempted=%s avec le numéro %s", (isExempted, numero) => {
+    expect(parseOperator({ isExempted, numero }).success).toBe(true);
   });
 });

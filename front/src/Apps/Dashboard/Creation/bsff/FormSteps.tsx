@@ -370,6 +370,7 @@ const BsffFormSteps = ({
                   holders.set(key, {
                     ...getDetenteurFromPackagingDetenteur(detenteur),
                     numero: undefined,
+                    isExempted: false,
                     postalCode: undefined,
                     weight: undefined,
                     packagings: []
@@ -597,14 +598,6 @@ const BsffFormSteps = ({
     return isEmpty ? undefined : company;
   }
 
-  function hasFicheInterventionData(ficheIntervention: any) {
-    return Boolean(
-      ficheIntervention.numero?.trim() ||
-        ficheIntervention.postalCode?.trim() ||
-        Number(ficheIntervention.weight ?? 0) > 0
-    );
-  }
-
   function toPackagingDetenteur(ficheIntervention: any) {
     const company = ficheIntervention.detenteur?.company;
     const isPrivateIndividual =
@@ -710,19 +703,18 @@ const BsffFormSteps = ({
     const entries = await Promise.all(
       ficheInterventions
         .filter(fi => {
-          // Pour les BSFF de collecte, la fiche est réellement facultative :
-          // sélectionner un détenteur et ses contenants ne doit pas créer de
-          // fiche avec des valeurs techniques.
-          if (values.type === BsffType.CollectePetitesQuantites) {
-            return hasFicheInterventionData(fi);
-          }
-
           const hasDetenteur = Boolean(
             fi.detenteur?.company?.siret ||
               fi.detenteur?.company?.orgId ||
               fi.detenteur?.company?.name ||
               fi.detenteur?.isPrivateIndividual
           );
+
+          // Un brouillon sans numéro et non exempté conserve uniquement le
+          // détenteur porté par les contenants, sans créer de fiche technique.
+          if (values.type === BsffType.CollectePetitesQuantites) {
+            return Boolean(fi.numero?.trim() || fi.isExempted);
+          }
 
           // TRACER_FLUIDE :
           // On accepte une fiche qui contient uniquement
@@ -740,11 +732,14 @@ const BsffFormSteps = ({
         .map(async (fi, index) => {
           const detenteurCompany = fi.detenteur?.company;
 
-          const isEquipmentHolder = values.type === BsffType.TracerFluide;
+          const usesEquipmentHolderFields = [
+            BsffType.TracerFluide,
+            BsffType.CollectePetitesQuantites
+          ].includes(values.type as BsffType);
 
           const identification = fi.identification?.trim();
 
-          const isPrivateIndividual = isEquipmentHolder
+          const isPrivateIndividual = usesEquipmentHolderFields
             ? fi.holderType !== "ENTREPRISE"
             : fi.detenteur?.isPrivateIndividual ?? false;
 
@@ -801,21 +796,30 @@ const BsffFormSteps = ({
           // ======================================================
 
           const ficheInput = {
-            numero: holderKey,
+            numero:
+              values.type === BsffType.TracerFluide
+                ? holderKey
+                : fi.numero?.trim() ?? "",
+
+            isExempted: Boolean(fi.isExempted),
 
             // IMPORTANT :
             // Pour TRACER_FLUIDE, le poids vient des contenants
             // rattachés à cette fiche.
             //
             // Pour les autres types, on conserve fi.weight.
-            weight: isEquipmentHolder ? linkedWeight : Number(fi.weight ?? 0),
+            weight: usesEquipmentHolderFields
+              ? linkedWeight
+              : Number(fi.weight ?? 0),
 
             // GraphQL exige postalCode: String!
             //
             // Pour TRACER_FLUIDE, la valeur n'est pas utilisée
             // comme adresse du détenteur : on fournit simplement
             // une valeur technique obligatoire.
-            postalCode: isEquipmentHolder ? "00000" : fi.postalCode ?? "00000",
+            postalCode: usesEquipmentHolderFields
+              ? "00000"
+              : fi.postalCode ?? "00000",
 
             detenteur: cleanedDetenteur,
 

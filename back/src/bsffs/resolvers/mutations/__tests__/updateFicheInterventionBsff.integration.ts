@@ -20,6 +20,8 @@ const UPDATE_FICHE_INTERVENTION = `
   mutation UpdateFicheIntervention($id: ID!, $input: BsffFicheInterventionInput!) {
     updateFicheInterventionBsff(id: $id, input: $input) {
       id
+      isExempted
+      numero
     }
   }
 `;
@@ -89,6 +91,27 @@ describe("Mutation.updateFicheInterventionBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.updateFicheInterventionBsff.id).toBe(ficheInterventionId);
+  });
+
+  it("should persist an exemption with an empty intervention number", async () => {
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateFicheInterventionBsff">,
+      MutationUpdateFicheInterventionBsffArgs
+    >(UPDATE_FICHE_INTERVENTION, {
+      variables: {
+        id: ficheInterventionId,
+        input: {
+          ...variables.input,
+          numero: "",
+          isExempted: true
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateFicheInterventionBsff.isExempted).toBe(true);
+    expect(data.updateFicheInterventionBsff.numero).toBe("");
   });
 
   it("should disallow unauthenticated user to update a fiche d'intervention", async () => {
