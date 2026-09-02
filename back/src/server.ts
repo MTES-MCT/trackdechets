@@ -52,6 +52,7 @@ import { createFormDataLoaders } from "./forms/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
+import { fluidesFrigoBsffRouter } from "./routers/fluidesFrigoBsffRouter";
 import { gericoWebhookHandler } from "./routers/gericoWebhookRouter";
 import { oauth2Router } from "./routers/oauth2-router";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
@@ -355,6 +356,7 @@ app.use(passport.session());
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);
 app.use(oauth2Router);
+app.use(fluidesFrigoBsffRouter);
 
 app.use(invalidSessionMiddleware);
 app.use(impersonateMiddleware);

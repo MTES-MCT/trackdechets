@@ -118,6 +118,22 @@ export const schema = z.object({
   INSEE_CLIENT_SECRET: z.string(),
   INSEE_USERNAME: z.string(),
   INSEE_PASSWORD: z.string(),
+  FF_API_BASE_URL: z
+    .string()
+    .optional()
+    .default(
+      "http://fluidesfrigorigenes-prod-ihm-docker-ibp.dgpr-prod2.eco4.sihc.fr"
+    ),
+  FF_OIDC_TOKEN_URL: z
+    .string()
+    .optional()
+    .default(
+      "https://authentification.din.developpement-durable.gouv.fr/authSAML/oidc/fluides-frigorigenes/token"
+    ),
+  FF_OIDC_CLIENT_ID: z.string().optional(),
+  FF_OIDC_CLIENT_SECRET: z.string().optional(),
+  FF_API_TIMEOUT: z.string().optional().default("30000").refine(isNumber),
+  FF_API_RETRIES: z.string().optional().default("3").refine(isNumber),
   // -------
   // S3
   S3_ENDPOINT: z.string(),
