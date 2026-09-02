@@ -50,14 +50,24 @@ const BSFFPreviewWaste = ({ bsd }: BSFFPreviewWasteProps) => {
         <PreviewContainerCol gridWidth={4}>
           <PreviewTextRow
             label="Opération réalisée"
-            value={bsd.destination?.plannedOperationCode}
+            value={
+              bsd.packagings?.length === 1 &&
+              bsd.packagings[0].operation?.signature?.date
+                ? bsd.packagings[0].operation?.code
+                : "-"
+            }
           />
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={4}>
           <PreviewDateRow
             label="Date de traitement"
-            value={bsd.destination?.reception?.date}
+            value={
+              bsd.packagings?.length === 1 &&
+              bsd.packagings[0].operation?.signature?.date
+                ? bsd.packagings[0].operation?.date
+                : undefined
+            }
           />
         </PreviewContainerCol>
       </PreviewContainerRow>
