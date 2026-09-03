@@ -85,7 +85,11 @@ export async function indexBsdJob(
     const bsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsdId },
       include: {
-        packagings: true,
+        packagings: {
+          include: {
+            ficheInterventions: true
+          }
+        },
         ficheInterventions: true,
         transporters: true
       }
