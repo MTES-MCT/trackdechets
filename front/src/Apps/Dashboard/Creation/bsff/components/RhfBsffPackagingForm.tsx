@@ -15,10 +15,12 @@ function RhfBsffPackagingForm({
   idx,
   disabled = false,
   volumeEditable = false,
-  detenteurMode = false
+  detenteurMode = false,
+  operateurMode = false
 }: RenderPackagingFormProps & {
   volumeEditable?: boolean;
   detenteurMode?: boolean;
+  operateurMode?: boolean;
 }) {
   const fieldPath = (name: string) => `${fieldName}.${idx}.${name}`;
 
@@ -73,6 +75,7 @@ function RhfBsffPackagingForm({
       packagingTypes={packagingTypes}
       volumeEditable={volumeEditable}
       detenteurMode={detenteurMode}
+      operateurMode={operateurMode}
       disabled={disabled}
       errors={errors}
       touched={touched}

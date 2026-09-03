@@ -43,6 +43,7 @@ export type PackagingFormProps = {
   >;
   volumeEditable?: boolean;
   detenteurMode?: boolean;
+  operateurMode?: boolean;
 };
 
 /**
@@ -57,6 +58,7 @@ function BsffPackagingForm({
   disabled = false,
   volumeEditable = false, // ← ajouter
   detenteurMode = false,
+  operateurMode = false,
 
   errors,
   touched
@@ -130,7 +132,11 @@ function BsffPackagingForm({
         <div className="fr-col-md-2 fr-col-12">
           <NonScrollableInput
             label={
-              detenteurMode ? "Quantité de fluides en kg *" : "Poids en kg"
+              detenteurMode
+                ? "Quantité de fluides en kg *"
+                : operateurMode
+                ? "Quantité de fluide en kg"
+                : "Poids en kg"
             }
             className="fr-mb-2w"
             disabled={disabled}

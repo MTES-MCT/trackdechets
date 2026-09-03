@@ -24,6 +24,7 @@ export type PackagingListProps = {
   disabled?: boolean;
   volumeEditable?: boolean;
   detenteurMode?: boolean;
+  operateurMode?: boolean;
   push: (packaging: PackagingInfoInput) => void;
   insert: (idx: number, packaging: PackagingInfoInput) => void;
   remove: (idx: number) => void;
@@ -44,6 +45,7 @@ function BsffPackagingList({
   disabled = false,
   volumeEditable = false,
   detenteurMode = false,
+  operateurMode = false,
 
   children
 }: PackagingListProps) {
@@ -102,7 +104,7 @@ function BsffPackagingList({
           volumeEditable
         });
 
-        if (detenteurMode) {
+        if (detenteurMode || operateurMode) {
           return (
             <DetenteurAccordion
               key={stableKey}
@@ -190,17 +192,21 @@ function BsffPackagingList({
         );
       })}
 
-      {!detenteurMode && !disabled && canAdd && !showbutton && (
-        <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
-          <button
-            type="button"
-            className="fr-btn fr-btn--secondary"
-            onClick={() => push(emptyBsddPackaging)}
-          >
-            Ajouter un conditionnement
-          </button>
-        </div>
-      )}
+      {!detenteurMode &&
+        !operateurMode &&
+        !disabled &&
+        canAdd &&
+        !showbutton && (
+          <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
+            <button
+              type="button"
+              className="fr-btn fr-btn--secondary"
+              onClick={() => push(emptyBsddPackaging)}
+            >
+              Ajouter un conditionnement
+            </button>
+          </div>
+        )}
     </>
   );
 }
