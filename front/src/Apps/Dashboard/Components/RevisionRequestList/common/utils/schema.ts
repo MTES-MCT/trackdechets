@@ -297,6 +297,22 @@ export const initialBsdaReview = {
   isCanceled: false
 };
 
+export const initialBsffReview = {
+  emitter: {
+    pickupSite: {
+      name: "",
+      address: "",
+      city: "",
+      postalCode: "",
+      infos: ""
+    }
+  },
+  destination: {
+    cap: ""
+  },
+  isCanceled: false
+};
+
 export const validationBsdaSchema = z.object({
   comment: z.string().min(3, "Le commentaire doit faire au moins 3 caractères"),
   isCanceled: z.boolean().nullish(),
@@ -398,6 +414,26 @@ export const validationBsdaSchema = z.object({
         mode: z.string().nullish(),
         description: z.string().nullish()
       })
+    })
+    .nullish()
+});
+
+export const validationBsffSchema = z.object({
+  comment: z.string().min(3, "Le commentaire doit faire au moins 3 caractères"),
+  isCanceled: z.boolean().nullish(),
+
+  emitter: z.object({
+    pickupSite: z.object({
+      name: z.string().nullish(),
+      address: z.string().nullish(),
+      city: z.string().nullish(),
+      postalCode: z.string().nullish(),
+      infos: z.string().nullish()
+    })
+  }),
+  destination: z
+    .object({
+      cap: z.string().nullish()
     })
     .nullish()
 });

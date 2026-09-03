@@ -1805,6 +1805,24 @@ export const canReviewBsda = (bsd: BsdDisplay, siret: string) => {
   );
 };
 
+export const canReviewBsff = (bsd: BsdDisplay, siret: string) => {
+  if (bsd.type !== BsdType.Bsff || bsd.status === BsdStatusCode.Initial) {
+    return false;
+  }
+
+  const isDestination = isSameSiretDestination(siret, bsd);
+  const isEmitter = isSameSiretEmitter(siret, bsd);
+
+  return (
+    (isEmitter &&
+      // On ne propose pas le bouton "Réviser" à l'émetteur
+      // lorsqu'il est le seul à avoir signé car il peut encore
+      // modifier le BSFF
+      bsd.status !== BsdStatusCode.SignedByProducer) ||
+    isDestination
+  );
+};
+
 export const canReviewBsdasri = (bsd: BsdDisplay, siret: string) => {
   if (
     bsd.type !== BsdType.Bsdasri ||
@@ -1886,7 +1904,8 @@ export const canReviewBsd = (bsd: BsdDisplay, siret: string) => {
   return (
     (bsd.type === BsdType.Bsdd && canReviewBsdd(bsd, siret)) ||
     (bsd.type === BsdType.Bsda && canReviewBsda(bsd, siret)) ||
-    (bsd.type === BsdType.Bsdasri && canReviewBsdasri(bsd, siret))
+    (bsd.type === BsdType.Bsdasri && canReviewBsdasri(bsd, siret)) ||
+    (bsd.type === BsdType.Bsff && canReviewBsff(bsd, siret))
   );
 };
 

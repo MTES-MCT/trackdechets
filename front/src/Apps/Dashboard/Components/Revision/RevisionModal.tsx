@@ -12,6 +12,7 @@ import { useLazyQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { GET_BSDA_REVISION_REQUESTS } from "../../../common/queries/reviews/BsdaReviewQuery";
 import { GET_BSDASRI_REVISION_REQUESTS } from "../../../common/queries/reviews/BsdasriReviewQuery";
+import { GET_BSFF_REVISION_REQUESTS } from "../../../common/queries/reviews/BsffReviewQuery2";
 import { ReviewInterface, mapRevision } from "./revisionMapper";
 import RevisionList from "./RevisionList/RevisionList";
 import { Modal } from "../../../../common/components";
