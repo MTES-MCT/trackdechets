@@ -106,7 +106,6 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
-
     if (
       (args.data.ficheInterventions || args.data.packagings) &&
       fullBsff.packagings.length > 0

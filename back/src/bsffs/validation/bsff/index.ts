@@ -36,7 +36,6 @@ export async function mergeInputAndParseBsffAsync(
     ...zodInput
   };
 
-
   if (zodInput.packagings && zodPersisted.packagings) {
     bsff.packagings = zodInput.packagings.map(inputPackaging => {
       const persistedPackaging = zodPersisted.packagings!.find(p =>
