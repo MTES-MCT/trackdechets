@@ -1,6 +1,29 @@
-import { buildFindUniqueBsffGetFicheInterventions } from "../findUnique";
+import {
+  buildFindUniqueBsffGetFicheInterventions,
+  buildFindUniqueBsffGetPackagings
+} from "../findUnique";
 
 describe("bsffRepository.findUnique relations", () => {
+  it("forwards a packaging select without adding an incompatible include", async () => {
+    const foundPackagings = [{ id: "packaging-id" }];
+    const packagings = jest.fn().mockResolvedValue(foundPackagings);
+    const findUnique = jest.fn().mockReturnValue({ packagings });
+    const repository = buildFindUniqueBsffGetPackagings({
+      prisma: {
+        bsff: { findUnique }
+      } as any
+    });
+
+    const result = await repository(
+      { where: { id: "bsff-id" } },
+      { select: { id: true } }
+    );
+
+    expect(findUnique).toHaveBeenCalledWith({ where: { id: "bsff-id" } });
+    expect(packagings).toHaveBeenCalledWith({ select: { id: true } });
+    expect(result).toEqual(foundPackagings);
+  });
+
   it("loads packagings with fiche interventions", async () => {
     const foundFiches = [{ id: "fiche-id", packagings: [] }];
     const ficheInterventions = jest.fn().mockResolvedValue(foundFiches);

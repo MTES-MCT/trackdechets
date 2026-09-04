@@ -55,17 +55,7 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
-    // Si le BSFF a des fiches d'intervention et des packagings,
-    // on fait le lien entre eux
-    const hasExplicitPackagingFicheInterventions = fullBsff.packagings.some(
-      packaging => packaging.ficheInterventions.length > 0
-    );
-
-    if (
-      !hasExplicitPackagingFicheInterventions &&
-      fullBsff.ficheInterventions.length &&
-      fullBsff.packagings.length
-    ) {
+    if (fullBsff.ficheInterventions.length && fullBsff.packagings.length) {
       await addBsffPackagingsFichesIntervention(
         fullBsff.packagings,
         fullBsff.ficheInterventions,

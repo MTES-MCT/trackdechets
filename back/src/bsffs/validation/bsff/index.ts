@@ -36,8 +36,7 @@ export async function mergeInputAndParseBsffAsync(
     ...zodInput
   };
 
-  // Fusion spéciale pour les packagings: préserver les détenteurs
-  // si l'input n'en envoie pas
+
   if (zodInput.packagings && zodPersisted.packagings) {
     bsff.packagings = zodInput.packagings.map(inputPackaging => {
       const persistedPackaging = zodPersisted.packagings!.find(p =>
@@ -50,20 +49,17 @@ export async function mergeInputAndParseBsffAsync(
         return inputPackaging;
       }
 
-      // Préserver les détenteurs du persisted si l'input n'en a pas
-      if (
-        (!inputPackaging.detenteurs ||
+      return {
+        ...inputPackaging,
+        ...((!inputPackaging.detenteurs ||
           inputPackaging.detenteurs.length === 0) &&
-        persistedPackaging.detenteurs &&
-        persistedPackaging.detenteurs.length > 0
-      ) {
-        return {
-          ...inputPackaging,
-          detenteurs: persistedPackaging.detenteurs
-        };
-      }
-
-      return inputPackaging;
+        persistedPackaging.detenteurs !== undefined
+          ? { detenteurs: persistedPackaging.detenteurs }
+          : {}),
+        ...(inputPackaging.ficheInterventions === undefined
+          ? { ficheInterventions: persistedPackaging.ficheInterventions }
+          : {})
+      };
     });
   }
 
@@ -111,7 +107,8 @@ export async function mergeInputAndParseBsffAsync(
         numero: p.numero,
         emissionNumero: p.emissionNumero,
         weight: p.weight,
-        detenteurs: p.detenteurs
+        detenteurs: p.detenteurs,
+        ficheInterventions: p.ficheInterventions
       }))
     },
     bsff,
