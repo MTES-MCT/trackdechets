@@ -5,13 +5,14 @@ import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRa
 import { SealedFieldsContext } from "../../context";
 
 export default function BsffTypeRadioGroup() {
-  const { register } = useFormContext();
+  const { register, watch } = useFormContext();
   const sealedFields = useContext(SealedFieldsContext);
+  const id = watch("id");
   return (
     <WasteRadioGroup
       title="Type de bordereau"
       legend="J'édite un BSFF pour :"
-      disabled={sealedFields.includes("type")}
+      disabled={Boolean(id) || sealedFields.includes("type")}
       options={[
         [
           "Un opérateur qui collecte des déchets dangereux de fluides frigorigènes (ou autres déchets dangereux de fluides) lors d'opérations sur les équipements en contenant de ses clients",
