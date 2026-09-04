@@ -5,6 +5,7 @@ import { gql } from "graphql-tag";
 const fullFicheIntervention = gql`
   fragment FullFicheIntervention on BsffFicheIntervention {
     id
+    isExempted
     numero
     weight
     detenteur {

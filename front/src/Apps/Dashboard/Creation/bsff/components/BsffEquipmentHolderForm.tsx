@@ -1,8 +1,13 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
+import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
+import {
+  requiredAria,
+  requiredLabel
+} from "../../../../Forms/Components/RequiredField/requiredField";
 
 export const EQUIPMENT_HOLDER_TYPES = [
   { value: "ENTREPRISE", label: "Entreprise" },
@@ -11,16 +16,23 @@ export const EQUIPMENT_HOLDER_TYPES = [
   { value: "NAVIRE", label: "Navire" }
 ] as const;
 
-type Props = { fieldName: string; orgId?: string; disabled?: boolean };
+type Props = {
+  fieldName: string;
+  orgId?: string;
+  disabled?: boolean;
+  showInterventionSection?: boolean;
+};
 
 export function BsffEquipmentHolderForm({
   fieldName,
   orgId,
-  disabled = false
+  disabled = false,
+  showInterventionSection = false
 }: Props) {
   const { register, watch, setValue, formState } = useFormContext();
   const [selectedPackaging, setSelectedPackaging] = useState("");
   const holderType = watch(`${fieldName}.holderType`);
+  const isExempted = !!watch(`${fieldName}.isExempted`);
   const packagings = watch("packagings") ?? [];
   const linkedPackagings = watch(`${fieldName}.packagings`) ?? [];
   const companyField = `${fieldName}.detenteur.company`;
@@ -45,6 +57,35 @@ export function BsffEquipmentHolderForm({
 
   return (
     <div className="fr-col-12">
+      {showInterventionSection && (
+        <>
+          <h4 className="fr-mt-4w">Fiche d’intervention</h4>
+          <ToggleSwitch
+            label="Équipement exempté de fiche d’intervention au sens de l’article R. 543-82 du code de l’environnement"
+            inputTitle="Exemption de fiche d’intervention"
+            checked={isExempted}
+            disabled={disabled}
+            onChange={checked =>
+              setValue(`${fieldName}.isExempted`, checked, {
+                shouldDirty: true,
+                shouldValidate: true
+              })
+            }
+          />
+          <Input
+            className="fr-mt-3w"
+            label={requiredLabel("N° de fiche d’intervention", !isExempted)}
+            disabled={disabled}
+            state={holderErrors?.numero ? "error" : "default"}
+            stateRelatedMessage={holderErrors?.numero?.message}
+            nativeInputProps={{
+              ...register(`${fieldName}.numero`),
+              required: !isExempted,
+              ...requiredAria(!isExempted)
+            }}
+          />
+        </>
+      )}
       <h4 className="fr-mt-4w">Détenteur</h4>
       <Select
         label="Type de détenteur *"

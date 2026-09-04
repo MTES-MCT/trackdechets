@@ -485,6 +485,8 @@ input BsffPackagingNextDestinationInput {
 }
 
 input BsffFicheInterventionInput {
+  "Indique si l'équipement est exempté de fiche d'intervention au sens de l'article R. 543-82 du code de l'environnement"
+  isExempted: Boolean
   """
   Numéro de la fiche d'intervention mentionnée à l'article R. 543-82 du code de l'environnement
 

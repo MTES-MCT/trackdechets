@@ -395,6 +395,7 @@ const bsffFi = {
   createdAt: new Date(),
   updatedAt: new Date(),
   numero: "12345",
+  isExempted: false,
   weight: new Decimal(1),
   postalCode: "44340",
   detenteurCompanyName: "Établissement de test",

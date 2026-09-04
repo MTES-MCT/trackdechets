@@ -21,6 +21,8 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
 
   const type = watch("type");
   const isTracerFluide = type === BsffType.TracerFluide;
+  const isOperator = type === BsffType.CollectePetitesQuantites;
+  const usesEquipmentHolderForm = isTracerFluide || isOperator;
 
   const INSTALLATION_TYPES = [
     BsffType.Reexpedition,
@@ -32,18 +34,19 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
 
   const emptyHolder = React.useCallback(
     () =>
-      isTracerFluide
+      usesEquipmentHolderForm
         ? {
-            numero: `DETENTEUR_${Date.now()}_${Math.random()
-              .toString(36)
-              .slice(2)}`,
+            numero: isTracerFluide
+              ? `DETENTEUR_${Date.now()}_${Math.random().toString(36).slice(2)}`
+              : "",
+            isExempted: false,
             holderType: "",
             identification: "",
             detenteur: { isPrivateIndividual: false, company: {} },
             packagings: []
           }
         : {},
-    [isTracerFluide]
+    [isTracerFluide, usesEquipmentHolderForm]
   );
 
   React.useEffect(() => {
@@ -111,10 +114,11 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
             deleteLabel="Supprimer"
             hideHeader={isInstallationType}
           >
-            {isTracerFluide ? (
+            {usesEquipmentHolderForm ? (
               <BsffEquipmentHolderForm
                 orgId={orgId}
                 fieldName={`${fieldName}.${idx}`}
+                showInterventionSection={isOperator}
               />
             ) : (
               <RhfDetenteurForm

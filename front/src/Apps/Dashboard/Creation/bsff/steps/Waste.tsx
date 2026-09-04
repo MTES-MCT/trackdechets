@@ -15,6 +15,11 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import BsffSelectableWasteTableWrapper from "../components/BsffSelectableWasteTableWrapper";
 import MyBsffCompanySelector from "../components/MyBsffComapnySelector";
 import BsffTypeRadioGroup from "../components/BsffTypeRadioGroup";
+import {
+  hasBsffPackagingAccordions,
+  isBsffOperatorWasteStep,
+  isBsffSpecialWasteStep
+} from "../utils/waste";
 
 const WasteBsff = () => {
   const methods = useFormContext();
@@ -24,6 +29,7 @@ const WasteBsff = () => {
   const id = watch("id", null);
   const bsffType = watch("type");
   const isDetenteur = bsffType === BsffType.TracerFluide;
+  const isOperateur = isBsffOperatorWasteStep(bsffType);
   const packagings = watch("packagings");
   const weight = watch("weight", {});
   const emitterCompany = watch("emitter.company");
@@ -48,11 +54,7 @@ const WasteBsff = () => {
     prevTypeRef.current = bsffType;
   }, [bsffType, setValue, id]);
 
-  const isSpecialType = [
-    BsffType.Groupement,
-    BsffType.Reexpedition,
-    BsffType.Reconditionnement
-  ].includes(bsffType);
+  const isSpecialType = isBsffSpecialWasteStep(bsffType);
 
   const hasEmitterCompany =
     !!emitterCompany && (emitterCompany?.orgId || emitterCompany?.siret);
@@ -98,9 +100,9 @@ const WasteBsff = () => {
       {!!sealedFields.length && <DisabledParagraphStep />}
 
       <div className="fr-col">
-        {bsffType !== BsffType.TracerFluide && <BsffTypeRadioGroup />}
+        {isSpecialType && <BsffTypeRadioGroup />}
 
-        <h4 className="form__section-heading">{heading}</h4>
+        {heading && <h4 className="form__section-heading">{heading}</h4>}
 
         {heading && (
           <MyBsffCompanySelector
@@ -159,7 +161,11 @@ const WasteBsff = () => {
                 sealedFields.includes("waste.code") || wasteCodeDisabled
               }
             >
-              <option value="">Sélectionnez une valeur</option>
+              <option value="">
+                {isOperateur
+                  ? "Sélectionnez un code déchet"
+                  : "Sélectionnez une valeur"}
+              </option>
               {BSFF_WASTES.map(item => (
                 <option value={item.code} key={item.code}>
                   {item.code} - {item.description}
@@ -184,7 +190,11 @@ const WasteBsff = () => {
             />
             <Input
               className="fr-col-md-8 fr-mt-4w"
-              label="Mentions au titre des règlements ADR, RID, ADNR, IMDG"
+              label={
+                isOperateur
+                  ? "Mentions au titre des règlements ADR, RID, ADN, IMDG (optionnel)"
+                  : "Mentions au titre des règlements ADR, RID, ADNR, IMDG"
+              }
               disabled={sealedFields.includes("waste.adr")}
               nativeInputProps={{
                 ...register("waste.adr"),
@@ -195,9 +205,17 @@ const WasteBsff = () => {
                 (formState.errors.waste?.["adr"]?.message as string) ?? ""
               }
             />
-            <p className="fr-info-text">A renseigner si vous êtes concerné</p>
-            {!isDetenteur && <h4 className="fr-h4 fr-mt-4w">Contenants</h4>}
-            <div className={isDetenteur ? "fr-mt-4w" : undefined}>
+            {!isOperateur && (
+              <p className="fr-info-text">A renseigner si vous êtes concerné</p>
+            )}
+            {!hasBsffPackagingAccordions(bsffType) && (
+              <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
+            )}
+            <div
+              className={
+                hasBsffPackagingAccordions(bsffType) ? "fr-mt-4w" : undefined
+              }
+            >
               <RhfBsffPackagingList
                 disabled={
                   sealedFields.includes("packagings") ||
@@ -211,6 +229,7 @@ const WasteBsff = () => {
                 fieldName="packagings"
                 packagingTypes={bsffPackagingTypes}
                 detenteurMode={isDetenteur}
+                operateurMode={isOperateur}
               />
             </div>
             <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>

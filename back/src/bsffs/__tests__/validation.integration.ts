@@ -61,6 +61,32 @@ describe("ficheInterventionSchema", () => {
     ).toBe(true);
   });
 
+  it("should require an intervention number when the equipment is not exempted", () => {
+    expect(
+      ficheInterventionSchema.isValidSync({
+        ...ficheInteventionData,
+        ...detenteurCompanyData,
+        numero: "",
+        isExempted: false
+      })
+    ).toBe(false);
+  });
+
+  it.each([
+    ["", true],
+    ["FI-1", true],
+    ["FI-1", false]
+  ])("should accept numero=%s when isExempted=%s", (numero, isExempted) => {
+    expect(
+      ficheInterventionSchema.isValidSync({
+        ...ficheInteventionData,
+        ...detenteurCompanyData,
+        numero,
+        isExempted
+      })
+    ).toBe(true);
+  });
+
   it("should be invalid when a company field is missing", async () => {
     const data = {
       ...ficheInteventionData,

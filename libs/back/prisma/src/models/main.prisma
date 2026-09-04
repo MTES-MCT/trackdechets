@@ -1716,9 +1716,10 @@ model BsffFicheIntervention {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  numero     String
-  weight     Decimal @db.Decimal(65, 30)
-  postalCode String
+  numero      String
+  isExempted  Boolean @default(false)
+  weight      Decimal @db.Decimal(65, 30)
+  postalCode  String
 
   // Détenteur porté par la FI.
   // On conserve ces informations pour l'historique et pour la

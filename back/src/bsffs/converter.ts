@@ -442,6 +442,7 @@ export function flattenFicheInterventionBsffInput(
   | Prisma.Prisma.BsffFicheInterventionUpdateInput {
   return {
     numero: ficheInterventionInput.numero,
+    isExempted: ficheInterventionInput.isExempted ?? undefined,
     weight: ficheInterventionInput.weight,
     postalCode: ficheInterventionInput.postalCode,
     detenteurCompanyName:
@@ -487,6 +488,7 @@ export function expandFicheInterventionBsffFromDB(
 ): GraphQL.BsffFicheIntervention {
   return {
     id: prismaFicheIntervention.id,
+    isExempted: prismaFicheIntervention.isExempted,
     numero: prismaFicheIntervention.numero,
     weight: processDecimal(prismaFicheIntervention.weight).toNumber(),
     postalCode: prismaFicheIntervention.postalCode,
