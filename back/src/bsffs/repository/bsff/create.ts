@@ -23,13 +23,13 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
     logMetadata?: LogMetadata
   ) => {
     const { prisma, user } = deps;
-    if (!args.data.rowNumber) {
-      const maxBsff = await prisma.bsff.findFirst({
-        orderBy: { rowNumber: "desc" },
-        select: { rowNumber: true }
-      });
-      args.data.rowNumber = (maxBsff?.rowNumber ?? 0) + 1;
-    }
+    // if (!args.data.rowNumber) {
+    //   const maxBsff = await prisma.bsff.findFirst({
+    //     orderBy: { rowNumber: "desc" },
+    //     select: { rowNumber: true }
+    //   });
+    //   args.data.rowNumber = (maxBsff?.rowNumber ?? 0) + 1;
+    // }
 
     const bsff = await prisma.bsff.create(args);
 
