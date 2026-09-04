@@ -39,7 +39,6 @@ import {
 } from "../../../__tests__/factories";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { getTransportersSync } from "../../../database";
-import { UPDATE_BSFF } from "./updateBsff.integration";
 
 // Mock searchCompany for dormant/closed company tests.
 // The mock defaults to jest.fn() (returns undefined), which makes
@@ -63,6 +62,14 @@ const SIGN = gql`
           validityLimit
         }
       }
+    }
+  }
+`;
+
+const UPDATE_BSFF = gql`
+  mutation UpdateBsff($id: ID!, $input: BsffInput!) {
+    updateBsff(id: $id, input: $input) {
+      id
     }
   }
 `;
@@ -1160,6 +1167,10 @@ describe("Mutation.signBsff", () => {
         destination
       });
 
+      const operationHookDrained = new Promise(resolve => {
+        operationHooksQueue.once("global:drained", () => resolve(true));
+      });
+
       const { mutate } = makeClient(destination.user);
       const { data, errors } = await mutate<
         Pick<Mutation, "signBsff">,
@@ -1178,9 +1189,7 @@ describe("Mutation.signBsff", () => {
       expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
 
-      await new Promise(resolve => {
-        operationHooksQueue.once("global:drained", () => resolve(true));
-      });
+      await operationHookDrained;
 
       const signedBsff = await prisma.bsff.findUniqueOrThrow({
         where: { id: data.signBsff.id },
@@ -1196,6 +1205,10 @@ describe("Mutation.signBsff", () => {
         emitter,
         transporter,
         destination
+      });
+
+      const operationHookDrained = new Promise(resolve => {
+        operationHooksQueue.once("global:drained", () => resolve(true));
       });
 
       const { mutate } = makeClient(destination.user);
@@ -1217,9 +1230,7 @@ describe("Mutation.signBsff", () => {
       expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
 
-      await new Promise(resolve => {
-        operationHooksQueue.once("global:drained", () => resolve(true));
-      });
+      await operationHookDrained;
 
       const signedBsff = await prisma.bsff.findUniqueOrThrow({
         where: { id: data.signBsff.id },

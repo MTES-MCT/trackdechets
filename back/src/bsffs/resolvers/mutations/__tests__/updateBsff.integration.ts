@@ -50,7 +50,14 @@ import {
   getFirstTransporterSync,
   getTransportersSync
 } from "../../../database";
-import { UPDATE_BSFF_PACKAGING } from "./updateBsffPackaging.integration";
+
+const UPDATE_BSFF_PACKAGING = gql`
+  mutation UpdateBsffPackaging($id: ID!, $input: UpdateBsffPackagingInput!) {
+    updateBsffPackaging(id: $id, input: $input) {
+      id
+    }
+  }
+`;
 
 const CREATE_BSFF = gql`
   mutation CreateBsff($input: BsffInput!) {

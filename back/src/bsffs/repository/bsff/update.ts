@@ -106,17 +106,8 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
-    const hasExplicitPackagingFicheInterventions = fullBsff.packagings.some(
-      packaging => packaging.ficheInterventions.length > 0
-    );
-
-    // Compatibilité : on conserve l'association historique « toutes les FI avec
-    // tous les contenants » seulement lorsqu'aucune association explicite n'est
-    // portée par les contenants.
     if (
-      !hasExplicitPackagingFicheInterventions &&
       (args.data.ficheInterventions || args.data.packagings) &&
-      fullBsff.ficheInterventions.length > 0 &&
       fullBsff.packagings.length > 0
     ) {
       await removeBsffPackagingsFichesIntervention(
