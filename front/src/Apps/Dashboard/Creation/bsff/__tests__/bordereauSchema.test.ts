@@ -11,6 +11,7 @@ const parse = (values: Record<string, unknown>) =>
   rawBsffSchema.safeParse({
     type: "TRACER_FLUIDE",
     emitter: { company: holder },
+    transporters: [{ company: { siret: "11111111111111" } }],
     waste: {
       code: "13 03 10*",
       description: "Autres huiles isolantes et fluides caloporteurs"
@@ -138,6 +139,62 @@ describe("onglet Bordereau du parcours détenteur", () => {
           "packagings",
           "weight.value"
         ])
+      );
+    }
+  });
+
+  it("exige au moins un transporteur pour tous les parcours BSFF", () => {
+    const result = parse({
+      type: "COLLECTE_PETITES_QUANTITES",
+      transporters: []
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map(issue => issue.path.join("."))).toContain(
+        "transporters"
+      );
+    }
+  });
+
+  it("déclenche une erreur sur chaque champ requis du transporteur", () => {
+    const result = parse({
+      transporters: [
+        {
+          company: {
+            siret: "",
+            name: "",
+            contact: "",
+            phone: "",
+            mail: ""
+          },
+          transport: {
+            mode: undefined,
+            plates: []
+          }
+        }
+      ]
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map(issue => issue.path.join("."))).toEqual(
+        expect.arrayContaining([
+          "transporters.0.company.siret",
+          "transporters.0.company.name",
+          "transporters.0.company.contact",
+          "transporters.0.company.phone",
+          "transporters.0.company.mail",
+          "transporters.0.transport.mode"
+        ])
+      );
+    }
+  });
+
+  it("exige au moins un transporteur", () => {
+    const result = parse({ transporters: [] });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map(issue => issue.path.join("."))).toContain(
+        "transporters"
       );
     }
   });

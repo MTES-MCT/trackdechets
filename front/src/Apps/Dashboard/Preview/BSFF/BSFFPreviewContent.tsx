@@ -77,15 +77,11 @@ const BSFFPreviewContent = ({ bsdId }: BSFFPreviewContentProps) => {
           }
         ]
       : []),
-    ...(!(bsd?.type === BsffType.TracerFluide)
-      ? [
-          {
-            tabId: "transport",
-            label: "Transporteur" + (isMultiModal ? "s" : ""),
-            iconId: "ri-truck-fill" as RiIconClassName
-          }
-        ]
-      : []),
+    {
+      tabId: "transport",
+      label: "Transporteur" + (isMultiModal ? "s" : ""),
+      iconId: "ri-truck-fill" as RiIconClassName
+    },
     {
       tabId: "destination",
       label: "Destinataire",
