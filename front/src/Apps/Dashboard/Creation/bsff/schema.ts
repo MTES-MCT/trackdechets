@@ -291,6 +291,71 @@ export const rawBsffSchema = z
   })
   .superRefine((data, ctx) => {
     const blank = (value?: string | null) => !value?.trim();
+    const hasTransporter = (data.transporters ?? []).some(transporter => {
+      const company = transporter?.company;
+      return !blank(company?.siret) || !blank(company?.vatNumber);
+    });
+    if (!hasTransporter) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["transporters"],
+        message: "Au moins un transporteur est requis"
+      });
+    }
+
+    (data.transporters ?? []).forEach((transporter, index) => {
+      if (!transporter) return;
+
+      const company = transporter.company;
+      if (
+        blank(company?.siret) &&
+        blank(company?.vatNumber) &&
+        blank(company?.orgId)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["transporters", index, "company", "siret"],
+          message: "Le SIRET ou le numéro TVA du transporteur est requis"
+        });
+      }
+      if (blank(company?.name)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["transporters", index, "company", "name"],
+          message: "La raison sociale du transporteur est requise"
+        });
+      }
+      if (blank(company?.contact)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["transporters", index, "company", "contact"],
+          message: "La personne à contacter est requise"
+        });
+      }
+      if (blank(company?.phone)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["transporters", index, "company", "phone"],
+          message: "Le téléphone du transporteur est requis"
+        });
+      }
+      if (blank(company?.mail)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["transporters", index, "company", "mail"],
+          message: "Le courriel du transporteur est requis"
+        });
+      }
+
+      if (!transporter.transport?.mode) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["transporters", index, "transport", "mode"],
+          message: "Le mode de transport est requis"
+        });
+      }
+    });
+
     if (data.type === BsffType.TRACER_FLUIDE) {
       const company = data.emitter?.company;
       const requiredCompanyFields: [string, string][] = [
