@@ -1126,9 +1126,11 @@ const BsffFormSteps = ({
       if (currentCompany && input.emitter?.company) {
         methods.setValue("emitter.company", {
           ...currentCompany,
-          contact: input.emitter.company.contact ?? currentCompany.contact,
-          phone: input.emitter.company.phone ?? currentCompany.phone,
-          mail: input.emitter.company.mail ?? currentCompany.mail
+          ...input.emitter.company,
+          contact:
+            currentCompany.contact ?? input.emitter.company.contact ?? "",
+          phone: currentCompany.phone ?? input.emitter.company.phone ?? "",
+          mail: currentCompany.mail ?? input.emitter.company.mail ?? ""
         });
       }
       return result;

@@ -72,18 +72,20 @@ export function RhfTransporterForm<T extends AnyTransporterInput>({
         selectedCompanyError={selectedCompanyError}
         onCompanySelected={company => {
           if (company) {
-            if (company.siret !== transporter?.company?.siret) {
-              setValue(`${actor}.company.contact`, company.contact);
-              setValue(`${actor}.company.phone`, company.contactPhone);
-              setValue(`${actor}.company.mail`, company.contactEmail);
-            } else {
-              setValue(
-                `${actor}.company.contact`,
-                transporter?.company?.contact
-              );
-              setValue(`${actor}.company.phone`, transporter?.company?.phone);
+            const currentCompany = transporter?.company ?? {};
+            const nextContact = company.contact ?? currentCompany.contact ?? "";
+            const nextPhone =
+              company.contactPhone ?? currentCompany.phone ?? "";
+            const nextMail = company.contactEmail ?? currentCompany.mail ?? "";
 
-              setValue(`${actor}.company.mail`, transporter?.company?.mail);
+            if (company.siret !== transporter?.company?.siret) {
+              setValue(`${actor}.company.contact`, nextContact);
+              setValue(`${actor}.company.phone`, nextPhone);
+              setValue(`${actor}.company.mail`, nextMail);
+            } else {
+              setValue(`${actor}.company.contact`, nextContact);
+              setValue(`${actor}.company.phone`, nextPhone);
+              setValue(`${actor}.company.mail`, nextMail);
             }
             setValue(`${actor}.company.orgId`, company.orgId);
             setValue(`${actor}.company.siret`, company.siret);
