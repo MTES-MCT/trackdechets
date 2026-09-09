@@ -8,7 +8,6 @@ import Select, { Option } from "../../../../common/Components/Select/Select";
 import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 import { ZodBsff } from "../schema";
 import styles from "./FluidesFrigorigenes.module.scss";
-import { mockFluidesFrigorigenesInterventions } from "./fluides-frigorigenes/mockData";
 import {
   filterInterventions,
   FluidesFrigorigenesDataState,
@@ -17,6 +16,7 @@ import {
   getSelectedWasteCode,
   isInterventionSelectable
 } from "./fluides-frigorigenes/model";
+import { useFluidesFrigorigenes } from "./fluides-frigorigenes/useFluidesFrigorigenes";
 
 const AVAILABILITY_URL =
   "https://faq.trackdechets.fr/aide-et-disponibilite/disponibilite-de-loutil";
@@ -25,22 +25,31 @@ const initialFilters: FluidesFrigorigenesFilters = {
   equipmentHolders: [],
   association: ["no"]
 };
-type Props = { dataState?: FluidesFrigorigenesDataState };
 const toOptions = (values: string[]): Option[] =>
   values.map(value => ({ value, label: value }));
 const optionsToValues = (options: Option[]) =>
   options.map(({ value }) => value);
 
-export default function FluidesFrigorigenesBsff({ dataState }: Props) {
+export default function FluidesFrigorigenesBsff() {
   const { watch } = useFormContext<ZodBsff>();
   const operatorSiret = watch("emitter.company.siret") ?? "";
-  // TODO(backend FF): replace this isolated mock state with the Trackdechets GraphQL query using
-  // operatorSiret. Consume the mapped backend contract (not raw FF JSON), connect loading/error/
-  // empty states and verify this frontend model against the backend-returned fields.
-  const state: FluidesFrigorigenesDataState = dataState ?? {
-    status: "success",
-    interventions: mockFluidesFrigorigenesInterventions
-  };
+  const state = useFluidesFrigorigenes(operatorSiret);
+
+  return (
+    <FluidesFrigorigenesView
+      key={operatorSiret}
+      operatorSiret={operatorSiret}
+      state={state}
+    />
+  );
+}
+
+type ViewProps = {
+  operatorSiret: string;
+  state: FluidesFrigorigenesDataState;
+};
+
+export function FluidesFrigorigenesView({ operatorSiret, state }: ViewProps) {
   const [filters, setFilters] = useState(initialFilters);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
@@ -64,6 +73,13 @@ export default function FluidesFrigorigenesBsff({ dataState }: Props) {
               </a>
             </>
           }
+        />
+      )}
+      {state.status === "missingSiret" && (
+        <Alert
+          severity="error"
+          title="Opérateur manquant"
+          description="Sélectionnez d'abord l'opérateur dans l'onglet Bordereau pour charger ses fiches d'intervention Fluides Frigorigènes."
         />
       )}
       {state.status === "unknownSiret" && (

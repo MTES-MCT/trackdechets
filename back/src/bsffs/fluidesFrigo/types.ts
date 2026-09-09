@@ -10,7 +10,7 @@ export interface RestUtilisationBouteilleRecuperation {
   bouteilleIdentification: string;
   capaciteUtilisee: number;
   inflammable: boolean;
-  codeUN: string;
+  codeUN?: string;
 }
 
 export interface RestCerfa {
@@ -33,7 +33,7 @@ export interface RestCerfa {
   signatureDetenteur?: {
     dateSignature: string;
   };
-  bouteilleRecuperations: RestUtilisationBouteilleRecuperation[];
+  bouteilleRecuperations?: RestUtilisationBouteilleRecuperation[];
   quantiteTotalRecuperation?: string;
   quantitéTotalRecuperation?: string;
 }
@@ -53,6 +53,8 @@ export interface BsffOperateurDraft {
     siret: string;
     nom: string;
     adresse?: string;
+    codePostal?: string;
+    ville?: string;
   };
   operateur: {
     siret: string;
@@ -61,4 +63,8 @@ export interface BsffOperateurDraft {
   sourceData: "fluides_frigo";
   ffFicheId: string;
   quantiteTotalRecuperation?: string;
+}
+
+export interface BsffOperateurDraftWithAssociations extends BsffOperateurDraft {
+  associatedBsffIds: string[];
 }

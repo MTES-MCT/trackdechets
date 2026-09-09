@@ -1,21 +1,15 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import React from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import FluidesFrigorigenesBsff from "./FluidesFrigorigenes";
+import { FluidesFrigorigenesView } from "./FluidesFrigorigenes";
 import { FluidesFrigorigenesDataState } from "./fluides-frigorigenes/model";
-import { mockFluidesFrigorigenesInterventions } from "./fluides-frigorigenes/mockData";
+import { fluidesFrigorigenesInterventionsFixture } from "./fluides-frigorigenes/fixtures";
 
-function Wrapper({ children }: { children: React.ReactNode }) {
-  const methods = useForm({
-    defaultValues: { emitter: { company: { siret: "12345678901234" } } }
-  });
-  return <FormProvider {...methods}>{children}</FormProvider>;
-}
 const renderComponent = (dataState?: FluidesFrigorigenesDataState) =>
   render(
-    <Wrapper>
-      <FluidesFrigorigenesBsff dataState={dataState} />
-    </Wrapper>
+    <FluidesFrigorigenesView
+      operatorSiret="12345678901234"
+      state={dataState ?? { status: "loading" }}
+    />
   );
 
 describe("FluidesFrigorigenesBsff", () => {
@@ -25,17 +19,17 @@ describe("FluidesFrigorigenesBsff", () => {
       screen.getByText(/Connexion à l'API impossible/)
     ).toBeInTheDocument();
     rerender(
-      <Wrapper>
-        <FluidesFrigorigenesBsff dataState={{ status: "unknownSiret" }} />
-      </Wrapper>
+      <FluidesFrigorigenesView
+        operatorSiret="12345678901234"
+        state={{ status: "unknownSiret" }}
+      />
     );
     expect(screen.getByText(/n'a pas été reconnu/)).toBeInTheDocument();
     rerender(
-      <Wrapper>
-        <FluidesFrigorigenesBsff
-          dataState={{ status: "success", interventions: [] }}
-        />
-      </Wrapper>
+      <FluidesFrigorigenesView
+        operatorSiret="12345678901234"
+        state={{ status: "success", interventions: [] }}
+      />
     );
     expect(screen.getByText(/12345678901234/)).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
@@ -44,7 +38,7 @@ describe("FluidesFrigorigenesBsff", () => {
   it("renders mocked interventions and expands their containers", () => {
     renderComponent({
       status: "success",
-      interventions: mockFluidesFrigorigenesInterventions
+      interventions: fluidesFrigorigenesInterventionsFixture
     });
     expect(screen.getByText("FI-2026-001")).toBeInTheDocument();
     expect(screen.queryByText("Bouteille BOUT-001")).not.toBeInTheDocument();
@@ -61,7 +55,7 @@ describe("FluidesFrigorigenesBsff", () => {
   it("removes the default association filter tag", () => {
     renderComponent({
       status: "success",
-      interventions: mockFluidesFrigorigenesInterventions
+      interventions: fluidesFrigorigenesInterventionsFixture
     });
     expect(screen.queryByText("FI-2026-003")).not.toBeInTheDocument();
     fireEvent.click(
@@ -73,7 +67,7 @@ describe("FluidesFrigorigenesBsff", () => {
   it("creates one selected row per container and enforces then resets RG4 bis", () => {
     renderComponent({
       status: "success",
-      interventions: mockFluidesFrigorigenesInterventions
+      interventions: fluidesFrigorigenesInterventionsFixture
     });
     const importButton = screen.getByRole("button", {
       name: "Importer les fiches d'interventions"
@@ -100,7 +94,7 @@ describe("FluidesFrigorigenesBsff", () => {
   it("creates all container rows for a multi-container intervention", () => {
     renderComponent({
       status: "success",
-      interventions: mockFluidesFrigorigenesInterventions
+      interventions: fluidesFrigorigenesInterventionsFixture
     });
     fireEvent.click(
       screen.getByRole("checkbox", {

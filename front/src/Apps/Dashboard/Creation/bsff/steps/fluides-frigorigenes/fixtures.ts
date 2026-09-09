@@ -1,7 +1,6 @@
 import { FluidesFrigorigenesIntervention } from "./model";
 
-// Temporary fixture. Delete this file when the Trackdechets backend query is available.
-export const mockFluidesFrigorigenesInterventions: FluidesFrigorigenesIntervention[] =
+export const fluidesFrigorigenesInterventionsFixture: FluidesFrigorigenesIntervention[] =
   [
     {
       id: "fi-1",

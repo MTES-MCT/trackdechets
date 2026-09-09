@@ -29,11 +29,9 @@ export function mapCerfaToBsffOperateurDraft(
     dechets: (cerfa.bouteilleRecuperations ?? []).map(bouteille => ({
       bouteilleId: bouteille.bouteilleId,
       bouteilleIdentification: bouteille.bouteilleIdentification,
-      // ✅ CORRIGÉ : Déduit de inflammable
-      codeDechet: bouteille.inflammable ? "16 04 05*" : "14 06 01*",
+      codeDechet: bouteille.inflammable ? "16 05 04*" : "14 06 01*",
       poidsFluide: bouteille.capaciteUtilisee,
       volumeContenant: null,
-      // ✅ CORRIGÉ : Calculé basé sur inflammable + codeUN
       mentionADR:
         bouteille.inflammable && bouteille.codeUN
           ? `ADR ${bouteille.codeUN}`
@@ -42,7 +40,9 @@ export function mapCerfaToBsffOperateurDraft(
     detenteur: {
       siret: cerfa.detenteur.siret,
       nom: cerfa.detenteur.nom,
-      adresse: formatAddress(cerfa.detenteur.adresseCerfa)
+      adresse: formatAddress(cerfa.detenteur.adresseCerfa),
+      codePostal: cerfa.detenteur.adresseCerfa?.codePostal,
+      ville: cerfa.detenteur.adresseCerfa?.ville
     },
     operateur: {
       siret: cerfa.operateur.siret,

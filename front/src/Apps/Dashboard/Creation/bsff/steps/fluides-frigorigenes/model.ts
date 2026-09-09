@@ -21,6 +21,7 @@ export type FluidesFrigorigenesFilters = {
 };
 export type FluidesFrigorigenesDataState =
   | { status: "loading" }
+  | { status: "missingSiret" }
   | { status: "serviceError" }
   | { status: "unknownSiret" }
   | { status: "success"; interventions: FluidesFrigorigenesIntervention[] };

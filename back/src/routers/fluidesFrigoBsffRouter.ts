@@ -9,6 +9,7 @@ import {
   FluidesFrigoConfigError
 } from "../bsffs/fluidesFrigo/client";
 import { mapCerfaToBsffOperateurDraft } from "../bsffs/fluidesFrigo/mapper";
+import { BsffOperateurDraftWithAssociations } from "../bsffs/fluidesFrigo/types";
 import ensureLoggedIn from "../common/middlewares/ensureLoggedIn";
 
 const fluidesFrigoBsffRouter = Router();
@@ -24,6 +25,43 @@ const querySchema = z.object({
   fin: z.string().datetime().optional(),
   identifiantBouteille: z.string().optional()
 });
+
+async function enrichWithAssociatedBsffs(
+  drafts: ReturnType<typeof mapCerfaToBsffOperateurDraft>[],
+  operatorSiret: string
+): Promise<BsffOperateurDraftWithAssociations[]> {
+  if (!drafts.length) {
+    return [];
+  }
+
+  const existingFiches = await prisma.bsffFicheIntervention.findMany({
+    where: {
+      numero: {
+        in: drafts.map(({ ficheInterventionNumero }) => ficheInterventionNumero)
+      },
+      operateurCompanySiret: operatorSiret,
+      bsffs: { some: {} }
+    },
+    select: {
+      numero: true,
+      bsffs: { select: { id: true } }
+    }
+  });
+
+  const bsffIdsByFicheNumero = new Map<string, Set<string>>();
+  for (const fiche of existingFiches) {
+    const ids = bsffIdsByFicheNumero.get(fiche.numero) ?? new Set<string>();
+    fiche.bsffs.forEach(({ id }) => ids.add(id));
+    bsffIdsByFicheNumero.set(fiche.numero, ids);
+  }
+
+  return drafts.map(draft => ({
+    ...draft,
+    associatedBsffIds: [
+      ...(bsffIdsByFicheNumero.get(draft.ficheInterventionNumero) ?? [])
+    ].sort()
+  }));
+}
 
 const handleFluidesFrigoError = (
   error: unknown,
@@ -125,7 +163,8 @@ fluidesFrigoBsffRouter.get(
         identifiantBouteille: parsedQuery.data.identifiantBouteille
       });
 
-      const data = cerfas.map(mapCerfaToBsffOperateurDraft);
+      const mappedCerfas = cerfas.map(mapCerfaToBsffOperateurDraft);
+      const data = await enrichWithAssociatedBsffs(mappedCerfas, siret);
 
       return res.status(200).json({
         success: true,

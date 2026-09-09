@@ -1,4 +1,10 @@
 import axios from "axios";
+import {
+  DEFAULT_FF_API_BASE_URL,
+  DEFAULT_FF_API_RETRIES,
+  DEFAULT_FF_API_TIMEOUT,
+  DEFAULT_FF_OIDC_TOKEN_URL
+} from "@td/env";
 import { FluidesFrigoGetCerfaParams, RestCerfa } from "./types";
 
 type TokenResponse = {
@@ -36,23 +42,35 @@ class FluidesFrigoClient {
     }
 
     return {
-      apiBaseUrl: process.env.FF_API_BASE_URL,
-      tokenUrl: process.env.FF_OIDC_TOKEN_URL,
+      apiBaseUrl: process.env.FF_API_BASE_URL ?? DEFAULT_FF_API_BASE_URL,
+      tokenUrl: process.env.FF_OIDC_TOKEN_URL ?? DEFAULT_FF_OIDC_TOKEN_URL,
       clientId,
       clientSecret,
-      timeout: parseInt(process.env.FF_API_TIMEOUT, 10),
-      retries: parseInt(process.env.FF_API_RETRIES, 10)
+      timeout: parseInt(
+        process.env.FF_API_TIMEOUT ?? DEFAULT_FF_API_TIMEOUT,
+        10
+      ),
+      retries: parseInt(
+        process.env.FF_API_RETRIES ?? DEFAULT_FF_API_RETRIES,
+        10
+      )
     };
   }
 
   async getCerfaBySiret(
     params: FluidesFrigoGetCerfaParams
   ): Promise<RestCerfa[]> {
-    const token = await this.getValidToken();
+    let token = await this.getValidToken();
     const config = this.getConfig();
     const url = `${config.apiBaseUrl}/${params.siret}/cerfa`;
+    let retryAttempt = 0;
+    let tokenWasRenewed = false;
 
-    for (let attempt = 0; attempt <= config.retries; attempt++) {
+    for (
+      let requestAttempt = 0;
+      requestAttempt <= config.retries + 1;
+      requestAttempt++
+    ) {
       try {
         const response = await axios.get<RestCerfa[]>(url, {
           params: {
@@ -72,25 +90,15 @@ class FluidesFrigoClient {
           throw error;
         }
 
-        if (error.response?.status === 401) {
-          const refreshedToken = await this.renewToken();
-          const response = await axios.get<RestCerfa[]>(url, {
-            params: {
-              debut: params.debut,
-              fin: params.fin,
-              identifiantBouteille: params.identifiantBouteille
-            },
-            headers: {
-              Authorization: `Bearer ${refreshedToken}`
-            },
-            timeout: config.timeout
-          });
-
-          return response.data;
+        if (error.response?.status === 401 && !tokenWasRenewed) {
+          token = await this.renewToken();
+          tokenWasRenewed = true;
+          continue;
         }
 
-        if (error.response?.status === 429 && attempt < config.retries) {
-          await this.wait(Math.pow(2, attempt + 1) * 1000);
+        if (error.response?.status === 429 && retryAttempt < config.retries) {
+          await this.wait(Math.pow(2, retryAttempt + 1) * 1000);
+          retryAttempt += 1;
           continue;
         }
 

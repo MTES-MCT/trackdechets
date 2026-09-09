@@ -1,4 +1,4 @@
-import { mockFluidesFrigorigenesInterventions } from "./mockData";
+import { fluidesFrigorigenesInterventionsFixture } from "./fixtures";
 import {
   filterInterventions,
   getSelectedWasteCode,
@@ -8,14 +8,14 @@ import {
 describe("Fluides Frigorigènes business rules", () => {
   it("filters independently by waste code, holder and association", () => {
     expect(
-      filterInterventions(mockFluidesFrigorigenesInterventions, {
+      filterInterventions(fluidesFrigorigenesInterventionsFixture, {
         wasteCodes: ["14 06 02*"],
         equipmentHolders: ["Leclerc Millau"],
         association: ["yes"]
       }).map(({ id }) => id)
     ).toEqual(["fi-3"]);
     expect(
-      filterInterventions(mockFluidesFrigorigenesInterventions, {
+      filterInterventions(fluidesFrigorigenesInterventionsFixture, {
         wasteCodes: [],
         equipmentHolders: [],
         association: ["no"]
@@ -24,21 +24,24 @@ describe("Fluides Frigorigènes business rules", () => {
   });
 
   it("locks selection to the waste code of the first selected intervention", () => {
-    const code = getSelectedWasteCode(mockFluidesFrigorigenesInterventions, [
+    const code = getSelectedWasteCode(fluidesFrigorigenesInterventionsFixture, [
       "fi-2"
     ]);
     expect(
-      isInterventionSelectable(mockFluidesFrigorigenesInterventions[0], code)
+      isInterventionSelectable(fluidesFrigorigenesInterventionsFixture[0], code)
     ).toBe(false);
     expect(
-      isInterventionSelectable(mockFluidesFrigorigenesInterventions[2], code)
+      isInterventionSelectable(fluidesFrigorigenesInterventionsFixture[2], code)
     ).toBe(true);
   });
 
   it("resets the constraint when selection is empty", () => {
-    const code = getSelectedWasteCode(mockFluidesFrigorigenesInterventions, []);
+    const code = getSelectedWasteCode(
+      fluidesFrigorigenesInterventionsFixture,
+      []
+    );
     expect(
-      isInterventionSelectable(mockFluidesFrigorigenesInterventions[0], code)
+      isInterventionSelectable(fluidesFrigorigenesInterventionsFixture[0], code)
     ).toBe(true);
   });
 });

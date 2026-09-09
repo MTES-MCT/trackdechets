@@ -5,6 +5,8 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { logIn } from "../../__tests__/auth.helper";
 import { siretify, userWithCompanyFactory } from "../../__tests__/factories";
 import { resetFluidesFrigoTokenCacheForTests } from "../../bsffs/fluidesFrigo/client";
+import { prisma } from "@td/prisma";
+import { createBsff } from "../../bsffs/__tests__/factories";
 
 jest.mock("axios");
 
@@ -137,7 +139,9 @@ describe("Fluides Frigorigènes BSFF router", () => {
           detenteur: {
             siret: expect.any(String),
             nom: "Detenteur test",
-            adresse: "10 rue des Frigos, 75010 Paris"
+            adresse: "10 rue des Frigos, 75010 Paris",
+            codePostal: "75010",
+            ville: "Paris"
           },
           operateur: {
             siret: company.siret,
@@ -145,7 +149,8 @@ describe("Fluides Frigorigènes BSFF router", () => {
           },
           sourceData: "fluides_frigo",
           ffFicheId: "FI-123",
-          quantiteTotalRecuperation: "42"
+          quantiteTotalRecuperation: "42",
+          associatedBsffIds: []
         }
       ],
       metadata: {
@@ -165,6 +170,67 @@ describe("Fluides Frigorigènes BSFF router", () => {
         headers: { Authorization: "Bearer token" }
       })
     );
+  });
+
+  it("returns the BSFF ids already associated with an intervention", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { sessionCookie } = await logIn(app, user.email, "pass");
+    const ficheIntervention = await prisma.bsffFicheIntervention.create({
+      data: {
+        numero: "FI-ASSOCIATED",
+        detenteurCompanySiret: siretify(),
+        detenteurCompanyName: "Détenteur",
+        detenteurCompanyAddress: "1 rue du Test",
+        weight: 1,
+        postalCode: "75001",
+        operateurCompanySiret: company.siret,
+        operateurCompanyName: company.name,
+        operateurCompanyAddress: company.address!,
+        operateurCompanyContact: company.contact!,
+        operateurCompanyMail: company.contactEmail!,
+        operateurCompanyPhone: company.contactPhone!
+      }
+    });
+    const bsff = await createBsff(
+      { emitter: { user, company } },
+      {
+        data: {
+          ficheInterventions: { connect: { id: ficheIntervention.id } }
+        }
+      }
+    );
+
+    (axios.post as jest.Mock).mockResolvedValueOnce({
+      data: { access_token: "token", expires_in: 3600 }
+    });
+    (axios.get as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          siret: company.siret,
+          ficheInterventionNumero: "FI-ASSOCIATED",
+          operateur: { nom: company.name, siret: company.siret },
+          detenteur: {
+            nom: "Détenteur",
+            siret: ficheIntervention.detenteurCompanySiret
+          },
+          bouteilleRecuperations: [
+            {
+              bouteilleId: "btl-1",
+              bouteilleIdentification: "BOUT-001",
+              capaciteUtilisee: 1,
+              inflammable: false
+            }
+          ]
+        }
+      ]
+    });
+
+    const response = await request
+      .get(`/api/bsff/operateur/fluides-frigo/${company.siret}`)
+      .set("Cookie", sessionCookie);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data[0].associatedBsffIds).toEqual([bsff.id]);
   });
 
   it("renews token once when FF API returns 401", async () => {
