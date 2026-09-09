@@ -237,6 +237,8 @@ describe("Fluides Frigorigènes BSFF router", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { sessionCookie } = await logIn(app, user.email, "pass");
 
+    (axios.isAxiosError as jest.Mock).mockReturnValue(true);
+
     (axios.post as jest.Mock)
       .mockResolvedValueOnce({
         data: { access_token: "expired-token", expires_in: 3600 }
@@ -248,7 +250,10 @@ describe("Fluides Frigorigènes BSFF router", () => {
     (axios.get as jest.Mock)
       .mockRejectedValueOnce({
         isAxiosError: true,
-        response: { status: 401, data: { message: "expired token" } }
+        response: {
+          status: 401,
+          data: { message: "expired token" }
+        }
       })
       .mockResolvedValueOnce({
         data: []
