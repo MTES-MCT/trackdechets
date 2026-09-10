@@ -72,11 +72,11 @@ describe("FluidesFrigorigenesBsff", () => {
     const importButton = screen.getByRole("button", {
       name: "Importer les fiches d'interventions"
     });
-    const first = screen.getByRole("checkbox", {
-      name: "Sélectionner la fiche FI-2026-001"
+    const first = screen.getByRole("button", {
+      name: "Ajouter la fiche FI-2026-001"
     });
-    const second = screen.getByRole("checkbox", {
-      name: "Sélectionner la fiche FI-2026-002"
+    const second = screen.getByRole("button", {
+      name: "Ajouter la fiche FI-2026-002"
     });
     expect(importButton).toBeDisabled();
     fireEvent.click(second);
@@ -86,9 +86,27 @@ describe("FluidesFrigorigenesBsff", () => {
       name: "Fiches d'intervention sélectionnées"
     });
     expect(within(selectedTable).getByText("BOUT-003")).toBeInTheDocument();
-    fireEvent.click(second);
+    const availableTable = screen.getByRole("table", {
+      name: "Fiches d'intervention disponibles"
+    });
+    expect(within(availableTable).getByText("Ajouté")).toBeInTheDocument();
+    expect(
+      within(availableTable).queryByRole("button", {
+        name: "Ajouter la fiche FI-2026-002"
+      })
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      within(selectedTable).getByRole("button", {
+        name: "Retirer la fiche FI-2026-002"
+      })
+    );
     expect(importButton).toBeDisabled();
     expect(first).toBeEnabled();
+    expect(
+      within(availableTable).getByRole("button", {
+        name: "Ajouter la fiche FI-2026-002"
+      })
+    ).toBeEnabled();
   });
 
   it("creates all container rows for a multi-container intervention", () => {
@@ -97,8 +115,8 @@ describe("FluidesFrigorigenesBsff", () => {
       interventions: fluidesFrigorigenesInterventionsFixture
     });
     fireEvent.click(
-      screen.getByRole("checkbox", {
-        name: "Sélectionner la fiche FI-2026-001"
+      screen.getByRole("button", {
+        name: "Ajouter la fiche FI-2026-001"
       })
     );
     const table = screen.getByRole("table", {

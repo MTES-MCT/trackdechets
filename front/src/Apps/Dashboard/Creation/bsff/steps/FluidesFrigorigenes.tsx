@@ -5,7 +5,6 @@ import Tag from "@codegouvfr/react-dsfr/Tag";
 import React, { useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import Select, { Option } from "../../../../common/Components/Select/Select";
-import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 import { ZodBsff } from "../schema";
 import styles from "./FluidesFrigorigenes.module.scss";
 import {
@@ -158,20 +157,6 @@ function Content({
     const disabled =
       !checked && !isInterventionSelectable(intervention, selectedWasteCode);
     const main = [
-      <SingleCheckbox
-        key={`check-${intervention.id}`}
-        options={[
-          {
-            label: "",
-            nativeInputProps: {
-              checked,
-              disabled,
-              onChange: () => toggleSelection(intervention.id),
-              "aria-label": `Sélectionner la fiche ${intervention.number}`
-            }
-          }
-        ]}
-      />,
       <button
         key={`expand-${intervention.id}`}
         type="button"
@@ -188,19 +173,36 @@ function Content({
       intervention.wasteCode,
       intervention.equipmentHolder,
       `${intervention.weightKg} kg`,
-      intervention.interventionDate ?? "—"
+      intervention.interventionDate ?? "—",
+      checked ? (
+        <span key={`selected-${intervention.id}`}>Ajouté</span>
+      ) : (
+        <Button
+          key={`select-${intervention.id}`}
+          type="button"
+          priority="secondary"
+          size="small"
+          disabled={disabled}
+          nativeButtonProps={{
+            "aria-label": `Ajouter la fiche ${intervention.number}`
+          }}
+          onClick={() => toggleSelection(intervention.id)}
+        >
+          Ajouter
+        </Button>
+      )
     ];
     return expandedIds.includes(intervention.id)
       ? [
           main,
           ...intervention.containers.map(container => [
-            "",
             "↳",
             `Bouteille ${container.number}`,
             intervention.wasteCode,
             intervention.equipmentHolder,
             `${container.weightKg} kg`,
-            container.volumeLiters ? `${container.volumeLiters} L` : "—"
+            container.volumeLiters ? `${container.volumeLiters} L` : "—",
+            ""
           ])
         ]
       : [main];
@@ -289,12 +291,12 @@ function Content({
         caption="Fiches d'intervention disponibles"
         headers={[
           "",
-          "",
           "Fiche intervention",
           "Code déchet",
           "Détenteur de l'équipement",
           "Poids",
-          "Date intervention"
+          "Date intervention",
+          ""
         ]}
         data={rows}
       />
@@ -311,7 +313,8 @@ function Content({
           "N° Fiche d'intervention",
           "Détenteur",
           "Code déchet",
-          "Poids"
+          "Poids",
+          ""
         ]}
         data={selected.flatMap(intervention =>
           intervention.containers.map(container => [
@@ -319,7 +322,19 @@ function Content({
             intervention.number,
             intervention.equipmentHolder,
             intervention.wasteCode,
-            `${container.weightKg} kg`
+            `${container.weightKg} kg`,
+            <Button
+              key={`remove-${intervention.id}-${container.number}`}
+              type="button"
+              priority="secondary"
+              size="small"
+              nativeButtonProps={{
+                "aria-label": `Retirer la fiche ${intervention.number}`
+              }}
+              onClick={() => toggleSelection(intervention.id)}
+            >
+              Retirer
+            </Button>
           ])
         )}
       />
