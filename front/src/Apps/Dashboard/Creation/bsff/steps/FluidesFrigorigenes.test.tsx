@@ -41,15 +41,15 @@ describe("FluidesFrigorigenesBsff", () => {
       interventions: fluidesFrigorigenesInterventionsFixture
     });
     expect(screen.getByText("FI-2026-001")).toBeInTheDocument();
-    expect(screen.queryByText("Bouteille BOUT-001")).not.toBeInTheDocument();
+    expect(screen.queryByText("BOUT-001")).not.toBeInTheDocument();
     fireEvent.click(
       screen.getByRole("button", { name: "Déplier la fiche FI-2026-001" })
     );
-    expect(screen.getByText("Bouteille BOUT-001")).toBeInTheDocument();
+    expect(screen.getByText("BOUT-001")).toBeInTheDocument();
     fireEvent.click(
       screen.getByRole("button", { name: "Replier la fiche FI-2026-001" })
     );
-    expect(screen.queryByText("Bouteille BOUT-001")).not.toBeInTheDocument();
+    expect(screen.queryByText("BOUT-001")).not.toBeInTheDocument();
   });
 
   it("removes the default association filter tag", () => {

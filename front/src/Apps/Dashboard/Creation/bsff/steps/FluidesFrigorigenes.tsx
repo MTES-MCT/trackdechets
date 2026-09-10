@@ -4,6 +4,7 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import Tag from "@codegouvfr/react-dsfr/Tag";
 import React, { useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { IconBSFF } from "../../../../common/Components/Icons/Icons";
 import Select, { Option } from "../../../../common/Components/Select/Select";
 import { ZodBsff } from "../schema";
 import styles from "./FluidesFrigorigenes.module.scss";
@@ -167,9 +168,22 @@ function Content({
         } la fiche ${intervention.number}`}
         onClick={() => toggleExpanded(intervention.id)}
       >
-        {expandedIds.includes(intervention.id) ? "−" : "+"}
+        <span
+          aria-hidden="true"
+          className={
+            expandedIds.includes(intervention.id)
+              ? "ri-arrow-up-s-line"
+              : "ri-arrow-down-s-line"
+          }
+        />
       </button>,
-      intervention.number,
+      <span className={styles.numberCell}>
+        <span
+          aria-hidden="true"
+          className={`ri-file-line ${styles.numberIcon}`}
+        />
+        {intervention.number}
+      </span>,
       intervention.wasteCode,
       intervention.equipmentHolder,
       `${intervention.weightKg} kg`,
@@ -196,8 +210,11 @@ function Content({
       ? [
           main,
           ...intervention.containers.map(container => [
-            "↳",
-            `Bouteille ${container.number}`,
+            "",
+            <span className={styles.numberCell}>
+              <IconBSFF aria-hidden="true" width="24" height="24" />
+              {container.number}
+            </span>,
             intervention.wasteCode,
             intervention.equipmentHolder,
             `${container.weightKg} kg`,

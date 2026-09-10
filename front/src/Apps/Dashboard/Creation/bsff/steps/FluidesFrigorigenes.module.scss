@@ -25,3 +25,14 @@
     grid-template-columns: 1fr;
   }
 }
+.numberCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.numberIcon {
+  color: var(--text-action-high-blue-france);
+  font-size: 1rem;
+}
