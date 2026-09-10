@@ -59,7 +59,7 @@ async function enrichWithAssociatedBsffs(
     ...draft,
     associatedBsffIds: [
       ...(bsffIdsByFicheNumero.get(draft.ficheInterventionNumero) ?? [])
-    ].sort()
+    ].sort((a, b) => a.localeCompare(b))
   }));
 }
 
