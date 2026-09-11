@@ -64,7 +64,7 @@ describe("FluidesFrigorigenesBsff", () => {
     expect(screen.getByText("FI-2026-003")).toBeInTheDocument();
   });
 
-  it("creates one selected row per container and enforces then resets RG4 bis", () => {
+  it("displays the selected intervention and enforces then resets RG4 bis", () => {
     renderComponent({
       status: "success",
       interventions: fluidesFrigorigenesInterventionsFixture
@@ -85,7 +85,11 @@ describe("FluidesFrigorigenesBsff", () => {
     const selectedTable = screen.getByRole("table", {
       name: "Fiches d'intervention sélectionnées"
     });
-    expect(within(selectedTable).getByText("BOUT-003")).toBeInTheDocument();
+    expect(within(selectedTable).getByText("FI-2026-002")).toBeInTheDocument();
+    expect(within(selectedTable).getByText("2026-08-20")).toBeInTheDocument();
+    expect(
+      within(selectedTable).queryByText("BOUT-003")
+    ).not.toBeInTheDocument();
     const availableTable = screen.getByRole("table", {
       name: "Fiches d'intervention disponibles"
     });
@@ -109,7 +113,7 @@ describe("FluidesFrigorigenesBsff", () => {
     ).toBeEnabled();
   });
 
-  it("creates all container rows for a multi-container intervention", () => {
+  it("displays one row for a selected multi-container intervention", () => {
     renderComponent({
       status: "success",
       interventions: fluidesFrigorigenesInterventionsFixture
@@ -122,7 +126,11 @@ describe("FluidesFrigorigenesBsff", () => {
     const table = screen.getByRole("table", {
       name: "Fiches d'intervention sélectionnées"
     });
-    expect(within(table).getByText("BOUT-001")).toBeInTheDocument();
-    expect(within(table).getByText("BOUT-002")).toBeInTheDocument();
+    expect(within(table).getByText("FI-2026-001")).toBeInTheDocument();
+    expect(within(table).getByText("8 kg")).toBeInTheDocument();
+    expect(within(table).getByText("2026-08-18")).toBeInTheDocument();
+    expect(within(table).queryByText("BOUT-001")).not.toBeInTheDocument();
+    expect(within(table).queryByText("BOUT-002")).not.toBeInTheDocument();
+    expect(within(table).getAllByRole("row")).toHaveLength(2);
   });
 });

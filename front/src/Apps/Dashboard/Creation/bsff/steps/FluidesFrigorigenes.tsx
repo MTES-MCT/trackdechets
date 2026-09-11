@@ -326,34 +326,38 @@ function Content({
         noCaption
         caption="Fiches d'intervention sélectionnées"
         headers={[
-          "N° contenant",
-          "N° Fiche d'intervention",
-          "Détenteur",
+          "Fiche intervention",
           "Code déchet",
+          "Détenteur de l'équipement",
           "Poids",
+          "Date intervention",
           ""
         ]}
-        data={selected.flatMap(intervention =>
-          intervention.containers.map(container => [
-            container.number,
-            intervention.number,
-            intervention.equipmentHolder,
-            intervention.wasteCode,
-            `${container.weightKg} kg`,
-            <Button
-              key={`remove-${intervention.id}-${container.number}`}
-              type="button"
-              priority="secondary"
-              size="small"
-              nativeButtonProps={{
-                "aria-label": `Retirer la fiche ${intervention.number}`
-              }}
-              onClick={() => toggleSelection(intervention.id)}
-            >
-              Retirer
-            </Button>
-          ])
-        )}
+        data={selected.map(intervention => [
+          <span className={styles.numberCell}>
+            <span
+              aria-hidden="true"
+              className={`ri-file-line ${styles.numberIcon}`}
+            />
+            {intervention.number}
+          </span>,
+          intervention.wasteCode,
+          intervention.equipmentHolder,
+          `${intervention.weightKg} kg`,
+          intervention.interventionDate ?? "—",
+          <Button
+            key={`remove-${intervention.id}`}
+            type="button"
+            priority="secondary"
+            size="small"
+            nativeButtonProps={{
+              "aria-label": `Retirer la fiche ${intervention.number}`
+            }}
+            onClick={() => toggleSelection(intervention.id)}
+          >
+            Retirer
+          </Button>
+        ])}
       />
       {!selected.length && <p>Aucune fiche sélectionnée</p>}
       <div className={styles.actions}>
