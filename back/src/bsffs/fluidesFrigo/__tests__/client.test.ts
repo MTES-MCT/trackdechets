@@ -2,6 +2,7 @@ import axios from "axios";
 import {
   fluidesFrigoClient,
   FluidesFrigoApiError,
+  FluidesFrigoAuthError,
   resetFluidesFrigoTokenCacheForTests
 } from "../client";
 
@@ -58,5 +59,34 @@ describe("FluidesFrigoClient", () => {
     ).rejects.toEqual(
       expect.objectContaining<Partial<FluidesFrigoApiError>>({ status: 503 })
     );
+  });
+
+  it("converts an OAuth token failure to an authentication error", async () => {
+    (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+    (axios.post as jest.Mock).mockRejectedValue({
+      response: { status: 401, data: { error: "invalid_client" } }
+    });
+
+    await expect(
+      fluidesFrigoClient.getCerfaBySiret({ siret: "53075596600047" })
+    ).rejects.toBeInstanceOf(FluidesFrigoAuthError);
+  });
+
+  it("converts a second FF API 401 to an authentication error", async () => {
+    (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+    (axios.post as jest.Mock)
+      .mockResolvedValueOnce({
+        data: { access_token: "expired-token", expires_in: 3600 }
+      })
+      .mockResolvedValueOnce({
+        data: { access_token: "fresh-token", expires_in: 3600 }
+      });
+    (axios.get as jest.Mock)
+      .mockRejectedValueOnce({ response: { status: 401 } })
+      .mockRejectedValueOnce({ response: { status: 401 } });
+
+    await expect(
+      fluidesFrigoClient.getCerfaBySiret({ siret: "53075596600047" })
+    ).rejects.toBeInstanceOf(FluidesFrigoAuthError);
   });
 });

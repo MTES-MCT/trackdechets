@@ -1,25 +1,17 @@
 import { FluidesFrigorigenesDto } from "./api";
 import { FluidesFrigorigenesIntervention } from "./model";
 
-export class FluidesFrigorigenesContractError extends Error {}
-
 export function adaptFluidesFrigorigenesIntervention(
   dto: FluidesFrigorigenesDto
 ): FluidesFrigorigenesIntervention {
   const wasteCodes = [
     ...new Set(dto.dechets.map(({ codeDechet }) => codeDechet))
-  ];
-
-  if (wasteCodes.length !== 1) {
-    throw new FluidesFrigorigenesContractError(
-      `La fiche ${dto.ficheInterventionNumero} doit contenir un seul code déchet.`
-    );
-  }
+  ].sort((a, b) => a.localeCompare(b));
 
   return {
     id: dto.ffFicheId,
     number: dto.ficheInterventionNumero,
-    wasteCode: wasteCodes[0],
+    wasteCodes,
     equipmentHolder: dto.detenteur.nom,
     weightKg: dto.dechets.reduce(
       (total, { poidsFluide }) => total + poidsFluide,
@@ -30,6 +22,7 @@ export function adaptFluidesFrigorigenesIntervention(
     containers: dto.dechets.map(container => ({
       id: container.bouteilleId,
       number: container.bouteilleIdentification,
+      wasteCode: container.codeDechet,
       weightKg: container.poidsFluide,
       volumeLiters: container.volumeContenant ?? undefined
     }))

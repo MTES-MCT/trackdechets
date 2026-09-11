@@ -27,6 +27,8 @@ export class FluidesFrigoApiError extends Error {
   }
 }
 
+export class FluidesFrigoAuthError extends FluidesFrigoApiError {}
+
 class FluidesFrigoClient {
   private accessToken: string | null = null;
   private tokenExpiresAt = 0;
@@ -96,6 +98,14 @@ class FluidesFrigoClient {
           continue;
         }
 
+        if (error.response?.status === 401) {
+          throw new FluidesFrigoAuthError(
+            "Les identifiants Fluides Frigorigènes ont été refusés.",
+            error.response.status,
+            error.response.data
+          );
+        }
+
         if (error.response?.status === 429 && retryAttempt < config.retries) {
           await this.wait(Math.pow(2, retryAttempt + 1) * 1000);
           retryAttempt += 1;
@@ -143,7 +153,7 @@ class FluidesFrigoClient {
       );
 
       if (!response.data?.access_token || !response.data?.expires_in) {
-        throw new FluidesFrigoApiError(
+        throw new FluidesFrigoAuthError(
           "Réponse de token OAuth2 invalide pour Fluides Frigorigènes."
         );
       }
@@ -155,7 +165,7 @@ class FluidesFrigoClient {
       if (!axios.isAxiosError(error)) {
         throw error;
       }
-      throw new FluidesFrigoApiError(
+      throw new FluidesFrigoAuthError(
         "Impossible de récupérer un token OAuth2 Fluides Frigorigènes.",
         error.response?.status,
         error.response?.data

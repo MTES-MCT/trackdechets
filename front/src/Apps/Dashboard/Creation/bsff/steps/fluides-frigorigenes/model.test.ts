@@ -1,47 +1,55 @@
 import { fluidesFrigorigenesInterventionsFixture } from "./fixtures";
 import {
   filterInterventions,
-  getSelectedWasteCode,
+  getSelectedWasteCodes,
   isInterventionSelectable
 } from "./model";
 
 describe("Fluides Frigorigènes business rules", () => {
-  it("filters independently by waste code, holder and association", () => {
+  it("automatically excludes associated interventions before applying filters", () => {
     expect(
       filterInterventions(fluidesFrigorigenesInterventionsFixture, {
         wasteCodes: ["14 06 02*"],
-        equipmentHolders: ["Leclerc Millau"],
-        association: ["yes"]
+        equipmentHolders: []
       }).map(({ id }) => id)
-    ).toEqual(["fi-3"]);
+    ).toEqual(["fi-2"]);
     expect(
       filterInterventions(fluidesFrigorigenesInterventionsFixture, {
         wasteCodes: [],
-        equipmentHolders: [],
-        association: ["no"]
+        equipmentHolders: []
       }).map(({ id }) => id)
     ).toEqual(["fi-1", "fi-2"]);
   });
 
   it("locks selection to the waste code of the first selected intervention", () => {
-    const code = getSelectedWasteCode(fluidesFrigorigenesInterventionsFixture, [
-      "fi-2"
-    ]);
+    const codes = getSelectedWasteCodes(
+      fluidesFrigorigenesInterventionsFixture,
+      ["fi-2"]
+    );
     expect(
-      isInterventionSelectable(fluidesFrigorigenesInterventionsFixture[0], code)
+      isInterventionSelectable(
+        fluidesFrigorigenesInterventionsFixture[0],
+        codes
+      )
     ).toBe(false);
     expect(
-      isInterventionSelectable(fluidesFrigorigenesInterventionsFixture[2], code)
+      isInterventionSelectable(
+        fluidesFrigorigenesInterventionsFixture[2],
+        codes
+      )
     ).toBe(true);
   });
 
   it("resets the constraint when selection is empty", () => {
-    const code = getSelectedWasteCode(
+    const codes = getSelectedWasteCodes(
       fluidesFrigorigenesInterventionsFixture,
       []
     );
     expect(
-      isInterventionSelectable(fluidesFrigorigenesInterventionsFixture[0], code)
+      isInterventionSelectable(
+        fluidesFrigorigenesInterventionsFixture[0],
+        codes
+      )
     ).toBe(true);
   });
 });

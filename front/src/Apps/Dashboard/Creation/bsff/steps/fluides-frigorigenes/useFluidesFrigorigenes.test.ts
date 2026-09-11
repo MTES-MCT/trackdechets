@@ -95,6 +95,32 @@ describe("useFluidesFrigorigenes", () => {
     expect(result.current).toEqual({ status: "success", interventions: [] });
   });
 
+  it("exposes a 200 response containing several waste codes", async () => {
+    const payload = response("FI-MIXED");
+    payload.data[0].dechets.push({
+      ...payload.data[0].dechets[0],
+      bouteilleId: "b-mixed",
+      bouteilleIdentification: "BOUT-MIXED",
+      codeDechet: "16 05 04*"
+    });
+    mockedGetFluidesFrigorigenes.mockResolvedValue(payload);
+
+    const { result } = renderHook(() =>
+      useFluidesFrigorigenes("53075596600047")
+    );
+
+    await waitFor(() => expect(result.current.status).toBe("success"));
+    expect(result.current).toEqual(
+      expect.objectContaining({
+        interventions: [
+          expect.objectContaining({
+            wasteCodes: ["14 06 01*", "16 05 04*"]
+          })
+        ]
+      })
+    );
+  });
+
   it("requests a changed SIRET and ignores the stale response", async () => {
     let resolveFirst!: (value: FluidesFrigorigenesResponse) => void;
     const first = new Promise<FluidesFrigorigenesResponse>(resolve => {
@@ -128,10 +154,11 @@ describe("useFluidesFrigorigenes", () => {
   it.each([
     ["FF_NOT_FOUND", "success"],
     ["SIRET_INVALID", "unknownSiret"],
+    ["FF_FORBIDDEN", "unknownSiret"],
     ["FORBIDDEN", "serviceError"],
-    ["FF_CONFIG_ERROR", "serviceError"],
+    ["FF_CONFIG_ERROR", "credentialsError"],
+    ["FF_AUTH_ERROR", "credentialsError"],
     ["FF_API_ERROR", "serviceError"],
-    ["FF_FORBIDDEN", "serviceError"],
     ["FF_RATE_LIMITED", "serviceError"],
     ["UNEXPECTED_RESPONSE", "serviceError"]
   ])("maps %s to %s", async (code, status) => {

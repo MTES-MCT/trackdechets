@@ -41,6 +41,7 @@ describe("getFluidesFrigorigenes", () => {
     ["SIRET_INVALID", 400],
     ["FORBIDDEN", 403],
     ["FF_CONFIG_ERROR", 500],
+    ["FF_AUTH_ERROR", 502],
     ["FF_API_ERROR", 502],
     ["FF_FORBIDDEN", 403],
     ["FF_RATE_LIMITED", 503]

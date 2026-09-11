@@ -1,13 +1,14 @@
 export type FluidesFrigorigenesContainer = {
   id: string;
   number: string;
+  wasteCode: string;
   volumeLiters?: number;
   weightKg: number;
 };
 export type FluidesFrigorigenesIntervention = {
   id: string;
   number: string;
-  wasteCode: string;
+  wasteCodes: string[];
   equipmentHolder: string;
   weightKg: number;
   interventionDate?: string;
@@ -17,12 +18,12 @@ export type FluidesFrigorigenesIntervention = {
 export type FluidesFrigorigenesFilters = {
   wasteCodes: string[];
   equipmentHolders: string[];
-  association: Array<"yes" | "no">;
 };
 export type FluidesFrigorigenesDataState =
   | { status: "loading" }
   | { status: "missingSiret" }
   | { status: "serviceError" }
+  | { status: "credentialsError" }
   | { status: "unknownSiret" }
   | { status: "success"; interventions: FluidesFrigorigenesIntervention[] };
 
@@ -32,18 +33,21 @@ export const filterInterventions = (
 ) =>
   items.filter(
     item =>
+      !item.isAssociated &&
       (!filters.wasteCodes.length ||
-        filters.wasteCodes.includes(item.wasteCode)) &&
+        item.wasteCodes.some(code => filters.wasteCodes.includes(code))) &&
       (!filters.equipmentHolders.length ||
-        filters.equipmentHolders.includes(item.equipmentHolder)) &&
-      (!filters.association.length ||
-        filters.association.includes(item.isAssociated ? "yes" : "no"))
+        filters.equipmentHolders.includes(item.equipmentHolder))
   );
-export const getSelectedWasteCode = (
+export const getSelectedWasteCodes = (
   items: FluidesFrigorigenesIntervention[],
   selectedIds: string[]
-) => items.find(({ id }) => selectedIds.includes(id))?.wasteCode;
+) => items.find(({ id }) => selectedIds.includes(id))?.wasteCodes;
 export const isInterventionSelectable = (
   item: FluidesFrigorigenesIntervention,
-  selectedWasteCode?: string
-) => !selectedWasteCode || item.wasteCode === selectedWasteCode;
+  selectedWasteCodes?: string[]
+) =>
+  item.wasteCodes.length > 0 &&
+  (!selectedWasteCodes?.length ||
+    (item.wasteCodes.length === selectedWasteCodes.length &&
+      item.wasteCodes.every(code => selectedWasteCodes.includes(code))));

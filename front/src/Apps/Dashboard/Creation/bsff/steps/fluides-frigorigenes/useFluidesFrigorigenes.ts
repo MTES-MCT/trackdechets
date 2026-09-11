@@ -15,8 +15,11 @@ const toErrorState = (error: unknown): FluidesFrigorigenesDataState => {
     if (error.code === "FF_NOT_FOUND") {
       return { status: "success", interventions: [] };
     }
-    if (error.code === "SIRET_INVALID") {
+    if (error.code === "SIRET_INVALID" || error.code === "FF_FORBIDDEN") {
       return { status: "unknownSiret" };
+    }
+    if (error.code === "FF_CONFIG_ERROR" || error.code === "FF_AUTH_ERROR") {
+      return { status: "credentialsError" };
     }
   }
   return { status: "serviceError" };

@@ -12,27 +12,61 @@ const renderComponent = (dataState?: FluidesFrigorigenesDataState) =>
     />
   );
 
+const expectEmptyTables = () => {
+  expect(screen.getAllByRole("table")).toHaveLength(2);
+  expect(
+    screen.getByRole("table", {
+      name: "Fiches d'intervention disponibles"
+    })
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("table", {
+      name: "Fiches d'intervention sélectionnées"
+    })
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("button", {
+      name: "Importer les fiches d'interventions"
+    })
+  ).toBeDisabled();
+};
+
 describe("FluidesFrigorigenesBsff", () => {
-  it("renders service, unknown SIRET and empty dataset states", () => {
+  it("renders the RG1 error states", () => {
     const { rerender } = renderComponent({ status: "serviceError" });
+    expect(screen.getByText("Erreur 500 : API down")).toBeInTheDocument();
     expect(
       screen.getByText(/Connexion à l'API impossible/)
     ).toBeInTheDocument();
+    expectEmptyTables();
+    rerender(
+      <FluidesFrigorigenesView
+        operatorSiret="12345678901234"
+        state={{ status: "credentialsError" }}
+      />
+    );
+    expect(
+      screen.getByText("Erreur de connexion avec les identifiants")
+    ).toBeInTheDocument();
+    expectEmptyTables();
     rerender(
       <FluidesFrigorigenesView
         operatorSiret="12345678901234"
         state={{ status: "unknownSiret" }}
       />
     );
+    expect(screen.getByText("SIRET non reconnu")).toBeInTheDocument();
     expect(screen.getByText(/n'a pas été reconnu/)).toBeInTheDocument();
+    expectEmptyTables();
     rerender(
       <FluidesFrigorigenesView
         operatorSiret="12345678901234"
         state={{ status: "success", interventions: [] }}
       />
     );
+    expect(screen.getByText("Dataset vide")).toBeInTheDocument();
     expect(screen.getByText(/12345678901234/)).toBeInTheDocument();
-    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    expectEmptyTables();
   });
 
   it("renders mocked interventions and expands their containers", () => {
@@ -52,16 +86,40 @@ describe("FluidesFrigorigenesBsff", () => {
     expect(screen.queryByText("BOUT-001")).not.toBeInTheDocument();
   });
 
-  it("removes the default association filter tag", () => {
+  it("renders every waste code of a mixed intervention", () => {
+    renderComponent({
+      status: "success",
+      interventions: [
+        {
+          ...fluidesFrigorigenesInterventionsFixture[0],
+          wasteCodes: ["14 06 01*", "16 05 04*"],
+          containers: [
+            fluidesFrigorigenesInterventionsFixture[0].containers[0],
+            {
+              ...fluidesFrigorigenesInterventionsFixture[0].containers[1],
+              wasteCode: "16 05 04*"
+            }
+          ]
+        }
+      ]
+    });
+
+    expect(screen.getByText("14 06 01*, 16 05 04*")).toBeInTheDocument();
+    expect(screen.queryByText("Erreur 500 : API down")).not.toBeInTheDocument();
+  });
+
+  it("automatically hides interventions already associated with a BSFF", () => {
     renderComponent({
       status: "success",
       interventions: fluidesFrigorigenesInterventionsFixture
     });
     expect(screen.queryByText("FI-2026-003")).not.toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole("button", { name: "Supprimer le filtre Non" })
-    );
-    expect(screen.getByText("FI-2026-003")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Associé à un bordereau")
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Supprimer le filtre Non" })
+    ).not.toBeInTheDocument();
   });
 
   it("displays the selected intervention and enforces then resets RG4 bis", () => {

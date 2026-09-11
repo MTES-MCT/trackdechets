@@ -6,6 +6,7 @@ import { z } from "zod";
 import {
   fluidesFrigoClient,
   FluidesFrigoApiError,
+  FluidesFrigoAuthError,
   FluidesFrigoConfigError
 } from "../bsffs/fluidesFrigo/client";
 import { mapCerfaToBsffOperateurDraft } from "../bsffs/fluidesFrigo/mapper";
@@ -73,6 +74,18 @@ const handleFluidesFrigoError = (
 
     return res.status(500).json({
       error: "FF_CONFIG_ERROR",
+      message: error.message
+    });
+  }
+
+  if (error instanceof FluidesFrigoAuthError) {
+    logger.error(error.message, {
+      status: error.status,
+      details: error.details
+    });
+
+    return res.status(502).json({
+      error: "FF_AUTH_ERROR",
       message: error.message
     });
   }

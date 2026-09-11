@@ -71,6 +71,23 @@ describe("Fluides Frigorigènes BSFF router", () => {
     expect(response.body.error).toBe("FORBIDDEN");
   });
 
+  it("returns a dedicated error when FF credentials are rejected", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { sessionCookie } = await logIn(app, user.email, "pass");
+
+    (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+    (axios.post as jest.Mock).mockRejectedValueOnce({
+      response: { status: 401, data: { error: "invalid_client" } }
+    });
+
+    const response = await request
+      .get(`/api/bsff/operateur/fluides-frigo/${company.siret}`)
+      .set("Cookie", sessionCookie);
+
+    expect(response.status).toBe(502);
+    expect(response.body.error).toBe("FF_AUTH_ERROR");
+  });
+
   it("returns mapped BSFF operator drafts", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { sessionCookie } = await logIn(app, user.email, "pass");

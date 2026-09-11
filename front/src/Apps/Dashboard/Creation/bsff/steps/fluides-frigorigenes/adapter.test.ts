@@ -1,7 +1,4 @@
-import {
-  adaptFluidesFrigorigenesIntervention,
-  FluidesFrigorigenesContractError
-} from "./adapter";
+import { adaptFluidesFrigorigenesIntervention } from "./adapter";
 import { FluidesFrigorigenesDto } from "./api";
 
 const dto: FluidesFrigorigenesDto = {
@@ -38,7 +35,7 @@ describe("adaptFluidesFrigorigenesIntervention", () => {
     expect(adaptFluidesFrigorigenesIntervention(dto)).toEqual({
       id: "ff-id",
       number: "FI-123",
-      wasteCode: "14 06 01*",
+      wasteCodes: ["14 06 01*"],
       equipmentHolder: "Détenteur",
       weightKg: 5.5,
       interventionDate: "2026-01-02",
@@ -47,12 +44,14 @@ describe("adaptFluidesFrigorigenesIntervention", () => {
         {
           id: "b-1",
           number: "BOUT-001",
+          wasteCode: "14 06 01*",
           weightKg: 2.5,
           volumeLiters: undefined
         },
         {
           id: "b-2",
           number: "BOUT-002",
+          wasteCode: "14 06 01*",
           weightKg: 3,
           volumeLiters: 12
         }
@@ -72,15 +71,26 @@ describe("adaptFluidesFrigorigenesIntervention", () => {
     expect(result.isAssociated).toBe(false);
   });
 
-  it.each([
-    { label: "without a bottle", dechets: [] },
-    {
-      label: "with mixed waste codes",
+  it("preserves every waste code of a mixed intervention", () => {
+    const result = adaptFluidesFrigorigenesIntervention({
+      ...dto,
       dechets: [{ ...dto.dechets[0], codeDechet: "16 05 04*" }, dto.dechets[1]]
-    }
-  ])("rejects an intervention $label", ({ dechets }) => {
-    expect(() =>
-      adaptFluidesFrigorigenesIntervention({ ...dto, dechets })
-    ).toThrow(FluidesFrigorigenesContractError);
+    });
+
+    expect(result.wasteCodes).toEqual(["14 06 01*", "16 05 04*"]);
+    expect(result.containers.map(({ wasteCode }) => wasteCode)).toEqual([
+      "16 05 04*",
+      "14 06 01*"
+    ]);
+  });
+
+  it("keeps an intervention without bottles without failing the dataset", () => {
+    const result = adaptFluidesFrigorigenesIntervention({
+      ...dto,
+      dechets: []
+    });
+
+    expect(result.wasteCodes).toEqual([]);
+    expect(result.containers).toEqual([]);
   });
 });
