@@ -34,7 +34,7 @@ services:
       - 27017:27017
 
   minio:
-    image: minio/minio
+    image: quay.io/minio/minio
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     environment:
       MINIO_ROOT_USER: trackdechets
