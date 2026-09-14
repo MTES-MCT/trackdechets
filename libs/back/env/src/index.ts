@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export const DEFAULT_FF_API_BASE_URL =
+  "http://fluidesfrigorigenes-prod-ihm-docker-ibp.dgpr-prod2.eco4.sihc.fr";
+export const DEFAULT_FF_OIDC_TOKEN_URL =
+  "https://authentification.din.developpement-durable.gouv.fr/authSAML/oidc/fluides-frigorigenes/token";
+export const DEFAULT_FF_API_TIMEOUT = "30000";
+export const DEFAULT_FF_API_RETRIES = "3";
+
 export const schema = z.object({
   // Node
   TZ: z
@@ -118,6 +125,20 @@ export const schema = z.object({
   INSEE_CLIENT_SECRET: z.string(),
   INSEE_USERNAME: z.string(),
   INSEE_PASSWORD: z.string(),
+  FF_API_BASE_URL: z.string().optional().default(DEFAULT_FF_API_BASE_URL),
+  FF_OIDC_TOKEN_URL: z.string().optional().default(DEFAULT_FF_OIDC_TOKEN_URL),
+  FF_OIDC_CLIENT_ID: z.string().optional(),
+  FF_OIDC_CLIENT_SECRET: z.string().optional(),
+  FF_API_TIMEOUT: z
+    .string()
+    .optional()
+    .default(DEFAULT_FF_API_TIMEOUT)
+    .refine(isNumber),
+  FF_API_RETRIES: z
+    .string()
+    .optional()
+    .default(DEFAULT_FF_API_RETRIES)
+    .refine(isNumber),
   // -------
   // S3
   S3_ENDPOINT: z.string(),
