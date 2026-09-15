@@ -31,8 +31,11 @@ const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
 const BANNER_MESSAGES = [
   <>
-    Renforcez la sécurité de votre compte Trackdéchets en activant dès
-    maintenant la double authentification depuis l'onglet Mon compte.
+    Un assistant conversationnel, basé sur l'intelligence artificiel, est
+    désormais disponible en bas à droite de votre interface. Il vous aide à
+    trouver rapidement les informations recherchées et à vous orienter dans
+    l’utilisation de la plateforme. Il vient en complément de notre équipe
+    support, qui reste disponible pour vous accompagner.
   </>
 ];
 
@@ -69,10 +72,6 @@ export default function LayoutContainer() {
               v2banner={
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
-                  button={{
-                    title: "En savoir plus",
-                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/renouveler-son-mot-de-passe-1"
-                  }}
                   persistedSurveyName="td-20260210"
                 />
               }
