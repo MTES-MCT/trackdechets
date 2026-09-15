@@ -33,7 +33,7 @@ import {
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
 import { UserRole } from "@td/prisma";
-
+import { resetDatabase } from "../../../../../integration-tests/helper";
 const CLONE_BSD = gql`
   mutation cloneBsd($id: String!) {
     cloneBsd(id: $id) {
@@ -91,6 +91,7 @@ const expectBsdsToMatch = (bsd1, bsd2) => {
 };
 
 describe("mutation cloneBsd", () => {
+  afterEach(resetDatabase);
   it("should clone regular BSDD", async () => {
     // Given
     const user = await userFactory();
