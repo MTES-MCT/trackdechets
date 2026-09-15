@@ -162,20 +162,22 @@ const SurveyBanner = ({
               ))}
             </div>
           </div>
-          <div className="survey-banner__link">
-            <Button
-              iconId={"ri-questionnaire-fill"}
-              iconPosition="right"
-              linkProps={{
-                target: "_blank",
-                href: button.href
-              }}
-              className="survey-banner__link__a"
-              priority="tertiary"
-            >
-              {button.title}
-            </Button>
-          </div>
+          {button && (
+            <div className="survey-banner__link">
+              <Button
+                iconId={"ri-questionnaire-fill"}
+                iconPosition="right"
+                linkProps={{
+                  target: "_blank",
+                  href: button.href
+                }}
+                className="survey-banner__link__a"
+                priority="tertiary"
+              >
+                {button.title}
+              </Button>
+            </div>
+          )}
         </div>
         {!!persistedSurveyName && (
           <div className="survey-banner__group">
