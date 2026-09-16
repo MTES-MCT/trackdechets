@@ -740,7 +740,7 @@ describe("Mutation.createBsff", () => {
               },
               {
                 type: BsffPackagingType.CONTENEUR,
-                numero: "456",
+                numero: "789",
                 weight: 2,
                 volume: 2
                 // No fiche
@@ -754,49 +754,49 @@ describe("Mutation.createBsff", () => {
       // Then
       expect(errors).toBeUndefined();
 
-      // Get packagings
-      const packagings = await prisma.bsffPackaging.findMany({
-        where: {
-          bsffId: data.createBsff.id
-        },
+      const createdBsff = await prisma.bsff.findUniqueOrThrow({
+        where: { id: data.createBsff.id },
         include: {
-          ficheInterventions: true
+          ficheInterventions: true,
+          packagings: {
+            include: {
+              ficheInterventions: true
+            }
+          }
         }
       });
-      expect(packagings.length).toBe(3);
 
-      const packaging1 = packagings.find(
+      // The BSFF-level fiche remains linked to the BSFF
+      expect(createdBsff.ficheInterventions).toHaveLength(1);
+      expect(createdBsff.ficheInterventions).toMatchObject([
+        { id: bsffFicheIntervention.id }
+      ]);
+
+      const packaging1 = createdBsff.packagings.find(
         p => p.type === BsffPackagingType.BOUTEILLE
       );
-      const packaging2 = packagings.find(
+      const packaging2 = createdBsff.packagings.find(
         p => p.type === BsffPackagingType.CITERNE
       );
-      const packaging3 = packagings.find(
+      const packaging3 = createdBsff.packagings.find(
         p => p.type === BsffPackagingType.CONTENEUR
       );
 
-      // Packaging 1 should have 2 fiches
-      expect(packaging1?.ficheInterventions?.length).toBe(2);
+      // Explicit packaging links must be preserved as-is
+      expect(packaging1?.ficheInterventions).toHaveLength(1);
       expect(packaging1?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention1.id },
-        { id: bsffFicheIntervention.id }
+        { id: ficheIntervention1.id }
       ]);
 
-      // Packaging 2 should have 2 fiches
-      expect(packaging2?.ficheInterventions?.length).toBe(3);
+      expect(packaging2?.ficheInterventions).toHaveLength(2);
       expect(packaging2?.ficheInterventions).toMatchObject([
         { id: ficheIntervention2.id },
-        { id: ficheIntervention3.id },
-        { id: bsffFicheIntervention.id }
+        { id: ficheIntervention3.id }
       ]);
 
-      // Packaging 3 has none
-      expect(packaging3?.ficheInterventions?.length).toBe(1);
-      expect(packaging3?.ficheInterventions).toMatchObject([
-        { id: bsffFicheIntervention.id }
-      ]);
+      // A packaging without an explicit fiche must remain without fiche
+      expect(packaging3?.ficheInterventions).toHaveLength(0);
     });
-
     it("fiches should be returned in packaging", async () => {
       // Given
       const operateur = await userWithCompanyFactory(UserRole.ADMIN);
@@ -841,24 +841,27 @@ describe("Mutation.createBsff", () => {
 
       const newBsff = data.createBsff;
 
-      expect(newBsff.packagings.length).toBe(1);
+      expect(newBsff.packagings).toHaveLength(1);
 
       const newPackaging = newBsff.packagings[0];
-      expect(newPackaging.ficheInterventions.length).toBe(2);
 
-      const fiche1 = newPackaging.ficheInterventions.find(
+      // Only the fiche explicitly linked to the packaging should be returned
+      expect(newPackaging.ficheInterventions).toHaveLength(1);
+
+      const fiche = newPackaging.ficheInterventions.find(
         f => f.id === packagingFicheIntervention.id
       );
-      const fiche2 = newPackaging.ficheInterventions.find(
-        f => f.id === bsffFicheIntervention.id
-      );
-      expect(fiche1?.id).toBe(packagingFicheIntervention.id);
-      expect(fiche1?.numero).toBe(packagingFicheIntervention.numero);
-      expect(fiche1?.weight).toBe(packagingFicheIntervention.weight.toNumber());
 
-      expect(fiche2?.id).toBe(bsffFicheIntervention.id);
-      expect(fiche2?.numero).toBe(bsffFicheIntervention.numero);
-      expect(fiche2?.weight).toBe(bsffFicheIntervention.weight.toNumber());
+      expect(fiche?.id).toBe(packagingFicheIntervention.id);
+      expect(fiche?.numero).toBe(packagingFicheIntervention.numero);
+      expect(fiche?.weight).toBe(packagingFicheIntervention.weight.toNumber());
+
+      // The BSFF-level fiche must not be implicitly added to the packaging
+      expect(
+        newPackaging.ficheInterventions.find(
+          f => f.id === bsffFicheIntervention.id
+        )
+      ).toBeUndefined();
     });
   });
 });
