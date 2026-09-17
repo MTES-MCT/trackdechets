@@ -106,10 +106,20 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
+    // Nouveau modèle : les relations FI / contenant sont explicitement
+    // renseignées au niveau des packagings.
+    //
+    // Prisma a déjà appliqué args.data.packagings via bsff.update().
+    // On conserve donc les relations obtenues et on ne lance surtout pas
+    // le mécanisme legacy qui associerait toutes les FI à tous les contenants.
     if (
-      (args.data.ficheInterventions || args.data.packagings) &&
+      args.data.ficheInterventions &&
+      !args.data.packagings &&
       fullBsff.packagings.length > 0
     ) {
+      // Compatibilité avec les BSFF legacy :
+      // lorsqu'on modifie uniquement les FI globales du BSFF sans fournir
+      // les relations par contenant, on conserve le comportement historique.
       await removeBsffPackagingsFichesIntervention(
         previousBsff.packagings,
         previousBsff.ficheInterventions,

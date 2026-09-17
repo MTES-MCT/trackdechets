@@ -3484,22 +3484,20 @@ describe("Mutation.updateBsff", () => {
           ficheInterventions: true
         }
       });
-      // Make sure fiche is linked to packagings
+
       const initialPackaging1 = initialPackagings.find(
         p => p.type === BsffPackagingType.BOUTEILLE
       );
       const initialPackaging2 = initialPackagings.find(
         p => p.type === BsffPackagingType.CITERNE
       );
-      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+
+      // Explicit packaging links are preserved on creation
+      expect(initialPackaging1?.ficheInterventions).toHaveLength(1);
       expect(initialPackaging1?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id },
         { id: ficheInterventionPackage1.id }
       ]);
-      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
-      expect(initialPackaging2?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id }
-      ]);
+      expect(initialPackaging2?.ficheInterventions).toHaveLength(0);
 
       // When
       const { mutate } = makeClient(operateur.user);
@@ -3523,7 +3521,6 @@ describe("Mutation.updateBsff", () => {
       // Then
       expect(errors).toBeUndefined();
 
-      // Get packagings
       const updatedPackagings = await prisma.bsffPackaging.findMany({
         where: {
           bsffId: data.updateBsff.id
@@ -3532,21 +3529,24 @@ describe("Mutation.updateBsff", () => {
           ficheInterventions: true
         }
       });
-      expect(updatedPackagings.length).toBe(2);
 
-      // Make sure new fiche only is linked to packagings
+      expect(updatedPackagings).toHaveLength(2);
+
       const updatedPackaging1 = updatedPackagings.find(
         p => p.type === BsffPackagingType.BOUTEILLE
       );
       const updatedPackaging2 = updatedPackagings.find(
         p => p.type === BsffPackagingType.CITERNE
       );
-      expect(updatedPackaging1?.ficheInterventions?.length).toBe(2);
+
+      // Updating only BSFF-level fiches keeps the legacy behavior
+      expect(updatedPackaging1?.ficheInterventions).toHaveLength(2);
       expect(updatedPackaging1?.ficheInterventions).toMatchObject([
         { id: ficheInterventionPackage1.id },
         { id: newficheIntervention.id }
       ]);
-      expect(updatedPackaging2?.ficheInterventions?.length).toBe(1);
+
+      expect(updatedPackaging2?.ficheInterventions).toHaveLength(1);
       expect(updatedPackaging2?.ficheInterventions).toMatchObject([
         { id: newficheIntervention.id }
       ]);
@@ -3573,15 +3573,12 @@ describe("Mutation.updateBsff", () => {
       const initialPackaging2 = initialPackagings.find(
         p => p.type === BsffPackagingType.CITERNE
       );
-      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(initialPackaging1?.ficheInterventions).toHaveLength(1);
       expect(initialPackaging1?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id },
         { id: ficheInterventionPackage1.id }
       ]);
-      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
-      expect(initialPackaging2?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id }
-      ]);
+
+      expect(initialPackaging2?.ficheInterventions).toHaveLength(0);
 
       // When
       const { mutate } = makeClient(operateur.user);
@@ -3652,15 +3649,12 @@ describe("Mutation.updateBsff", () => {
       const initialPackaging2 = initialPackagings.find(
         p => p.type === BsffPackagingType.CITERNE
       );
-      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(initialPackaging1?.ficheInterventions).toHaveLength(1);
       expect(initialPackaging1?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id },
         { id: ficheInterventionPackage1.id }
       ]);
-      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
-      expect(initialPackaging2?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id }
-      ]);
+
+      expect(initialPackaging2?.ficheInterventions).toHaveLength(0);
 
       // When
       const { mutate } = makeClient(operateur.user);
@@ -3719,22 +3713,20 @@ describe("Mutation.updateBsff", () => {
         include: { ficheInterventions: true }
       });
 
-      // Make sure fiche is linked to packagings
+      // Make sure explicit fiche is linked to packaging
       const initialPackaging1 = initialPackagings.find(
         p => p.type === BsffPackagingType.BOUTEILLE
       );
       const initialPackaging2 = initialPackagings.find(
         p => p.type === BsffPackagingType.CITERNE
       );
-      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+
+      expect(initialPackaging1?.ficheInterventions).toHaveLength(1);
       expect(initialPackaging1?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id },
         { id: ficheInterventionPackage1.id }
       ]);
-      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
-      expect(initialPackaging2?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id }
-      ]);
+
+      expect(initialPackaging2?.ficheInterventions).toHaveLength(0);
 
       const newficheIntervention = await createFicheIntervention({
         operateur,
@@ -3782,6 +3774,7 @@ describe("Mutation.updateBsff", () => {
           ficheInterventions: true
         }
       });
+
       expect(newPackagings.length).toBe(2);
 
       const updatedPackaging1 = newPackagings.find(
@@ -3791,13 +3784,12 @@ describe("Mutation.updateBsff", () => {
         p => p.type === BsffPackagingType.CONTENEUR
       );
 
-      expect(updatedPackaging1?.ficheInterventions?.length).toBe(1);
-      expect(updatedPackaging1?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id }
-      ]);
-      expect(updatedPackaging2?.ficheInterventions?.length).toBe(2);
+      // No fiche was explicitly linked to this packaging
+      expect(updatedPackaging1?.ficheInterventions).toHaveLength(0);
+
+      // Only the explicitly provided fiche should be linked
+      expect(updatedPackaging2?.ficheInterventions).toHaveLength(1);
       expect(updatedPackaging2?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id },
         { id: newficheIntervention.id }
       ]);
 
@@ -3807,6 +3799,7 @@ describe("Mutation.updateBsff", () => {
           id: { in: initialPackagings.map(i => i.id) }
         }
       });
+
       expect(updatedInitialPackagings.length).toBe(0);
 
       // Link to fiches should have been deleted as well
@@ -3817,9 +3810,9 @@ describe("Mutation.updateBsff", () => {
           }
         }
       });
+
       expect(fiches.length).toBe(0);
     });
-
     it("fiches should be returned in packaging", async () => {
       // Given
       const bsff = await createBsff();
@@ -3841,16 +3834,12 @@ describe("Mutation.updateBsff", () => {
       const initialPackaging2 = initialPackagings.find(
         p => p.type === BsffPackagingType.CITERNE
       );
-      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(initialPackaging1?.ficheInterventions).toHaveLength(1);
       expect(initialPackaging1?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id },
         { id: ficheInterventionPackage1.id }
       ]);
-      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
-      expect(initialPackaging2?.ficheInterventions).toMatchObject([
-        { id: ficheIntervention.id }
-      ]);
 
+      expect(initialPackaging2?.ficheInterventions).toHaveLength(0);
       // When
       const { mutate } = makeClient(operateur.user);
       const { data, errors } = await mutate<

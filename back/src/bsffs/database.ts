@@ -283,6 +283,8 @@ export const removeBsffPackagingsFichesIntervention = async (
 /**
  * TRA-16247: Pour les BSFF legacy, on associe chaque fiche d'intervention
  * d'un BSFF à tous les contenants dudit BSFF
+ * Cette fonction ne doit pas être utilisée lorsque les associations
+ * fiche d'intervention / contenant sont explicitement renseignées.
  */
 export const addBsffPackagingsFichesIntervention = async (
   packagings: BsffPackaging[],
@@ -463,6 +465,15 @@ export function getPackagingCreateInput(
         return {
           ...packagingData,
           emissionNumero: p.numero,
+
+          ...(ficheInterventions?.length
+            ? {
+                ficheInterventions: {
+                  connect: ficheInterventions.map(id => ({ id }))
+                }
+              }
+            : {}),
+
           ...(detenteurs?.length
             ? {
                 detenteurs: {

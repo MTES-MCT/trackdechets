@@ -55,7 +55,15 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
-    if (fullBsff.ficheInterventions.length && fullBsff.packagings.length) {
+    const hasPackagingFicheInterventions = fullBsff.packagings.some(
+      packaging => packaging.ficheInterventions.length > 0
+    );
+
+    if (
+      !hasPackagingFicheInterventions &&
+      fullBsff.ficheInterventions.length &&
+      fullBsff.packagings.length
+    ) {
       await addBsffPackagingsFichesIntervention(
         fullBsff.packagings,
         fullBsff.ficheInterventions,
