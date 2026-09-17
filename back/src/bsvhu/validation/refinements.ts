@@ -298,6 +298,32 @@ function checkFieldIsDefined<T extends ZodBsvhu | ZodBsvhuTransporter>(
 }
 const MAX_WEIGHT_BY_ROAD_KG = MAX_WEIGHT_BY_ROAD_TONNES * 1000;
 
+export const checkTransporters: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  { addIssue }
+) => {
+  if (bsvhu.id) {
+    const alreadyPartOfAnotherBsvhuIndex = bsvhu.transporters?.findIndex(
+      t => Boolean(t.bsvhuId) && t.bsvhuId !== bsvhu.id
+    );
+    if (
+      alreadyPartOfAnotherBsvhuIndex !== undefined &&
+      alreadyPartOfAnotherBsvhuIndex !== -1
+    ) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [
+          "transporters",
+          `${alreadyPartOfAnotherBsvhuIndex + 1}`,
+          "company",
+          "siret"
+        ] as any as EditionRulePath,
+        message: `Le transporteur BSVHU ${bsvhu.transporters?.[alreadyPartOfAnotherBsvhuIndex]?.id} est déjà associé à un autre BSVHU`
+      });
+    }
+  }
+};
+
 export const checkTransportModeAndWeightRefinement = (
   createdAt: Date | null | undefined,
   weightValue: number | null | undefined,
