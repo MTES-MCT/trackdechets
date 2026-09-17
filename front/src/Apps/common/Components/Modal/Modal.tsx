@@ -2,14 +2,22 @@ import React, { useEffect, useState } from "react";
 import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
 import FocusTrap from "focus-trap-react";
-import "./modal.scss";
 import cn from "classnames";
+
+import {
+  CRISP_CHAT_CLOSED_EVENT,
+  CRISP_CHAT_OPENED_EVENT
+} from "../../hooks/useCrisp";
+
+import "./modal.scss";
+
 const ModalSizesClass = {
   M: "fr-col-12 fr-col-md-6 fr-col-lg-6",
   L: "fr-col-12 fr-col-md-8 fr-col-lg-8",
   XL: "fr-col-12 fr-col-md-12 fr-col-lg-12",
-  TD_SIZE: "td-dsfr-modal-bsd-form" // custom class to host bsd forms
+  TD_SIZE: "td-dsfr-modal-bsd-form"
 };
+
 export type ModalSizes = keyof typeof ModalSizesClass;
 
 type ModalProps = {
@@ -39,6 +47,31 @@ export function Modal({
   const { modalProps, underlayProps } = useModalOverlay(props, state, ref);
 
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [isCrispOpen, setIsCrispOpen] = useState(false);
+
+  /**
+   * Crisp is itself a modal dialog.
+   *
+   * Pause the Trackdéchets focus trap while Crisp is opened, then resume it
+   * when Crisp closes. The Trackdéchets modal itself stays mounted/open.
+   */
+  useEffect(() => {
+    const handleCrispOpened = () => {
+      setIsCrispOpen(true);
+    };
+
+    const handleCrispClosed = () => {
+      setIsCrispOpen(false);
+    };
+
+    window.addEventListener(CRISP_CHAT_OPENED_EVENT, handleCrispOpened);
+    window.addEventListener(CRISP_CHAT_CLOSED_EVENT, handleCrispClosed);
+
+    return () => {
+      window.removeEventListener(CRISP_CHAT_OPENED_EVENT, handleCrispOpened);
+      window.removeEventListener(CRISP_CHAT_CLOSED_EVENT, handleCrispClosed);
+    };
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -87,17 +120,38 @@ export function Modal({
           >
             <FocusTrap
               active
+              paused={isCrispOpen}
               focusTrapOptions={{
-                // To allow other portals (eg combobox inside modal)
+                // Keep the existing behaviour for Trackdéchets portals
+                // (eg. combobox rendered outside the modal content).
                 clickOutsideDeactivates: e => {
                   return portal != null && portal.contains(e.target as Node);
                 },
+
+                // Crisp is rendered outside the Trackdéchets modal.
+                // Allow the initial click on Crisp without deactivating the focus trap.
+                // Once Crisp opens, the trap is paused through `isCrispOpen`.
+                allowOutsideClick: e => {
+                  const target = e.target;
+
+                  if (!(target instanceof Node)) {
+                    return false;
+                  }
+
+                  const crisp = document.querySelector(".crisp-client");
+
+                  return crisp?.contains(target) ?? false;
+                },
+
                 preventScroll: true,
-                // Fix for focus-trap error when modal content has no focusable elements
+
+                // Fix for focus-trap error when modal content has no focusable elements.
                 delayInitialFocus: true,
+
                 fallbackFocus: () => {
                   const closeButton =
                     document.querySelector("#close-btn-modal");
+
                   return closeButton as HTMLElement;
                 }
               }}
@@ -116,11 +170,13 @@ export function Modal({
                         {closeLabel}
                       </button>
                     </div>
+
                     {title && (
                       <h1 className="fr-modal__header fr-modal__title">
                         {title}
                       </h1>
                     )}
+
                     <div
                       className={cn("fr-modal__content", {
                         "fr-mb-0": hasFooter
@@ -203,6 +259,7 @@ export function TdModalTrigger({
   ...props
 }: Pick<ModalProps, "padding" | "ariaLabel"> & TdModalTriggerProps) {
   const state = useOverlayTriggerState(props);
+
   const { triggerProps, overlayProps } = useOverlayTrigger(
     { type: "dialog" },
     state
@@ -213,6 +270,7 @@ export function TdModalTrigger({
   return (
     <>
       {React.cloneElement(trigger(state.open), triggerProps)}
+
       {state.isOpen && (
         <Modal
           ariaLabel={ariaLabel}
@@ -224,6 +282,7 @@ export function TdModalTrigger({
           state={state}
         >
           <h2 className="td-modal-title">{ariaLabel}</h2>
+
           {modalContentValue != null &&
             React.cloneElement(modalContentValue, overlayProps)}
         </Modal>
