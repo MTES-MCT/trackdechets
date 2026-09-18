@@ -25,7 +25,7 @@ export function useMyCompany(orgId: string | undefined) {
     skip: !orgId
   });
 
-  const company = data?.myCompanies.edges[0]?.node;
+  const company = data?.myCompanies?.edges?.[0]?.node;
 
   const reloadCompany = () => {
     refetch({ orgId });
