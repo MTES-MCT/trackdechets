@@ -7,6 +7,10 @@ export const fluidesFrigorigenesInterventionsFixture: FluidesFrigorigenesInterve
       number: "FI-2026-001",
       wasteCodes: ["14 06 01*"],
       equipmentHolder: "Leclerc Millau",
+      holder: {
+        siret: "53075596600047",
+        name: "Leclerc Millau"
+      },
       weightKg: 8,
       interventionDate: "2026-08-18",
       isAssociated: false,
@@ -32,6 +36,10 @@ export const fluidesFrigorigenesInterventionsFixture: FluidesFrigorigenesInterve
       number: "FI-2026-002",
       wasteCodes: ["14 06 02*"],
       equipmentHolder: "Hôtel des Causses",
+      holder: {
+        siret: "35600000000048",
+        name: "Hôtel des Causses"
+      },
       weightKg: 5,
       interventionDate: "2026-08-20",
       isAssociated: false,
@@ -50,6 +58,10 @@ export const fluidesFrigorigenesInterventionsFixture: FluidesFrigorigenesInterve
       number: "FI-2026-003",
       wasteCodes: ["14 06 02*"],
       equipmentHolder: "Leclerc Millau",
+      holder: {
+        siret: "53075596600047",
+        name: "Leclerc Millau"
+      },
       weightKg: 10,
       interventionDate: "2026-08-25",
       isAssociated: true,

@@ -1,8 +1,22 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import React from "react";
-import { FluidesFrigorigenesView } from "./FluidesFrigorigenes";
+import { FormProvider, useForm } from "react-hook-form";
+import FluidesFrigorigenesBsff, {
+  FluidesFrigorigenesView
+} from "./FluidesFrigorigenes";
 import { FluidesFrigorigenesDataState } from "./fluides-frigorigenes/model";
 import { fluidesFrigorigenesInterventionsFixture } from "./fluides-frigorigenes/fixtures";
+import { useFluidesFrigorigenes } from "./fluides-frigorigenes/useFluidesFrigorigenes";
+import initialState from "../utils/initial-state";
+import RhfBsffPackagingList from "../components/RhfBsffPackagingList";
+import { bsffPackagingTypes } from "../../../../Forms/Components/PackagingList/helpers";
+import { BsffType } from "@td/codegen-ui";
+
+jest.mock("./fluides-frigorigenes/useFluidesFrigorigenes", () => ({
+  useFluidesFrigorigenes: jest.fn()
+}));
+
+const mockedUseFluidesFrigorigenes = jest.mocked(useFluidesFrigorigenes);
 
 const renderComponent = (dataState?: FluidesFrigorigenesDataState) =>
   render(
@@ -32,6 +46,8 @@ const expectEmptyTables = () => {
 };
 
 describe("FluidesFrigorigenesBsff", () => {
+  beforeEach(() => mockedUseFluidesFrigorigenes.mockReset());
+
   it("renders the RG1 error states", () => {
     const { rerender } = renderComponent({ status: "serviceError" });
     expect(screen.getByText("Erreur 500 : API down")).toBeInTheDocument();
@@ -190,5 +206,211 @@ describe("FluidesFrigorigenesBsff", () => {
     expect(within(table).queryByText("BOUT-001")).not.toBeInTheDocument();
     expect(within(table).queryByText("BOUT-002")).not.toBeInTheDocument();
     expect(within(table).getAllByRole("row")).toHaveLength(2);
+  });
+
+  it("imports the selected intervention when clicking the import button", () => {
+    const onImport = jest.fn();
+    render(
+      <FluidesFrigorigenesView
+        operatorSiret="12345678901234"
+        state={{
+          status: "success",
+          interventions: fluidesFrigorigenesInterventionsFixture
+        }}
+        onImport={onImport}
+      />
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Ajouter la fiche FI-2026-002" })
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Importer les fiches d'interventions"
+      })
+    );
+
+    expect(onImport).toHaveBeenCalledWith([
+      fluidesFrigorigenesInterventionsFixture[1]
+    ]);
+  });
+
+  it("updates only the fields owned by the import", () => {
+    mockedUseFluidesFrigorigenes.mockReturnValue({
+      status: "success",
+      interventions: fluidesFrigorigenesInterventionsFixture
+    });
+
+    function FormWrapper() {
+      const methods = useForm({
+        defaultValues: {
+          ...initialState,
+          emitter: {
+            ...initialState.emitter,
+            company: {
+              ...initialState.emitter.company,
+              siret: "12345678901234"
+            }
+          },
+          destination: {
+            ...initialState.destination,
+            customInfo: "À préserver"
+          }
+        }
+      });
+      const values = methods.watch();
+
+      return (
+        <FormProvider {...methods}>
+          <FluidesFrigorigenesBsff />
+          <output data-testid="form-values">{JSON.stringify(values)}</output>
+        </FormProvider>
+      );
+    }
+
+    render(<FormWrapper />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Ajouter la fiche FI-2026-002" })
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Importer les fiches d'interventions"
+      })
+    );
+
+    const values = JSON.parse(
+      screen.getByTestId("form-values").textContent ?? "{}"
+    );
+    expect(values.destination.customInfo).toBe("À préserver");
+    expect(values.emitter.company.siret).toBe("12345678901234");
+    expect(values.waste.code).toBe("14 06 02*");
+    expect(values.packagings).toEqual([
+      expect.objectContaining({
+        type: "BOUTEILLE",
+        numero: "BOUT-003",
+        weight: 5,
+        volume: ""
+      })
+    ]);
+    expect(values.weight).toEqual({ value: 5, isEstimate: false });
+    expect(values.ficheInterventions[0].packagings).toEqual([
+      { numero: "BOUT-003" }
+    ]);
+    expect(values.fluidesFrigorigenesImport).toEqual({
+      selectedInterventionIds: ["fi-2"],
+      interventions: [
+        {
+          id: "fi-2",
+          number: "FI-2026-002",
+          packagingNumbers: ["BOUT-003"]
+        }
+      ]
+    });
+  });
+
+  it("restores selections after leaving and reopening the tab", () => {
+    mockedUseFluidesFrigorigenes.mockReturnValue({
+      status: "success",
+      interventions: fluidesFrigorigenesInterventionsFixture
+    });
+
+    function FormWrapper() {
+      const methods = useForm({
+        defaultValues: {
+          ...initialState,
+          emitter: {
+            ...initialState.emitter,
+            company: {
+              ...initialState.emitter.company,
+              siret: "12345678901234"
+            }
+          }
+        }
+      });
+      const [showFluidesFrigorigenes, setShowFluidesFrigorigenes] =
+        React.useState(true);
+
+      return (
+        <FormProvider {...methods}>
+          <button
+            type="button"
+            onClick={() => setShowFluidesFrigorigenes(visible => !visible)}
+          >
+            Changer d'onglet
+          </button>
+          {showFluidesFrigorigenes && <FluidesFrigorigenesBsff />}
+        </FormProvider>
+      );
+    }
+
+    render(<FormWrapper />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Ajouter la fiche FI-2026-002" })
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Changer d'onglet" }));
+    fireEvent.click(screen.getByRole("button", { name: "Changer d'onglet" }));
+
+    const selectedTable = screen.getByRole("table", {
+      name: "Fiches d'intervention sélectionnées"
+    });
+    expect(within(selectedTable).getByText("FI-2026-002")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "Importer les fiches d'interventions"
+      })
+    ).toBeEnabled();
+  });
+
+  it("labels imported containers with their intervention number and source", () => {
+    function PackagingWrapper() {
+      const methods = useForm({
+        defaultValues: {
+          type: BsffType.CollectePetitesQuantites,
+          packagings: [
+            {
+              type: "BOUTEILLE",
+              numero: "BOUT-003",
+              weight: 5,
+              volume: "",
+              other: ""
+            },
+            {
+              type: "BOUTEILLE",
+              numero: "MANUEL-001",
+              weight: 1,
+              volume: 1,
+              other: ""
+            }
+          ],
+          fluidesFrigorigenesImport: {
+            selectedInterventionIds: ["fi-2"],
+            interventions: [
+              {
+                id: "fi-2",
+                number: "FI-2026-002",
+                packagingNumbers: ["BOUT-003"]
+              }
+            ]
+          }
+        }
+      });
+
+      return (
+        <FormProvider {...methods}>
+          <RhfBsffPackagingList
+            fieldName="packagings"
+            packagingTypes={bsffPackagingTypes}
+            operateurMode
+          />
+        </FormProvider>
+      );
+    }
+
+    render(<PackagingWrapper />);
+
+    expect(
+      screen.getByText("1 - FI-2026-002 - Importé depuis Fluides Frigorigènes")
+    ).toBeInTheDocument();
+    expect(screen.getByText("2 - Contenant")).toBeInTheDocument();
   });
 });

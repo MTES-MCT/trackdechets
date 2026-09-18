@@ -9,6 +9,7 @@ import { PackagingFormProps } from "./BsffPackagingForm";
 import { useWatch } from "react-hook-form";
 import { emptyBsddPackaging } from "../../../../Forms/Components/PackagingList/helpers";
 import { DetenteurAccordion } from "../../../../Forms/Components/DetenteurAccordion/DetenteurAccordion";
+import { ZodBsff } from "../schema";
 
 export interface RenderPackagingFormProps
   extends Omit<PackagingFormProps, "inputProps" | "errors" | "touched"> {
@@ -51,6 +52,8 @@ function BsffPackagingList({
 }: PackagingListProps) {
   const bsffType = useWatch({ name: "type" });
   const repackaging: any[] = useWatch({ name: "repackaging" }) ?? [];
+  const fluidesFrigorigenesImport: ZodBsff["fluidesFrigorigenesImport"] =
+    useWatch({ name: "fluidesFrigorigenesImport" });
   const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
 
   const stableKeys = useRef<Map<PackagingInfoInput, string>>(new Map());
@@ -93,6 +96,15 @@ function BsffPackagingList({
       {packagingInfos.map((p, idx) => {
         const fromTable = isFromTable(p);
         const stableKey = getStableKey(p, idx);
+        const importedIntervention =
+          fluidesFrigorigenesImport?.interventions.find(intervention =>
+            intervention.packagingNumbers.includes(p.numero ?? "")
+          );
+        const accordionName = importedIntervention
+          ? `${idx + 1} - ${
+              importedIntervention.number
+            } - Importé depuis Fluides Frigorigènes`
+          : `${idx + 1} - Contenant`;
 
         const packagingForm = children({
           fieldName,
@@ -109,7 +121,7 @@ function BsffPackagingList({
             <DetenteurAccordion
               key={stableKey}
               numero={idx + 1}
-              name={`${idx + 1} - Contenant`}
+              name={accordionName}
               expanded={expandedIdx === idx}
               onExpanded={() =>
                 setExpandedIdx(expandedIdx === idx ? null : idx)

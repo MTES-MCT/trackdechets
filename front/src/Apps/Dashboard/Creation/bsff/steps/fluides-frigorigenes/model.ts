@@ -2,14 +2,23 @@ export type FluidesFrigorigenesContainer = {
   id: string;
   number: string;
   wasteCode: string;
+  adr?: string;
   volumeLiters?: number;
   weightKg: number;
+};
+export type FluidesFrigorigenesHolder = {
+  siret: string;
+  name: string;
+  address?: string;
+  postalCode?: string;
+  city?: string;
 };
 export type FluidesFrigorigenesIntervention = {
   id: string;
   number: string;
   wasteCodes: string[];
   equipmentHolder: string;
+  holder: FluidesFrigorigenesHolder;
   weightKg: number;
   interventionDate?: string;
   isAssociated: boolean;
@@ -47,7 +56,7 @@ export const isInterventionSelectable = (
   item: FluidesFrigorigenesIntervention,
   selectedWasteCodes?: string[]
 ) =>
-  item.wasteCodes.length > 0 &&
+  item.wasteCodes.length === 1 &&
   (!selectedWasteCodes?.length ||
-    (item.wasteCodes.length === selectedWasteCodes.length &&
-      item.wasteCodes.every(code => selectedWasteCodes.includes(code))));
+    (selectedWasteCodes.length === 1 &&
+      item.wasteCodes[0] === selectedWasteCodes[0]));
