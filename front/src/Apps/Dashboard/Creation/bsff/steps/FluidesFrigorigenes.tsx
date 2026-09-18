@@ -8,6 +8,7 @@ import { IconBSFF } from "../../../../common/Components/Icons/Icons";
 import Select, { Option } from "../../../../common/Components/Select/Select";
 import { ZodBsff } from "../schema";
 import styles from "./FluidesFrigorigenes.module.scss";
+import { adaptFluidesFrigorigenesToBsffImport } from "./fluides-frigorigenes/adapter";
 import {
   filterInterventions,
   FluidesFrigorigenesDataState,
@@ -30,15 +31,45 @@ const optionsToValues = (options: Option[]) =>
   options.map(({ value }) => value);
 
 export default function FluidesFrigorigenesBsff() {
-  const { watch } = useFormContext<ZodBsff>();
+  const { setValue, watch } = useFormContext<ZodBsff>();
   const operatorSiret = watch("emitter.company.siret") ?? "";
+  const importedInterventionIds =
+    watch("fluidesFrigorigenesImport.selectedInterventionIds") ?? [];
   const state = useFluidesFrigorigenes(operatorSiret);
+  const importInterventions = (
+    interventions: FluidesFrigorigenesIntervention[]
+  ) => {
+    const imported = adaptFluidesFrigorigenesToBsffImport(interventions);
+    const options = { shouldDirty: true, shouldValidate: true };
+
+    setValue("waste.code", imported.waste.code, options);
+    setValue("waste.description", imported.waste.description, options);
+    setValue("waste.adr", imported.waste.adr, options);
+    setValue("packagings", imported.packagings, options);
+    setValue("weight.value", imported.weight.value, options);
+    setValue("weight.isEstimate", imported.weight.isEstimate, options);
+    setValue("ficheInterventions", imported.ficheInterventions, options);
+    setValue(
+      "fluidesFrigorigenesImport",
+      imported.fluidesFrigorigenesImport,
+      options
+    );
+  };
 
   return (
     <FluidesFrigorigenesView
       key={operatorSiret}
       operatorSiret={operatorSiret}
       state={state}
+      onImport={importInterventions}
+      initialSelectedIds={importedInterventionIds}
+      onSelectionChange={selectedInterventionIds =>
+        setValue(
+          "fluidesFrigorigenesImport.selectedInterventionIds",
+          selectedInterventionIds,
+          { shouldDirty: true }
+        )
+      }
     />
   );
 }
@@ -46,11 +77,20 @@ export default function FluidesFrigorigenesBsff() {
 type ViewProps = {
   operatorSiret: string;
   state: FluidesFrigorigenesDataState;
+  onImport?: (interventions: FluidesFrigorigenesIntervention[]) => void;
+  initialSelectedIds?: string[];
+  onSelectionChange?: (selectedIds: string[]) => void;
 };
 
-export function FluidesFrigorigenesView({ operatorSiret, state }: ViewProps) {
+export function FluidesFrigorigenesView({
+  operatorSiret,
+  state,
+  onImport = () => undefined,
+  initialSelectedIds = [],
+  onSelectionChange = () => undefined
+}: ViewProps) {
   const [filters, setFilters] = useState(initialFilters);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
   const interventions = state.status === "success" ? state.interventions : [];
   if (state.status === "loading")
@@ -123,6 +163,8 @@ export function FluidesFrigorigenesView({ operatorSiret, state }: ViewProps) {
         setSelectedIds={setSelectedIds}
         expandedIds={expandedIds}
         setExpandedIds={setExpandedIds}
+        onImport={onImport}
+        onSelectionChange={onSelectionChange}
       />
     </section>
   );
@@ -136,6 +178,8 @@ type ContentProps = {
   setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
   expandedIds: string[];
   setExpandedIds: React.Dispatch<React.SetStateAction<string[]>>;
+  onImport: (interventions: FluidesFrigorigenesIntervention[]) => void;
+  onSelectionChange: (selectedIds: string[]) => void;
 };
 function Content({
   interventions,
@@ -144,7 +188,9 @@ function Content({
   selectedIds,
   setSelectedIds,
   expandedIds,
-  setExpandedIds
+  setExpandedIds,
+  onImport,
+  onSelectionChange
 }: ContentProps) {
   const filtered = useMemo(
     () => filterInterventions(interventions, filters),
@@ -158,10 +204,13 @@ function Content({
   const holderOptions = toOptions([
     ...new Set(interventions.map(({ equipmentHolder }) => equipmentHolder))
   ]);
-  const toggleSelection = (id: string) =>
-    setSelectedIds(ids =>
-      ids.includes(id) ? ids.filter(item => item !== id) : [...ids, id]
-    );
+  const toggleSelection = (id: string) => {
+    const selected = selectedIds.includes(id)
+      ? selectedIds.filter(item => item !== id)
+      : [...selectedIds, id];
+    setSelectedIds(selected);
+    onSelectionChange(selected);
+  };
   const toggleExpanded = (id: string) =>
     setExpandedIds(ids =>
       ids.includes(id) ? ids.filter(item => item !== id) : [...ids, id]
@@ -350,11 +399,10 @@ function Content({
       />
       {!selected.length && <p>Aucune fiche sélectionnée</p>}
       <div className={styles.actions}>
-        <Button disabled={!selected.length} onClick={() => undefined}>
+        <Button disabled={!selected.length} onClick={() => onImport(selected)}>
           Importer les fiches d'interventions
         </Button>
       </div>
-      {/* TODO(TRA-18633): fill the Déchet and Détenteur tabs while retaining source interventions. */}
     </>
   );
 }

@@ -49,6 +49,10 @@ export default {
   pickupSiteManualMode: false,
   equipmentHolderDifferent: false,
   fluidesFrigorigenesEnabled: false,
+  fluidesFrigorigenesImport: {
+    selectedInterventionIds: [],
+    interventions: []
+  },
   waste: {
     code: null,
     description: "",

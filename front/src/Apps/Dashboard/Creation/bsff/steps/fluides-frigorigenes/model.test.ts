@@ -52,4 +52,16 @@ describe("Fluides Frigorigènes business rules", () => {
       )
     ).toBe(true);
   });
+
+  it("does not allow selecting an intervention containing several waste codes", () => {
+    expect(
+      isInterventionSelectable(
+        {
+          ...fluidesFrigorigenesInterventionsFixture[0],
+          wasteCodes: ["14 06 01*", "16 05 04*"]
+        },
+        undefined
+      )
+    ).toBe(false);
+  });
 });
