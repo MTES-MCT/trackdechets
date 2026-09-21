@@ -266,9 +266,9 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkEmitterSituation)
   .superRefine(checkNextDestinationCompany)
   .superRefine(checkPackagingAndIdentificationType)
-  .superRefine(checkTransporters)
   .superRefine(checkTransportModeAndWeight)
   .superRefine(checkTransportModeAndReceptionWeight)
+  .superRefine(checkTransporters)
   .superRefine(validateMultiTransporterPlates);
 
 // Transformations synchrones qui sont toujours
