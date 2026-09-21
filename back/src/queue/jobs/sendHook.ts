@@ -21,7 +21,8 @@ const WEBHOOK_REQUEST_TIMEMOUT = 5000;
 export const axiosPost = async (url, action, id, clearToken) => {
   return axios.post(url, [{ action, id }], {
     timeout: WEBHOOK_REQUEST_TIMEMOUT,
-    headers: { Authorization: `Bearer: ${clearToken}` }
+    headers: { Authorization: `Bearer: ${clearToken}` },
+    maxRedirects: 0
   });
 };
 
