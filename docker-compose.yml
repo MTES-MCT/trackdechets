@@ -4,7 +4,7 @@ services:
       file: docker-compose.dbs.yml
       service: postgres
     ports:
-      - 5432:5432
+      - 5443:5432
     volumes:
       - postgres:/var/lib/postgresql/data
 
