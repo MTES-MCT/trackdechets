@@ -11,7 +11,8 @@ import {
   checkPackagingAndIdentificationType,
   checkTransportModeAndWeight,
   checkTransportModeAndReceptionWeight,
-  checkNextDestinationCompany
+  checkNextDestinationCompany,
+  checkTransporters
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
@@ -267,6 +268,7 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkPackagingAndIdentificationType)
   .superRefine(checkTransportModeAndWeight)
   .superRefine(checkTransportModeAndReceptionWeight)
+  .superRefine(checkTransporters)
   .superRefine(validateMultiTransporterPlates);
 
 // Transformations synchrones qui sont toujours
