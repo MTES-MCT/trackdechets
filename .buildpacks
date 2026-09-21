@@ -1,2 +1,2 @@
-https://github.com/heroku/heroku-buildpack-multi-procfile.git
-https://github.com/Scalingo/nodejs-buildpack.git
+https://github.com/heroku/heroku-buildpack-multi-procfile
+https://github.com/Scalingo/nodejs-buildpack
