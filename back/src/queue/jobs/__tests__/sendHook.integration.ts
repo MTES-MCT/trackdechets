@@ -48,7 +48,11 @@ describe("sendHook", () => {
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company.fr/endpoint",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret" },
+          maxRedirects: 0
+        }
       );
     });
 
@@ -119,17 +123,29 @@ describe("sendHook", () => {
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company1.fr/endpoint1",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh1" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh1" },
+          maxRedirects: 0
+        }
       );
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company1.fr/endpoint2",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh2" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh2" },
+          maxRedirects: 0
+        }
       );
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company2.fr/endpoint1",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh3" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh3" },
+          maxRedirects: 0
+        }
       );
     });
 
@@ -185,17 +201,29 @@ describe("sendHook", () => {
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company1.fr/endpoint1",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh1" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh1" },
+          maxRedirects: 0
+        }
       );
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company1.fr/endpoint2",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh2" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh2" },
+          maxRedirects: 0
+        }
       );
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company2.fr/endpoint1",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh3" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh3" },
+          maxRedirects: 0
+        }
       );
     });
 
@@ -263,17 +291,29 @@ describe("sendHook", () => {
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company1.fr/endpoint1",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh1" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh1" },
+          maxRedirects: 0
+        }
       );
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company1.fr/endpoint2",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh2" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh2" },
+          maxRedirects: 0
+        }
       );
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company2.fr/endpoint1",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh3" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh3" },
+          maxRedirects: 0
+        }
       );
     });
 
@@ -342,17 +382,29 @@ describe("sendHook", () => {
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company1.fr/endpoint1",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh1" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh1" },
+          maxRedirects: 0
+        }
       );
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company1.fr/endpoint2",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh2" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh2" },
+          maxRedirects: 0
+        }
       );
       expect(axios.post as jest.Mock).toHaveBeenCalledWith(
         "https://company2.fr/endpoint1",
         [{ action: "CREATE", id: "bsd-id" }],
-        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh3" } }
+        {
+          timeout: 5000,
+          headers: { Authorization: "Bearer: secret-wh3" },
+          maxRedirects: 0
+        }
       );
     });
   });
