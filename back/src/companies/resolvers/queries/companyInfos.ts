@@ -5,9 +5,6 @@ import { searchCompany } from "../../search";
 import { ClosedCompanyError } from "../../sirene/errors";
 import { isClosedCompany } from "@td/constants";
 
-import { applyAuthStrategies, AuthType } from "../../../auth/auth";
-import { checkIsAuthenticated } from "../../../common/permissions";
-
 /**
  * Recherche et renvoie les données diffusables
  * sur une entreprise pour un SIRET ou de TVA
@@ -68,12 +65,8 @@ export async function getCompanyInfos(
  */
 const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
   _,
-  args,
-  context
+  args
 ) => {
-  applyAuthStrategies(context, [AuthType.Session]);
-  checkIsAuthenticated(context);
-
   if (!args.siret && !args.clue) {
     throw new UserInputError(
       "Paramètre siret et clue absents. Un SIRET ou de TVA intracommunautaire valide est requis",
@@ -90,22 +83,23 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
 
   if (!["P", "N"].includes(companyInfos.statutDiffusionEtablissement!)) {
     return companyInfos;
+  } else {
+    // hide non-diffusible Company from public query
+    return {
+      orgId: companyInfos.orgId,
+      siret: companyInfos.siret,
+      vatNumber: companyInfos.vatNumber,
+      isRegistered: companyInfos.isRegistered,
+      companyTypes: companyInfos.companyTypes,
+      ecoOrganismeAgreements: companyInfos.ecoOrganismeAgreements,
+      statutDiffusionEtablissement: companyInfos.statutDiffusionEtablissement,
+      etatAdministratif: companyInfos.etatAdministratif,
+      allowBsdasriTakeOverWithoutSignature:
+        companyInfos.allowBsdasriTakeOverWithoutSignature,
+      isDormant: companyInfos.isDormant,
+      ecoOrganismePartnersIds: companyInfos.ecoOrganismePartnersIds
+    };
   }
-
-  return {
-    orgId: companyInfos.orgId,
-    siret: companyInfos.siret,
-    vatNumber: companyInfos.vatNumber,
-    isRegistered: companyInfos.isRegistered,
-    companyTypes: companyInfos.companyTypes,
-    ecoOrganismeAgreements: companyInfos.ecoOrganismeAgreements,
-    statutDiffusionEtablissement: companyInfos.statutDiffusionEtablissement,
-    etatAdministratif: companyInfos.etatAdministratif,
-    allowBsdasriTakeOverWithoutSignature:
-      companyInfos.allowBsdasriTakeOverWithoutSignature,
-    isDormant: companyInfos.isDormant,
-    ecoOrganismePartnersIds: companyInfos.ecoOrganismePartnersIds
-  };
 };
 
 export default companyInfosResolvers;
