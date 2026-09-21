@@ -9,7 +9,8 @@ import {
   checkFicheInterventions,
   checkWeights,
   checkPackagings,
-  checkRequiredFields
+  checkRequiredFields,
+  checkTransporters
 } from "./refinements";
 import { BsffValidationContext } from "./types";
 import { weightSchema } from "../../../common/validation/weight";
@@ -212,7 +213,8 @@ export type ParsedZodBsff = z.output<typeof rawBsffSchema>;
 const refinedBsffSchema = rawBsffSchema
   .superRefine(checkPackagings)
   .superRefine(checkWeights)
-  .superRefine(validateMultiTransporterPlates);
+  .superRefine(validateMultiTransporterPlates)
+  .superRefine(checkTransporters);
 
 /**
  * Modification du schéma Zod pour appliquer des tranformations et

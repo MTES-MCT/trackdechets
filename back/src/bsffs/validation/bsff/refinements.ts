@@ -731,3 +731,29 @@ export const checkRequiredFields: (
     });
   };
 };
+
+export const checkTransporters: Refinement<ParsedZodBsff> = (
+  bsff,
+  { addIssue }
+) => {
+  if (bsff.id) {
+    const alreadyPartOfAnotherBsffIndex = bsff.transporters?.findIndex(
+      t => Boolean(t.bsffId) && t.bsffId !== bsff.id
+    );
+    if (
+      alreadyPartOfAnotherBsffIndex !== undefined &&
+      alreadyPartOfAnotherBsffIndex !== -1
+    ) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [
+          "transporters",
+          `${alreadyPartOfAnotherBsffIndex + 1}`,
+          "company",
+          "siret"
+        ] as any as EditionRulePath,
+        message: `Le transporteur BSFF ${bsff.transporters?.[alreadyPartOfAnotherBsffIndex]?.id} est déjà associé à un autre BSFF`
+      });
+    }
+  }
+};
