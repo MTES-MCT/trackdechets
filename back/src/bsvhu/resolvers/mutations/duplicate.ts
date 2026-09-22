@@ -90,8 +90,15 @@ async function getDuplicateData(
     ...zodBsvhu
   } = prismaToZodBsvhu(bsvhu);
 
+  const zodBsvhuForDuplication = {
+    ...zodBsvhu,
+    transporters: zodBsvhu.transporters?.map(
+      ({ bsvhuId, ...transporter }) => transporter
+    )
+  };
+
   const { intermediaries, transporters, ...parsedBsvhu } =
-    await parseBsvhuAsync(zodBsvhu, {
+    await parseBsvhuAsync(zodBsvhuForDuplication, {
       user
     });
 

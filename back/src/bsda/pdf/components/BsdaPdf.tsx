@@ -48,6 +48,8 @@ export function BsdaPdf({
     destinationReceptionWeight: bsda.destination?.reception?.weight
   });
 
+  const weightIsEstimate = bsda?.destination?.reception?.weightIsEstimate;
+
   return (
     <Document title={bsda.id}>
       <div className="Page">
@@ -377,15 +379,13 @@ export function BsdaPdf({
               Type de quantité :{" "}
               <input
                 type="checkbox"
-                checked={!bsda?.destination?.reception?.weightIsEstimate}
+                checked={weightIsEstimate === false}
                 readOnly
               />{" "}
               Réelle{" "}
               <input
                 type="checkbox"
-                checked={Boolean(
-                  bsda?.destination?.reception?.weightIsEstimate
-                )}
+                checked={weightIsEstimate === true}
                 readOnly
               />{" "}
               Estimée

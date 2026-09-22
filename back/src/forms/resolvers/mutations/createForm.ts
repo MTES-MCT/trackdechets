@@ -104,6 +104,24 @@ const createFormResolver = async (
         )}`
       );
     }
+
+    const alreadyAssociatedTransporters = await prisma.bsddTransporter.findMany(
+      {
+        where: {
+          id: { in: formContent.transporters },
+          formId: { not: null }
+        },
+        select: { id: true, formId: true }
+      }
+    );
+    if (alreadyAssociatedTransporters.length > 0) {
+      throw new UserInputError(
+        `Le ou les transporteurs suivants sont déjà associés à un bordereau : ${alreadyAssociatedTransporters
+          .map(transporter => transporter.id)
+          .join(", ")}`
+      );
+    }
+
     transportersForValidation = [
       ...transportersForValidation,
       ...dbTransporters
