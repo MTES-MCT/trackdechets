@@ -5,6 +5,17 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2026.09.2] 22/09/2026
+
+#### :bug: Corrections de bugs
+
+- BSFF - Aperçu - Absence de l'onglet transporteur [PR-4883] (https://github.com/MTES-MCT/trackdechets/pull/4883)
+- BSFF - Aperçu - Opération réalisée renseignée dès la publication [PR-4884] (https://github.com/MTES-MCT/trackdechets/pull/4884)
+- BSFF - Aperçu - Date de traitement renseignée dès la réception du bordereau [PR-4884] (https://github.com/MTES-MCT/trackdechets/pull/4884)
+- Mobile et ordinateur — Le bouton d’aide CRISP « ? » est inaccessible lorsqu’une modale est ouverte [PR-4898] (https://github.com/MTES-MCT/trackdechets/pull/4898)
+- YOGOSHA - 37667 - HIGH - Tout utilisateur peut supprimer discrètement le transporteur d'un bordereau de suivi de déchets scellé appartenant à une autre entreprise [PR-4897] (https://github.com/MTES-MCT/trackdechets/pull/4897)
+- YOGOSHA - 37665 - HIGH - Falsification de requête côté serveur (SSRF) via l'URI "endpointUri" du webhook : le backend émet des requêtes vers des hôtes internes arbitraires sous le contrôle de l'attaquant [PR-4904] (https://github.com/MTES-MCT/trackdechets/pull/4904)
+
 # [2026.07.1] 28/07/2026
 
 #### :rocket: Nouvelles fonctionnalités
