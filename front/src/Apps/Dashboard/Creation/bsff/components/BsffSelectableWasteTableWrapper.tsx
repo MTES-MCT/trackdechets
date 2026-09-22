@@ -27,6 +27,17 @@ type Props = {
   disabled: boolean;
 };
 
+export function toggleRepackagingSelection(
+  selected: ZodBsffGroupingOrForwarding[],
+  item: ZodBsffGroupingOrForwarding
+) {
+  const isSelected = selected.some(packaging => packaging.id === item.id);
+
+  return isSelected
+    ? selected.filter(packaging => packaging.id !== item.id)
+    : [...selected, item];
+}
+
 function BsffSelectableWasteTableWrapper({
   type,
   bsffId,
@@ -225,22 +236,6 @@ function BsffSelectableWasteTableWrapper({
     setValue("nextBsff.company", nextCompany);
   }
 
-  function mapPackaging(p: ZodBsffGroupingOrForwarding) {
-    if (p.packagings?.length) {
-      return p.packagings;
-    }
-    return [
-      {
-        id: p.id ?? null,
-        type: p.type ?? null,
-        volume: p.volume ?? null,
-        numero: p.numero ?? "",
-        weight: p.acceptation?.weight ?? p.acceptation?.weight ?? null,
-        other: p.other ?? null
-      }
-    ];
-  }
-
   function onForwardingChange(fwd: ZodBsffGroupingOrForwarding | null) {
     setValue("waste.code", fwd?.acceptation?.wasteCode ?? fwd?.waste?.code);
     setValue("weight.value", fwd?.acceptation?.weight ?? 0);
@@ -343,35 +338,9 @@ function BsffSelectableWasteTableWrapper({
         <BsffSelectableWasteTable
           disabled={disabled}
           onClick={item => {
-            const isSelected = repackaging.find(r => r.id === item.id);
-
-            let updated: typeof repackaging;
-
-            if (isSelected) {
-              updated = repackaging.filter(r => r.id !== item.id);
-            } else if (!item.id) {
-              const withoutManual = repackaging.filter(r => r.id);
-              updated = [...withoutManual, item];
-            } else {
-              updated = [...repackaging, item];
-            }
-
-            setValue("repackaging", updated);
-
-            const currentPackagings: any[] = getValues("packagings") ?? [];
-            const manualPackagings = currentPackagings.filter(
-              (p: any) => !p.id
-            );
-
-            const tablePackagings = updated.flatMap(mapPackaging);
-            setValue("packagings", [...tablePackagings, ...manualPackagings]);
-
             setValue(
-              "weight.value",
-              updated.reduce(
-                (sum, r) => sum + (r.acceptation?.weight ?? r.weight ?? 0),
-                0
-              )
+              "repackaging",
+              toggleRepackagingSelection(repackaging, item)
             );
           }}
           bsffPackagings={bsffPackagings}
