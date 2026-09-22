@@ -6,19 +6,22 @@
   position: fixed;
   top: 0;
   left: 0;
-  bottom: 0;
   right: 0;
+
   background: rgba(0, 0, 0, 0.5);
-  overflow: auto;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+
+  display: block;
 }
 
 .tdModalInner {
   position: relative;
-  flex: auto;
+  min-height: 100%;
+  width: 100%;
 }
 
 .fr-modal__header.close-btn-override {
