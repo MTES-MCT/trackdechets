@@ -82,7 +82,8 @@ const CompanySwitcher = ({
     orgIds,
     orgPermissions: { role }
   } = usePermissions(currentOrgId);
-  const { company: defaultCompany } = useMyCompany(currentOrgId);
+  const { company: defaultCompany, loading: defaultCompanyLoading } =
+    useMyCompany(currentOrgId);
   const nbOfCompanies = orgIds.length;
 
   const handleOnClickCompany = (orgId: string) => {
@@ -144,11 +145,11 @@ const CompanySwitcher = ({
         <div className="company-switcher-item__content">
           {current ? (
             <h1 className="company-switcher-item__name">
-              {company.givenName || company.name}
+              {company?.givenName || company?.name}
             </h1>
           ) : (
             <div className="company-switcher-item__name">
-              {company.givenName || company.name}
+              {company?.givenName || company?.name}
             </div>
           )}
           {current && nbOfCompanies > 1 && (
@@ -214,12 +215,16 @@ const CompanySwitcher = ({
       }`}
       ref={targetRef as React.RefObject<HTMLDivElement>}
     >
-      {displayedItem(
-        defaultCompany,
-        () => {
-          if (nbOfCompanies > 1) setOpen(open => !open);
-        },
-        true
+      {defaultCompanyLoading || !defaultCompany ? (
+        <InlineLoader />
+      ) : (
+        displayedItem(
+          defaultCompany,
+          () => {
+            if (nbOfCompanies > 1) setOpen(open => !open);
+          },
+          true
+        )
       )}
       <div className="company-switcher-list">
         {nbOfCompanies > 10 && (
