@@ -231,6 +231,21 @@ export const rawBsffSchema = z
     pickupSiteManualMode: z.boolean().default(false),
     equipmentHolderDifferent: z.boolean().default(false),
     fluidesFrigorigenesEnabled: z.boolean().default(false),
+    // Données purement locales au formulaire : elles permettent de restaurer
+    // la sélection et d'identifier visuellement les contenants importés.
+    // Elles ne sont pas transmises à l'API GraphQL BSFF.
+    fluidesFrigorigenesImport: z
+      .object({
+        selectedInterventionIds: z.array(z.string()),
+        interventions: z.array(
+          z.object({
+            id: z.string(),
+            number: z.string(),
+            packagingNumbers: z.array(z.string())
+          })
+        )
+      })
+      .optional(),
     waste: z
       .object({
         code: ZodWasteCodeEnum,

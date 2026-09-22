@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
-import { BsffPackaging, BsffType } from "@td/codegen-ui";
+import { BsffType } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { bsffPackagingTypes } from "../../../../Forms/Components/PackagingList/helpers";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
@@ -17,6 +17,7 @@ import MyBsffCompanySelector from "../components/MyBsffComapnySelector";
 import BsffTypeRadioGroup from "../components/BsffTypeRadioGroup";
 import {
   hasBsffPackagingAccordions,
+  getBsffPackagingsTotalWeight,
   isBsffOperatorWasteStep,
   isBsffSpecialWasteStep
 } from "../utils/waste";
@@ -60,11 +61,7 @@ const WasteBsff = () => {
     !!emitterCompany && (emitterCompany?.orgId || emitterCompany?.siret);
 
   const hideAfterCompanySelector = isSpecialType && !hasEmitterCompany;
-  const totalWeightNumber = (packagings ?? []).reduce(
-    (acc: number, packaging: BsffPackaging) =>
-      acc + (Number(packaging?.weight) || 0),
-    0
-  );
+  const totalWeightNumber = getBsffPackagingsTotalWeight(packagings ?? []);
 
   const totalWeight = totalWeightNumber === 0 ? "" : totalWeightNumber;
   const totalPackagings = packagings?.length ?? 0;
