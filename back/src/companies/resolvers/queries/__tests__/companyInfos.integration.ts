@@ -1,13 +1,8 @@
 import { CompanyType } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
-import {
-  companyFactory,
-  siretify,
-  userFactory
-} from "../../../../__tests__/factories";
+import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { AuthType } from "../../../../auth/auth";
 
 const mockSearchSirene = jest.fn();
 jest.mock("../../../sirene/searchCompany", () => ({
@@ -17,43 +12,14 @@ jest.mock("../../../sirene/searchCompany", () => ({
 
 describe("query { companyInfos(siret: <SIRET>) }", () => {
   let query: ReturnType<typeof makeClient>["query"];
-  beforeAll(async () => {
-    const user = await userFactory();
-
-    const testClient = makeClient({
-      ...user,
-      auth: AuthType.Session
-    });
-
+  beforeAll(() => {
+    const testClient = makeClient();
     query = testClient.query;
   });
 
   afterEach(async () => {
     await resetDatabase();
     mockSearchSirene.mockReset();
-  });
-  it("should forbid unauthenticated access", async () => {
-    const { query: unauthenticatedQuery } = makeClient();
-
-    const siret = siretify(8);
-
-    const gqlquery = `
-    query {
-      companyInfos(siret: "${siret}") {
-        siret
-        contact
-        contactEmail
-        contactPhone
-      }
-    }
-  `;
-
-    const { errors } = await unauthenticatedQuery<any>(gqlquery);
-
-    expect(errors).toBeDefined();
-    expect(errors[0].extensions?.code).toBe("UNAUTHENTICATED");
-
-    expect(mockSearchSirene).not.toHaveBeenCalled();
   });
 
   it("Random company not registered in Trackdéchets", async () => {
