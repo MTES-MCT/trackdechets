@@ -1,4 +1,5 @@
 import {
+  BsffPackagingInput,
   BsffPackagingType,
   BsffType,
   PackagingInfoInput,
@@ -7,7 +8,7 @@ import {
 import React, { useRef } from "react";
 import { PackagingFormProps } from "./BsffPackagingForm";
 import { useWatch } from "react-hook-form";
-import { emptyBsddPackaging } from "../../../../Forms/Components/PackagingList/helpers";
+import { emptyBsffPackaging } from "../../../../Forms/Components/PackagingList/helpers";
 
 export interface RenderPackagingFormProps
   extends Omit<PackagingFormProps, "inputProps" | "errors" | "touched"> {
@@ -19,12 +20,11 @@ export interface RenderPackagingFormProps
 export type PackagingListProps = {
   fieldName: string;
   packagingTypes: (Packagings | BsffPackagingType)[];
-  packagingInfos: PackagingInfoInput[];
+  packagingInfos: (PackagingInfoInput | BsffPackagingInput)[];
   disabled?: boolean;
   volumeEditable?: boolean;
-  push: (packaging: PackagingInfoInput) => void;
+  push: (packaging: PackagingInfoInput | BsffPackagingInput) => void;
   remove: (idx: number) => void;
-  onRemoveFromTable?: (id: string) => void;
   children: React.FC<RenderPackagingFormProps>;
 };
 
@@ -34,17 +34,20 @@ function BsffPackagingList({
   packagingInfos = [],
   push,
   remove,
-  onRemoveFromTable,
   disabled = false,
   volumeEditable = false,
 
   children
 }: PackagingListProps) {
   const bsffType = useWatch({ name: "type" });
-  const repackaging: any[] = useWatch({ name: "repackaging" }) ?? [];
 
-  const stableKeys = useRef<Map<PackagingInfoInput, string>>(new Map());
-  const getStableKey = (p: PackagingInfoInput, idx: number): string => {
+  const stableKeys = useRef<
+    Map<PackagingInfoInput | BsffPackagingInput, string>
+  >(new Map());
+  const getStableKey = (
+    p: PackagingInfoInput | BsffPackagingInput,
+    idx: number
+  ): string => {
     const id = (p as any).id;
     if (id) return `table-${id}`;
     if (!stableKeys.current.has(p)) {
@@ -58,22 +61,11 @@ function BsffPackagingList({
   const isReexpedition = bsffType === BsffType.Reexpedition;
   const showbutton = isGroupement || isReexpedition;
 
-  const tableIds = new Set<string>(
-    isReconditionnement ? repackaging.map((r: any) => r.id).filter(Boolean) : []
-  );
-
-  const isFromTable = (p: PackagingInfoInput) =>
-    isReconditionnement && !!(p as any).id && tableIds.has((p as any).id);
-
-  const manualCount = isReconditionnement
-    ? packagingInfos.filter(p => !isFromTable(p)).length
-    : 0;
-
-  const canAdd = !isReconditionnement || manualCount < 1;
+  const canAdd = !isReconditionnement;
 
   return (
     <>
-      {isReconditionnement && manualCount >= 1 && (
+      {isReconditionnement && (
         <div className="fr-alert fr-alert--info fr-mb-4w">
           Un seul contenant est autorisé dans le cadre d'un reconditionnement.
           Ex. : 1 citerne
@@ -81,7 +73,6 @@ function BsffPackagingList({
       )}
 
       {packagingInfos.map((p, idx) => {
-        const fromTable = isFromTable(p);
         const stableKey = getStableKey(p, idx);
 
         return (
@@ -96,35 +87,18 @@ function BsffPackagingList({
               volumeEditable
             })}
 
-            {fromTable
-              ? !disabled && (
-                  <>
-                    <button
-                      type="button"
-                      className="fr-btn fr-btn--tertiary fr-mb-2w"
-                      onClick={() => onRemoveFromTable?.((p as any).id)}
-                    >
-                      Retirer
-                    </button>
-                    <hr />
-                  </>
-                )
-              : !disabled &&
-                !showbutton &&
-                (isReconditionnement
-                  ? tableIds.size > 0 || manualCount > 1
-                  : packagingInfos.length > 1) && (
-                  <>
-                    <button
-                      type="button"
-                      className="fr-btn fr-btn--tertiary fr-mb-2w"
-                      onClick={() => remove(idx)}
-                    >
-                      Supprimer
-                    </button>
-                    <hr />
-                  </>
-                )}
+            {!disabled && !showbutton && packagingInfos.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  className="fr-btn fr-btn--tertiary fr-mb-2w"
+                  onClick={() => remove(idx)}
+                >
+                  Supprimer
+                </button>
+                <hr />
+              </>
+            )}
           </div>
         );
       })}
@@ -134,7 +108,7 @@ function BsffPackagingList({
           <button
             type="button"
             className="fr-btn fr-btn--secondary"
-            onClick={() => push(emptyBsddPackaging)}
+            onClick={() => push({ ...emptyBsffPackaging })}
           >
             Ajouter un conditionnement
           </button>
