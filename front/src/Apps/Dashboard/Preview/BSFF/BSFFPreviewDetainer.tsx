@@ -1,5 +1,5 @@
 import React from "react";
-import { Bsff } from "@td/codegen-ui";
+import { Bsff, BsffPackagingType, BsffType } from "@td/codegen-ui";
 
 import {
   PreviewContainer,
@@ -7,130 +7,92 @@ import {
   PreviewContainerCol,
   PreviewTextRow
 } from "../BSDPreviewComponents";
+import { getBsffDetainerRows } from "./bsffPreviewUtils";
 
 interface BSFFPreviewDetenteurProps {
   bsd: Bsff;
 }
 
 const BSFFPreviewDetenteur = ({ bsd }: BSFFPreviewDetenteurProps) => {
-  const ficheInterventions =
-    bsd.ficheInterventions?.filter(fi => fi?.detenteur) ?? [];
+  const rows = getBsffDetainerRows(bsd);
 
-  // Détenteurs des packagings qui n'ont PAS de fiche d'intervention
-  const detenteursWithoutFiche: Array<{
-    detenteur: any;
-    packagingNumero: string;
-  }> = [];
-
-  bsd.packagings?.forEach(p => {
-    // Si le packaging a des détenteurs et PAS de fiche d'intervention
-    if (
-      p.detenteurs &&
-      p.detenteurs.length > 0 &&
-      (!p.ficheInterventions || p.ficheInterventions.length === 0)
-    ) {
-      p.detenteurs.forEach(detenteur => {
-        detenteursWithoutFiche.push({
-          detenteur,
-          packagingNumero: p.numero
-        });
-      });
-    }
-  });
-
-  if (ficheInterventions.length === 0 && detenteursWithoutFiche.length === 0) {
+  if (rows.length === 0) {
     return null;
   }
 
   return (
     <>
-      {ficheInterventions.map((ficheIntervention, index) => {
-        const detenteur = ficheIntervention.detenteur;
-
-        if (!detenteur) {
-          return null;
-        }
-
-        return (
-          <PreviewContainer key={ficheIntervention.id ?? index}>
-            <PreviewContainerRow>
-              <PreviewContainerCol gridWidth={3}>
-                <PreviewTextRow
-                  label="Raison sociale"
-                  value={detenteur.company?.name}
-                />
-
-                <PreviewTextRow
-                  label="SIRET"
-                  value={detenteur.company?.siret}
-                />
-              </PreviewContainerCol>
-
-              <PreviewContainerCol gridWidth={6}>
-                <PreviewTextRow
-                  label="Numéro de fiche d'intervention"
-                  value={ficheIntervention.numero}
-                />
-
-                <PreviewTextRow
-                  label="Quantité fluides en Kg"
-                  value={ficheIntervention.weight}
-                  units="kg"
-                />
-                <PreviewTextRow
-                  label="Code postal lieu de collecte"
-                  value={ficheIntervention.postalCode}
-                />
-              </PreviewContainerCol>
-            </PreviewContainerRow>
-          </PreviewContainer>
-        );
-      })}
-
-      {detenteursWithoutFiche.map((item, index) => (
-        <PreviewContainer key={`without-fiche-${index}`}>
+      {rows.map(({ detenteur, packaging, ficheIntervention }, index) => (
+        <PreviewContainer
+          key={`${packaging?.id ?? "legacy"}-${
+            ficheIntervention?.id ?? "without-fiche"
+          }-${index}`}
+        >
           <PreviewContainerRow>
             <PreviewContainerCol gridWidth={3}>
               <PreviewTextRow
                 label={
-                  item.detenteur.isPrivateIndividual
+                  detenteur.isPrivateIndividual
                     ? "Nom (particulier)"
                     : "Raison sociale"
                 }
-                value={item.detenteur.company?.name}
+                value={detenteur.company?.name}
               />
 
+              <PreviewTextRow label="SIRET" value={detenteur.company?.siret} />
               <PreviewTextRow
-                label="SIRET"
-                value={item.detenteur.company?.siret}
+                label="Adresse"
+                value={detenteur.company?.address}
               />
             </PreviewContainerCol>
 
             <PreviewContainerCol gridWidth={6}>
               <PreviewTextRow
-                label="Adresse"
-                value={item.detenteur.company?.address}
-              />
-
-              <PreviewTextRow
                 label="Contact"
-                value={item.detenteur.company?.contact}
+                value={detenteur.company?.contact}
               />
 
               <PreviewTextRow
                 label="Téléphone"
-                value={item.detenteur.company?.phone}
+                value={detenteur.company?.phone}
               />
 
               <PreviewTextRow
-                label="Email"
-                value={item.detenteur.company?.mail}
+                label="Courriel"
+                value={detenteur.company?.mail}
               />
 
               <PreviewTextRow
                 label="Contenant associé"
-                value={item.packagingNumero}
+                value={
+                  packaging
+                    ? `${
+                        packaging.type === BsffPackagingType.Autre
+                          ? packaging.other || packaging.type
+                          : packaging.type
+                      } n°${packaging.numero}`
+                    : null
+                }
               />
+
+              <PreviewTextRow
+                label="Quantité de fluide"
+                value={packaging?.weight}
+                units="kg"
+              />
+
+              {ficheIntervention && (
+                <PreviewTextRow
+                  label="Numéro de fiche d'intervention"
+                  value={
+                    ficheIntervention.numero ||
+                    (bsd.type === BsffType.CollectePetitesQuantites &&
+                    ficheIntervention.isExempted
+                      ? "Exemption au titre R.543-82 du code de l'environnement"
+                      : null)
+                  }
+                />
+              )}
             </PreviewContainerCol>
           </PreviewContainerRow>
         </PreviewContainer>
