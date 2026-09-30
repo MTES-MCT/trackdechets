@@ -95,7 +95,7 @@ describe("useFluidesFrigorigenes", () => {
     expect(result.current).toEqual({ status: "success", interventions: [] });
   });
 
-  it("exposes a 200 response containing several waste codes", async () => {
+  it("ignores an intervention containing several waste codes", async () => {
     const payload = response("FI-MIXED");
     payload.data[0].dechets.push({
       ...payload.data[0].dechets[0],
@@ -104,21 +104,11 @@ describe("useFluidesFrigorigenes", () => {
       codeDechet: "16 05 04*"
     });
     mockedGetFluidesFrigorigenes.mockResolvedValue(payload);
-
     const { result } = renderHook(() =>
       useFluidesFrigorigenes("53075596600047")
     );
-
     await waitFor(() => expect(result.current.status).toBe("success"));
-    expect(result.current).toEqual(
-      expect.objectContaining({
-        interventions: [
-          expect.objectContaining({
-            wasteCodes: ["14 06 01*", "16 05 04*"]
-          })
-        ]
-      })
-    );
+    expect(result.current).toEqual({ status: "success", interventions: [] });
   });
 
   it("requests a changed SIRET and ignores the stale response", async () => {
