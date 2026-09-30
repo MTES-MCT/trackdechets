@@ -43,6 +43,7 @@ export const filterInterventions = (
   items.filter(
     item =>
       !item.isAssociated &&
+      item.wasteCodes.length === 1 &&
       (!filters.wasteCodes.length ||
         item.wasteCodes.some(code => filters.wasteCodes.includes(code))) &&
       (!filters.equipmentHolders.length ||
