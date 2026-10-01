@@ -5,6 +5,7 @@ import {
   cleanUpIsReviewedRevisionForTab,
   expireAdminRequests,
   processDueMfaResetRequests,
+  checkAndRenewInseePasswordIfNeeded,
   initSentry
 } from "back";
 import {
@@ -38,9 +39,16 @@ let jobs: cron.CronJob[] = [
     timeZone: TZ
   }),
   new cron.CronJob({
-    cronTime: "0/5 * * * *", // Every hour
+    cronTime: "0/5 * * * *", // Every 5 minutes
     onTick: async () => {
       await processDueMfaResetRequests();
+    },
+    timeZone: TZ
+  }),
+  new cron.CronJob({
+    cronTime: "0 2 * * *", // Every day at 02:00
+    onTick: async () => {
+      await checkAndRenewInseePasswordIfNeeded();
     },
     timeZone: TZ
   })

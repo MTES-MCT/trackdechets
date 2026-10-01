@@ -164,7 +164,6 @@ kubectl create secret generic trackdechets-secrets -n trackdechets \
   --from-literal=INSEE_CLIENT_ID='your-insee-client-id' \
   --from-literal=INSEE_CLIENT_SECRET='your-insee-client-secret' \
   --from-literal=INSEE_USERNAME='your-insee-username' \
-  --from-literal=INSEE_PASSWORD='your-insee-password' \
   --from-literal=S3_ENDPOINT='https://s3.fr-par.scw.cloud' \
   --from-literal=S3_REGION='fr-par' \
   --from-literal=S3_ACCESS_KEY_ID='your-scaleway-access-key' \
