@@ -4,7 +4,7 @@ export const schema = z.object({
   // Node
   TZ: z
     .string()
-    .optional() // We have to keep it optional as it's defined as is in official Node typings
+    .optional()
     .refine(val => val === "Europe/Paris"),
   NODE_ENV: z.enum(["test", "production", "dev", "development"]),
   // -------
@@ -117,7 +117,6 @@ export const schema = z.object({
   INSEE_CLIENT_ID: z.string(),
   INSEE_CLIENT_SECRET: z.string(),
   INSEE_USERNAME: z.string(),
-  INSEE_PASSWORD: z.string(),
   // -------
   // S3
   S3_ENDPOINT: z.string(),
@@ -187,14 +186,6 @@ export const envVariables = schema.superRefine((val, ctx) => {
 });
 
 export type EnvVariables = z.infer<typeof envVariables>;
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace NodeJS {
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-empty-object-type
-    interface ProcessEnv extends z.infer<typeof envVariables> {}
-  }
-}
 
 function isBoolean(value: string) {
   return value === "true" || value === "false";

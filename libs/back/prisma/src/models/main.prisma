@@ -2255,6 +2255,13 @@ model WebhookSetting {
   @@index([orgId], map: "_WebhookSettingOrgIdIdx")
 }
 
+model InseePasswordCredential {
+  key               String   @id @default("insee_password")
+  encryptedPassword String
+  passwordChangedAt DateTime @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(6)
+}
+
 model MigrationScript {
   id         Int       @id @default(autoincrement())
   name       String    @unique
