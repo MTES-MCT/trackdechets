@@ -546,6 +546,7 @@ const BsffFormSteps = ({
     () => ({
       bordereau: [
         BsffType.TracerFluide,
+        BsffType.Reconditionnement,
         BsffType.CollectePetitesQuantites
       ].includes(type as BsffType) ? (
         <BordereauBsff />
@@ -1253,6 +1254,7 @@ const BsffFormSteps = ({
         )}
         initialTabId={
           type === BsffType.TracerFluide ||
+          type === BsffType.Reconditionnement ||
           type === BsffType.CollectePetitesQuantites
             ? TabId.bordereau
             : TabId.waste
