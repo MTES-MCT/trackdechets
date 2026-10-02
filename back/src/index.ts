@@ -96,3 +96,10 @@ export {
 export { expireAdminRequests } from "./adminRequest/resolvers/mutations/utils/refuseAdminRequest.utils";
 export { getAdminRequestRepository } from "./adminRequest/repository/index";
 export { processDueMfaResetRequests } from "./mfaResetRequest/resolvers/jobs/processDueMfaResetRequests";
+export {
+  checkAndRenewInseePasswordIfNeeded,
+  generateToken,
+  getToken,
+  shouldRenewInseePassword,
+  parsePwdChangedTime
+} from "./companies/sirene/insee/token";
