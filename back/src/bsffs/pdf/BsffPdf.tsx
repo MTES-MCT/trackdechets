@@ -23,6 +23,12 @@ import { getOperationModeLabel } from "../../common/operationModes";
 import { dateToXMonthAtHHMM } from "../../common/helpers";
 import Transporter from "../../common/pdf/components/Transporter";
 import { extractPostalCode } from "../../common/addresses";
+import {
+  formatEquipmentHolderContact,
+  formatEquipmentHolderIdentification,
+  formatFicheIntervention,
+  getEquipmentHolderRows
+} from "./equipmentHolders";
 
 type Props = {
   bsff: Bsff & { packagings: BsffPackaging[] } & {
@@ -33,7 +39,7 @@ type Props = {
 };
 
 export function BsffPdf({ bsff, qrCode, renderEmpty = false }: Props) {
-  const hasFicheInterventions = bsff.ficheInterventions?.length > 0;
+  const equipmentHolderRows = getEquipmentHolderRows(bsff);
   const hasPreviousBsffs = bsff.previousBsffs?.length > 0;
 
   return (
@@ -88,16 +94,14 @@ export function BsffPdf({ bsff, qrCode, renderEmpty = false }: Props) {
             ))}
         </div>
       )}
-      {(hasFicheInterventions || hasPreviousBsffs) && (
+      {(equipmentHolderRows.length > 0 || hasPreviousBsffs) && (
         <div className="Page">
           {" "}
           <h3 className="TextAlignCenter mb-30">
             Traçabilité associée au BSD n° {bsff.id}
           </h3>
-          {hasFicheInterventions && (
-            <BsffFicheInterventions
-              ficheInterventions={bsff.ficheInterventions}
-            />
+          {equipmentHolderRows.length > 0 && (
+            <BsffEquipmentHolders bsff={bsff} />
           )}
           {hasPreviousBsffs && <PreviousBsffsTable bsff={bsff} />}
         </div>
@@ -305,7 +309,7 @@ function BsffPackagingFull({ packaging }: { packaging: BsffPackaging }) {
 function bsffPackagingLight(packaging: BsffPackaging) {
   return `${
     packaging.type === BsffPackagingType.AUTRE
-      ? packaging.other
+      ? packaging.other || packaging.type
       : packaging.type
   } n°${packaging.numero}`;
 }
@@ -691,50 +695,42 @@ function BsffPackagingAcceptationOperation({ bsff }: Pick<Props, "bsff">) {
   );
 }
 
-function BsffFicheInterventions({
-  ficheInterventions
-}: {
-  ficheInterventions: BsffFicheIntervention[];
-}) {
+export function BsffEquipmentHolders({ bsff }: Pick<Props, "bsff">) {
+  const rows = getEquipmentHolderRows(bsff);
+
   return (
     <div className="mb-30">
       <h4 className="TextUnderline">
-        Cas lié à la collecte de petites quantités
+        Détenteurs des équipements visés par le bordereau
       </h4>
       <table className="mb-3">
         <thead>
           <tr>
-            <th colSpan={3}>
-              Fiches d'interventions liées au bordereau de collecte de petites
-              quantités
-            </th>
-          </tr>
-          <tr>
-            <th>Numéro fiche d'intervention</th>
+            <th>Contenant</th>
             <th>Quantité de fluide en kg</th>
-            <th>Code postal lieu de collecte</th>
+            <th>Numéro fiche d'intervention</th>
+            <th>Détenteur d'équipement</th>
+            <th>Infos contact</th>
           </tr>
         </thead>
         <tbody>
-          {ficheInterventions.map(FI => (
-            <tr key={FI.id}>
-              <td>{FI.numero}</td>
-              <td>{FI.weight}</td>
-              <td>{FI.postalCode}</td>
+          {rows.map((row, index) => (
+            <tr
+              key={`${row.packaging?.id ?? "legacy"}-${
+                row.ficheIntervention?.id ?? "without-fiche"
+              }-${index}`}
+            >
+              <td>{row.packaging ? bsffPackagingLight(row.packaging) : ""}</td>
+              <td>{row.packaging?.weight ?? ""}</td>
+              <td>
+                {formatFicheIntervention(row.ficheIntervention, bsff.type)}
+              </td>
+              <td>{formatEquipmentHolderIdentification(row.detenteur)}</td>
+              <td>{formatEquipmentHolderContact(row.detenteur)}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div>
-        <div className="TextAlignCenter mb-3">
-          <strong>Ou</strong>
-        </div>
-        <div>
-          <input type="checkbox" /> Déclaration d'exemption de fiche
-          d'intervention pour certaines activités relevant R. 543-82 de code de
-          l'environnement.
-        </div>
-      </div>
     </div>
   );
 }

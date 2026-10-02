@@ -22,6 +22,7 @@ import {
 import { getPackagingInfosSummary } from "../../../common/utils/packagingsBsffSummary";
 import QRCodeIcon from "react-qr-code";
 import { TBsdStatusCode } from "../../../common/types/bsdTypes";
+import { getBsffPreviewActorTabs } from "./bsffPreviewUtils";
 
 interface BSFFPreviewContentProps {
   bsdId: string;
@@ -50,33 +51,17 @@ const BSFFPreviewContent = ({ bsdId }: BSFFPreviewContentProps) => {
   const shouldHideAssociatedBsffsTab =
     bsd?.type === BsffType.TracerFluide ||
     bsd?.type === BsffType.CollectePetitesQuantites;
-  const emitterLabel =
-    bsd?.type === BsffType.CollectePetitesQuantites
-      ? "Opérateur"
-      : bsd?.type === BsffType.TracerFluide
-      ? "Autre détenteur"
-      : "Installation de tri, transit, regroupement";
+  const actorTabs = bsd ? getBsffPreviewActorTabs(bsd) : [];
   const tabsList = [
     {
       tabId: "dechet",
       label: "Déchet",
       iconId: "fr-icon-arrow-right-line" as FrIconClassName
     },
-    {
-      tabId: "emetteur",
-      label: emitterLabel,
+    ...actorTabs.map(tab => ({
+      ...tab,
       iconId: "fr-icon-map-pin-2-fill" as FrIconClassName
-    },
-    ...(bsd?.type === BsffType.CollectePetitesQuantites &&
-    bsd?.ficheInterventions?.length > 0
-      ? [
-          {
-            tabId: "detenteur",
-            label: "Détenteur",
-            iconId: "fr-icon-map-pin-2-fill" as FrIconClassName
-          }
-        ]
-      : []),
+    })),
     {
       tabId: "transport",
       label: "Transporteur" + (isMultiModal ? "s" : ""),
@@ -122,9 +107,6 @@ const BSFFPreviewContent = ({ bsdId }: BSFFPreviewContentProps) => {
         : "",
     [bsd]
   );
-
-  console.log("BSD", bsd);
-  console.log("updatedAt", bsd?.updatedAt);
 
   return (
     <>
