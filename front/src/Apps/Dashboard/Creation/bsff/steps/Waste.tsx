@@ -97,11 +97,15 @@ const WasteBsff = () => {
       {!!sealedFields.length && <DisabledParagraphStep />}
 
       <div className="fr-col">
-        {isSpecialType && <BsffTypeRadioGroup />}
+        {isSpecialType && bsffType !== BsffType.Reconditionnement && (
+          <BsffTypeRadioGroup />
+        )}
 
-        {heading && <h4 className="form__section-heading">{heading}</h4>}
+        {heading && bsffType !== BsffType.Reconditionnement && (
+          <h4 className="form__section-heading">{heading}</h4>
+        )}
 
-        {heading && (
+        {heading && bsffType !== BsffType.Reconditionnement && (
           <MyBsffCompanySelector
             value={emitterCompany}
             onChange={company => {
@@ -113,7 +117,7 @@ const WasteBsff = () => {
 
         {!hideAfterCompanySelector && (
           <>
-            {instruction && (
+            {instruction && bsffType !== BsffType.Reconditionnement && (
               <>
                 <Alert
                   description={instruction}

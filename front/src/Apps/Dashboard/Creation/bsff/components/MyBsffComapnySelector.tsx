@@ -68,7 +68,8 @@ export default function MyBsffCompanySelector({
 
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: data => {
-      const companies = data.me.companies ?? [];
+      const allCompanies = data.me.companies ?? [];
+      const companies = filter ? filter(allCompanies) : allCompanies;
       const exists = companies.some(c => c.siret === company.siret);
 
       if (!exists) {
