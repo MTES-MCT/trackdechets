@@ -34,17 +34,17 @@ services:
       - 27017:27017
 
   minio:
-    image: quay.io/minio/minio
+    image: bitnamilegacy/minio:latest
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     environment:
       MINIO_ROOT_USER: trackdechets
       MINIO_ROOT_PASSWORD: password
+      MINIO_CONSOLE_PORT_NUMBER: 8900
     ports:
       - "9000:9000"
       - "8900:8900"
     volumes:
       - minio:/data/minio
-    command: minio server /data/minio --console-address ":8900"
 
   nginx:
     image: nginx:1.19.6
