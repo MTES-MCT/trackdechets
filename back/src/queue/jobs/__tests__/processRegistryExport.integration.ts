@@ -20,6 +20,7 @@ import { RegistryExportFormat, RegistryExportStatus } from "@td/prisma";
 import { parse as csvParse } from "@fast-csv/parse";
 import * as Excel from "exceljs";
 import { Readable } from "stream";
+import { indexQueue } from "../../producers/elastic";
 
 const CREATE_BSDA = gql`
   mutation CreateBsda($input: BsdaInput!) {
@@ -52,30 +53,25 @@ const SIGN_BSDA = gql`
   }
 `;
 
-// Helper function to wait for RegistryLookup entries to be created
+// Mutations enqueue indexing after commit. Wait for this BSDA's jobs, including
+// retries, before asserting the lookup rows written by the indexing worker.
 const waitForRegistryLookup = async (
   bsdaId: string,
-  maxAttempts = 10,
-  intervalMs = 1000,
-  expectedCount = 1
+  expectedCount: number
 ): Promise<void> => {
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const lookupCount = await prisma.registryLookup.count({
-      where: { bsdaId }
-    });
+  const jobs = await indexQueue.getJobs([
+    "waiting",
+    "active",
+    "delayed",
+    "completed",
+    "failed"
+  ]);
+  const bsdaJobs = jobs.filter(job => job.data === bsdaId);
+  expect(bsdaJobs.length).toBeGreaterThan(0);
+  await Promise.all(bsdaJobs.map(job => job.finished()));
 
-    if (lookupCount === expectedCount) {
-      return;
-    }
-
-    if (attempt < maxAttempts - 1) {
-      await new Promise(resolve => setTimeout(resolve, intervalMs));
-    }
-  }
-
-  throw new Error(
-    `Registry lookup entries not created for BSDA ${bsdaId} after ${maxAttempts} attempts`
-  );
+  const lookupCount = await prisma.registryLookup.count({ where: { bsdaId } });
+  expect(lookupCount).toBe(expectedCount);
 };
 
 // Helper function to sign BSDA
@@ -112,7 +108,7 @@ const signBsdaForOutgoingRegistry = async (
   await signBsda(workerUser, bsdaId, "WORK");
   await signBsda(transporterUser, bsdaId, "TRANSPORT");
   // After transport signature, outgoing registry entries should appear
-  await waitForRegistryLookup(bsdaId, 10, 500, 3);
+  await waitForRegistryLookup(bsdaId, 3);
 };
 
 // Helper function to sign BSDA for incoming registry (complete flow through operation)
@@ -128,7 +124,7 @@ const signBsdaForIncomingRegistry = async (
   await signBsda(transporterUser, bsdaId, "TRANSPORT");
   await signBsda(destinationUser, bsdaId, "OPERATION");
   // After operation signature, incoming registry entries should appear
-  await waitForRegistryLookup(bsdaId, 10, 500, 4);
+  await waitForRegistryLookup(bsdaId, 4);
 };
 
 // Helper function to create a BSDA using GraphQL mutation
