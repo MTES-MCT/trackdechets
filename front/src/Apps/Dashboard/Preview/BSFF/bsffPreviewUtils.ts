@@ -60,6 +60,39 @@ const getPackagingFiches = (
   );
 };
 
+const appendPackagingHolderRows = (
+  packaging: BsffPackaging,
+  packagingDetenteurs: BsffDetenteur[],
+  packagingFiches: BsffFicheIntervention[],
+  rows: BsffDetainerRow[],
+  displayedFicheIds: Set<string>
+): void => {
+  for (const detenteur of packagingDetenteurs) {
+    let matchingFiches = packagingFiches.filter(fiche =>
+      isSameDetenteur(detenteur, fiche.detenteur)
+    );
+
+    // Legacy data may contain the relation without enough identity data
+    // to perform the match. A one-to-one relation is unambiguous.
+    if (
+      matchingFiches.length === 0 &&
+      packagingDetenteurs.length === 1 &&
+      packagingFiches.length === 1
+    ) {
+      matchingFiches = packagingFiches;
+    }
+
+    if (matchingFiches.length === 0) {
+      rows.push({ packaging, detenteur });
+    } else {
+      for (const ficheIntervention of matchingFiches) {
+        displayedFicheIds.add(ficheIntervention.id);
+        rows.push({ packaging, detenteur, ficheIntervention });
+      }
+    }
+  }
+};
+
 /**
  * The packaging owns the holder assignment. The intervention sheet only
  * enriches that assignment and remains a fallback for legacy BSFFs.
@@ -80,30 +113,13 @@ export const getBsffDetainerRows = (
     );
 
     if (packagingDetenteurs.length > 0) {
-      for (const detenteur of packagingDetenteurs) {
-        let matchingFiches = packagingFiches.filter(fiche =>
-          isSameDetenteur(detenteur, fiche.detenteur)
-        );
-
-        // Legacy data may contain the relation without enough identity data
-        // to perform the match. A one-to-one relation is unambiguous.
-        if (
-          matchingFiches.length === 0 &&
-          packagingDetenteurs.length === 1 &&
-          packagingFiches.length === 1
-        ) {
-          matchingFiches = packagingFiches;
-        }
-
-        if (matchingFiches.length === 0) {
-          rows.push({ packaging, detenteur });
-        } else {
-          for (const ficheIntervention of matchingFiches) {
-            displayedFicheIds.add(ficheIntervention.id);
-            rows.push({ packaging, detenteur, ficheIntervention });
-          }
-        }
-      }
+      appendPackagingHolderRows(
+        packaging,
+        packagingDetenteurs,
+        packagingFiches,
+        rows,
+        displayedFicheIds
+      );
       continue;
     }
 

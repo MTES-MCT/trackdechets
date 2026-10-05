@@ -71,6 +71,37 @@ const hasCompanyValue = (company?: FormCompany | null) =>
       )
   );
 
+const appendPackagingHolderRows = (
+  packaging: BsffPackaging,
+  detenteurs: BsffDetenteur[],
+  packagingFiches: BsffFicheIntervention[],
+  rows: EquipmentHolderRow[],
+  displayedFicheIds: Set<string>
+): void => {
+  for (const detenteur of detenteurs) {
+    let matchingFiches = packagingFiches.filter(fiche =>
+      isSameDetenteur(detenteur, fiche.detenteur)
+    );
+
+    if (
+      matchingFiches.length === 0 &&
+      detenteurs.length === 1 &&
+      packagingFiches.length === 1
+    ) {
+      matchingFiches = packagingFiches;
+    }
+
+    if (matchingFiches.length === 0) {
+      rows.push({ packaging, detenteur });
+    } else {
+      for (const ficheIntervention of matchingFiches) {
+        displayedFicheIds.add(ficheIntervention.id);
+        rows.push({ packaging, detenteur, ficheIntervention });
+      }
+    }
+  }
+};
+
 /**
  * Builds the PDF rows from packaging assignments. Intervention sheets are
  * optional metadata and remain a fallback for legacy BSFFs.
@@ -133,28 +164,13 @@ export function getEquipmentHolderRows(
       ];
     }
 
-    for (const detenteur of detenteurs) {
-      let matchingFiches = packagingFiches.filter(fiche =>
-        isSameDetenteur(detenteur, fiche.detenteur)
-      );
-
-      if (
-        matchingFiches.length === 0 &&
-        detenteurs.length === 1 &&
-        packagingFiches.length === 1
-      ) {
-        matchingFiches = packagingFiches;
-      }
-
-      if (matchingFiches.length === 0) {
-        rows.push({ packaging, detenteur });
-      } else {
-        for (const ficheIntervention of matchingFiches) {
-          displayedFicheIds.add(ficheIntervention.id);
-          rows.push({ packaging, detenteur, ficheIntervention });
-        }
-      }
-    }
+    appendPackagingHolderRows(
+      packaging,
+      detenteurs,
+      packagingFiches,
+      rows,
+      displayedFicheIds
+    );
   }
 
   // Older BSFFs can have intervention sheets without packaging relations.
