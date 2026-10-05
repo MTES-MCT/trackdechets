@@ -31,11 +31,9 @@ const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
 const BANNER_MESSAGES = [
   <>
-    Un assistant conversationnel, basé sur l'intelligence artificiel, est
-    désormais disponible en bas à droite de votre interface. Il vous aide à
-    trouver rapidement les informations recherchées et à vous orienter dans
-    l’utilisation de la plateforme. Il vient en complément de notre équipe
-    support, qui reste disponible pour vous accompagner.
+    Vous pouvez désormais tester en avance de phase les bordereaux de suivi
+    Fluides Frigorigènes (BSFF). Vous voulez partager vos retours, remonter une
+    anomalie ? Le formulaire ci-contre est pour vous !
   </>
 ];
 
