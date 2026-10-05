@@ -73,7 +73,12 @@ export async function buildPdf(bsff: BsffForBuildPdf, renderEmpty?: boolean) {
 
   let bsffForPdf = {
     ...expandBsffFromDB(bsff),
-    packagings: bsff.packagings.map(expandBsffPackagingFromDB),
+    packagings: bsff.packagings.map(packaging => ({
+      ...expandBsffPackagingFromDB(packaging),
+      ficheInterventions: packaging.ficheInterventions.map(
+        expandFicheInterventionBsffFromDB
+      )
+    })),
     ficheInterventions: bsff.ficheInterventions.map(
       expandFicheInterventionBsffFromDB
     ),
