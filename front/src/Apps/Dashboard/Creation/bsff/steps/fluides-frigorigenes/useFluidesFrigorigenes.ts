@@ -49,9 +49,9 @@ export function useFluidesFrigorigenes(
             siret,
             dataState: {
               status: "success",
-              interventions: response.data.map(
-                adaptFluidesFrigorigenesIntervention
-              )
+              interventions: response.data
+                .map(adaptFluidesFrigorigenesIntervention)
+                .filter(intervention => intervention.wasteCodes.length === 1)
             }
           });
         }

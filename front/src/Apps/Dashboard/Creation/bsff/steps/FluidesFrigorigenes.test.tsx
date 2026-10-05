@@ -102,7 +102,7 @@ describe("FluidesFrigorigenesBsff", () => {
     expect(screen.queryByText("BOUT-001")).not.toBeInTheDocument();
   });
 
-  it("renders every waste code of a mixed intervention", () => {
+  it("hides mixed waste code interventions", () => {
     renderComponent({
       status: "success",
       interventions: [
@@ -120,7 +120,8 @@ describe("FluidesFrigorigenesBsff", () => {
       ]
     });
 
-    expect(screen.getByText("14 06 01*, 16 05 04*")).toBeInTheDocument();
+    expect(screen.queryByText("FI-2026-001")).not.toBeInTheDocument();
+    expect(screen.queryByText("14 06 01*, 16 05 04*")).not.toBeInTheDocument();
     expect(screen.queryByText("Erreur 500 : API down")).not.toBeInTheDocument();
   });
 
