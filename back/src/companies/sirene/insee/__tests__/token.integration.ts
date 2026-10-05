@@ -9,7 +9,17 @@ import { prisma } from "@td/prisma";
 jest.mock("axios");
 
 describe("authorizedAxiosGet", () => {
+  const originalEnv = {
+    INSEE_CLIENT_ID: process.env.INSEE_CLIENT_ID,
+    INSEE_CLIENT_SECRET: process.env.INSEE_CLIENT_SECRET,
+    INSEE_USERNAME: process.env.INSEE_USERNAME
+  };
+
   beforeEach(async () => {
+    process.env.INSEE_CLIENT_ID = "test-client-id";
+    process.env.INSEE_CLIENT_SECRET = "test-client-secret";
+    process.env.INSEE_USERNAME = "test-user";
+
     await prisma.inseePasswordCredential.upsert({
       where: { key: "insee_password" },
       create: {
@@ -26,6 +36,10 @@ describe("authorizedAxiosGet", () => {
 
   afterEach(async () => {
     (axios.get as jest.Mock).mockReset();
+    (axios.post as jest.Mock).mockReset();
+    process.env.INSEE_CLIENT_ID = originalEnv.INSEE_CLIENT_ID;
+    process.env.INSEE_CLIENT_SECRET = originalEnv.INSEE_CLIENT_SECRET;
+    process.env.INSEE_USERNAME = originalEnv.INSEE_USERNAME;
     await resetCache();
   });
 

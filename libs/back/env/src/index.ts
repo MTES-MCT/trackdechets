@@ -4,7 +4,7 @@ export const schema = z.object({
   // Node
   TZ: z
     .string()
-    .optional()
+    .optional() // We have to keep it optional as it's defined as is in official Node typings
     .refine(val => val === "Europe/Paris"),
   NODE_ENV: z.enum(["test", "production", "dev", "development"]),
   // -------
@@ -186,6 +186,14 @@ export const envVariables = schema.superRefine((val, ctx) => {
 });
 
 export type EnvVariables = z.infer<typeof envVariables>;
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-empty-object-type
+    interface ProcessEnv extends z.infer<typeof envVariables> {}
+  }
+}
 
 function isBoolean(value: string) {
   return value === "true" || value === "false";

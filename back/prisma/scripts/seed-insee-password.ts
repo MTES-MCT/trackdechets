@@ -45,7 +45,7 @@ async function main() {
 
   const passwordChangedAt = new Date();
 
-  const credential = await prisma.inseePasswordCredential.upsert({
+  await prisma.inseePasswordCredential.upsert({
     where: { key: INSEE_PASSWORD_CREDENTIAL_KEY },
     create: {
       key: INSEE_PASSWORD_CREDENTIAL_KEY,
