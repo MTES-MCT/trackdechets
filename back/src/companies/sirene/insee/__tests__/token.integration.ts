@@ -3,10 +3,27 @@ import { authorizedAxiosGet, getToken, INSEE_TOKEN_KEY } from "../token";
 import { resetCache } from "../../../../../integration-tests/helper";
 import { setInCache } from "../../../../common/redis";
 import { siretify } from "../../../../__tests__/factories";
+import { aesEncrypt } from "../../../../utils";
+import { prisma } from "@td/prisma";
 
 jest.mock("axios");
 
 describe("authorizedAxiosGet", () => {
+  beforeEach(async () => {
+    await prisma.inseePasswordCredential.upsert({
+      where: { key: "insee_password" },
+      create: {
+        key: "insee_password",
+        encryptedPassword: aesEncrypt("TestPassword123!"),
+        passwordChangedAt: new Date()
+      },
+      update: {
+        encryptedPassword: aesEncrypt("TestPassword123!"),
+        passwordChangedAt: new Date()
+      }
+    });
+  });
+
   afterEach(async () => {
     (axios.get as jest.Mock).mockReset();
     await resetCache();
