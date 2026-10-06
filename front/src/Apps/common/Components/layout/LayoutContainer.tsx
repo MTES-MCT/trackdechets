@@ -70,6 +70,10 @@ export default function LayoutContainer() {
               v2banner={
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
+                  button={{
+                    title: "Formulaire de retours",
+                    href: "https://forms.cloud.microsoft/e/tDLQAQHj6a"
+                  }}
                   persistedSurveyName="td-20260210"
                 />
               }
