@@ -15,6 +15,7 @@ const ME = `
       trackingConsentUntil
       companies {
         siret
+        securityCode
         userRole
         userPermissions
       }
@@ -73,5 +74,6 @@ describe("query me", () => {
       "BSD_CAN_REVISE",
       "REGISTRY_CAN_IMPORT"
     ]);
+    expect(companies[0].securityCode).toEqual(company.securityCode);
   });
 });
