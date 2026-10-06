@@ -3,7 +3,10 @@ import { useFormContext } from "react-hook-form";
 import { BsffPackaging, BsffType } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
-import { bsffPackagingTypes } from "../../../../Forms/Components/PackagingList/helpers";
+import {
+  bsffPackagingTypes,
+  emptyBsffPackaging
+} from "../../../../Forms/Components/PackagingList/helpers";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { BSFF_WASTES } from "@td/constants";
 import Select from "@codegouvfr/react-dsfr/Select";
@@ -32,9 +35,15 @@ const WasteBsff = () => {
   useEffect(() => {
     if (prevTypeRef.current !== bsffType) {
       if (!id) {
-        setValue("packagings", []);
+        setValue(
+          "packagings",
+          bsffType === BsffType.Reconditionnement
+            ? [{ ...emptyBsffPackaging }]
+            : []
+        );
         setValue("grouping", []);
         setValue("forwarding", null);
+        setValue("repackaging", []);
         setValue("waste.code", "");
         setValue("waste.description", "");
         setValue("waste.adr", "");
