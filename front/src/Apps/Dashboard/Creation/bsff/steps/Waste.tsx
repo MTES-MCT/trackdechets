@@ -7,8 +7,10 @@ import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { BSFF_WASTES } from "@td/constants";
 import Select from "@codegouvfr/react-dsfr/Select";
 import Input from "@codegouvfr/react-dsfr/Input";
+import Table from "@codegouvfr/react-dsfr/Table";
 import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
+import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 import RhfBsffPackagingList from "../components/RhfBsffPackagingList";
 import Alert from "@codegouvfr/react-dsfr/Alert";
@@ -31,9 +33,11 @@ const WasteBsff = () => {
   const bsffType = watch("type");
   const isDetenteur = bsffType === BsffType.TracerFluide;
   const isOperateur = isBsffOperatorWasteStep(bsffType);
+  const isReconditionnement = bsffType === BsffType.Reconditionnement;
   const packagings = watch("packagings");
   const weight = watch("weight", {});
   const emitterCompany = watch("emitter.company");
+  const repackaging = watch("repackaging", []);
 
   const prevTypeRef = useRef<BsffType | undefined>(bsffType);
 
@@ -64,16 +68,60 @@ const WasteBsff = () => {
   const totalWeightNumber = getBsffPackagingsTotalWeight(packagings ?? []);
 
   const totalWeight = totalWeightNumber === 0 ? "" : totalWeightNumber;
-  const totalPackagings = packagings?.length ?? 0;
+  //const totalPackagings = packagings?.length ?? 0;
 
   useEffect(() => {
     setValue("weight.value", totalWeight);
   }, [totalWeight, setValue]);
 
+  useEffect(() => {
+    if (bsffType !== BsffType.Reconditionnement || !repackaging.length) return;
+
+    const first = repackaging[0];
+    const wasteCode = first.acceptation?.wasteCode ?? first.waste?.code ?? "";
+    const wasteDescription =
+      first.acceptation?.wasteDescription ?? first.waste?.description ?? "";
+
+    if (wasteCode && !watch("waste.code")) {
+      setValue("waste.code", wasteCode, {
+        shouldDirty: true,
+        shouldValidate: true
+      });
+    }
+
+    if (wasteDescription && !watch("waste.description")) {
+      setValue("waste.description", wasteDescription, {
+        shouldDirty: true,
+        shouldValidate: true
+      });
+    }
+  }, [bsffType, repackaging, setValue, watch]);
+
   const wasteCodeDisabled = [
     BsffType.Groupement,
     BsffType.Reexpedition
   ].includes(bsffType);
+
+  const reconditioningTableData = (repackaging ?? []).map(container => [
+    container.type ?? "Non renseigné",
+    container.volume == null ? "Non renseigné" : `${container.volume} L`,
+    container.numero ?? "Non renseigné",
+    container.acceptation?.weight == null && container.weight == null
+      ? "Non renseigné"
+      : `${container.acceptation?.weight ?? container.weight} kg`
+  ]);
+
+  const selectedContainersTotalWeight = (repackaging ?? []).reduce(
+    (total, container) =>
+      total + Number(container.acceptation?.weight ?? container.weight ?? 0),
+    0
+  );
+  const fluidWeightDifference =
+    Number(weight?.value ?? 0) - selectedContainersTotalWeight;
+  const formatKg = (value: number) =>
+    `${new Intl.NumberFormat("fr-FR", {
+      maximumFractionDigits: 3
+    }).format(value)} kg`;
 
   const heading =
     bsffType === BsffType.Groupement
@@ -134,7 +182,11 @@ const WasteBsff = () => {
                 />
               </>
             )}
-            <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
+
+            {isReconditionnement && (
+              <h4 className="fr-h4 fr-mt-4w">Informations générales</h4>
+            )}
+            {!isReconditionnement && <h4 className="fr-h4 fr-mt-4w">Déchet</h4>}
             <Select
               className="fr-col-md-8 fr-mt-2w"
               label={`Code déchet${isDetenteur ? " *" : ""}`}
@@ -209,7 +261,33 @@ const WasteBsff = () => {
             {!isOperateur && (
               <p className="fr-info-text">A renseigner si vous êtes concerné</p>
             )}
-            {!hasBsffPackagingAccordions(bsffType) && (
+
+            {isReconditionnement && repackaging.length > 0 && (
+              <>
+                <h4 className="fr-h4 fr-mt-4w">Avant reconditionnement</h4>
+                <Accordion
+                  label="Afficher les contenants sélectionnés"
+                  defaultExpanded={true}
+                  className="fr-mb-2w"
+                >
+                  <Table
+                    caption="Contenants sélectionnés"
+                    headers={[
+                      "Type de contenant",
+                      "Volume",
+                      "Identifiant du contenant",
+                      "Poids"
+                    ]}
+                    data={reconditioningTableData}
+                  />
+                </Accordion>
+              </>
+            )}
+
+            {isReconditionnement && (
+              <h4 className="fr-h4 fr-mt-4w">1 - Contenant</h4>
+            )}
+            {!isReconditionnement && !hasBsffPackagingAccordions(bsffType) && (
               <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
             )}
             <div
@@ -230,15 +308,40 @@ const WasteBsff = () => {
                 fieldName="packagings"
                 packagingTypes={bsffPackagingTypes}
                 detenteurMode={isDetenteur}
-                operateurMode={isOperateur}
+                operateurMode={
+                  isOperateur || bsffType === BsffType.Reconditionnement
+                }
               />
             </div>
             <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>
+            {isReconditionnement && repackaging.length > 0 && (
+              <div className="fr-mt-4w">
+                {Math.abs(fluidWeightDifference) <= 1 ? (
+                  <Alert
+                    severity="success"
+                    small
+                    title="Écart OK"
+                    description="Aucun écart significatif entre la somme des poids des contenants sélectionnés et la quantité totale de fluide."
+                  />
+                ) : (
+                  <Alert
+                    severity="warning"
+                    small
+                    title="Écart indicatif"
+                    description={`Écart de ${formatKg(
+                      fluidWeightDifference
+                    )} entre la somme des poids des contenants sélectionnés et la quantité totale de fluide.`}
+                  />
+                )}
+              </div>
+            )}
             <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
               <div className="fr-col-md-6">
                 <NonScrollableInput
                   label={
-                    isDetenteur
+                    isReconditionnement
+                      ? "Quantité totale de fluide en kg"
+                      : isDetenteur
                       ? "Quantité totale de fluide en kg *"
                       : "Poids total en kilos"
                   }
@@ -262,7 +365,7 @@ const WasteBsff = () => {
                 </p>
               </div>
 
-              {isDetenteur && (
+              {(isDetenteur || isReconditionnement) && (
                 <>
                   <div className="fr-col-md-6">
                     <NonScrollableInput
@@ -280,7 +383,7 @@ const WasteBsff = () => {
                     </p>
                   </div>
 
-                  <div className="fr-col-md-6">
+                  {/* <div className="fr-col-md-6">
                     <NonScrollableInput
                       label="Nombre total de contenants *"
                       disabled
@@ -291,7 +394,7 @@ const WasteBsff = () => {
                         "aria-required": true
                       }}
                     />
-                  </div>
+                  </div> */}
                 </>
               )}
 

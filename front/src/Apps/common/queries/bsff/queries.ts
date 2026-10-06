@@ -4,6 +4,7 @@ import {
   FullBsffFragment,
   PreviousBsffPackagingFragment
 } from "../fragments";
+import { bsffPackagingForReconditioningFragment } from "../../../../../../front/src/Apps/Dashboard/Validation/bsff/queries";
 
 export const GET_BSFF_FORM = gql`
   query Bsff($id: ID!) {
@@ -41,6 +42,19 @@ export const GET_PREVIOUS_PACKAGINGS = gql`
     }
   }
   ${PreviousBsffPackagingFragment}
+`;
+export const GET_RECONDITIONING_PACKAGINGS = gql`
+  query ReconditioningPackagings($where: BsffPackagingWhere, $first: Int) {
+    bsffPackagings(where: $where, first: $first) {
+      totalCount
+      edges {
+        node {
+          ...BsffPackagingForReconditioningFragment
+        }
+      }
+    }
+  }
+  ${bsffPackagingForReconditioningFragment}
 `;
 
 export const CREATE_DRAFT_BSFF = gql`

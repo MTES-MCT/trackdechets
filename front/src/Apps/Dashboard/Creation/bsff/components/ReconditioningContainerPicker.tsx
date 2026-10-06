@@ -40,6 +40,10 @@ export default function ReconditioningContainerPicker({
       (getReconditioningWasteCode(container) ?? "").includes(filters.wasteCode)
     );
   });
+  const isAlreadySelected = (container: ReconditioningContainer) =>
+    selected.some(item => item.id === container.id) ||
+    confirmed.some(item => item.id === container.id);
+
   const columns = (container: ReconditioningContainer) => [
     container.numero ?? "Non renseigné",
     container.bsff.emitter?.company?.name ?? "Non renseigné",
@@ -91,7 +95,9 @@ export default function ReconditioningContainerPicker({
             type="button"
             size="small"
             disabled={
-              disabled || !canAddReconditioningContainer(selected, container)
+              disabled ||
+              isAlreadySelected(container) ||
+              !canAddReconditioningContainer(selected, container)
             }
             onClick={() =>
               setSelected(current =>
@@ -99,7 +105,7 @@ export default function ReconditioningContainerPicker({
               )
             }
           >
-            Ajouter
+            {isAlreadySelected(container) ? "Ajouté" : "Ajouter"}
           </Button>
         ])}
       />

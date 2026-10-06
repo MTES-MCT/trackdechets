@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import "./DetenteurAccordion.scss";
 
@@ -18,7 +18,7 @@ export type DetenteurAccordionProps = {
   expanded?: boolean;
   children: NonNullable<React.ReactNode>;
   deleteLabel: string;
-  hideHeader?: boolean; // Nouvelle prop pour masquer l'en-tête
+  hideHeader?: boolean;
 };
 
 export function DetenteurAccordion({
@@ -37,22 +37,9 @@ export function DetenteurAccordion({
   disableDown = false,
   children,
   deleteLabel,
-  hideHeader = false // Par défaut, l'en-tête est visible
+  hideHeader = false
 }: DetenteurAccordionProps) {
   const collapseElementId = `actor__${numero}__form`;
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [contentHeight, setContentHeight] = useState(0);
-
-  useEffect(() => {
-    if (!contentRef.current) return;
-    const resizeObserver = new ResizeObserver(entries => {
-      if (entries[0]) {
-        setContentHeight(entries[0].contentRect.height);
-      }
-    });
-    resizeObserver.observe(contentRef.current);
-    return () => resizeObserver.disconnect();
-  }, []);
 
   return (
     <section className="actor">
@@ -125,12 +112,12 @@ export function DetenteurAccordion({
 
       <div
         id={collapseElementId}
-        className="actor__form"
+        className={`actor__form ${expanded ? "is-expanded" : ""}`}
         style={{
-          maxHeight: expanded ? contentHeight + 28 : 0
+          display: expanded ? "block" : "none"
         }}
       >
-        <div ref={contentRef}>{children}</div>
+        <div>{children}</div>
       </div>
     </section>
   );
