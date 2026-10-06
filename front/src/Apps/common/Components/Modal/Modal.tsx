@@ -46,7 +46,7 @@ export function Modal({
   const ref = React.useRef(null);
   const { modalProps, underlayProps } = useModalOverlay(props, state, ref);
 
-  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [isCrispOpen, setIsCrispOpen] = useState(false);
 
   /**
@@ -74,27 +74,30 @@ export function Modal({
   }, []);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.visualViewport) {
-        const viewportHeight = window.visualViewport.height;
-        const screenHeight = window.innerHeight;
+    const visualViewport = window.visualViewport;
 
-        if (viewportHeight < screenHeight) {
-          // Le clavier est ouvert, calcul de l'espace perdu
-          setKeyboardOffset(screenHeight - viewportHeight);
-        } else {
-          // Clavier fermé
-          setKeyboardOffset(0);
-        }
-      }
+    const updateViewportHeight = () => {
+      setViewportHeight(visualViewport?.height ?? window.innerHeight);
     };
 
-    window.visualViewport?.addEventListener("resize", handleResize);
-    window.visualViewport?.addEventListener("scroll", handleResize);
+    updateViewportHeight();
+
+    visualViewport?.addEventListener("resize", updateViewportHeight);
+    window.addEventListener("resize", updateViewportHeight);
 
     return () => {
-      window.visualViewport?.removeEventListener("resize", handleResize);
-      window.visualViewport?.removeEventListener("scroll", handleResize);
+      visualViewport?.removeEventListener("resize", updateViewportHeight);
+      window.removeEventListener("resize", updateViewportHeight);
+    };
+  }, []);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
     };
   }, []);
 
@@ -104,9 +107,10 @@ export function Modal({
     <Overlay portalContainer={portal || undefined}>
       <div
         style={{
-          height: `calc(100vh - ${keyboardOffset}px)`,
-          overflow: "auto",
-          transition: "height 0.05s ease-out"
+          height: viewportHeight ? `${viewportHeight}px` : "100dvh",
+          maxHeight: viewportHeight ? `${viewportHeight}px` : "100dvh",
+          WebkitOverflowScrolling: "touch",
+          overscrollBehavior: "contain"
         }}
         className="tdModalOverlay"
         {...underlayProps}
