@@ -274,6 +274,8 @@ export const FullBsffFragment = gql`
     forwarding {
       id
       numero
+      type
+      other
       weight
       volume
       name
@@ -295,10 +297,31 @@ export const FullBsffFragment = gql`
     repackaging {
       id
       numero
+      type
+      other
       weight
       volume
       name
       bsffId
+
+      detenteurs {
+        isPrivateIndividual
+        company {
+          ...CompanyFragment
+        }
+      }
+
+      ficheInterventions {
+        id
+        numero
+        detenteur {
+          isPrivateIndividual
+          company {
+            ...CompanyFragment
+          }
+        }
+      }
+
       bsff {
         id
         emitter {
@@ -316,6 +339,8 @@ export const FullBsffFragment = gql`
     grouping {
       id
       numero
+      type
+      other
       weight
       volume
       name
@@ -370,5 +395,40 @@ export const PreviousBsffPackagingFragment = gql`
     nextBsff {
       id
     }
+    detenteurs {
+      isPrivateIndividual
+      company {
+        ...CompanyFragment
+      }
+    }
+    ficheInterventions {
+      id
+      numero
+      detenteur {
+        isPrivateIndividual
+        company {
+          ...CompanyFragment
+        }
+      }
+    }
+    bsff {
+      id
+      ficheInterventions {
+        id
+        numero
+        detenteur {
+          isPrivateIndividual
+          company {
+            ...CompanyFragment
+          }
+        }
+      }
+      emitter {
+        company {
+          ...CompanyFragment
+        }
+      }
+    }
   }
+  ${companyFragment}
 `;

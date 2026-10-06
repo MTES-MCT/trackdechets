@@ -1,9 +1,8 @@
 import * as React from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { BsdType } from "@td/codegen-ui";
+import { BsdType, BsffType } from "@td/codegen-ui";
 import { DetenteurAccordion } from "../DetenteurAccordion/DetenteurAccordion";
 import { RhfDetenteurForm } from "../DetenteurForm/RhfDetenteurForm";
-import { BsffType } from "@td/codegen-ui";
 import { BsffEquipmentHolderForm } from "../../../Dashboard/Creation/bsff/components/BsffEquipmentHolderForm";
 
 type RhfDetenteurListProps = {
@@ -12,16 +11,23 @@ type RhfDetenteurListProps = {
   bsdType: BsdType;
 };
 
-export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
+export function RhfDetenteurList({
+  orgId,
+  fieldName
+}: Readonly<RhfDetenteurListProps>) {
   const { control, watch } = useFormContext();
+
   const { fields, insert, remove, swap } = useFieldArray({
     control,
     name: fieldName
   });
 
   const type = watch("type");
+
   const isTracerFluide = type === BsffType.TracerFluide;
   const isOperator = type === BsffType.CollectePetitesQuantites;
+  const isReconditionnement = type === BsffType.Reconditionnement;
+
   const usesEquipmentHolderForm = isTracerFluide || isOperator;
 
   const INSTALLATION_TYPES = [
@@ -32,35 +38,59 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
 
   const isInstallationType = INSTALLATION_TYPES.includes(type);
 
-  const emptyHolder = React.useCallback(
-    () =>
-      usesEquipmentHolderForm
-        ? {
-            numero: isTracerFluide
-              ? `DETENTEUR_${Date.now()}_${Math.random().toString(36).slice(2)}`
-              : "",
-            isExempted: false,
-            holderType: "",
-            identification: "",
-            detenteur: { isPrivateIndividual: false, company: {} },
-            packagings: []
-          }
-        : {},
-    [isTracerFluide, usesEquipmentHolderForm]
-  );
+  const emptyHolder = React.useCallback(() => {
+    const makeRandomSuffix = () => {
+      if (typeof crypto !== "undefined" && "getRandomValues" in crypto) {
+        const values = new Uint32Array(1);
+        crypto.getRandomValues(values);
+        return values[0].toString(36);
+      }
+
+      return Date.now().toString(36);
+    };
+
+    return usesEquipmentHolderForm
+      ? {
+          numero: isTracerFluide
+            ? `DETENTEUR_${Date.now()}_${makeRandomSuffix()}`
+            : "",
+          isExempted: false,
+          holderType: "",
+          identification: "",
+          detenteur: {
+            isPrivateIndividual: false,
+            company: {}
+          },
+          packagings: []
+        }
+      : {};
+  }, [isTracerFluide, usesEquipmentHolderForm]);
 
   React.useEffect(() => {
-    if (fields.length === 0) {
+    if (fields.length === 0 && !isReconditionnement) {
       insert(0, emptyHolder());
     }
-  }, [emptyHolder, fields.length, insert]);
+  }, [emptyHolder, fields.length, insert, isReconditionnement]);
 
-  const [expandedIdx, setExpandedIdx] = React.useState<number | null>(0);
+  const [expandedIdx, setExpandedIdx] = React.useState<number | null>(
+    isReconditionnement ? null : 0
+  );
 
   return (
     <>
       {fields.map((fieldItem, idx) => {
         const numero = idx + 1;
+        let holderTypeLabel = "Détenteur";
+
+        if (isReconditionnement) {
+          holderTypeLabel = watch(
+            `${fieldName}.${idx}.detenteur.isPrivateIndividual`
+          )
+            ? "Détenteur particulier"
+            : "Détenteur entreprise";
+        }
+
+        const isExpanded = isReconditionnement || expandedIdx === idx;
 
         const onAdd = () => {
           insert(idx + 1, emptyHolder());
@@ -69,6 +99,7 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
 
         const onDelete = () => {
           remove(idx);
+
           if (expandedIdx === idx) {
             setExpandedIdx(null);
           } else if (expandedIdx !== null && expandedIdx > idx) {
@@ -77,8 +108,12 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
         };
 
         const onShiftUp = () => {
-          if (idx === 0) return;
+          if (idx === 0) {
+            return;
+          }
+
           swap(idx, idx - 1);
+
           if (expandedIdx === idx) {
             setExpandedIdx(idx - 1);
           } else if (expandedIdx === idx - 1) {
@@ -87,8 +122,12 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
         };
 
         const onShiftDown = () => {
-          if (idx === fields.length - 1) return;
+          if (idx === fields.length - 1) {
+            return;
+          }
+
           swap(idx, idx + 1);
+
           if (expandedIdx === idx) {
             setExpandedIdx(idx + 1);
           } else if (expandedIdx === idx + 1) {
@@ -100,9 +139,19 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
           <DetenteurAccordion
             key={fieldItem.id}
             numero={numero}
-            name={`${numero} - Détenteur de l'équipement`}
-            expanded={expandedIdx === idx}
-            onExpanded={() => setExpandedIdx(expandedIdx === idx ? null : idx)}
+            name={
+              isReconditionnement
+                ? `${numero} - ${holderTypeLabel}`
+                : `${numero} - Détenteur de l'équipement`
+            }
+            expanded={isExpanded}
+            onExpanded={() => {
+              if (isReconditionnement) {
+                return;
+              }
+
+              setExpandedIdx(current => (current === idx ? null : idx));
+            }}
             onActorAdd={onAdd}
             onActorDelete={onDelete}
             onActorShiftUp={onShiftUp}
@@ -112,7 +161,8 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
             disableUp={idx === 0}
             disableDown={idx === fields.length - 1}
             deleteLabel="Supprimer"
-            hideHeader={isInstallationType}
+            hideHeader={isInstallationType && !isReconditionnement}
+            showActions={!isReconditionnement}
           >
             {usesEquipmentHolderForm ? (
               <BsffEquipmentHolderForm

@@ -76,10 +76,10 @@
   &__form {
     margin: auto;
     overflow: hidden;
-    transition: max-height 0.4s ease-out;
+    padding-top: 15px;
 
     > div {
-      padding-top: 15px;
+      width: 100%;
     }
   }
 

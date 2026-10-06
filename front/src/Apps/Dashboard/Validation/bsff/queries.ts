@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+import { companyFragment } from "../../../common/queries/fragments/company";
 
 const bsffPackagingFragment = gql`
   fragment BsffPackagingFragment on BsffPackaging {
@@ -7,6 +8,14 @@ const bsffPackagingFragment = gql`
     type
     numero
     weight
+
+    detenteurs {
+      isPrivateIndividual
+      company {
+        ...CompanyFragment
+      }
+    }
+
     acceptation {
       date
       status
@@ -18,6 +27,7 @@ const bsffPackagingFragment = gql`
         date
       }
     }
+
     operation {
       date
       code
@@ -35,6 +45,7 @@ const bsffPackagingFragment = gql`
         date
       }
     }
+
     bsff {
       id
       status
@@ -52,6 +63,7 @@ const bsffPackagingFragment = gql`
         id
       }
     }
+
     nextBsff {
       id
     }
@@ -77,6 +89,7 @@ export const GET_BSFF = gql`
     }
   }
   ${bsffPackagingFragment}
+  ${companyFragment}
 `;
 
 export const GET_BSFF_PACKAGING = gql`
@@ -86,6 +99,7 @@ export const GET_BSFF_PACKAGING = gql`
     }
   }
   ${bsffPackagingFragment}
+  ${companyFragment}
 `;
 
 export const UPDATE_BSFF_PACKAGING = gql`
@@ -95,4 +109,43 @@ export const UPDATE_BSFF_PACKAGING = gql`
     }
   }
   ${bsffPackagingFragment}
+  ${companyFragment}
+`;
+export const bsffPackagingForReconditioningFragment = gql`
+  fragment BsffPackagingForReconditioningFragment on BsffPackaging {
+    ...BsffPackagingFragment
+    volume
+    bsff {
+      emitter {
+        company {
+          name
+          siret
+          orgId
+          address
+          contact
+          phone
+          mail
+        }
+      }
+      ficheInterventions {
+        id
+        numero
+        detenteur {
+          isPrivateIndividual
+          company {
+            name
+            siret
+            orgId
+            vatNumber
+            address
+            contact
+            phone
+            mail
+          }
+        }
+      }
+    }
+  }
+  ${bsffPackagingFragment}
+  ${companyFragment}
 `;

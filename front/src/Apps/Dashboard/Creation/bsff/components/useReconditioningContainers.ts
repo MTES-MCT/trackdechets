@@ -5,10 +5,9 @@ import {
   Query,
   QueryBsffPackagingsArgs
 } from "@td/codegen-ui";
-import { GET_PREVIOUS_PACKAGINGS } from "../../../../common/queries/bsff/queries";
+import { GET_RECONDITIONING_PACKAGINGS } from "../../../../common/queries/bsff/queries";
 import { MAX_BSFF_COUNT_TABLE_DISPLAY } from "./BsffSelectableWasteTable";
 import { ReconditioningContainer } from "../utils/reconditionnement";
-
 
 export function useReconditioningContainers(
   siret: string | null | undefined,
@@ -30,7 +29,7 @@ export function useReconditioningContainers(
   const { data, loading, error } = useQuery<
     Pick<Query, "bsffPackagings">,
     QueryBsffPackagingsArgs
-  >(GET_PREVIOUS_PACKAGINGS, {
+  >(GET_RECONDITIONING_PACKAGINGS, {
     variables: { where, first: MAX_BSFF_COUNT_TABLE_DISPLAY },
     skip: !siret,
     fetchPolicy: "network-only"
