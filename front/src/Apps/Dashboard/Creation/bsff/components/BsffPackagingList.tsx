@@ -54,6 +54,8 @@ function BsffPackagingList({
   const repackaging: any[] = useWatch({ name: "repackaging" }) ?? [];
   const fluidesFrigorigenesImport: ZodBsff["fluidesFrigorigenesImport"] =
     useWatch({ name: "fluidesFrigorigenesImport" });
+  const isImportedFromFF =
+    (fluidesFrigorigenesImport?.selectedInterventionIds?.length ?? 0) > 0;
   const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
 
   const stableKeys = useRef<Map<PackagingInfoInput, string>>(new Map());
@@ -157,7 +159,9 @@ function BsffPackagingList({
                 }
               }}
               disableAdd={disabled}
-              disableDelete={disabled || packagingInfos.length <= 1}
+              disableDelete={
+                disabled || packagingInfos.length <= 1 || isImportedFromFF
+              }
               disableUp={disabled || idx === 0}
               disableDown={disabled || idx === packagingInfos.length - 1}
               deleteLabel="Supprimer"
@@ -177,6 +181,7 @@ function BsffPackagingList({
                     <button
                       type="button"
                       className="fr-btn fr-btn--tertiary fr-mb-2w"
+                      disabled={isImportedFromFF}
                       onClick={() => onRemoveFromTable?.((p as any).id)}
                     >
                       Retirer
@@ -193,6 +198,7 @@ function BsffPackagingList({
                     <button
                       type="button"
                       className="fr-btn fr-btn--tertiary fr-mb-2w"
+                      disabled={isImportedFromFF}
                       onClick={() => remove(idx)}
                     >
                       Supprimer

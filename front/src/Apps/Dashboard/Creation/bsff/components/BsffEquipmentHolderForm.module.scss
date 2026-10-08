@@ -1,0 +1,5 @@
+.packagingTagNoClose {
+  &::after {
+    display: none !important;
+  }
+}

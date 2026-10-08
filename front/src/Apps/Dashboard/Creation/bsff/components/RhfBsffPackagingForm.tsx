@@ -24,8 +24,11 @@ function RhfBsffPackagingForm({
 }) {
   const fieldPath = (name: string) => `${fieldName}.${idx}.${name}`;
 
-  const { register, getFieldState, formState, setValue, resetField } =
+  const { register, getFieldState, formState, setValue, resetField, watch } =
     useFormContext();
+  const importedInterventionIds =
+    watch("fluidesFrigorigenesImport.selectedInterventionIds") ?? [];
+  const isImportedFromFF = importedInterventionIds.length > 0;
 
   const { error: errorVolume, isTouched: isTouchedVolume } = getFieldState(
     fieldPath("volume")
@@ -77,6 +80,7 @@ function RhfBsffPackagingForm({
       detenteurMode={detenteurMode}
       operateurMode={operateurMode}
       disabled={disabled}
+      importedFromFF={isImportedFromFF}
       errors={errors}
       touched={touched}
       inputProps={{
@@ -84,6 +88,7 @@ function RhfBsffPackagingForm({
           value: packagingType,
           ...register(fieldPath("type"), {
             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+              if (isImportedFromFF) return;
               if (
                 event.target.value === Packagings.Autre ||
                 event.target.value === BsffPackagingType.Autre

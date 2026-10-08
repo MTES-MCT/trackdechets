@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { BsffType } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import { bsffPackagingTypes } from "../../../../Forms/Components/PackagingList/helpers";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { BSFF_WASTES } from "@td/constants";
 import Select from "@codegouvfr/react-dsfr/Select";
@@ -15,6 +14,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import BsffSelectableWasteTableWrapper from "../components/BsffSelectableWasteTableWrapper";
 import MyBsffCompanySelector from "../components/MyBsffComapnySelector";
 import BsffTypeRadioGroup from "../components/BsffTypeRadioGroup";
+import { bsffPackagingTypes } from "../../../../Forms/Components/PackagingList/helpers";
 import {
   hasBsffPackagingAccordions,
   getBsffPackagingsTotalWeight,
@@ -34,6 +34,9 @@ const WasteBsff = () => {
   const packagings = watch("packagings");
   const weight = watch("weight", {});
   const emitterCompany = watch("emitter.company");
+  const importedInterventionIds =
+    watch("fluidesFrigorigenesImport.selectedInterventionIds") ?? [];
+  const importedFromFF = importedInterventionIds.length > 0;
 
   const prevTypeRef = useRef<BsffType | undefined>(bsffType);
 
@@ -138,7 +141,6 @@ const WasteBsff = () => {
                 ...register("waste.code", {
                   onChange: event => {
                     // harmoniser le fonctionnement entre les deux types de BSFF initial afin que la sélection d’un code déchet préremplisse automatiquement la dénomination usuelle correspondante.
-                    //if (!isDetenteur) return;
                     const selectedWaste = BSFF_WASTES.find(
                       waste => waste.code === event.target.value
                     );
@@ -155,7 +157,9 @@ const WasteBsff = () => {
               state={formState.errors.waste?.["code"] ? "error" : "default"}
               stateRelatedMessage={formState.errors.waste?.["code"]?.message}
               disabled={
-                sealedFields.includes("waste.code") || wasteCodeDisabled
+                sealedFields.includes("waste.code") ||
+                wasteCodeDisabled ||
+                importedFromFF
               }
             >
               <option value="">

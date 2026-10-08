@@ -33,6 +33,7 @@ export type PackagingFormProps = {
   };
   // Permet de griser les champs pour les rendre non éditable
   disabled?: boolean;
+  importedFromFF?: boolean;
   // Erreurs sur chacun des champs
   errors?: Partial<
     Record<keyof (PackagingInfoInput | BsffPackagingInput), string>
@@ -56,7 +57,8 @@ function BsffPackagingForm({
   packagingTypes,
   inputProps,
   disabled = false,
-  volumeEditable = false, // ← ajouter
+  importedFromFF = false,
+  volumeEditable = false,
   detenteurMode = false,
   operateurMode = false,
 
@@ -71,6 +73,10 @@ function BsffPackagingForm({
       })),
     [packagingTypes]
   );
+
+  const typeDisabled = disabled || importedFromFF;
+  const volumeDisabled = !importedFromFF && disabled && !volumeEditable;
+  const weightDisabled = disabled || importedFromFF;
 
   return (
     <>
@@ -90,7 +96,7 @@ function BsffPackagingForm({
         <div className="fr-col-md-6 fr-col-12">
           <Select
             label={`Type de contenant${detenteurMode ? " *" : ""}`}
-            disabled={disabled}
+            disabled={typeDisabled}
             state={errors?.type && touched?.type ? "error" : "default"}
             stateRelatedMessage={errors?.type}
             nativeSelectProps={{
@@ -112,7 +118,7 @@ function BsffPackagingForm({
           <NonScrollableInput
             label={`Volume en litres${detenteurMode ? " *" : ""}`}
             className="fr-mb-2w"
-            disabled={disabled && !volumeEditable}
+            disabled={volumeDisabled}
             state={errors?.volume && touched?.volume ? "error" : "default"}
             stateRelatedMessage={errors?.volume}
             nativeInputProps={{
@@ -139,7 +145,7 @@ function BsffPackagingForm({
                 : "Poids en kg"
             }
             className="fr-mb-2w"
-            disabled={disabled}
+            disabled={weightDisabled}
             state={errors?.weight && touched?.weight ? "error" : "default"}
             stateRelatedMessage={errors?.weight}
             nativeInputProps={{
@@ -159,7 +165,7 @@ function BsffPackagingForm({
           <div className="fr-col-12">
             <Input
               label="Autre contenant (préciser)"
-              disabled={disabled}
+              disabled={weightDisabled}
               state={errors?.other && touched?.other ? "error" : "default"}
               stateRelatedMessage={errors?.other}
               nativeInputProps={{
@@ -173,7 +179,7 @@ function BsffPackagingForm({
         <div className="fr-col-md-12 fr-col-12">
           <Input
             label={`N° de contenant${detenteurMode ? " *" : ""}`}
-            disabled={disabled}
+            disabled={weightDisabled}
             state={errors?.numero && touched?.numero ? "error" : "default"}
             stateRelatedMessage={errors?.numero}
             nativeInputProps={{

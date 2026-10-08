@@ -23,6 +23,9 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
   const isTracerFluide = type === BsffType.TracerFluide;
   const isOperator = type === BsffType.CollectePetitesQuantites;
   const usesEquipmentHolderForm = isTracerFluide || isOperator;
+  const importedInterventionIds =
+    watch("fluidesFrigorigenesImport.selectedInterventionIds") ?? [];
+  const isImportedFromFF = importedInterventionIds.length > 0;
 
   const INSTALLATION_TYPES = [
     BsffType.Reexpedition,
@@ -108,7 +111,7 @@ export function RhfDetenteurList({ orgId, fieldName }: RhfDetenteurListProps) {
             onActorShiftUp={onShiftUp}
             onActorShiftDown={onShiftDown}
             disableAdd={false}
-            disableDelete={fields.length <= 1}
+            disableDelete={fields.length <= 1 || isImportedFromFF}
             disableUp={idx === 0}
             disableDown={idx === fields.length - 1}
             deleteLabel="Supprimer"

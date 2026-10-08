@@ -8,6 +8,7 @@ import {
   requiredAria,
   requiredLabel
 } from "../../../../Forms/Components/RequiredField/requiredField";
+import styles from "./BsffEquipmentHolderForm.module.scss";
 
 export const EQUIPMENT_HOLDER_TYPES = [
   { value: "ENTREPRISE", label: "Entreprise" },
@@ -35,6 +36,12 @@ export function BsffEquipmentHolderForm({
   const isExempted = !!watch(`${fieldName}.isExempted`);
   const packagings = watch("packagings") ?? [];
   const linkedPackagings = watch(`${fieldName}.packagings`) ?? [];
+  const importedInterventionIds =
+    watch("fluidesFrigorigenesImport.selectedInterventionIds") ?? [];
+  const isImportedFromFF = importedInterventionIds.length > 0;
+  const isEntrepriseImported = isImportedFromFF && holderType === "ENTREPRISE";
+  const isParticulierImported =
+    isImportedFromFF && holderType === "PARTICULIER";
   const companyField = `${fieldName}.detenteur.company`;
   const errors: any = formState.errors;
   const holderErrors = fieldName
@@ -55,6 +62,12 @@ export function BsffEquipmentHolderForm({
 
   const requiredProps = { required: true, "aria-required": true } as const;
 
+  const packagingTagClassName = `fr-tag fr-tag--dismiss fr-mr-1w ${styles.packagingTagNoClose}`;
+  const packagingTagDisabled = disabled || isImportedFromFF;
+
+  const packagingSelectorDisabled = disabled || isImportedFromFF;
+  const packagingAddDisabled = packagingSelectorDisabled || !selectedPackaging;
+
   return (
     <div className="fr-col-12">
       {showInterventionSection && (
@@ -64,7 +77,7 @@ export function BsffEquipmentHolderForm({
             label="Équipement exempté de fiche d’intervention au sens de l’article R. 543-82 du code de l’environnement"
             inputTitle="Exemption de fiche d’intervention"
             checked={isExempted}
-            disabled={disabled}
+            disabled={disabled || isImportedFromFF}
             onChange={checked =>
               setValue(`${fieldName}.isExempted`, checked, {
                 shouldDirty: true,
@@ -75,7 +88,7 @@ export function BsffEquipmentHolderForm({
           <Input
             className="fr-mt-3w"
             label={requiredLabel("N° de fiche d’intervention", !isExempted)}
-            disabled={disabled}
+            disabled={disabled || isImportedFromFF}
             state={holderErrors?.numero ? "error" : "default"}
             stateRelatedMessage={holderErrors?.numero?.message}
             nativeInputProps={{
@@ -89,7 +102,7 @@ export function BsffEquipmentHolderForm({
       <h4 className="fr-mt-4w">Détenteur</h4>
       <Select
         label="Type de détenteur *"
-        disabled={disabled}
+        disabled={disabled || isImportedFromFF}
         state={holderErrors?.holderType ? "error" : "default"}
         stateRelatedMessage={holderErrors?.holderType?.message}
         nativeSelectProps={{
@@ -114,7 +127,7 @@ export function BsffEquipmentHolderForm({
         <>
           <CompanySelectorWrapper
             orgId={orgId}
-            disabled={disabled}
+            disabled={disabled || isEntrepriseImported}
             searchRequired
             selectedCompanyOrgId={
               watch(`${companyField}.orgId`) ?? watch(`${companyField}.siret`)
@@ -149,7 +162,7 @@ export function BsffEquipmentHolderForm({
         holderType !== "ENTREPRISE" && (
           <Input
             label={`${identificationLabel} *`}
-            disabled={disabled}
+            disabled={disabled || isImportedFromFF}
             state={holderErrors?.identification ? "error" : "default"}
             stateRelatedMessage={holderErrors?.identification?.message}
             nativeInputProps={{
@@ -222,7 +235,9 @@ export function BsffEquipmentHolderForm({
               id={`${fieldName}-packaging`}
               className="fr-select fr-col"
               value={selectedPackaging}
-              disabled={disabled || availablePackagings.length === 0}
+              disabled={
+                packagingSelectorDisabled || availablePackagings.length === 0
+              }
               aria-required="true"
               onChange={event => setSelectedPackaging(event.target.value)}
             >
@@ -236,8 +251,9 @@ export function BsffEquipmentHolderForm({
             <button
               type="button"
               className="fr-btn"
-              disabled={disabled || !selectedPackaging}
+              disabled={packagingAddDisabled}
               onClick={() => {
+                if (packagingSelectorDisabled) return;
                 const packaging = packagings.find(
                   item => item.numero === selectedPackaging
                 );
@@ -264,17 +280,18 @@ export function BsffEquipmentHolderForm({
               <button
                 key={packaging.numero}
                 type="button"
-                className="fr-tag fr-tag--dismiss fr-mr-1w"
-                disabled={disabled}
-                onClick={() =>
+                className={packagingTagClassName}
+                disabled={packagingTagDisabled}
+                onClick={() => {
+                  if (packagingTagDisabled) return;
                   setValue(
                     `${fieldName}.packagings`,
                     linkedPackagings.filter(
                       linked => linked.numero !== packaging.numero
                     ),
                     { shouldDirty: true, shouldValidate: true }
-                  )
-                }
+                  );
+                }}
               >
                 {packaging.numero}
               </button>
