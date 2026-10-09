@@ -7,6 +7,7 @@ interface CompanyContactInfoProps {
   fieldName: string;
   disabled?: boolean;
   required?: boolean;
+  readOnlyFields?: readonly string[];
   requiredMarkers?: boolean;
   errorObject?: any;
 }
@@ -31,6 +32,7 @@ interface CompanyContactInfoProps {
 export default function CompanyContactInfo({
   fieldName,
   disabled = false,
+  readOnlyFields = [],
   required = false,
   requiredMarkers,
   errorObject
@@ -53,6 +55,7 @@ export default function CompanyContactInfo({
                 `${fieldName}.contact`,
                 required ? { required: "Champ requis" } : {}
               ),
+              readOnly: readOnlyFields.includes("contact"),
               ...(requiredMarkers === undefined
                 ? {}
                 : requiredAria(requiredMarkers))
@@ -72,6 +75,7 @@ export default function CompanyContactInfo({
                 `${fieldName}.phone`,
                 required ? { required: "Champ requis" } : {}
               ),
+              readOnly: readOnlyFields.includes("phone"),
               ...(requiredMarkers === undefined
                 ? {}
                 : requiredAria(requiredMarkers))
@@ -89,6 +93,7 @@ export default function CompanyContactInfo({
                 `${fieldName}.mail`,
                 required ? { required: "Champ requis" } : {}
               ),
+              readOnly: readOnlyFields.includes("mail"),
               type: "email",
               ...(requiredMarkers === undefined
                 ? {}

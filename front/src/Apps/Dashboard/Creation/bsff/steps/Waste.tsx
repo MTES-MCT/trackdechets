@@ -1,4 +1,9 @@
-import React, { useContext, useEffect, useRef } from "react";
+import {
+  hasInitialValue,
+  usesInitialDetenteurs
+} from "../utils/initial-detenteurs";
+import { getInitialWaste } from "../utils/reconditionnement";
+import React, { useContext, useEffect, useRef, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { BsffType } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
@@ -7,8 +12,10 @@ import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { BSFF_WASTES } from "@td/constants";
 import Select from "@codegouvfr/react-dsfr/Select";
 import Input from "@codegouvfr/react-dsfr/Input";
+import Table from "@codegouvfr/react-dsfr/Table";
 import EstimatedQuantityTooltip from "../../../../../common/components/EstimatedQuantityTooltip";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
+import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 import RhfBsffPackagingList from "../components/RhfBsffPackagingList";
 import Alert from "@codegouvfr/react-dsfr/Alert";
@@ -31,9 +38,15 @@ const WasteBsff = () => {
   const bsffType = watch("type");
   const isDetenteur = bsffType === BsffType.TracerFluide;
   const isOperateur = isBsffOperatorWasteStep(bsffType);
+  const isReconditionnement = bsffType === BsffType.Reconditionnement;
   const packagings = watch("packagings");
   const weight = watch("weight", {});
   const emitterCompany = watch("emitter.company");
+  const repackaging = watch("repackaging", []);
+  const grouping = watch("grouping", []);
+  const usesInitialContainers = usesInitialDetenteurs(bsffType);
+  const sources = bsffType === BsffType.Groupement ? grouping : repackaging;
+  const initialWaste = useMemo(() => getInitialWaste(sources?.[0]), [sources]);
 
   const prevTypeRef = useRef<BsffType | undefined>(bsffType);
 
@@ -64,16 +77,48 @@ const WasteBsff = () => {
   const totalWeightNumber = getBsffPackagingsTotalWeight(packagings ?? []);
 
   const totalWeight = totalWeightNumber === 0 ? "" : totalWeightNumber;
-  const totalPackagings = packagings?.length ?? 0;
+  //const totalPackagings = packagings?.length ?? 0;
 
   useEffect(() => {
     setValue("weight.value", totalWeight);
   }, [totalWeight, setValue]);
 
-  const wasteCodeDisabled = [
-    BsffType.Groupement,
-    BsffType.Reexpedition
-  ].includes(bsffType);
+  useEffect(() => {
+    if (!usesInitialContainers || !sources?.length) return;
+    for (const field of ["code", "description", "adr"] as const) {
+      if (hasInitialValue(initialWaste[field])) {
+        setValue(`waste.${field}`, initialWaste[field], {
+          shouldDirty: true,
+          shouldValidate: true
+        });
+      }
+    }
+  }, [usesInitialContainers, sources, initialWaste, setValue]);
+
+  const wasteCodeDisabled =
+    bsffType === BsffType.Reexpedition ||
+    (usesInitialContainers && hasInitialValue(initialWaste.code));
+
+  const reconditioningTableData = (repackaging ?? []).map(container => [
+    container.type ?? "Non renseigné",
+    container.volume == null ? "Non renseigné" : `${container.volume} L`,
+    container.numero ?? "Non renseigné",
+    container.acceptation?.weight == null && container.weight == null
+      ? "Non renseigné"
+      : `${container.acceptation?.weight ?? container.weight} kg`
+  ]);
+
+  const selectedContainersTotalWeight = (repackaging ?? []).reduce(
+    (total, container) =>
+      total + Number(container.acceptation?.weight ?? container.weight ?? 0),
+    0
+  );
+  const fluidWeightDifference =
+    Number(weight?.value ?? 0) - selectedContainersTotalWeight;
+  const formatKg = (value: number) =>
+    `${new Intl.NumberFormat("fr-FR", {
+      maximumFractionDigits: 3
+    }).format(value)} kg`;
 
   const heading =
     bsffType === BsffType.Groupement
@@ -97,11 +142,13 @@ const WasteBsff = () => {
       {!!sealedFields.length && <DisabledParagraphStep />}
 
       <div className="fr-col">
-        {isSpecialType && <BsffTypeRadioGroup />}
+        {isSpecialType && !usesInitialContainers && <BsffTypeRadioGroup />}
 
-        {heading && <h4 className="form__section-heading">{heading}</h4>}
+        {heading && !usesInitialContainers && (
+          <h4 className="form__section-heading">{heading}</h4>
+        )}
 
-        {heading && (
+        {heading && !usesInitialContainers && (
           <MyBsffCompanySelector
             value={emitterCompany}
             onChange={company => {
@@ -111,9 +158,17 @@ const WasteBsff = () => {
           />
         )}
 
+        {usesInitialContainers && !sources?.length && (
+          <Alert
+            severity="info"
+            small
+            description="Sélectionnez puis ajoutez les contenants dans l’onglet Bordereau pour renseigner les informations du déchet."
+          />
+        )}
+
         {!hideAfterCompanySelector && (
           <>
-            {instruction && (
+            {instruction && !usesInitialContainers && (
               <>
                 <Alert
                   description={instruction}
@@ -130,13 +185,22 @@ const WasteBsff = () => {
                 />
               </>
             )}
-            <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
+
+            {isReconditionnement && (
+              <h4 className="fr-h4 fr-mt-4w">Informations générales</h4>
+            )}
+            {!isReconditionnement && <h4 className="fr-h4 fr-mt-4w">Déchet</h4>}
             <Select
               className="fr-col-md-8 fr-mt-2w"
               label={`Code déchet${isDetenteur ? " *" : ""}`}
               nativeSelectProps={{
                 ...register("waste.code", {
                   onChange: event => {
+                    if (
+                      usesInitialContainers &&
+                      hasInitialValue(initialWaste.description)
+                    )
+                      return;
                     // harmoniser le fonctionnement entre les deux types de BSFF initial afin que la sélection d’un code déchet préremplisse automatiquement la dénomination usuelle correspondante.
                     //if (!isDetenteur) return;
                     const selectedWaste = BSFF_WASTES.find(
@@ -172,7 +236,11 @@ const WasteBsff = () => {
             <Input
               className="fr-col-md-8"
               label={`Dénomination usuelle du déchet${isDetenteur ? " *" : ""}`}
-              disabled={sealedFields.includes("waste.description")}
+              disabled={
+                sealedFields.includes("waste.description") ||
+                (usesInitialContainers &&
+                  hasInitialValue(initialWaste.description))
+              }
               nativeInputProps={{
                 ...register("waste.description"),
                 required: isDetenteur,
@@ -192,7 +260,10 @@ const WasteBsff = () => {
                   ? "Mentions au titre des règlements ADR, RID, ADN, IMDG (optionnel)"
                   : "Mentions au titre des règlements ADR, RID, ADNR, IMDG"
               }
-              disabled={sealedFields.includes("waste.adr")}
+              disabled={
+                sealedFields.includes("waste.adr") ||
+                (usesInitialContainers && hasInitialValue(initialWaste.adr))
+              }
               nativeInputProps={{
                 ...register("waste.adr"),
                 "aria-required": false
@@ -205,7 +276,33 @@ const WasteBsff = () => {
             {!isOperateur && (
               <p className="fr-info-text">A renseigner si vous êtes concerné</p>
             )}
-            {!hasBsffPackagingAccordions(bsffType) && (
+
+            {isReconditionnement && repackaging.length > 0 && (
+              <>
+                <h4 className="fr-h4 fr-mt-4w">Avant reconditionnement</h4>
+                <Accordion
+                  label="Afficher les contenants sélectionnés"
+                  defaultExpanded={true}
+                  className="fr-mb-2w"
+                >
+                  <Table
+                    caption="Contenants sélectionnés"
+                    headers={[
+                      "Type de contenant",
+                      "Volume",
+                      "Identifiant du contenant",
+                      "Poids"
+                    ]}
+                    data={reconditioningTableData}
+                  />
+                </Accordion>
+              </>
+            )}
+
+            {isReconditionnement && (
+              <h4 className="fr-h4 fr-mt-4w">1 - Contenant</h4>
+            )}
+            {!isReconditionnement && !hasBsffPackagingAccordions(bsffType) && (
               <h4 className="fr-h4 fr-mt-4w">Contenants</h4>
             )}
             <div
@@ -226,15 +323,40 @@ const WasteBsff = () => {
                 fieldName="packagings"
                 packagingTypes={bsffPackagingTypes}
                 detenteurMode={isDetenteur}
-                operateurMode={isOperateur}
+                operateurMode={
+                  isOperateur || bsffType === BsffType.Reconditionnement
+                }
               />
             </div>
             <h4 className="fr-h4 fr-mt-4w">Quantité totale</h4>
+            {isReconditionnement && repackaging.length > 0 && (
+              <div className="fr-mt-4w">
+                {Math.abs(fluidWeightDifference) <= 1 ? (
+                  <Alert
+                    severity="success"
+                    small
+                    title="Écart OK"
+                    description="Aucun écart significatif entre la somme des poids des contenants sélectionnés et la quantité totale de fluide."
+                  />
+                ) : (
+                  <Alert
+                    severity="warning"
+                    small
+                    title="Écart indicatif"
+                    description={`Écart de ${formatKg(
+                      fluidWeightDifference
+                    )} entre la somme des poids des contenants sélectionnés et la quantité totale de fluide.`}
+                  />
+                )}
+              </div>
+            )}
             <div className="fr-grid-row fr-grid-row--gutters fr-mt-4w">
               <div className="fr-col-md-6">
                 <NonScrollableInput
                   label={
-                    isDetenteur
+                    isReconditionnement
+                      ? "Quantité totale de fluide en kg"
+                      : isDetenteur
                       ? "Quantité totale de fluide en kg *"
                       : "Poids total en kilos"
                   }
@@ -244,6 +366,8 @@ const WasteBsff = () => {
                     step: "0.000001",
                     type: "number",
                     ...register("weight.value"),
+                    readOnly:
+                      bsffType === BsffType.Groupement && grouping.length > 0,
                     required: isDetenteur,
                     "aria-required": isDetenteur
                   }}
@@ -258,7 +382,7 @@ const WasteBsff = () => {
                 </p>
               </div>
 
-              {isDetenteur && (
+              {(isDetenteur || isReconditionnement) && (
                 <>
                   <div className="fr-col-md-6">
                     <NonScrollableInput
@@ -276,7 +400,7 @@ const WasteBsff = () => {
                     </p>
                   </div>
 
-                  <div className="fr-col-md-6">
+                  {/* <div className="fr-col-md-6">
                     <NonScrollableInput
                       label="Nombre total de contenants *"
                       disabled
@@ -287,7 +411,7 @@ const WasteBsff = () => {
                         "aria-required": true
                       }}
                     />
-                  </div>
+                  </div> */}
                 </>
               )}
 

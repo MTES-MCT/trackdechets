@@ -1,14 +1,22 @@
 import React, { useContext, useRef, useEffect, useCallback } from "react";
+
 import { useFormContext, Controller } from "react-hook-form";
+
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+
 import { BsffType } from "@td/codegen-ui";
+import { usesInitialDetenteurs } from "../../../Dashboard/Creation/bsff/utils/initial-detenteurs";
 
 import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
+
 import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
+
 import DsfrfWorkSiteAddress from "../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
+
 import { SealedFieldsContext } from "../../../../Apps/Dashboard/Creation/context";
+
 import SingleCheckbox from "../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 type Props = {
@@ -16,13 +24,15 @@ type Props = {
   fieldName: string;
 };
 
-export function RhfDetenteurForm({ orgId, fieldName }: Props) {
+export function RhfDetenteurForm({ orgId, fieldName }: Readonly<Props>) {
   const { control, setValue, watch, getValues } = useFormContext();
 
   const emitterCompany = watch("emitter.company");
 
   const type = watch("type");
+
   const packagingInfos = watch("packagings");
+
   const isCollectePetitesQuantites = type === BsffType.CollectePetitesQuantites;
 
   const INSTALLATION_TYPES = [
@@ -33,11 +43,33 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
   const isInstallationType = INSTALLATION_TYPES.includes(type);
 
+  const usesOriginalHolders = usesInitialDetenteurs(type);
+  const lockedFields: string[] = watch(`${fieldName}.lockedFields`) ?? [];
+  const holderSealed =
+    useContext(SealedFieldsContext).includes("ficheInterventions");
+  const isLocked = (field: string) =>
+    holderSealed || lockedFields.includes(field);
+
   const isTracerFluide = type === BsffType.TracerFluide;
 
   const companyField = isTracerFluide
     ? "emitter.company"
     : `${fieldName}.detenteur.company`;
+
+  /**
+   * Pour les types installation :
+   *
+   * - REEXPEDITION :
+   *   le détenteur affiché est l'émetteur.
+   *
+   * - RECONDITIONNEMENT / GROUPEMENT :
+   *   l'affichage reste celui du bloc installation,
+   *   mais les données viennent du vrai détenteur
+   *   présent dans ficheInterventions.
+   */
+  const installationCompanyField = usesOriginalHolders
+    ? `${fieldName}.detenteur.company`
+    : "emitter.company";
 
   const privateField = `${fieldName}.detenteur.isPrivateIndividual`;
 
@@ -48,32 +80,50 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
   const selectedOrgId = watch(`${companyField}.orgId`);
 
   const sealedFields = useContext(SealedFieldsContext);
+
   const hasInitializedTracerFluide = useRef(false);
+
   useEffect(() => {
-    if (!isTracerFluide || hasInitializedTracerFluide.current) return;
+    if (!isTracerFluide || hasInitializedTracerFluide.current) {
+      return;
+    }
+
     hasInitializedTracerFluide.current = true;
   }, [isTracerFluide]);
 
   /**
+   * ======================================================
    * CAS PARTICULIER
+   * ======================================================
    */
 
   const previousIsPrivate = useRef(isPrivate);
+
   const resetHolderCompanyFields = useCallback(
     (nextIsPrivate: boolean) => {
       setValue(`${companyField}.orgId`, undefined);
+
       setValue(`${companyField}.siret`, undefined);
+
       setValue(`${companyField}.vatNumber`, undefined);
+
       setValue(`${companyField}.country`, undefined);
+
       setValue(
         `${companyField}.name`,
         nextIsPrivate ? "Détenteur particulier" : ""
       );
+
       setValue(`${companyField}.address`, "");
+
       setValue(`${companyField}.city`, "");
+
       setValue(`${companyField}.postalCode`, "");
+
       setValue(`${companyField}.contact`, "");
+
       setValue(`${companyField}.phone`, "");
+
       setValue(`${companyField}.mail`, "");
     },
     [companyField, setValue]
@@ -86,18 +136,33 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
       return;
     }
 
-    resetHolderCompanyFields(isPrivate);
+    if (!usesOriginalHolders) resetHolderCompanyFields(isPrivate);
 
     previousIsPrivate.current = isPrivate;
-  }, [isPrivate, resetHolderCompanyFields]);
+  }, [isPrivate, usesOriginalHolders, resetHolderCompanyFields]);
+
   /**
+   * ======================================================
    * CAS INSTALLATION
+   * ======================================================
+   *
+   * REEXPEDITION / GROUPEMENT :
+   *   le détenteur est initialisé avec l'émetteur.
+   *
+   * RECONDITIONNEMENT / GROUPEMENT :
+   *   NE PAS initialiser le détenteur avec l'émetteur.
+   *
+   *   Le détenteur vient des BSFF initiaux sélectionnés
+   *   et déjà injectés dans ficheInterventions.
+   * ======================================================
    */
+
   const hasInitializedInstallationDetenteur = React.useRef(false);
 
   React.useEffect(() => {
     if (
       !isInstallationType ||
+      usesOriginalHolders ||
       !emitterCompany ||
       hasInitializedInstallationDetenteur.current
     ) {
@@ -105,15 +170,22 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
     }
 
     const emitterIdentifier = emitterCompany.orgId || emitterCompany.siret;
-    if (!emitterIdentifier) return;
+
+    if (!emitterIdentifier) {
+      return;
+    }
 
     const current = getValues(companyField);
+
     const currentIdentifier = current?.orgId || current?.siret;
+
     const isEmpty = !currentIdentifier;
+
     const isSameCompany = currentIdentifier === emitterIdentifier;
 
     if (isEmpty || isSameCompany) {
       setValue(`${companyField}.orgId`, emitterCompany.orgId);
+
       setValue(`${companyField}.siret`, emitterCompany.siret);
 
       if (!current?.name) {
@@ -138,15 +210,48 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
     }
 
     hasInitializedInstallationDetenteur.current = true;
-  }, [isInstallationType, emitterCompany, companyField, getValues, setValue]);
+  }, [
+    isInstallationType,
+    usesOriginalHolders,
+    emitterCompany,
+    companyField,
+    getValues,
+    setValue
+  ]);
 
   const syncCompanyWithoutOverriding = (company: any) => {
+    if (usesOriginalHolders) {
+      const selected = {
+        orgId: company.orgId,
+        siret: company.siret,
+        vatNumber: company.vatNumber,
+        name: company.name,
+        address: company.address,
+        contact: company.contact,
+        phone: company.contactPhone,
+        mail: company.contactEmail
+      };
+      Object.entries(selected).forEach(([field, value]) => {
+        const isIdentifier = ["orgId", "siret", "vatNumber"].includes(field);
+        if (
+          !isLocked(field) &&
+          (isIdentifier || !getValues(`${companyField}.${field}`))
+        ) {
+          setValue(`${companyField}.${field}`, value, { shouldDirty: true });
+        }
+      });
+      return;
+    }
     const current = getValues(companyField);
+
     const currentOrgId = current?.orgId || current?.siret;
+
     const newOrgId = company.orgId || company.siret;
+
     const isNewCompany = currentOrgId !== newOrgId;
 
     setValue(`${companyField}.orgId`, company.orgId);
+
     setValue(`${companyField}.siret`, company.siret);
 
     setValue(
@@ -179,28 +284,32 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
     );
   };
 
-  // ======================================================
-  // NOUVELLE FONCTIONNALITÉ : synchronisation fiche ↔ contenants
-  // ======================================================
+  /**
+   * ======================================================
+   * SYNCHRONISATION FICHE ↔ CONTENANTS
+   * ======================================================
+   */
 
   const ficheInterventions = watch("ficheInterventions");
 
-  // le numéro saisi dans CETTE fiche
   const currentNumero = watch(`${fieldName}.numero`);
 
-  // la fiche correspondant au numéro
   const currentFicheIntervention = ficheInterventions?.find(
-    fi => fi.numero === currentNumero
+    (fi: any) => fi.numero === currentNumero
   );
 
   React.useEffect(() => {
-    if (!currentFicheIntervention) return;
+    if (!currentFicheIntervention) {
+      return;
+    }
 
     const alreadyLinked = (currentFicheIntervention.packagings ?? [])
       .map((p: any) => p.numero)
       .filter(Boolean);
 
-    if (!alreadyLinked.length) return;
+    if (!alreadyLinked.length) {
+      return;
+    }
 
     const current = watch(`${fieldName}.contenantsRattaches`) ?? [];
 
@@ -217,7 +326,10 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
   return (
     <div className="fr-col-12">
-      {/* CAS TRACER FLUIDE  */}
+      {/* ==================================================
+          CAS TRACER FLUIDE
+          ================================================== */}
+
       {isTracerFluide && (
         <>
           <h4 className="fr-mt-4w">Détenteur</h4>
@@ -231,7 +343,10 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                   watch(`${companyField}.siret`)
                 }
                 onCompanySelected={company => {
-                  if (!company) return;
+                  if (!company) {
+                    return;
+                  }
+
                   setValue(companyField, {
                     orgId: company.orgId,
                     siret: company.siret,
@@ -254,7 +369,10 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
         </>
       )}
 
-      {/* CAS INSTALLATION */}
+      {/* ==================================================
+          CAS INSTALLATION
+          ================================================== */}
+
       {isInstallationType && (
         <>
           <Alert
@@ -266,22 +384,90 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
 
           <h4 className="fr-mt-2w">Détenteur</h4>
 
-          <CompanySelectorWrapper
-            orgId={orgId}
-            selectedCompanyOrgId={
-              watch("emitter.company.orgId") ?? watch("emitter.company.siret")
-            }
-            disabled
-            onCompanySelected={() => {}}
+          {usesOriginalHolders && (
+            <Controller
+              control={control}
+              name={privateField}
+              render={({ field }) => (
+                <ToggleSwitch
+                  label="Le détenteur est un particulier"
+                  checked={field.value ?? false}
+                  onChange={field.onChange}
+                  disabled={isLocked("isPrivateIndividual")}
+                />
+              )}
+            />
+          )}
+
+          {(!usesOriginalHolders || !isPrivate) && (
+            <CompanySelectorWrapper
+              orgId={orgId}
+              selectedCompanyOrgId={
+                watch(`${installationCompanyField}.orgId`) ??
+                watch(`${installationCompanyField}.siret`)
+              }
+              disabled={
+                usesOriginalHolders && (isLocked("orgId") || isLocked("siret"))
+              }
+              onCompanySelected={company => {
+                if (company) syncCompanyWithoutOverriding(company);
+              }}
+            />
+          )}
+
+          {usesOriginalHolders &&
+            (["name", "address"] as const).map(fieldName => (
+              <Controller
+                key={fieldName}
+                control={control}
+                name={`${installationCompanyField}.${fieldName}`}
+                render={({ field }) => (
+                  <Input
+                    label={
+                      fieldName === "name"
+                        ? "Nom du détenteur"
+                        : "Adresse du détenteur"
+                    }
+                    nativeInputProps={{
+                      ...field,
+                      value: field.value ?? "",
+                      readOnly: isLocked(fieldName)
+                    }}
+                  />
+                )}
+              />
+            ))}
+
+          <CompanyContactInfo
+            fieldName={installationCompanyField}
+            disabled={usesOriginalHolders && holderSealed}
+            readOnlyFields={usesOriginalHolders ? lockedFields : []}
           />
 
-          <CompanyContactInfo fieldName="emitter.company" />
+          {usesOriginalHolders && (
+            <>
+              <h4 className="fr-mt-4w">Contenants rattachés</h4>
+              {(watch(`${fieldName}.packagings`) ?? []).map(
+                (packaging: { id?: string | null; numero: string }) => (
+                  <span
+                    className="fr-tag fr-mr-1w"
+                    key={packaging.id ?? packaging.numero}
+                  >
+                    {packaging.numero}
+                  </span>
+                )
+              )}
+            </>
+          )}
 
           <hr className="fr-mt-4w" />
         </>
       )}
 
-      {/* CAS NORMAL */}
+      {/* ==================================================
+          CAS NORMAL
+          ================================================== */}
+
       {!isInstallationType && !isTracerFluide && (
         <>
           <h4 className="fr-mt-4w">Fiche d'intervention (optionnel)</h4>
@@ -345,6 +531,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                       value: field.value ?? "",
                       onChange: e => {
                         const val = e.target.value;
+
                         field.onChange(val === "" ? undefined : Number(val));
                       }
                     }}
@@ -362,6 +549,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
           </div>
 
           {/* CONTENANTS RATTACHÉS */}
+
           {packagingInfos.length > 0 && (
             <>
               <h4 className="fr-mt-4w">Contenants rattachés</h4>
@@ -372,68 +560,77 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                 defaultValue={[]}
                 render={({ field }) => (
                   <SingleCheckbox
-                    options={packagingInfos.map((packaging, index) => {
-                      const numero =
-                        packaging.numero ?? `Contenant ${index + 1}`;
+                    options={packagingInfos.map(
+                      (packaging: any, index: number) => {
+                        const numero =
+                          packaging.numero ?? `Contenant ${index + 1}`;
 
-                      return {
-                        label: numero,
-                        nativeInputProps: {
-                          checked: field.value?.includes(numero),
-                          onChange: e => {
-                            const checked = e.target.checked;
+                        return {
+                          label: numero,
 
-                            const nextValue = checked
-                              ? [...(field.value ?? []), numero]
-                              : (field.value ?? []).filter(
-                                  (n: string) => n !== numero
+                          nativeInputProps: {
+                            checked: field.value?.includes(numero),
+
+                            onChange: e => {
+                              const checked = e.target.checked;
+
+                              const nextValue = checked
+                                ? [...(field.value ?? []), numero]
+                                : (field.value ?? []).filter(
+                                    (n: string) => n !== numero
+                                  );
+
+                              field.onChange(nextValue);
+
+                              const ficheIndex = (
+                                watch("ficheInterventions") ?? []
+                              ).findIndex(
+                                (fi: any) => fi.numero === currentNumero
+                              );
+
+                              if (ficheIndex === -1) {
+                                return;
+                              }
+
+                              const currentPackagings =
+                                watch(
+                                  `ficheInterventions.${ficheIndex}.packagings`
+                                ) ?? [];
+
+                              let updatedPackagings;
+
+                              if (checked) {
+                                updatedPackagings = [
+                                  ...currentPackagings,
+                                  {
+                                    id: packagingInfos[index].id,
+                                    numero
+                                  }
+                                ];
+                              } else {
+                                updatedPackagings = currentPackagings.filter(
+                                  (p: any) => p.numero !== numero
                                 );
+                              }
 
-                            field.onChange(nextValue);
+                              setValue(
+                                `ficheInterventions.${ficheIndex}.packagings`,
+                                updatedPackagings
+                              );
 
-                            // index de la fiche actuelle
-                            const ficheIndex = (
-                              watch("ficheInterventions") ?? []
-                            ).findIndex(
-                              (fi: any) => fi.numero === currentNumero
-                            );
-
-                            if (ficheIndex === -1) return;
-
-                            // packagings actuels de la fiche
-                            const currentPackagings =
-                              watch(
-                                `ficheInterventions.${ficheIndex}.packagings`
-                              ) ?? [];
-
-                            let updatedPackagings;
-                            if (checked) {
-                              updatedPackagings = [
-                                ...currentPackagings,
-                                { id: packagingInfos[index].id, numero: numero }
-                              ];
-                            } else {
-                              updatedPackagings = currentPackagings.filter(
-                                (p: any) => p.numero !== numero
+                              console.log(
+                                "PACKAGINGS FICHE UPDATED",
+                                updatedPackagings
                               );
                             }
-
-                            setValue(
-                              `ficheInterventions.${ficheIndex}.packagings`,
-                              updatedPackagings
-                            );
-
-                            console.log(
-                              "PACKAGINGS FICHE UPDATED",
-                              updatedPackagings
-                            );
                           }
-                        }
-                      };
-                    })}
+                        };
+                      }
+                    )}
                   />
                 )}
               />
+
               <hr className="fr-mt-4w" />
             </>
           )}
@@ -491,7 +688,9 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                     render={({ field }) => (
                       <Input
                         label="Personne à contacter"
-                        nativeInputProps={field}
+                        nativeInputProps={{
+                          ...field
+                        }}
                         disabled={sealedFields.includes("ficheInterventions")}
                       />
                     )}
@@ -507,7 +706,9 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                   postalCode={watch(`${companyField}.postalCode`)}
                   onAddressSelection={details => {
                     setValue(`${companyField}.address`, details.name);
+
                     setValue(`${companyField}.city`, details.city);
+
                     setValue(`${companyField}.postalCode`, details.postcode);
                   }}
                   designation="du détenteur"
@@ -523,7 +724,9 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                     render={({ field }) => (
                       <Input
                         label="Téléphone (optionnel)"
-                        nativeInputProps={field}
+                        nativeInputProps={{
+                          ...field
+                        }}
                         disabled={sealedFields.includes("ficheInterventions")}
                       />
                     )}
@@ -537,7 +740,9 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                     render={({ field }) => (
                       <Input
                         label="Courriel"
-                        nativeInputProps={field}
+                        nativeInputProps={{
+                          ...field
+                        }}
                         disabled={sealedFields.includes("ficheInterventions")}
                       />
                     )}
@@ -553,7 +758,10 @@ export function RhfDetenteurForm({ orgId, fieldName }: Props) {
                     orgId={orgId}
                     selectedCompanyOrgId={selectedOrgId}
                     onCompanySelected={company => {
-                      if (!company) return;
+                      if (!company) {
+                        return;
+                      }
+
                       syncCompanyWithoutOverriding(company);
                     }}
                     disabled={sealedFields.includes("ficheInterventions")}

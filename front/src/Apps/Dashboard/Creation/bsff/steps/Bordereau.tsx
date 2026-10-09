@@ -8,6 +8,7 @@ import BsffTypeRadioGroup from "../components/BsffTypeRadioGroup";
 import RhfBsffDetenteurCompany from "../../../../Forms/Components/DetenteurForm/RhfBsffDetenteurCompany";
 import RhfPickupSiteBlock from "../../../../Forms/Components/PickupSiteBlock/RhfPickupSiteBlock";
 import EmitterBsff from "./Emitter";
+import Reconditionnement from "../components/Reconditionnement";
 
 export default function BordereauBsff() {
   const { siret } = useParams<{ siret: string }>();
@@ -19,6 +20,16 @@ export default function BordereauBsff() {
       field === "emitter.pickupSite" || field.startsWith("emitter.pickupSite.")
   );
   const isOperateur = watch("type") === BsffType.CollectePetitesQuantites;
+  if (
+    [BsffType.Reconditionnement, BsffType.Groupement].includes(watch("type"))
+  ) {
+    return (
+      <>
+        <BsffTypeRadioGroup />
+        <Reconditionnement />
+      </>
+    );
+  }
   return (
     <div className="fr-col-md-10">
       <BsffTypeRadioGroup />

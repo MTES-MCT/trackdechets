@@ -51,6 +51,12 @@ const v2024071 = new Date("2024-07-03");
 // le volume sur les contenants
 const v2024091 = new Date("2024-09-24");
 
+// Date de la refonte du BSFF de reconditionnement : un reconditionnement
+// produit un seul nouveau contenant. Les BSFF de reconditionnement créés avant
+// cette date (qui peuvent avoir plusieurs contenants) ne sont pas bloqués.
+// TODO : ajuster à la date de mise en production.
+const vReconditionnementSingleContainer = new Date("2026-10-02");
+
 /**
  * Ce refinement permet de vérifier que les établissements présents sur le
  * BSFF sont bien inscrits sur Trackdéchets avec le bon profil
@@ -101,6 +107,22 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
   bsff,
   { addIssue }
 ) => {
+  if (
+    bsff.type === BsffType.RECONDITIONNEMENT &&
+    (bsff.packagings ?? []).length > 1 &&
+    (!bsff.createdAt ||
+      bsff.createdAt.getTime() >= vReconditionnementSingleContainer.getTime())
+  ) {
+    // RG7 : un reconditionnement crée un contenant unique, quel que soit
+    // le nombre de contenants sources.
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "Conditionnements : un reconditionnement ne peut produire qu'un seul nouveau contenant",
+      path: ["packagings"]
+    });
+  }
+
   for (let i = 0; i < (bsff.packagings ?? []).length; i++) {
     const packaging = (bsff.packagings ?? [])[i];
     const isCreatedAfterV2024071 =
@@ -330,7 +352,7 @@ function checkEmitterSiretIsDefined(
 const PreviousPackagingInclude = {
   bsff: true,
   nextPackaging: { select: { bsffId: true } },
-  ficheInterventions: { select: { id: true } },
+  ficheInterventions: true,
   detenteurs: true
 } satisfies Prisma.BsffPackagingInclude;
 

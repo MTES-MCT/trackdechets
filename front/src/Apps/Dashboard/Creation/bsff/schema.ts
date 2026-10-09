@@ -121,11 +121,36 @@ const bsffPackagingSchema = z
   });
 
 const bsffGroupingOrForwardingSchema = z.object({
-  id: z.string(),
+  id: z.string().nullish(),
   bsffId: z.string().nullish(),
   numero: z.string().nullish(),
-  type: z.nativeEnum(BsffPackagingType),
+  type: z
+    .nativeEnum(BsffPackagingType)
+    .optional()
+    .nullish()
+    .default(BsffPackagingType.BOUTEILLE),
   other: z.string().nullish(),
+  weight: z.number().nullish(),
+  detenteurs: z
+    .array(
+      z.object({
+        isPrivateIndividual: z.boolean().nullish(),
+        company: zodCompany
+      })
+    )
+    .nullish(),
+  ficheInterventions: z
+    .array(
+      z.object({
+        detenteur: z
+          .object({
+            isPrivateIndividual: z.boolean().nullish(),
+            company: zodCompany
+          })
+          .nullish()
+      })
+    )
+    .nullish(),
   volume: z.number().nonnegative().nullish(),
   acceptation: z
     .object({
@@ -144,6 +169,14 @@ const bsffGroupingOrForwardingSchema = z.object({
     .nullish(),
   plannedOperationCode: ZodOperationEnum,
   bsff: z.object({
+    id: z.string().nullish(),
+    waste: z
+      .object({
+        code: z.string().nullish(),
+        description: z.string().nullish(),
+        adr: z.string().nullish()
+      })
+      .nullish(),
     emitter: z
       .object({
         company: zodCompany.nullish()
@@ -164,6 +197,9 @@ const bsffGroupingOrForwardingSchema = z.object({
 
 const ficheInterventionSchema = z.object({
   id: z.string().nullish(),
+  // UI-only provenance; never sent as GraphQL input.
+  sourceKey: z.string().optional(),
+  lockedFields: z.array(z.string()).optional(),
 
   holderType: z
     .enum(["ENTREPRISE", "PARTICULIER", "ASSOCIATION", "NAVIRE"])
@@ -195,6 +231,7 @@ const ficheInterventionSchema = z.object({
   packagings: z
     .array(
       z.object({
+        id: z.string().nullish(),
         numero: z.string()
       })
     )
