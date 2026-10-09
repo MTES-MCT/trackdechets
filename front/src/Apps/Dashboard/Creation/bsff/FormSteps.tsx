@@ -54,6 +54,11 @@ import FormStepsContent from "../FormStepsContent";
 import { Loader } from "../../../common/Components";
 
 import initialState from "./utils/initial-state";
+import { getGroupingPackagings } from "./utils/reconditionnement";
+import {
+  buildInitialDetenteurs,
+  usesInitialDetenteurs
+} from "./utils/initial-detenteurs";
 
 import { getComputedState } from "../getComputedState";
 import {
@@ -264,7 +269,14 @@ const BsffFormSteps = ({
       {
         path: "packagings",
         getComputedValue: (initialValue, actualValue) =>
-          actualValue.length ? actualValue : initialValue
+          bsffQuery.data?.bsff?.type === BsffType.Groupement
+            ? getGroupingPackagings(
+                bsffQuery.data.bsff.grouping ?? [],
+                actualValue
+              )
+            : actualValue.length
+            ? actualValue
+            : initialValue
       },
       {
         path: "grouping",
@@ -295,6 +307,13 @@ const BsffFormSteps = ({
       {
         path: "ficheInterventions",
         getComputedValue: (initialValue, actualValue) => {
+          if (usesInitialDetenteurs(bsffQuery.data?.bsff?.type)) {
+            const holders = buildInitialDetenteurs(
+              bsffQuery.data?.bsff?.packagings ?? [],
+              actualValue ?? []
+            );
+            return holders.length ? holders : actualValue ?? initialValue;
+          }
           const result: any[] = [];
 
           // Les vraies fiches d'intervention restent prioritaires.
@@ -546,6 +565,7 @@ const BsffFormSteps = ({
     () => ({
       bordereau: [
         BsffType.TracerFluide,
+        BsffType.Groupement,
         BsffType.Reconditionnement,
         BsffType.CollectePetitesQuantites
       ].includes(type as BsffType) ? (
@@ -935,11 +955,17 @@ const BsffFormSteps = ({
 
       repackaging:
         type === BsffType.Reconditionnement
-          ? (repackaging ?? []).map(r => r.id)
+          ? (repackaging ?? [])
+              .map(r => r.id)
+              .filter((id): id is string => Boolean(id))
           : [],
 
       grouping:
-        type === BsffType.Groupement ? (grouping ?? []).map(g => g.id) : []
+        type === BsffType.Groupement
+          ? (grouping ?? [])
+              .map(g => g.id)
+              .filter((id): id is string => Boolean(id))
+          : []
     };
   }
 
@@ -1015,7 +1041,7 @@ const BsffFormSteps = ({
     emitter?: any,
     equipmentHolderDifferent?: boolean
   ) {
-    if ([BsffType.Groupement, BsffType.Reexpedition].includes(type)) {
+    if (type === BsffType.Reexpedition) {
       return undefined;
     }
 
@@ -1055,10 +1081,14 @@ const BsffFormSteps = ({
       }
       const linkedFicheInterventions = (ficheInterventions ?? [])
         .map((ficheIntervention, index) => ({ ficheIntervention, index }))
-        .filter(({ ficheIntervention }) =>
-          ficheIntervention.packagings?.some(
-            (linkedPackaging: any) => linkedPackaging.numero === p.numero
-          )
+        .filter(
+          ({ ficheIntervention }) =>
+            type === BsffType.Reconditionnement ||
+            ficheIntervention.packagings?.some((linkedPackaging: any) =>
+              type === BsffType.Groupement && linkedPackaging.id
+                ? linkedPackaging.id === p.id
+                : linkedPackaging.numero === p.numero
+            )
         );
 
       const detenteurs = linkedFicheInterventions
@@ -1072,6 +1102,8 @@ const BsffFormSteps = ({
         )
         .filter(
           (detenteur, index, allDetenteurs) =>
+            // Imported holders are already grouped by the shared identity rule.
+            usesInitialDetenteurs(type) ||
             allDetenteurs.findIndex(
               candidate =>
                 candidate!.company.siret === detenteur!.company.siret &&
@@ -1080,6 +1112,7 @@ const BsffFormSteps = ({
         );
 
       return {
+        ...(type === BsffType.Groupement ? { id: p.id } : {}),
         type: p.type,
         numero: p.numero,
         other: p.other ?? null,
@@ -1252,13 +1285,7 @@ const BsffFormSteps = ({
         genericErrorMessage={publishErrorMessages.filter(
           error => error.tabId === TabId.none
         )}
-        initialTabId={
-          type === BsffType.TracerFluide ||
-          type === BsffType.Reconditionnement ||
-          type === BsffType.CollectePetitesQuantites
-            ? TabId.bordereau
-            : TabId.waste
-        }
+        initialTabId={tabsContent.bordereau ? TabId.bordereau : TabId.waste}
       />
       {(createBsffError || ficheError || publishErrorForDisplay) && (
         <div className="fr-mb-8w">

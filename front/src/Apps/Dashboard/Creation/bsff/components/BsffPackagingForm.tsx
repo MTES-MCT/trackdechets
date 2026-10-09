@@ -90,7 +90,7 @@ function BsffPackagingForm({
         <div className="fr-col-md-6 fr-col-12">
           <Select
             label={`Type de contenant${detenteurMode ? " *" : ""}`}
-            disabled={disabled}
+            disabled={inputProps.type?.disabled ?? disabled}
             state={errors?.type && touched?.type ? "error" : "default"}
             stateRelatedMessage={errors?.type}
             nativeSelectProps={{
@@ -112,7 +112,9 @@ function BsffPackagingForm({
           <NonScrollableInput
             label={`Volume en litres${detenteurMode ? " *" : ""}`}
             className="fr-mb-2w"
-            disabled={disabled && !volumeEditable}
+            disabled={
+              inputProps.volume?.disabled ?? (disabled && !volumeEditable)
+            }
             state={errors?.volume && touched?.volume ? "error" : "default"}
             stateRelatedMessage={errors?.volume}
             nativeInputProps={{
@@ -139,7 +141,7 @@ function BsffPackagingForm({
                 : "Poids en kg"
             }
             className="fr-mb-2w"
-            disabled={disabled}
+            disabled={inputProps.weight?.disabled ?? disabled}
             state={errors?.weight && touched?.weight ? "error" : "default"}
             stateRelatedMessage={errors?.weight}
             nativeInputProps={{
@@ -159,7 +161,7 @@ function BsffPackagingForm({
           <div className="fr-col-12">
             <Input
               label="Autre contenant (préciser)"
-              disabled={disabled}
+              disabled={inputProps.other?.disabled ?? disabled}
               state={errors?.other && touched?.other ? "error" : "default"}
               stateRelatedMessage={errors?.other}
               nativeInputProps={{
@@ -173,7 +175,7 @@ function BsffPackagingForm({
         <div className="fr-col-md-12 fr-col-12">
           <Input
             label={`N° de contenant${detenteurMode ? " *" : ""}`}
-            disabled={disabled}
+            disabled={inputProps.numero?.disabled ?? disabled}
             state={errors?.numero && touched?.numero ? "error" : "default"}
             stateRelatedMessage={errors?.numero}
             nativeInputProps={{

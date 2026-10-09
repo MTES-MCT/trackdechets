@@ -1,4 +1,9 @@
-import React, { useContext, useEffect, useRef } from "react";
+import {
+  hasInitialValue,
+  usesInitialDetenteurs
+} from "../utils/initial-detenteurs";
+import { getInitialWaste } from "../utils/reconditionnement";
+import React, { useContext, useEffect, useRef, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { BsffType } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
@@ -38,6 +43,10 @@ const WasteBsff = () => {
   const weight = watch("weight", {});
   const emitterCompany = watch("emitter.company");
   const repackaging = watch("repackaging", []);
+  const grouping = watch("grouping", []);
+  const usesInitialContainers = usesInitialDetenteurs(bsffType);
+  const sources = bsffType === BsffType.Groupement ? grouping : repackaging;
+  const initialWaste = useMemo(() => getInitialWaste(sources?.[0]), [sources]);
 
   const prevTypeRef = useRef<BsffType | undefined>(bsffType);
 
@@ -75,32 +84,20 @@ const WasteBsff = () => {
   }, [totalWeight, setValue]);
 
   useEffect(() => {
-    if (bsffType !== BsffType.Reconditionnement || !repackaging.length) return;
-
-    const first = repackaging[0];
-    const wasteCode = first.acceptation?.wasteCode ?? first.waste?.code ?? "";
-    const wasteDescription =
-      first.acceptation?.wasteDescription ?? first.waste?.description ?? "";
-
-    if (wasteCode && !watch("waste.code")) {
-      setValue("waste.code", wasteCode, {
-        shouldDirty: true,
-        shouldValidate: true
-      });
+    if (!usesInitialContainers || !sources?.length) return;
+    for (const field of ["code", "description", "adr"] as const) {
+      if (hasInitialValue(initialWaste[field])) {
+        setValue(`waste.${field}`, initialWaste[field], {
+          shouldDirty: true,
+          shouldValidate: true
+        });
+      }
     }
+  }, [usesInitialContainers, sources, initialWaste, setValue]);
 
-    if (wasteDescription && !watch("waste.description")) {
-      setValue("waste.description", wasteDescription, {
-        shouldDirty: true,
-        shouldValidate: true
-      });
-    }
-  }, [bsffType, repackaging, setValue, watch]);
-
-  const wasteCodeDisabled = [
-    BsffType.Groupement,
-    BsffType.Reexpedition
-  ].includes(bsffType);
+  const wasteCodeDisabled =
+    bsffType === BsffType.Reexpedition ||
+    (usesInitialContainers && hasInitialValue(initialWaste.code));
 
   const reconditioningTableData = (repackaging ?? []).map(container => [
     container.type ?? "Non renseigné",
@@ -145,15 +142,13 @@ const WasteBsff = () => {
       {!!sealedFields.length && <DisabledParagraphStep />}
 
       <div className="fr-col">
-        {isSpecialType && bsffType !== BsffType.Reconditionnement && (
-          <BsffTypeRadioGroup />
-        )}
+        {isSpecialType && !usesInitialContainers && <BsffTypeRadioGroup />}
 
-        {heading && bsffType !== BsffType.Reconditionnement && (
+        {heading && !usesInitialContainers && (
           <h4 className="form__section-heading">{heading}</h4>
         )}
 
-        {heading && bsffType !== BsffType.Reconditionnement && (
+        {heading && !usesInitialContainers && (
           <MyBsffCompanySelector
             value={emitterCompany}
             onChange={company => {
@@ -163,9 +158,17 @@ const WasteBsff = () => {
           />
         )}
 
+        {usesInitialContainers && !sources?.length && (
+          <Alert
+            severity="info"
+            small
+            description="Sélectionnez puis ajoutez les contenants dans l’onglet Bordereau pour renseigner les informations du déchet."
+          />
+        )}
+
         {!hideAfterCompanySelector && (
           <>
-            {instruction && bsffType !== BsffType.Reconditionnement && (
+            {instruction && !usesInitialContainers && (
               <>
                 <Alert
                   description={instruction}
@@ -193,6 +196,11 @@ const WasteBsff = () => {
               nativeSelectProps={{
                 ...register("waste.code", {
                   onChange: event => {
+                    if (
+                      usesInitialContainers &&
+                      hasInitialValue(initialWaste.description)
+                    )
+                      return;
                     // harmoniser le fonctionnement entre les deux types de BSFF initial afin que la sélection d’un code déchet préremplisse automatiquement la dénomination usuelle correspondante.
                     //if (!isDetenteur) return;
                     const selectedWaste = BSFF_WASTES.find(
@@ -228,7 +236,11 @@ const WasteBsff = () => {
             <Input
               className="fr-col-md-8"
               label={`Dénomination usuelle du déchet${isDetenteur ? " *" : ""}`}
-              disabled={sealedFields.includes("waste.description")}
+              disabled={
+                sealedFields.includes("waste.description") ||
+                (usesInitialContainers &&
+                  hasInitialValue(initialWaste.description))
+              }
               nativeInputProps={{
                 ...register("waste.description"),
                 required: isDetenteur,
@@ -248,7 +260,10 @@ const WasteBsff = () => {
                   ? "Mentions au titre des règlements ADR, RID, ADN, IMDG (optionnel)"
                   : "Mentions au titre des règlements ADR, RID, ADNR, IMDG"
               }
-              disabled={sealedFields.includes("waste.adr")}
+              disabled={
+                sealedFields.includes("waste.adr") ||
+                (usesInitialContainers && hasInitialValue(initialWaste.adr))
+              }
               nativeInputProps={{
                 ...register("waste.adr"),
                 "aria-required": false
@@ -351,6 +366,8 @@ const WasteBsff = () => {
                     step: "0.000001",
                     type: "number",
                     ...register("weight.value"),
+                    readOnly:
+                      bsffType === BsffType.Groupement && grouping.length > 0,
                     required: isDetenteur,
                     "aria-required": isDetenteur
                   }}

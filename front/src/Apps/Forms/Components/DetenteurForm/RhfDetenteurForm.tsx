@@ -7,6 +7,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 import { BsffType } from "@td/codegen-ui";
+import { usesInitialDetenteurs } from "../../../Dashboard/Creation/bsff/utils/initial-detenteurs";
 
 import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 
@@ -42,7 +43,12 @@ export function RhfDetenteurForm({ orgId, fieldName }: Readonly<Props>) {
 
   const isInstallationType = INSTALLATION_TYPES.includes(type);
 
-  const isReconditionnement = type === BsffType.Reconditionnement;
+  const usesOriginalHolders = usesInitialDetenteurs(type);
+  const lockedFields: string[] = watch(`${fieldName}.lockedFields`) ?? [];
+  const holderSealed =
+    useContext(SealedFieldsContext).includes("ficheInterventions");
+  const isLocked = (field: string) =>
+    holderSealed || lockedFields.includes(field);
 
   const isTracerFluide = type === BsffType.TracerFluide;
 
@@ -53,15 +59,15 @@ export function RhfDetenteurForm({ orgId, fieldName }: Readonly<Props>) {
   /**
    * Pour les types installation :
    *
-   * - REEXPEDITION / GROUPEMENT :
+   * - REEXPEDITION :
    *   le détenteur affiché est l'émetteur.
    *
-   * - RECONDITIONNEMENT :
+   * - RECONDITIONNEMENT / GROUPEMENT :
    *   l'affichage reste celui du bloc installation,
    *   mais les données viennent du vrai détenteur
    *   présent dans ficheInterventions.
    */
-  const installationCompanyField = isReconditionnement
+  const installationCompanyField = usesOriginalHolders
     ? `${fieldName}.detenteur.company`
     : "emitter.company";
 
@@ -130,10 +136,10 @@ export function RhfDetenteurForm({ orgId, fieldName }: Readonly<Props>) {
       return;
     }
 
-    resetHolderCompanyFields(isPrivate);
+    if (!usesOriginalHolders) resetHolderCompanyFields(isPrivate);
 
     previousIsPrivate.current = isPrivate;
-  }, [isPrivate, resetHolderCompanyFields]);
+  }, [isPrivate, usesOriginalHolders, resetHolderCompanyFields]);
 
   /**
    * ======================================================
@@ -143,7 +149,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Readonly<Props>) {
    * REEXPEDITION / GROUPEMENT :
    *   le détenteur est initialisé avec l'émetteur.
    *
-   * RECONDITIONNEMENT :
+   * RECONDITIONNEMENT / GROUPEMENT :
    *   NE PAS initialiser le détenteur avec l'émetteur.
    *
    *   Le détenteur vient des BSFF initiaux sélectionnés
@@ -156,7 +162,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Readonly<Props>) {
   React.useEffect(() => {
     if (
       !isInstallationType ||
-      isReconditionnement ||
+      usesOriginalHolders ||
       !emitterCompany ||
       hasInitializedInstallationDetenteur.current
     ) {
@@ -206,7 +212,7 @@ export function RhfDetenteurForm({ orgId, fieldName }: Readonly<Props>) {
     hasInitializedInstallationDetenteur.current = true;
   }, [
     isInstallationType,
-    isReconditionnement,
+    usesOriginalHolders,
     emitterCompany,
     companyField,
     getValues,
@@ -214,6 +220,28 @@ export function RhfDetenteurForm({ orgId, fieldName }: Readonly<Props>) {
   ]);
 
   const syncCompanyWithoutOverriding = (company: any) => {
+    if (usesOriginalHolders) {
+      const selected = {
+        orgId: company.orgId,
+        siret: company.siret,
+        vatNumber: company.vatNumber,
+        name: company.name,
+        address: company.address,
+        contact: company.contact,
+        phone: company.contactPhone,
+        mail: company.contactEmail
+      };
+      Object.entries(selected).forEach(([field, value]) => {
+        const isIdentifier = ["orgId", "siret", "vatNumber"].includes(field);
+        if (
+          !isLocked(field) &&
+          (isIdentifier || !getValues(`${companyField}.${field}`))
+        ) {
+          setValue(`${companyField}.${field}`, value, { shouldDirty: true });
+        }
+      });
+      return;
+    }
     const current = getValues(companyField);
 
     const currentOrgId = current?.orgId || current?.siret;
@@ -356,37 +384,81 @@ export function RhfDetenteurForm({ orgId, fieldName }: Readonly<Props>) {
 
           <h4 className="fr-mt-2w">Détenteur</h4>
 
-          <CompanySelectorWrapper
-            orgId={orgId}
-            selectedCompanyOrgId={
-              watch(`${installationCompanyField}.orgId`) ??
-              watch(`${installationCompanyField}.siret`)
-            }
-            disabled={isReconditionnement}
-            onCompanySelected={company => {
-              /**
-               * Pour le reconditionnement,
-               * le détenteur vient du BSFF initial.
-               *
-               * On ne permet donc pas de le modifier
-               * depuis ce sélecteur.
-               */
-              if (isReconditionnement) {
-                return;
-              }
+          {usesOriginalHolders && (
+            <Controller
+              control={control}
+              name={privateField}
+              render={({ field }) => (
+                <ToggleSwitch
+                  label="Le détenteur est un particulier"
+                  checked={field.value ?? false}
+                  onChange={field.onChange}
+                  disabled={isLocked("isPrivateIndividual")}
+                />
+              )}
+            />
+          )}
 
-              if (!company) {
-                return;
+          {(!usesOriginalHolders || !isPrivate) && (
+            <CompanySelectorWrapper
+              orgId={orgId}
+              selectedCompanyOrgId={
+                watch(`${installationCompanyField}.orgId`) ??
+                watch(`${installationCompanyField}.siret`)
               }
+              disabled={
+                usesOriginalHolders && (isLocked("orgId") || isLocked("siret"))
+              }
+              onCompanySelected={company => {
+                if (company) syncCompanyWithoutOverriding(company);
+              }}
+            />
+          )}
 
-              syncCompanyWithoutOverriding(company);
-            }}
-          />
+          {usesOriginalHolders &&
+            (["name", "address"] as const).map(fieldName => (
+              <Controller
+                key={fieldName}
+                control={control}
+                name={`${installationCompanyField}.${fieldName}`}
+                render={({ field }) => (
+                  <Input
+                    label={
+                      fieldName === "name"
+                        ? "Nom du détenteur"
+                        : "Adresse du détenteur"
+                    }
+                    nativeInputProps={{
+                      ...field,
+                      value: field.value ?? "",
+                      readOnly: isLocked(fieldName)
+                    }}
+                  />
+                )}
+              />
+            ))}
 
           <CompanyContactInfo
             fieldName={installationCompanyField}
-            disabled={isReconditionnement}
+            disabled={usesOriginalHolders && holderSealed}
+            readOnlyFields={usesOriginalHolders ? lockedFields : []}
           />
+
+          {usesOriginalHolders && (
+            <>
+              <h4 className="fr-mt-4w">Contenants rattachés</h4>
+              {(watch(`${fieldName}.packagings`) ?? []).map(
+                (packaging: { id?: string | null; numero: string }) => (
+                  <span
+                    className="fr-tag fr-mr-1w"
+                    key={packaging.id ?? packaging.numero}
+                  >
+                    {packaging.numero}
+                  </span>
+                )
+              )}
+            </>
+          )}
 
           <hr className="fr-mt-4w" />
         </>

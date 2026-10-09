@@ -1,21 +1,28 @@
 import { useQuery } from "@apollo/client";
 import {
   BsffOperationCode,
+  BsffType,
   BsffPackagingWhere,
   Query,
   QueryBsffPackagingsArgs
 } from "@td/codegen-ui";
-import { GET_RECONDITIONING_PACKAGINGS } from "../../../../common/queries/bsff/queries";
+import { GET_PREVIOUS_PACKAGINGS } from "../../../../common/queries/bsff/queries";
 import { MAX_BSFF_COUNT_TABLE_DISPLAY } from "./BsffSelectableWasteTable";
 import { ReconditioningContainer } from "../utils/reconditionnement";
 
 export function useReconditioningContainers(
   siret: string | null | undefined,
-  bsffId?: string | null
+  bsffId?: string | null,
+  type: BsffType = BsffType.Reconditionnement
 ) {
   const baseWhere: BsffPackagingWhere = {
     operation: {
-      code: { _in: [BsffOperationCode.D14] },
+      code: {
+        _in:
+          type === BsffType.Groupement
+            ? [BsffOperationCode.D13, BsffOperationCode.R12]
+            : [BsffOperationCode.D14]
+      },
       noTraceability: false
     },
     bsff: { destination: { company: { siret: { _eq: siret } } } },
@@ -29,7 +36,7 @@ export function useReconditioningContainers(
   const { data, loading, error } = useQuery<
     Pick<Query, "bsffPackagings">,
     QueryBsffPackagingsArgs
-  >(GET_RECONDITIONING_PACKAGINGS, {
+  >(GET_PREVIOUS_PACKAGINGS, {
     variables: { where, first: MAX_BSFF_COUNT_TABLE_DISPLAY },
     skip: !siret,
     fetchPolicy: "network-only"

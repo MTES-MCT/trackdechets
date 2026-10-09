@@ -1,6 +1,40 @@
 import { gql } from "@apollo/client";
 import { companyFragment } from "./company";
 
+export const initialPackagingDetenteursFragment = gql`
+  fragment InitialPackagingDetenteurs on BsffPackaging {
+    acceptation {
+      wasteCode
+      wasteDescription
+      weight
+    }
+    detenteurs {
+      isPrivateIndividual
+      company {
+        ...CompanyFragment
+      }
+    }
+    ficheInterventions {
+      id
+      numero
+      detenteur {
+        isPrivateIndividual
+        company {
+          ...CompanyFragment
+        }
+      }
+    }
+    bsff {
+      waste {
+        code
+        description
+        adr
+      }
+    }
+  }
+  ${companyFragment}
+`;
+
 // This fragment query only the fields required for dashboard and workflow action button
 // Would you need to query more fields, pay attention to sub resolvers which
 // might make unwanted db queries
@@ -153,6 +187,9 @@ export const FullBsffFragment = gql`
       numero
       volume
       weight
+      previousBsffs {
+        id
+      }
       detenteurs {
         isPrivateIndividual
         company {
@@ -295,6 +332,7 @@ export const FullBsffFragment = gql`
       }
     }
     repackaging {
+      ...InitialPackagingDetenteurs
       id
       numero
       type
@@ -303,24 +341,6 @@ export const FullBsffFragment = gql`
       volume
       name
       bsffId
-
-      detenteurs {
-        isPrivateIndividual
-        company {
-          ...CompanyFragment
-        }
-      }
-
-      ficheInterventions {
-        id
-        numero
-        detenteur {
-          isPrivateIndividual
-          company {
-            ...CompanyFragment
-          }
-        }
-      }
 
       bsff {
         id
@@ -337,6 +357,7 @@ export const FullBsffFragment = gql`
       }
     }
     grouping {
+      ...InitialPackagingDetenteurs
       id
       numero
       type
@@ -362,10 +383,12 @@ export const FullBsffFragment = gql`
   }
   ${companyFragment}
   ${FicheInterventionFragment}
+  ${initialPackagingDetenteursFragment}
 `;
 
 export const PreviousBsffPackagingFragment = gql`
   fragment PreviousBsffPackaging on BsffPackaging {
+    ...InitialPackagingDetenteurs
     id
     numero
     type
@@ -395,40 +418,7 @@ export const PreviousBsffPackagingFragment = gql`
     nextBsff {
       id
     }
-    detenteurs {
-      isPrivateIndividual
-      company {
-        ...CompanyFragment
-      }
-    }
-    ficheInterventions {
-      id
-      numero
-      detenteur {
-        isPrivateIndividual
-        company {
-          ...CompanyFragment
-        }
-      }
-    }
-    bsff {
-      id
-      ficheInterventions {
-        id
-        numero
-        detenteur {
-          isPrivateIndividual
-          company {
-            ...CompanyFragment
-          }
-        }
-      }
-      emitter {
-        company {
-          ...CompanyFragment
-        }
-      }
-    }
   }
   ${companyFragment}
+  ${initialPackagingDetenteursFragment}
 `;

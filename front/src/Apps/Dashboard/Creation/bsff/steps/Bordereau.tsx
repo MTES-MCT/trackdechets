@@ -20,7 +20,9 @@ export default function BordereauBsff() {
       field === "emitter.pickupSite" || field.startsWith("emitter.pickupSite.")
   );
   const isOperateur = watch("type") === BsffType.CollectePetitesQuantites;
-  if (watch("type") === BsffType.Reconditionnement) {
+  if (
+    [BsffType.Reconditionnement, BsffType.Groupement].includes(watch("type"))
+  ) {
     return (
       <>
         <BsffTypeRadioGroup />

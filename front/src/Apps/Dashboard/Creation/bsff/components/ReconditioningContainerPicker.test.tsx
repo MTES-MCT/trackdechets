@@ -25,6 +25,11 @@ const available = () =>
   within(screen.getByRole("table", { name: "Contenants disponibles" }));
 const selected = () =>
   within(screen.getByRole("table", { name: "Contenants sélectionnés" }));
+const addAvailable = (id: string) =>
+  within(available().getByText(`BSFF-${id}`).closest("tr")!).getByRole(
+    "button",
+    { name: "Ajouter" }
+  );
 
 describe("ReconditioningContainerPicker", () => {
   it("stages, locks, removes and confirms containers without pagination", () => {
@@ -46,22 +51,16 @@ describe("ReconditioningContainerPicker", () => {
     fireEvent.click(available().getAllByRole("button", { name: "Ajouter" })[0]);
     expect(onConfirm).not.toHaveBeenCalled();
     expect(selected().getByText("A")).toBeInTheDocument();
-    expect(
-      available().getAllByRole("button", { name: "Ajouter" })[2]
-    ).toBeDisabled();
-    fireEvent.click(available().getAllByRole("button", { name: "Ajouter" })[1]);
+    expect(addAvailable("C")).toBeDisabled();
+    fireEvent.click(addAvailable("B"));
     expect(selected().getAllByRole("button", { name: "Retirer" })).toHaveLength(
       2
     );
     fireEvent.click(selected().getAllByRole("button", { name: "Retirer" })[0]);
-    expect(
-      available().getAllByRole("button", { name: "Ajouter" })[2]
-    ).toBeDisabled();
+    expect(addAvailable("C")).toBeDisabled();
     fireEvent.click(selected().getByRole("button", { name: "Retirer" }));
-    expect(
-      available().getAllByRole("button", { name: "Ajouter" })[2]
-    ).toBeEnabled();
-    fireEvent.click(available().getAllByRole("button", { name: "Ajouter" })[2]);
+    expect(addAvailable("C")).toBeEnabled();
+    fireEvent.click(addAvailable("C"));
     fireEvent.click(
       screen.getByRole("button", { name: "Ajouter les contenants" })
     );

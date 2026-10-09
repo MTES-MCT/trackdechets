@@ -3,6 +3,7 @@ import { useFormContext, useFieldArray } from "react-hook-form";
 import { BsdType, BsffType } from "@td/codegen-ui";
 import { DetenteurAccordion } from "../DetenteurAccordion/DetenteurAccordion";
 import { RhfDetenteurForm } from "../DetenteurForm/RhfDetenteurForm";
+import { usesInitialDetenteurs } from "../../../Dashboard/Creation/bsff/utils/initial-detenteurs";
 import { BsffEquipmentHolderForm } from "../../../Dashboard/Creation/bsff/components/BsffEquipmentHolderForm";
 
 type RhfDetenteurListProps = {
@@ -26,7 +27,7 @@ export function RhfDetenteurList({
 
   const isTracerFluide = type === BsffType.TracerFluide;
   const isOperator = type === BsffType.CollectePetitesQuantites;
-  const isReconditionnement = type === BsffType.Reconditionnement;
+  const usesOriginalHolders = usesInitialDetenteurs(type);
 
   const usesEquipmentHolderForm = isTracerFluide || isOperator;
 
@@ -67,13 +68,13 @@ export function RhfDetenteurList({
   }, [isTracerFluide, usesEquipmentHolderForm]);
 
   React.useEffect(() => {
-    if (fields.length === 0 && !isReconditionnement) {
+    if (fields.length === 0 && !usesOriginalHolders) {
       insert(0, emptyHolder());
     }
-  }, [emptyHolder, fields.length, insert, isReconditionnement]);
+  }, [emptyHolder, fields.length, insert, usesOriginalHolders]);
 
   const [expandedIdx, setExpandedIdx] = React.useState<number | null>(
-    isReconditionnement ? null : 0
+    usesOriginalHolders ? null : 0
   );
 
   return (
@@ -81,7 +82,7 @@ export function RhfDetenteurList({
       {fields.map((fieldItem, idx) => {
         const numero = idx + 1;
 
-        const isExpanded = isReconditionnement || expandedIdx === idx;
+        const isExpanded = usesOriginalHolders || expandedIdx === idx;
 
         const onAdd = () => {
           insert(idx + 1, emptyHolder());
@@ -133,7 +134,7 @@ export function RhfDetenteurList({
             name={`${numero} - Détenteur de l'équipement`}
             expanded={isExpanded}
             onExpanded={() => {
-              if (isReconditionnement) {
+              if (usesOriginalHolders) {
                 return;
               }
 
@@ -143,12 +144,12 @@ export function RhfDetenteurList({
             onActorDelete={onDelete}
             onActorShiftUp={onShiftUp}
             onActorShiftDown={onShiftDown}
-            disableAdd={false}
-            disableDelete={fields.length <= 1}
-            disableUp={idx === 0}
-            disableDown={idx === fields.length - 1}
+            disableAdd={usesOriginalHolders}
+            disableDelete={usesOriginalHolders || fields.length <= 1}
+            disableUp={usesOriginalHolders || idx === 0}
+            disableDown={usesOriginalHolders || idx === fields.length - 1}
             deleteLabel="Supprimer"
-            hideHeader={isInstallationType && !isReconditionnement}
+            hideHeader={isInstallationType && !usesOriginalHolders}
           >
             {usesEquipmentHolderForm ? (
               <BsffEquipmentHolderForm

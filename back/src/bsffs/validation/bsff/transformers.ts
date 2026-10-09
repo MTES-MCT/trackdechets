@@ -10,7 +10,12 @@ import { ParsedZodBsff } from "./schema";
 import { sirenifyBsff } from "./sirenify";
 import { recipifyBsff } from "./recipify";
 import { getSealedFields } from "./rules";
-import { uniqueDetenteurs } from "./detenteurs";
+import { completeInitialDetenteurs } from "./detenteurs";
+import {
+  hasBsffInitialValue,
+  mergeInitialDetenteurs,
+  getDetenteurKey
+} from "@td/constants";
 
 const toDetenteurInput = (detenteur: {
   detenteurCompanyName: string;
@@ -58,6 +63,41 @@ export const checkAndSetPreviousPackagings: ZodBsffTransformer = async (
   const previousPackagings = await checkPreviousPackagings(bsff, ctx);
 
   const { forwarding, grouping, repackaging, ...rest } = bsff;
+  const initialDetenteurs = mergeInitialDetenteurs(
+    previousPackagings.flatMap(source => [
+      ...source.detenteurs.map(toDetenteurInput),
+      ...source.ficheInterventions.map(toDetenteurInput)
+    ])
+  );
+
+  if (
+    bsff.type === BsffType.GROUPEMENT ||
+    bsff.type === BsffType.RECONDITIONNEMENT
+  ) {
+    const first = previousPackagings.find(
+      p => p.id === (grouping?.[0] ?? repackaging?.[0])
+    );
+    const originalWaste = {
+      wasteCode: [first?.acceptationWasteCode, first?.bsff?.wasteCode].find(
+        hasBsffInitialValue
+      ),
+      wasteDescription: [
+        first?.acceptationWasteDescription,
+        first?.bsff?.wasteDescription
+      ].find(hasBsffInitialValue),
+      wasteAdr: first?.bsff?.wasteAdr
+    };
+    for (const field of [
+      "wasteCode",
+      "wasteDescription",
+      "wasteAdr"
+    ] as const) {
+      if (hasBsffInitialValue(originalWaste[field])) {
+        // The database source is authoritative; drafts may omit these fields.
+        Object.assign(rest, { [field]: originalWaste[field] });
+      }
+    }
+  }
 
   if (
     bsff.type === BsffType.GROUPEMENT ||
@@ -65,23 +105,91 @@ export const checkAndSetPreviousPackagings: ZodBsffTransformer = async (
   ) {
     return {
       ...rest,
+      ...(bsff.type === BsffType.GROUPEMENT
+        ? {
+            weightValue: previousPackagings.reduce(
+              (sum, p) => sum + (p.acceptationWeight ?? p.weight ?? 0),
+              0
+            )
+          }
+        : {}),
       packagings: previousPackagings.map(p => {
-        const userPackaging = bsff.packagings?.find(
-          up => up.numero === p.numero
-        );
+        const numbered =
+          bsff.packagings?.filter(up => !up.id && up.numero === p.numero) ?? [];
+        const userPackaging =
+          bsff.type === BsffType.GROUPEMENT
+            ? bsff.packagings?.find(up => up.id === p.id) ??
+              (p.nextPackagingId
+                ? bsff.packagings?.find(up => up.id === p.nextPackagingId)
+                : undefined) ??
+              (previousPackagings.filter(source => source.numero === p.numero)
+                .length === 1
+                ? numbered.length === 1
+                  ? numbered[0]
+                  : undefined
+                : undefined)
+            : bsff.packagings?.find(up => up.numero === p.numero);
+        if (
+          bsff.type === BsffType.GROUPEMENT &&
+          !userPackaging &&
+          numbered.length
+        ) {
+          ctx.addIssue({
+            code: "custom",
+            message:
+              "Le numéro du contenant est ambigu : renseignez son identifiant pour conserver ses associations",
+            path: ["packagings"]
+          });
+        }
         return {
           type: p.type,
-          other: p.other,
-          numero: p.numero,
-          emissionNumero: p.numero,
-          volume: userPackaging?.volume ?? p.volume,
-          weight: p.acceptationWeight ?? 0,
+          other:
+            bsff.type === BsffType.GROUPEMENT && !hasBsffInitialValue(p.other)
+              ? userPackaging?.other ?? p.other
+              : p.other,
+          numero:
+            bsff.type === BsffType.GROUPEMENT && !hasBsffInitialValue(p.numero)
+              ? userPackaging?.numero ?? p.numero
+              : p.numero,
+          emissionNumero:
+            bsff.type === BsffType.GROUPEMENT && !hasBsffInitialValue(p.numero)
+              ? userPackaging?.numero ?? p.numero
+              : p.numero,
+          volume:
+            bsff.type === BsffType.GROUPEMENT
+              ? p.volume ?? userPackaging?.volume
+              : userPackaging?.volume ?? p.volume,
+          weight:
+            bsff.type === BsffType.GROUPEMENT
+              ? p.acceptationWeight ?? p.weight ?? userPackaging?.weight ?? 0
+              : p.acceptationWeight ?? 0,
           operationNoTraceability: false,
           previousPackagings: [p.id],
           // FI and holder associations follow a packaging to ensure that a
           // group of packagings linked by one FI stays together over time.
           ficheInterventions: p.ficheInterventions.map(fi => fi.id),
-          detenteurs: p.detenteurs.map(toDetenteurInput)
+          detenteurs:
+            bsff.type === BsffType.GROUPEMENT
+              ? completeInitialDetenteurs(
+                  mergeInitialDetenteurs([
+                    ...p.detenteurs.map(toDetenteurInput),
+                    ...p.ficheInterventions.map(toDetenteurInput)
+                  ]).map(
+                    holder =>
+                      mergeInitialDetenteurs([
+                        holder,
+                        ...initialDetenteurs.filter(
+                          candidate =>
+                            getDetenteurKey(holder) !== null &&
+                            getDetenteurKey(candidate) ===
+                              getDetenteurKey(holder)
+                        )
+                      ])[0]
+                  ),
+                  userPackaging?.detenteurs ?? [],
+                  initialDetenteurs
+                )
+              : p.detenteurs.map(toDetenteurInput)
         };
       })
     };
@@ -98,8 +206,9 @@ export const checkAndSetPreviousPackagings: ZodBsffTransformer = async (
             )
           )
         ],
-        detenteurs: uniqueDetenteurs(
-          previousPackagings.flatMap(p => p.detenteurs.map(toDetenteurInput))
+        detenteurs: completeInitialDetenteurs(
+          initialDetenteurs,
+          p.detenteurs ?? []
         )
       }))
     };

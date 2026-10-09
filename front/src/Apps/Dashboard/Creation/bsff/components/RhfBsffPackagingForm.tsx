@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { RenderPackagingFormProps } from "./BsffPackagingList";
 import { useFormContext } from "react-hook-form";
-import { BsffPackagingType, Packagings } from "@td/codegen-ui";
+import { BsffPackagingType, BsffType, Packagings } from "@td/codegen-ui";
+import { SealedFieldsContext } from "../../context";
+import { hasInitialValue } from "../utils/initial-detenteurs";
 import BsffPackagingForm from "./BsffPackagingForm";
 
 /**
@@ -24,8 +26,30 @@ function RhfBsffPackagingForm({
 }) {
   const fieldPath = (name: string) => `${fieldName}.${idx}.${name}`;
 
-  const { register, getFieldState, formState, setValue, resetField } =
-    useFormContext();
+  const {
+    register,
+    getFieldState,
+    formState,
+    setValue,
+    resetField,
+    watch,
+    getValues
+  } = useFormContext();
+  const isGrouping = watch("type") === BsffType.Groupement;
+  const sources = watch("grouping") ?? [];
+  const source =
+    sources.find(container => container.id === getValues(fieldPath("id"))) ??
+    sources.find(container => container.numero === packaging.numero);
+  const sealed = useContext(SealedFieldsContext);
+  const groupingSealed =
+    sealed.includes("packagings") || sealed.includes("grouping");
+  const initialFieldPresent = (field: string) =>
+    isGrouping &&
+    hasInitialValue(
+      field === "weight"
+        ? source?.acceptation?.weight ?? source?.weight
+        : source?.[field]
+    );
 
   const { error: errorVolume, isTouched: isTouchedVolume } = getFieldState(
     fieldPath("volume")
@@ -81,6 +105,9 @@ function RhfBsffPackagingForm({
       touched={touched}
       inputProps={{
         type: {
+          disabled: isGrouping
+            ? groupingSealed || initialFieldPresent("type")
+            : disabled,
           value: packagingType,
           ...register(fieldPath("type"), {
             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,16 +128,27 @@ function RhfBsffPackagingForm({
         },
         volume: {
           ...register(fieldPath("volume")),
-          disabled: volumeEditable ? false : disabled
+          disabled: isGrouping
+            ? groupingSealed
+            : volumeEditable
+            ? false
+            : disabled,
+          readOnly: initialFieldPresent("volume")
         },
         weight: {
-          ...register(fieldPath("weight"))
+          ...register(fieldPath("weight")),
+          disabled: isGrouping ? groupingSealed : disabled,
+          readOnly: initialFieldPresent("weight")
         },
         other: {
-          ...register(fieldPath("other"))
+          ...register(fieldPath("other")),
+          disabled: isGrouping ? groupingSealed : disabled,
+          readOnly: initialFieldPresent("other")
         },
         numero: {
-          ...register(fieldPath("numero"))
+          ...register(fieldPath("numero")),
+          disabled: isGrouping ? groupingSealed : disabled,
+          readOnly: initialFieldPresent("numero")
         }
       }}
     />
