@@ -1,7 +1,7 @@
 // Wrapper CompanySelectorWrapper cloned in RhfCompanySelectorWrapper for react-hook-forms
 
 import { useLazyQuery, ApolloError } from "@apollo/client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import CompanySelector from "../CompanySelector/CompanySelector";
 import {
   CompanySearchResult,
@@ -95,45 +95,58 @@ export default function CompanySelectorWrapper({
     QuerySearchCompaniesArgs
   >(SEARCH_COMPANIES);
 
-  const onSelectCompany = useCallback(
-    (company: CompanySearchResult) => {
-      setSelectedCompany(company);
-      // propage l'événement au parent pour modifier les données du store (Formik ou RHF)
-      onCompanySelected && onCompanySelected(company);
-    },
-    [setSelectedCompany, onCompanySelected]
-  );
+  const onCompanySelectedRef = useRef(onCompanySelected);
+  useEffect(() => {
+    onCompanySelectedRef.current = onCompanySelected;
+  }, [onCompanySelected]);
+
+  const onSelectCompany = useCallback((company: CompanySearchResult) => {
+    setSelectedCompany(company);
+    // propage l'événement au parent pour modifier les données du store (Formik ou RHF)
+    onCompanySelectedRef.current?.(company);
+  }, []);
+
   // S'assure que `selectedCompany` reste sync avec les données
   // du store Formik lors du render initial ou en cas modification
   // des données provoquée par un autre événement que la sélection d'un établissement
   // dans le CompanySelector (par exemple si on permute deux transporteurs
   // dans la liste des transporteurs multi-modaux)
   useEffect(() => {
-    if (
-      selectedCompanyOrgId &&
-      selectedCompanyOrgId !== selectedCompany?.orgId
-    ) {
-      searchCompaniesFromCompanyOrgId({
-        variables: { clue: selectedCompanyOrgId, allowForeignCompanies }
-      }).then(result => {
-        const searchCompanies = result.data?.searchCompanies;
-        if (searchCompanies?.length) {
-          onSelectCompany(searchCompanies[0]);
-        } else {
-          onUnknownInputCompany?.();
-        }
-      });
+    if (!selectedCompanyOrgId) {
+      if (selectedCompany) {
+        setSelectedCompany(null);
+      }
+      return;
     }
-    if (!selectedCompanyOrgId && selectedCompany) {
-      setSelectedCompany(null);
+
+    if (selectedCompanyOrgId === selectedCompany?.orgId) {
+      return;
     }
+
+    let isMounted = true;
+
+    searchCompaniesFromCompanyOrgId({
+      variables: { clue: selectedCompanyOrgId, allowForeignCompanies }
+    }).then(result => {
+      if (!isMounted) return;
+      const searchCompanies = result.data?.searchCompanies;
+      if (searchCompanies?.length) {
+        onSelectCompany(searchCompanies[0]);
+      } else {
+        onUnknownInputCompany?.();
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, [
-    selectedCompany,
     selectedCompanyOrgId,
     searchCompaniesFromCompanyOrgId,
-    onSelectCompany,
     onUnknownInputCompany,
-    allowForeignCompanies
+    allowForeignCompanies,
+    onSelectCompany,
+    selectedCompany?.orgId
   ]);
 
   const onSearchCompany = (searchClue: string, postalCodeClue: string) => {

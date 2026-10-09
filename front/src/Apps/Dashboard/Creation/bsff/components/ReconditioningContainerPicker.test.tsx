@@ -1,0 +1,147 @@
+import React from "react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import ReconditioningContainerPicker from "./ReconditioningContainerPicker";
+import {
+  ReconditioningContainer,
+  addReconditioningContainer
+} from "../utils/reconditionnement";
+
+export const containers: ReconditioningContainer[] = ["A", "B", "C"].map(
+  (id, index) => ({
+    id,
+    numero: id,
+    bsffId: `BSFF-${id}`,
+    type: "BOUTEILLE",
+    volume: 10,
+    acceptation: {
+      wasteCode: index === 2 ? "14 06 01*" : "14 06 02*",
+      weight: 5
+    },
+    bsff: { emitter: null }
+  })
+);
+
+const available = () =>
+  within(screen.getByRole("table", { name: "Contenants disponibles" }));
+const selected = () =>
+  within(screen.getByRole("table", { name: "Contenants sélectionnés" }));
+
+// Cible une ligne par son numéro de contenant plutôt que par sa position,
+// car une ligne ajoutée à la sélection quitte le tableau « disponibles ».
+const rowOf = (table: ReturnType<typeof available>, numero: string) =>
+  within(table.getByText(numero).closest("tr") as HTMLElement);
+
+const addButton = (numero: string) =>
+  rowOf(available(), numero).getByRole("button", { name: "Ajouter" });
+const removeButton = (numero: string) =>
+  rowOf(selected(), numero).getByRole("button", { name: "Retirer" });
+
+describe("ReconditioningContainerPicker", () => {
+  it("stages, locks, removes and confirms containers without pagination", () => {
+    const onConfirm = jest.fn();
+    render(
+      <ReconditioningContainerPicker
+        containers={containers}
+        confirmed={[]}
+        disabled={false}
+        onConfirm={onConfirm}
+      />
+    );
+    expect(screen.getAllByRole("table")).toHaveLength(2);
+    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Ajouter les contenants" })
+    ).toBeDisabled();
+    expect(available().getAllByText("10 L")).toHaveLength(3);
+
+    // A (14 06 02*) sélectionné -> C (14 06 01*) devient incompatible
+    fireEvent.click(addButton("A"));
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(selected().getByText("A")).toBeInTheDocument();
+    expect(addButton("C")).toBeDisabled();
+
+    // B est compatible avec A
+    fireEvent.click(addButton("B"));
+    expect(selected().getAllByRole("button", { name: "Retirer" })).toHaveLength(
+      2
+    );
+
+    // On retire A : B reste sélectionné, donc C reste verrouillé
+    fireEvent.click(removeButton("A"));
+    expect(addButton("C")).toBeDisabled();
+
+    // On retire B : plus de sélection, C est de nouveau disponible
+    fireEvent.click(removeButton("B"));
+    expect(addButton("C")).toBeEnabled();
+
+    fireEvent.click(addButton("C"));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Ajouter les contenants" })
+    );
+    expect(onConfirm).toHaveBeenCalledWith([containers[2]]);
+  });
+
+  it("protects direct addition against duplicates and incompatible waste codes", () => {
+    const selection = [containers[0]];
+    expect(addReconditioningContainer(selection, containers[2])).toBe(
+      selection
+    );
+    expect(addReconditioningContainer(selection, containers[0])).toBe(
+      selection
+    );
+    expect(addReconditioningContainer(selection, containers[1])).toEqual(
+      containers.slice(0, 2)
+    );
+  });
+
+  it("preserves confirmed containers missing from the search and can confirm their removal", () => {
+    const onConfirm = jest.fn();
+    render(
+      <ReconditioningContainerPicker
+        containers={[]}
+        confirmed={[containers[0]]}
+        disabled={false}
+        onConfirm={onConfirm}
+      />
+    );
+    expect(selected().getByText("A")).toBeInTheDocument();
+    fireEvent.click(removeButton("A"));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Ajouter les contenants" })
+    );
+    expect(onConfirm).toHaveBeenCalledWith([]);
+  });
+
+  it("applies the container number filter", () => {
+    render(
+      <ReconditioningContainerPicker
+        containers={containers}
+        confirmed={[]}
+        disabled={false}
+        onConfirm={jest.fn()}
+      />
+    );
+    fireEvent.change(screen.getByLabelText("N° contenant"), {
+      target: { value: "B" }
+    });
+    expect(
+      available().getAllByRole("button", { name: "Ajouter" })
+    ).toHaveLength(1);
+    expect(available().getByText("B")).toBeInTheDocument();
+  });
+
+  it("prevents changes to sealed selections", () => {
+    render(
+      <ReconditioningContainerPicker
+        containers={containers}
+        confirmed={[containers[0]]}
+        disabled
+        onConfirm={jest.fn()}
+      />
+    );
+    const buttons = screen.getAllByRole("button");
+    expect(buttons.length).toBeGreaterThan(0);
+    buttons.forEach(button => expect(button).toBeDisabled());
+    expect(removeButton("A")).toBeDisabled();
+  });
+});

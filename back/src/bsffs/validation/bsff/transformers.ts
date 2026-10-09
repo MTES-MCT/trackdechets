@@ -10,6 +10,7 @@ import { ParsedZodBsff } from "./schema";
 import { sirenifyBsff } from "./sirenify";
 import { recipifyBsff } from "./recipify";
 import { getSealedFields } from "./rules";
+import { uniqueDetenteurs } from "./detenteurs";
 
 const toDetenteurInput = (detenteur: {
   detenteurCompanyName: string;
@@ -30,17 +31,6 @@ const toDetenteurInput = (detenteur: {
   },
   isPrivateIndividual: detenteur.detenteurIsPrivateIndividual
 });
-
-const uniqueDetenteurs = <T extends { company?: { siret?: string | null } }>(
-  detenteurs: T[]
-) =>
-  detenteurs.filter(
-    (detenteur, index) =>
-      !detenteur.company?.siret ||
-      detenteurs.findIndex(
-        candidate => candidate.company?.siret === detenteur.company?.siret
-      ) === index
-  );
 
 export const runTransformers = async (
   bsff: ParsedZodBsff,

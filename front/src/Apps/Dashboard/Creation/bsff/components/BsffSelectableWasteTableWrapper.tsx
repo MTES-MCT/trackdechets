@@ -194,7 +194,7 @@ function BsffSelectableWasteTableWrapper({
 
     const currentPackagings: any[] = getValues("packagings") ?? [];
 
-    const allPackagings = grouping.flatMap(g => {
+    const allPackagings = grouping.flatMap((g): any[] => {
       const existing = currentPackagings.find(
         (c: any) => c.id === (g as any).id
       );
@@ -217,7 +217,6 @@ function BsffSelectableWasteTableWrapper({
         }
       ];
     });
-
     setValue("packagings", allPackagings);
 
     const nextCompany =
@@ -348,12 +347,9 @@ function BsffSelectableWasteTableWrapper({
             let updated: typeof repackaging;
 
             if (isSelected) {
-              updated = repackaging.filter(r => r.id !== item.id);
-            } else if (!item.id) {
-              const withoutManual = repackaging.filter(r => r.id);
-              updated = [...withoutManual, item];
+              updated = [];
             } else {
-              updated = [...repackaging, item];
+              updated = [item];
             }
 
             setValue("repackaging", updated);

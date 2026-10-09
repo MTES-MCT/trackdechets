@@ -121,10 +121,14 @@ const bsffPackagingSchema = z
   });
 
 const bsffGroupingOrForwardingSchema = z.object({
-  id: z.string(),
+  id: z.string().nullish(),
   bsffId: z.string().nullish(),
   numero: z.string().nullish(),
-  type: z.nativeEnum(BsffPackagingType),
+  type: z
+    .nativeEnum(BsffPackagingType)
+    .optional()
+    .nullish()
+    .default(BsffPackagingType.BOUTEILLE),
   other: z.string().nullish(),
   volume: z.number().nonnegative().nullish(),
   acceptation: z

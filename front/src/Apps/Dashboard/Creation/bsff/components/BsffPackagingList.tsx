@@ -7,7 +7,7 @@ import {
 import React, { useRef, useState } from "react";
 import { PackagingFormProps } from "./BsffPackagingForm";
 import { useWatch } from "react-hook-form";
-import { emptyBsddPackaging } from "../../../../Forms/Components/PackagingList/helpers";
+import { emptyBsffPackaging } from "../../../../Forms/Components/PackagingList/helpers";
 import { DetenteurAccordion } from "../../../../Forms/Components/DetenteurAccordion/DetenteurAccordion";
 import { ZodBsff } from "../schema";
 
@@ -33,7 +33,7 @@ export type PackagingListProps = {
   onRemoveFromTable?: (id: string) => void;
   children: React.FC<RenderPackagingFormProps>;
 };
-
+const emptyPackaging = emptyBsffPackaging as unknown as PackagingInfoInput;
 function BsffPackagingList({
   fieldName,
   packagingTypes,
@@ -124,10 +124,10 @@ function BsffPackagingList({
               name={accordionName}
               expanded={expandedIdx === idx}
               onExpanded={() =>
-                setExpandedIdx(expandedIdx === idx ? null : idx)
+                setExpandedIdx(current => (current === idx ? null : idx))
               }
               onActorAdd={() => {
-                insert(idx + 1, emptyBsddPackaging);
+                insert(idx + 1, emptyPackaging);
                 setExpandedIdx(idx + 1);
               }}
               onActorDelete={() => {
@@ -213,7 +213,7 @@ function BsffPackagingList({
             <button
               type="button"
               className="fr-btn fr-btn--secondary"
-              onClick={() => push(emptyBsddPackaging)}
+              onClick={() => push(emptyPackaging)}
             >
               Ajouter un conditionnement
             </button>

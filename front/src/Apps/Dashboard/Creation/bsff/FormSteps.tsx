@@ -116,6 +116,7 @@ const getFieldLabel = (name: string): string => {
 // à ignorer pour ne pas re-descendre dedans (notamment `ref` qui pointe
 // vers un noeud DOM).
 const RHF_ERROR_LEAF_KEYS = new Set(["type", "message", "types", "ref"]);
+const isDefined = (id: string | null | undefined): id is string => Boolean(id);
 
 // Aplatit l'objet d'erreurs react-hook-form (imbriqué, avec tableaux) en
 // une liste de { path, message } exploitable par `getPublishErrorMessages`.
@@ -546,6 +547,7 @@ const BsffFormSteps = ({
     () => ({
       bordereau: [
         BsffType.TracerFluide,
+        BsffType.Reconditionnement,
         BsffType.CollectePetitesQuantites
       ].includes(type as BsffType) ? (
         <BordereauBsff />
@@ -934,11 +936,13 @@ const BsffFormSteps = ({
 
       repackaging:
         type === BsffType.Reconditionnement
-          ? (repackaging ?? []).map(r => r.id)
+          ? (repackaging ?? []).map(r => r.id).filter(isDefined)
           : [],
 
       grouping:
-        type === BsffType.Groupement ? (grouping ?? []).map(g => g.id) : []
+        type === BsffType.Groupement
+          ? (grouping ?? []).map(g => g.id).filter(isDefined)
+          : []
     };
   }
 
@@ -1253,6 +1257,7 @@ const BsffFormSteps = ({
         )}
         initialTabId={
           type === BsffType.TracerFluide ||
+          type === BsffType.Reconditionnement ||
           type === BsffType.CollectePetitesQuantites
             ? TabId.bordereau
             : TabId.waste
